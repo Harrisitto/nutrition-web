@@ -2,6 +2,8 @@
 
 A modern, maintainable React web application for nutrition tracking, built with the latest technologies.
 
+🌐 **Live Demo:** [https://harrisitto.github.io/nutrition-web/](https://harrisitto.github.io/nutrition-web/)
+
 ## 🚀 Tech Stack
 
 - **Frontend Framework:** React 18 with TypeScript
