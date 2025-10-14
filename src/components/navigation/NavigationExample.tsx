@@ -1,7 +1,9 @@
-import useAppNavigation from '../../hooks/navigation'
+//import useAppNavigation from '../../hooks/navigation'
 
 const NavigationExample = () => {
-  const {
+
+  return null;
+  /*const {
     goToHome,
     goToDashboard,
     goToProfile,
@@ -24,7 +26,6 @@ const NavigationExample = () => {
     <div className="p-6 max-w-2xl mx-auto">
       <h2 className="text-2xl font-bold mb-6">Navigation Hook Demo</h2>
       
-      {/* Current Route Info */}
       <div className="mb-6 p-4 bg-blue-50 rounded-lg">
         <h3 className="font-semibold mb-2">Current Route</h3>
         <p className="text-sm">
@@ -41,7 +42,6 @@ const NavigationExample = () => {
         </p>
       </div>
 
-      {/* Breadcrumb */}
       <div className="mb-6">
         <h3 className="font-semibold mb-2">Breadcrumb</h3>
         <div className="flex items-center space-x-2 text-sm">
@@ -59,7 +59,6 @@ const NavigationExample = () => {
         </div>
       </div>
 
-      {/* Quick Navigation Buttons */}
       <div className="mb-6">
         <h3 className="font-semibold mb-3">Quick Navigation</h3>
         <div className="grid grid-cols-2 gap-3">
@@ -113,7 +112,6 @@ const NavigationExample = () => {
         </div>
       </div>
 
-      {/* Navigation Items */}
       <div className="mb-6">
         <h3 className="font-semibold mb-3">Generated Navigation Items</h3>
         <div className="space-y-2">
@@ -138,7 +136,6 @@ const NavigationExample = () => {
         </div>
       </div>
 
-      {/* Safe Navigation Example */}
       <div className="mb-6">
         <h3 className="font-semibold mb-3">Safe Navigation</h3>
         <p className="text-sm text-gray-600 mb-3">
@@ -160,7 +157,7 @@ const NavigationExample = () => {
         </div>
       </div>
     </div>
-  )
+  )*/
 }
 
 export default NavigationExample

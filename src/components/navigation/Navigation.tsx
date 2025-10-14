@@ -1,11 +1,12 @@
-import { Link } from 'react-router-dom'
-import { useAuth } from '../../hooks/redux/hooks/auth'
-import useAppNavigation from '../../hooks/navigation'
+//import { Link } from 'react-router-dom'
+//import { useAuth } from '../../hooks/redux/hooks/auth'
+//import useAppNavigation from '../../hooks/navigation'
 
 const Navigation = () => {
+  return null;
+  /*
   const { user, signOut, isAuthenticated } = useAuth()
   const { 
-    isRouteActive, 
     ROUTES 
   } = useAppNavigation()
 
@@ -17,11 +18,11 @@ const Navigation = () => {
     }
   }
 
+  
   return (
     <nav className="bg-black-green shadow-lg border-b border-dark-green">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Brand */}
           <div className="flex-shrink-0">
             <Link 
               to="/" 
@@ -31,7 +32,6 @@ const Navigation = () => {
             </Link>
           </div>
           
-          {/* Navigation Links */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
               <Link 
@@ -68,7 +68,6 @@ const Navigation = () => {
                     👤 Profile
                   </Link>
                   
-                  {/* User info and sign out */}
                   <div className="flex items-center space-x-3">
                     <span className="text-white-green text-sm">
                       👋 {user?.email}
@@ -96,7 +95,6 @@ const Navigation = () => {
             </div>
           </div>
           
-          {/* Mobile menu button */}
           <div className="md:hidden">
             <button className="text-white-green hover:text-white focus:outline-none focus:text-white">
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -107,7 +105,7 @@ const Navigation = () => {
         </div>
       </div>
     </nav>
-  )
+  )*/
 }
 
 export default Navigation

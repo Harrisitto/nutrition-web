@@ -3,7 +3,7 @@ import { useAuth } from '../redux/hooks/auth'
 import { APP_ROUTES } from './routes'
 import type { AppRoute } from './routes'
 import { DEFAULT_ROUTE_METADATA, ROUTE_METADATA } from './metadata'
-import useErrorHandling from '../redux/hooks/error'
+import { useErrorHandling } from '../redux/hooks/error'
 
 export default function useAppNavigation() {
     const navigate = useNavigate();
