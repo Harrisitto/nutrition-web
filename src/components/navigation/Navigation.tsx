@@ -1,9 +1,21 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import { useAuth } from '../../hooks/redux/hooks/auth'
+import useAppNavigation from '../../hooks/navigation'
 
 const Navigation = () => {
-  const location = useLocation()
+  const { user, signOut, isAuthenticated } = useAuth()
+  const { 
+    isRouteActive, 
+    ROUTES 
+  } = useAppNavigation()
 
-  const isActive = (path: string) => location.pathname === path
+  const handleSignOut = async () => {
+    try {
+      await signOut()
+    } catch (error) {
+      console.error('Sign out error:', error)
+    }
+  }
 
   return (
     <nav className="bg-black-green shadow-lg border-b border-dark-green">
@@ -25,33 +37,62 @@ const Navigation = () => {
               <Link 
                 to="/" 
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                  isActive('/') 
+                  isRouteActive(ROUTES.HOME) 
                     ? 'bg-nutrition-green text-white' 
                     : 'text-white-green hover:bg-dark-green hover:text-white'
                 }`}
               >
                 🏠 Home
               </Link>
-              <Link 
-                to="/dashboard" 
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                  isActive('/dashboard') 
-                    ? 'bg-nutrition-blue text-white' 
-                    : 'text-white-green hover:bg-dark-green hover:text-white'
-                }`}
-              >
-                📊 Dashboard
-              </Link>
-              <Link 
-                to="/profile" 
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                  isActive('/profile') 
-                    ? 'bg-nutrition-purple text-white' 
-                    : 'text-white-green hover:bg-dark-green hover:text-white'
-                }`}
-              >
-                👤 Profile
-              </Link>
+              
+              {isAuthenticated ? (
+                <>
+                  <Link 
+                    to="/dashboard" 
+                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+                      isRouteActive(ROUTES.DASHBOARD) 
+                        ? 'bg-nutrition-blue text-white' 
+                        : 'text-white-green hover:bg-dark-green hover:text-white'
+                    }`}
+                  >
+                    📊 Dashboard
+                  </Link>
+                  <Link 
+                    to="/profile" 
+                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+                      isRouteActive(ROUTES.PROFILE) 
+                        ? 'bg-nutrition-purple text-white' 
+                        : 'text-white-green hover:bg-dark-green hover:text-white'
+                    }`}
+                  >
+                    👤 Profile
+                  </Link>
+                  
+                  {/* User info and sign out */}
+                  <div className="flex items-center space-x-3">
+                    <span className="text-white-green text-sm">
+                      👋 {user?.email}
+                    </span>
+                    <button
+                      onClick={handleSignOut}
+                      className="px-3 py-2 rounded-md text-sm font-medium text-white-green hover:bg-red-600 hover:text-white transition-colors duration-200"
+                    >
+                      🚪 Sign Out
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <Link 
+                  to="/login" 
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+                    isRouteActive(ROUTES.LOGIN) 
+                      ? 'bg-nutrition-blue text-white' 
+                      : 'text-white-green hover:bg-dark-green hover:text-white'
+                  }`}
+                >
+                  🔐 Sign In
+                </Link>
+              )}
             </div>
           </div>
           

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { nutritionApi } from '../services/api'
-import NutritionCard from '../components/NutritionCard'
+import NutritionCard from '../components/styled/boxes/NutritionCard'
 import { layoutStyles, textStyles } from '../styles/tailwind-components'
 
 const DashboardPage = () => {
