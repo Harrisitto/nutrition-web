@@ -1,9 +1,26 @@
+import { useEffect } from "react";
 import { useAuth } from "../hooks/redux/hooks/auth";
+import { supabase } from "../services/supabase";
 
 const HomePage = () => {
   const auth = useAuth();
 
   console.log("Auth state in HomePage:", auth);
+
+  useEffect(() => {
+    const metaData = auth.user?.user_metadata;
+    console.log("User metadata:", metaData);
+    (async () => {
+      if (!metaData) return;
+      if (metaData.allUsers) {
+        await supabase.from('allusers').upsert(metaData.allUsers);
+      }
+
+      if (metaData.nutritionist) {
+        await supabase.from('allnutritionist').upsert(metaData.nutritionist);
+      }
+    })();
+  }, [auth.user])
 
   if (auth.error || auth.session === null) {
     return (
