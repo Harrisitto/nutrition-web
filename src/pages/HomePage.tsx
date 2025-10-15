@@ -3,7 +3,9 @@ import { useAuth } from "../hooks/redux/hooks/auth";
 const HomePage = () => {
   const auth = useAuth();
 
-  if (auth.error) {
+  console.log("Auth state in HomePage:", auth);
+
+  if (auth.error || auth.session === null) {
     return (
       <div className="w-full px-8">
         <div className="text-center mb-8">
