@@ -8,16 +8,20 @@ const HomePage = () => {
   console.log("Auth state in HomePage:", auth);
 
   useEffect(() => {
-    const metaData = auth.user?.user_metadata;
+    const metaData = auth.user?.user_metadata?.metadata;
     console.log("User metadata:", metaData);
     (async () => {
       if (!metaData) return;
       if (metaData.allUsers) {
+        let nutriId = null;
+        if (metaData.allNutritionist) {
+          const {
+            data: nutritionistData,
+          } = await supabase.from('allnutritionist').upsert(metaData.allNutritionist).select('id').single();
+          nutriId = nutritionistData;
+        }
+        metaData.allUsers.nutricionista = nutriId ? nutriId.id : null;
         await supabase.from('allusers').upsert(metaData.allUsers);
-      }
-
-      if (metaData.nutritionist) {
-        await supabase.from('allnutritionist').upsert(metaData.nutritionist);
       }
     })();
   }, [auth.user])
