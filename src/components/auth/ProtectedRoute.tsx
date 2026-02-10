@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom'
-import { useAuth } from '../../hooks/redux/hooks/auth'
+import { useAuth } from '../../store/slices/auth/hook'
 
 interface ProtectedRouteProps {
   children: React.ReactNode

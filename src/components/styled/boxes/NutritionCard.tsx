@@ -48,13 +48,6 @@ const NutritionCard: React.FC<NutritionCardProps> = ({
           )}
         </div>
       )}
-      
-      {calories === undefined && (
-        <div className="mt-4 text-center text-fade-dark-green">
-          <div className="text-4xl mb-2">🥗</div>
-          <p>Connect to your backend API to see nutrition data!</p>
-        </div>
-      )}
     </div>
   )
 }

@@ -1,6 +1,6 @@
-import { useAppSelector, useAppDispatch } from "..";
-import { addRouteToStack, setError } from "../../../store/slices/error";
-import type { ErrorPayload } from "../../../store/slices/error";
+import { useAppSelector, useAppDispatch } from "../..";
+import { addRouteToStack, clearError, setError } from "./store";
+import type { ErrorPayload } from "./store";
 
 export const throwError = (data: Partial<ErrorPayload>): never => {
     const errorMessage = JSON.stringify({
@@ -18,7 +18,7 @@ const parseError = (errorStr: string) => {
 }
 
 
-export function useErrorHandling() {
+export function useError() {
     const errorData = useAppSelector((state) => state.error);
     const dispatch = useAppDispatch();
 
@@ -28,6 +28,10 @@ export function useErrorHandling() {
 
     const createError = (errorData: Partial<ErrorPayload>) => {
         dispatch(setError(errorData));
+    }
+
+    const clear = () => {
+        dispatch(clearError());
     }
 
     const catchError = (fn?: (...args: unknown[]) => void) => {
@@ -47,5 +51,6 @@ export function useErrorHandling() {
         pushRouteToStack,
         createError,
         catchError,
+        clear,
     }
 }

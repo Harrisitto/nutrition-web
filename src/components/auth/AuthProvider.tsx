@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import type { AppDispatch } from '../../store'
-import { setSession, getCurrentSession } from '../../store/slices/auth'
+import { setSession, getCurrentSession } from '../../store/slices/auth/store'
 import { supabase } from '../../services/supabase'
 import type { AuthChangeEvent, Session } from '@supabase/supabase-js'
 
@@ -21,7 +21,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session: Session | null) => {
       console.log('Auth state changed:', event, session)
-      
       dispatch(setSession({
         user: session?.user ?? null,
         session: session ?? null,

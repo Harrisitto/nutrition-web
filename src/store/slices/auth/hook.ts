@@ -1,5 +1,5 @@
 import { useDispatch } from 'react-redux'
-import type { AppDispatch } from '../../../store'
+import type { AppDispatch } from '../..'
 import {
   signIn,
   signUp,
@@ -7,8 +7,8 @@ import {
   resetPassword,
   updatePassword,
   clearError,
-} from '../../../store/slices/auth'
-import { useAppSelector } from '..'
+} from './store'
+import { useAppSelector } from '../..'
 
 export const useAuth = () => {
   const dispatch = useDispatch<AppDispatch>()

@@ -8,7 +8,7 @@ import {
   getCurrentSession,
   resetPassword,
   updatePassword,
-} from '../../services/supabase'
+} from '../../../services/supabase'
 
 
 export interface AuthState {

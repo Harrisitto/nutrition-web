@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
-import { useAuth } from '../../hooks/redux/hooks/auth'
+import { useAuth } from '../../store/slices/auth/hook'
 import { useNavigate } from 'react-router-dom'
 
-const LoginForm = () => {
+const LogInPage= () => {
+
+  
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isSignUp, setIsSignUp] = useState(false)
@@ -147,4 +149,4 @@ const LoginForm = () => {
   )
 }
 
-export default LoginForm
+export default LogInPage

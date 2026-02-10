@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
-import { APP_ROUTES } from '../../hooks/navigation/routes';
+import { APP_ROUTES } from '../../../hooks/navigation/routes';
 
 export interface ErrorState {
     hasError: boolean;

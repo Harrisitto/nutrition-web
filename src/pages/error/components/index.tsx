@@ -1,9 +1,8 @@
-import type { ErrorState } from "../../../../store/slices/error";
+import type { ErrorState } from "@src/store/slices/error/store";
 
-export default function ErrorPage({ error }: { error: ErrorState }) {
+const Title = ({ error }: { error: ErrorState }) => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-red-100 p-4">
-      <div className="bg-white shadow-md rounded-lg p-6 max-w-md w-full">
+    <div className="bg-white shadow-md rounded-lg p-6 max-w-md w-full">
         <h1 className="text-3xl font-bold text-red-600 mb-4">
           An Error Occurred
         </h1>
@@ -32,6 +31,21 @@ export default function ErrorPage({ error }: { error: ErrorState }) {
           </p>
         )}
       </div>
-    </div>
+  )
+}
+
+const ClearButton = ({ onClear }: { onClear: () => void }) => {
+  return (
+    <button
+      onClick={onClear}
+      className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+    >
+      Clear Error
+    </button>
   );
+}
+
+export const ErrorComponents = {
+  Title,
+  ClearButton,
 }

@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import { useAuth } from "../hooks/redux/hooks/auth";
-import { supabase } from "../services/supabase";
+import { useAuth } from "../../store/slices/auth/hook";
+import { supabase } from "../../services/supabase";
 
-const HomePage = () => {
+const EmailVerified = () => {
   const auth = useAuth();
 
   console.log("Auth state in HomePage:", auth);
@@ -54,4 +54,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default EmailVerified;

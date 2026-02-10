@@ -1,15 +1,17 @@
 import { useNavigate, useLocation } from 'react-router-dom'
-import { useAuth } from '../redux/hooks/auth'
+import { useAuth } from '../../store/slices/auth/hook'
 import { APP_ROUTES } from './routes'
 import type { AppRoute } from './routes'
 import { DEFAULT_ROUTE_METADATA, ROUTE_METADATA } from './metadata'
-import { useErrorHandling } from '../redux/hooks/error'
+import { useError } from '../../store'
+import useSearchParams from './search_params'
 
 export default function useAppNavigation() {
     const navigate = useNavigate();
     const location = useLocation();
     const { isAuthenticated } = useAuth();
-    const pushRouteToErrorStack = useErrorHandling().pushRouteToStack;
+    const pushRouteToErrorStack = useError().pushRouteToStack;
+    const searchParams = useSearchParams();
 
     const navigateTo = (route: AppRoute, options?: { replace?: boolean; state?: unknown }) => {
 
@@ -46,6 +48,7 @@ export default function useAppNavigation() {
         location,
         goBack,
         navigateTo,
+        searchParams,
 
         // Current state
         currentRoute: location.pathname as AppRoute,

@@ -11,9 +11,6 @@ const NotFoundPage = () => {
           <Link to="/" className="btn-primary">
             Go Home
           </Link>
-          <Link to="/dashboard" className="btn-secondary">
-            Dashboard
-          </Link>
         </div>
       </div>
     </div>

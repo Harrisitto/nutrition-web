@@ -9,6 +9,3 @@ export const queryClient = new QueryClient({
     },
   },
 })
-
-// API base URL - update this to match your backend
-export const API_BASE_URL = 'http://localhost:3001/api'
