@@ -3,7 +3,7 @@ import { useAuth } from '../../store/slices/auth/hook'
 import { APP_ROUTES } from './routes'
 import type { AppRoute } from './routes'
 import { DEFAULT_ROUTE_METADATA, ROUTE_METADATA } from './metadata'
-import { useError } from '../../store'
+import { useError } from '@src/store/slices/error/hook'
 import useSearchParams from './search_params'
 
 export default function useAppNavigation() {

@@ -2,7 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+//import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import store from "./store/store.ts";
 import { queryClient } from "./hooks/query/queryClient.ts";
 import AuthProvider from "./components/global/AuthProvider.tsx";
@@ -18,7 +18,7 @@ createRoot(document.getElementById("root")!).render(
         <ErrorBoundary>
           <AuthProvider>
             <App />
-            <ReactQueryDevtools initialIsOpen={false} />
+            {/*<ReactQueryDevtools initialIsOpen={false} />*/}
           </AuthProvider>
         </ErrorBoundary>
       </QueryClientProvider>
