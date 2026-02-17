@@ -6,7 +6,7 @@ import { PagePrivacyPolicy } from './pages/privacyPolicy/page'
 
 function App() {
   return (
-    <Router basename='/nutrition-web'>
+    <Router>
         <main className="w-full p-8 min-h-screen bg-white-green text-black-green">
           <Routes>
             {/* Public routes */}
