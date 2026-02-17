@@ -1,16 +1,15 @@
 import { useEffect } from 'react'
-import { useDispatch } from 'react-redux'
-import type { AppDispatch } from '../../store'
 import { setSession, getCurrentSession } from '../../store/slices/auth/store'
 import { supabase } from '../../services/supabase'
 import type { AuthChangeEvent, Session } from '@supabase/supabase-js'
+import { useAppDispatch } from '@src/store/store'
 
 interface AuthProviderProps {
   children: React.ReactNode
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const dispatch = useDispatch<AppDispatch>()
+  const dispatch = useAppDispatch()
 
   useEffect(() => {
     // Get initial session

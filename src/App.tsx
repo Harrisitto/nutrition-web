@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import NotFoundPage from './pages/error/NotFoundPage'
 //import ProtectedRoute from './components/auth/ProtectedRoute'
 import LogInPage from './pages/auth/LogInPage'
+import { PagePrivacyPolicy } from './pages/privacyPolicy/page'
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<LogInPage />} />
+            <Route path="/privacy-policy" element={<PagePrivacyPolicy />} />
             
             {/* Protected routes 
             <Route path="/dashboard" element={

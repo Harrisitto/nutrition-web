@@ -1,4 +1,5 @@
-import { useAppSelector, useError } from "../../store";
+import { useAppSelector } from "@src/store/store";
+import { useError } from "@src/store/slices/error/hook";
 import { ErrorComponents } from "./components";
 
 export default function ErrorBoundary({

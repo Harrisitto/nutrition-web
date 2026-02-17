@@ -1,4 +1,4 @@
-import { useAppSelector, useAppDispatch } from "../..";
+import { useAppDispatch, useAppSelector } from "@src/store/store";
 import { addRouteToStack, clearError, setError } from "./store";
 import type { ErrorPayload } from "./store";
 

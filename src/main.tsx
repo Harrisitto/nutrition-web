@@ -3,10 +3,11 @@ import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { store } from "./store/index.ts";
+import store from "./store/store.ts";
 import { queryClient } from "./hooks/query/queryClient.ts";
-import AuthProvider from "./components/auth/AuthProvider";
+import AuthProvider from "./components/global/AuthProvider.tsx";
 import "./index.css";
+import "./services/i18n/config";
 import App from "./App.tsx";
 import ErrorBoundary from "./pages/error/ErrorPage.tsx";
 

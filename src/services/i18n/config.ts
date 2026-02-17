@@ -2,13 +2,11 @@ import i18next from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 
-import enAuth from "./locales/en/auth.json";
-import enError from "./locales/en/error.json";
+import enSystem from "./locales/en/system.json";
 
 const resources = {
     en: {
-        auth: enAuth,
-        error: enError
+        system: enSystem,
 
     }, // English translations
 };
