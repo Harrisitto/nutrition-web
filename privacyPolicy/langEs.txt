@@ -1,0 +1,55 @@
+Última actualización: 17/02/2026
+
+Bienvenido a Nutrition App. Estamos comprometidos a proteger tu información personal y tu derecho a la privacidad. Esta Política de Privacidad explica cómo recopilamos, usamos y protegemos tu información cuando utilizas nuestra aplicación móvil.
+Al descargar o usar la Aplicación, aceptas la recopilación y el uso de información de acuerdo con esta política.
+
+Recopilamos información mínima para brindarte el mejor servicio posible:
+
+- Información de la Cuenta: Cuando creas una cuenta, recopilamos únicamente tu **dirección de correo electrónico**. Esto es necesario para identificarte y vincularte con tu nutricionista.
+- Información del Perfil: Puedes elegir proporcionar información adicional como tu peso, altura, registros alimentarios...
+- Comunicaciones: Si te pones en contacto con nosotros para soporte, es posible que recibamos tu dirección de correo electrónico y el contenido de tu mensaje.
+
+Para mejorar el rendimiento de la aplicación y la experiencia del usuario, ciertos datos (como la configuración y preferencias de la aplicación) se guardan en caché localmente en tu dispositivo. Esta información nunca sale de tu teléfono a menos que la sincronices activamente.
+
+Utilizamos la información que recopilamos para:
+- Crear y gestionar tu cuenta.
+- Permitirte registrar tus comidas y realizar un seguimiento nutricional.
+- Permitir que tu **nutricionista asignado** vea tu progreso y te brinde orientación profesional.
+- Comunicarnos contigo sobre actualizaciones de la aplicación o responder a tus solicitudes de soporte.
+- Mejorar y optimizar la funcionalidad de la Aplicación.
+
+No utilizamos tus datos para la toma de decisiones automatizada ni para la elaboración de perfiles.
+
+La característica única de Nutrition App es la colaboración entre tú y tu nutricionista profesional.
+- Acceso a los Datos: Tu nutricionista tiene su propia cuenta dedicada. Pueden acceder a la base de datos para ver la información que has ingresado (como tus registros de alimentos y métricas opcionales).
+- Propósito: Este acceso está estrictamente limitado a brindarte asesoramiento dietético personalizado y monitorear tu progreso.
+- Confidencialidad: Tu nutricionista está sujeto a obligaciones de confidencialidad profesional con respecto a tus datos.
+
+- Ubicación de la Base de Datos: La información de tu cuenta y cualquier dato que ingreses se almacenan de forma segura en servidores alojados por Supabase en Francia (Europa). Esto garantiza que tus datos estén protegidos bajo las estrictas leyes europeas de protección de datos (GDPR).
+- Medidas de Seguridad: Utilizamos protocolos de cifrado y seguridad estándar de la industria para proteger tus datos durante la transmisión y el almacenamiento.
+- Caché Local: Los datos almacenados temporalmente en la caché de tu teléfono se borran automáticamente en un plazo de 15 a 30 minutos.
+
+No compartimos, vendemos, alquilamos ni intercambiamos tu información personal con terceros.
+La única excepción es cuando la ley nos obliga a hacerlo (por ejemplo, en respuesta a una orden judicial o proceso legal).
+
+Creemos en tu derecho a controlar tus datos.
+- Eliminación de Cuenta: Si eliges eliminar tu cuenta:
+    - Tus datos se eliminan inmediata y permanentemente de nuestra base de datos (Supabase).
+    - Los datos en caché que permanecen en tu teléfono se borrarán automáticamente en un plazo de 15 a 30 minutos.
+- Inactividad: No conservamos tus datos por más tiempo del necesario. Los datos se mantienen solo mientras tu cuenta esté activa.
+
+Dependiendo de tu ubicación, tienes derechos específicos con respecto a tu información personal:
+- Derecho de Acceso: Puedes solicitar una copia de los datos que tenemos sobre ti.
+- Derecho de Rectificación: Puedes corregir cualquier información inexacta. (También puedes actualizar tus métricas opcionales directamente en la aplicación).
+- Derecho de Supresión (Derecho al Olvido): Puedes solicitar que eliminemos tus datos. (También puedes hacerlo inmediatamente eliminando tu cuenta).
+- Derecho a la Portabilidad de Datos: Puedes solicitar una copia de tus datos en un formato estructurado, de uso común y lectura mecánica.
+
+Para ejercer cualquiera de estos derechos, contáctanos en la dirección de correo electrónico que se indica a continuación.
+
+Nuestra Aplicación no está dirigida a personas menores de 13 años. No recopilamos conscientemente información personal de niños. Si nos enteramos de que un niño nos ha proporcionado información personal, tomaremos medidas para eliminar dicha información de inmediato.
+
+Podemos actualizar esta Política de Privacidad de vez en cuando para reflejar cambios en nuestras prácticas o por razones legales. Te notificaremos cualquier cambio material publicando la nueva política en esta página y actualizando la fecha de "Última actualización" en la parte superior.
+
+Si tienes alguna pregunta, inquietud o solicitud con respecto a esta Política de Privacidad o tus datos, contáctanos:
+
+- Correo Electrónico: joseptomasjuan@gmail.com
