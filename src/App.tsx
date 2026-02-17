@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { HashRouter as Router, Routes, Route } from 'react-router-dom'
 import NotFoundPage from './pages/error/NotFoundPage'
 //import ProtectedRoute from './components/auth/ProtectedRoute'
 import LogInPage from './pages/auth/LogInPage'
