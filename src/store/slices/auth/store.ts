@@ -55,7 +55,7 @@ const authSlice = createSlice({
         state.loading = false
         state.user = action.payload.user
         state.session = action.payload.session
-        state.isAuthenticated = !!action.payload.user
+        state.isAuthenticated = !!action.payload.user?.email_confirmed_at
         state.error = null
       })
       .addCase(signUp.rejected, (state, action) => {
