@@ -11,11 +11,12 @@ export const signUp = createAsyncThunk(
     'auth/signUp',
     async ({ email, password }: SignUpCredentials, { rejectWithValue }) => {
         try {
+            const baseUrl = window.location.href.split('#')[0];
             const { data, error } = await supabase.auth.signUp({
                 email,
                 password,
                 options: {
-                    emailRedirectTo: `${window.location.origin}/#/${APP_ROUTES.EMAIL_VERIFICATION}`
+                    emailRedirectTo: `${baseUrl}#${APP_ROUTES.EMAIL_VERIFICATION}`
                 },
             });
 

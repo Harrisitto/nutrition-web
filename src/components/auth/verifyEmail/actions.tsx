@@ -28,11 +28,12 @@ export const ResendEmail = () => {
 
   const handleClick = useCallback(async () => {
     if (!user?.email) return;
+    const baseUrl = window.location.href.split('#')[0];
     await supabase.auth.resend({
       type: "signup",
       email: user.email,
       options: {
-        emailRedirectTo: `${window.location.origin}/#/${APP_ROUTES.EMAIL_VERIFICATION}`,
+        emailRedirectTo: `${baseUrl}#${APP_ROUTES.EMAIL_VERIFICATION}`,
       },
     });
   }, [user?.email]);
