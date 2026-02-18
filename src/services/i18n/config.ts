@@ -3,10 +3,12 @@ import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 
 import enSystem from "./locales/en/system.json";
+import enAuth from "./locales/en/auth.json";
 
 const resources = {
     en: {
         system: enSystem,
+        auth: enAuth
 
     }, // English translations
 };

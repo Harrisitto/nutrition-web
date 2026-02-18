@@ -1,14 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import type { User, Session } from '@supabase/supabase-js'
-import {
-  signUp,
-  signIn,
-  signOut,
-  getCurrentSession,
-  resetPassword,
-  updatePassword,
-} from '../../../services/supabase'
+import { signIn } from './thunks/signIn'
+import { signUp } from './thunks/signUp'
+import { signOut } from './thunks/signOut'
+import { fetchSession } from './thunks/fetchSession'
+
+
 
 
 export interface AuthState {
@@ -39,7 +37,7 @@ const authSlice = createSlice({
     setSession: (state, action: PayloadAction<{ user: User | null; session: Session | null }>) => {
       state.user = action.payload.user
       state.session = action.payload.session
-      state.isAuthenticated = !!action.payload.user
+      state.isAuthenticated = !!action.payload.user?.email_confirmed_at
       state.loading = false
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
@@ -107,53 +105,25 @@ const authSlice = createSlice({
         state.error = action.payload as string
       })
 
-    // Get Current Session
+    // Fetch Session
     builder
-      .addCase(getCurrentSession.pending, (state) => {
+      .addCase(fetchSession.pending, (state) => {
         state.loading = true
         state.error = null
       })
-      .addCase(getCurrentSession.fulfilled, (state, action) => {
+      .addCase(fetchSession.fulfilled, (state, action) => {
         state.loading = false
         state.user = action.payload.user
         state.session = action.payload.session
         state.isAuthenticated = !!action.payload.user
         state.error = null
       })
-      .addCase(getCurrentSession.rejected, (state, action) => {
+      .addCase(fetchSession.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload as string
-      })
-
-    // Reset Password
-    builder
-      .addCase(resetPassword.pending, (state) => {
-        state.loading = true
-        state.error = null
-      })
-      .addCase(resetPassword.fulfilled, (state) => {
-        state.loading = false
-        state.error = null
-      })
-      .addCase(resetPassword.rejected, (state, action) => {
-        state.loading = false
-        state.error = action.payload as string
-      })
-
-    // Update Password
-    builder
-      .addCase(updatePassword.pending, (state) => {
-        state.loading = true
-        state.error = null
-      })
-      .addCase(updatePassword.fulfilled, (state, action) => {
-        state.loading = false
-        state.user = action.payload.user
-        state.error = null
-      })
-      .addCase(updatePassword.rejected, (state, action) => {
-        state.loading = false
-        state.error = action.payload as string
+        state.user = null
+        state.session = null
+        state.isAuthenticated = false
       })
   },
 })
@@ -166,9 +136,7 @@ export {
   signUp,
   signIn,
   signOut,
-  getCurrentSession,
-  resetPassword,
-  updatePassword,
+  fetchSession,
 }
 
 // Export reducer

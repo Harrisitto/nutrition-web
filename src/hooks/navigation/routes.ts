@@ -1,13 +1,13 @@
 export const APP_ROUTES = {
   // Public routes
   HOME: '/',
-  LOGIN: '/login',
-  VALIDATION_CONFIRMED: '/validation-confirmed',
-  REDIRECT: '/redirect',
-  
-  // Protected routes
+  LOGIN: '/log-in',
+  SIGN_UP: '/sign-up',
+  EMAIL_VERIFICATION: '/verify-email',
+  PRIVACY_POLICY: '/privacy-policy',
+
   DASHBOARD: '/dashboard',
-  PROFILE: '/profile',
+
   
   // Error routes
   NOT_FOUND: '/404',

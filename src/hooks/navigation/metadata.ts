@@ -15,12 +15,4 @@ export const ROUTE_METADATA: Partial<Record<Partial<AppRoute>, RouteMetadata>> =
     isProtected: true,
     isAdminOnly: false,
   },
-  [APP_ROUTES.PROFILE]: {
-    isProtected: true,
-    isAdminOnly: false,
-  },
-  [APP_ROUTES.NOT_FOUND]: {
-    isProtected: false,
-    isAdminOnly: false,
-  },
 } as const

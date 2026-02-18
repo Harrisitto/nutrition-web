@@ -12,7 +12,7 @@ const Field = ({ form, id }: { form: Form; id: string }) => {
 
   return (
     <div
-      className={`flex flex-col gap-4 ${showExplanation ? "p-4" : ""} ${
+      className={`flex flex-col gap-4 mb-4 ${showExplanation ? "p-4" : ""} ${
         field?.errorMsg
           ? "border-l-4 border-red-500 pl-3"
           : field?.explanation && showExplanation
@@ -20,8 +20,10 @@ const Field = ({ form, id }: { form: Form; id: string }) => {
             : ""
       }`}
     >
-      <div className="flex flex-row gap-4">
-        <SwitchField field={field} form={form} id={id} />
+      <div className="flex flex-row gap-4 w-full">
+        <div className="flex-1">
+          <SwitchField field={field} form={form} id={id} />
+        </div>
         {field?.sharedRowElement ? field.sharedRowElement : null}
       </div>
 

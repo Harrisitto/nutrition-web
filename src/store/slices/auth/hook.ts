@@ -1,48 +1,57 @@
+import { useCallback, useEffect } from 'react'
 import {
   signIn,
   signUp,
-  signOut,
-  resetPassword,
-  updatePassword,
   clearError,
+  signOut,
+  fetchSession,
 } from './store'
 import { useAppDispatch, useAppSelector } from '@src/store/store'
+import { useNotification } from '../notification/hook'
 
 export const useAuth = () => {
   const dispatch = useAppDispatch()
   const auth = useAppSelector((state) => state.auth)
+  const { addErrorIcon, addSuccessIcon } = useNotification();
 
-  const handleSignIn = async (email: string, password: string) => {
-    return await dispatch(signIn({ email, password }))
-  }
+  const handleSignIn = useCallback(
+    (email: string, password: string) => {
+      dispatch(signIn({ email, password }))
+    },
+    [dispatch]
+  )
 
-  const handleSignUp = async (email: string, password: string) => {
-    return await dispatch(signUp({ email, password }))
-  }
+  const handleSignUp = useCallback(
+    (email: string, password: string) => {
+      dispatch(signUp({ email, password }))
+    },
+    [dispatch]
+  )
 
-  const handleSignOut = async () => {
-    return await dispatch(signOut())
-  }
+  const handleSignOut = useCallback(() => {
+    dispatch(signOut())
+  }, [dispatch])
 
-  const handleResetPassword = async (email: string) => {
-    return await dispatch(resetPassword(email))
-  }
+  const fetchCurrentSession = useCallback(() => {
+    dispatch(fetchSession());
+  }, [dispatch]);
 
-  const handleUpdatePassword = async (password: string) => {
-    return await dispatch(updatePassword(password))
-  }
 
-  const handleClearError = () => {
-    dispatch(clearError())
-  }
+  useEffect(() => {
+    if (auth.error) {
+      addErrorIcon();
+      dispatch(clearError());
+    }
+  }, [auth.error, auth.loading, addErrorIcon, addSuccessIcon, dispatch]);
+
+
+    
 
   return {
     ...auth,
     signIn: handleSignIn,
     signUp: handleSignUp,
     signOut: handleSignOut,
-    resetPassword: handleResetPassword,
-    updatePassword: handleUpdatePassword,
-    clearError: handleClearError,
+    fetchSession: fetchCurrentSession,
   }
 }

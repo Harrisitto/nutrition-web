@@ -1,6 +1,20 @@
 {
     "messages": {
-        
+        "submit": "Submit",
+        "cancel": "Cancel",
+        "loading": "Loading...",
+        "error": "An error occurred. Please try again.",
+        "invalidForm": "Please correct the errors in the form.",
+        "formSubmitted": "Form submitted successfully!",
+        "success": "Operation successful!"
+    },
+    "form": {
+        "invalidEmail": "Please enter a valid email address",
+        "minLength": "Need more characters",
+        "maxLength": "Too many characters",
+        "minValue": "Value is too low",
+        "maxValue": "Value is too high",
+        "required": "This field is required"
     },
     "privacyPolicy": {
         "title": "Privacy Policy",

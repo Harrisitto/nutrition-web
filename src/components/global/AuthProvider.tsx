@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
-import { setSession, getCurrentSession } from '../../store/slices/auth/store'
-import { supabase } from '../../services/supabase'
+import { setSession, fetchSession } from '../../store/slices/auth/store'
 import type { AuthChangeEvent, Session } from '@supabase/supabase-js'
 import { useAppDispatch } from '@src/store/store'
+import { supabase } from '@src/services/supabase/client'
 
 interface AuthProviderProps {
   children: React.ReactNode
@@ -13,13 +13,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     // Get initial session
-    dispatch(getCurrentSession())
+    dispatch(fetchSession())
 
-    // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session: Session | null) => {
-      console.log('Auth state changed:', event, session)
+    } = supabase.auth.onAuthStateChange(async (_event: AuthChangeEvent, session: Session | null) => {
       dispatch(setSession({
         user: session?.user ?? null,
         session: session ?? null,
@@ -29,7 +27,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return () => subscription.unsubscribe()
   }, [dispatch])
 
-  return <>{children}</>
+  return children
 }
 
 export default AuthProvider

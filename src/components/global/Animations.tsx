@@ -1,4 +1,3 @@
-import { colors } from "../../styles/colors";
 
 type PropsLoading = {
 	size?: number;
@@ -6,7 +5,7 @@ type PropsLoading = {
 	className?: string;
 };
 
-export const AnimationLoading = ({ size = 40, color = colors.green, className = "" }: PropsLoading) => {
+export const AnimationLoading = ({ size = 40, color = 'gray', className = "" }: PropsLoading) => {
 	return (
 		<div role="status" className={"inline-block " + className}>
 			<svg

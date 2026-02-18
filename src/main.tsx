@@ -10,11 +10,13 @@ import "./index.css";
 import "./services/i18n/config";
 import App from "./App.tsx";
 import ErrorBoundary from "./pages/error/ErrorPage.tsx";
+import { DisplayNotification } from "./components/global/Notification.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
+        <DisplayNotification />
         <ErrorBoundary>
           <AuthProvider>
             <App />

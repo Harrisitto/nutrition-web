@@ -37,12 +37,14 @@ export function useError() {
     const catchError = (fn?: (...args: unknown[]) => void) => {
         try {
             if (fn) fn();
+            return true;
         } catch (error) {
             if (!(error instanceof Error)) return;
             const data = parseError(error.message);
             if(data) {
                 createError(data);
             }
+            return false;
         }
     }
 
