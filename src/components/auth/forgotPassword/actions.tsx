@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { fieldIds, useContextFormForgotPassword } from "./form";
 import { useNotification } from "@src/store/slices/notification/hook";
 import { supabase } from "@src/services/supabase/client";
+import { composeRedirectUrl } from "@src/helpers/auth";
 
 export const NavigateLogIn = () => {
   const { navigateTo } = useAppNavigation();
@@ -32,7 +33,7 @@ export const SubmitEmail = () => {
     formStateEmail: { form },
   } = useContextFormForgotPassword();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.validateForm()) {
       addFormSubmitError();
@@ -45,9 +46,11 @@ export const SubmitEmail = () => {
       return;
     }
     try {
-      supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}${APP_ROUTES.EMAIL_VERIFICATION}`,
+      console.log("Attempting to send password reset email to:", email);
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: composeRedirectUrl(APP_ROUTES.FORGOT_PASSWORD),
       });
+      if (error) throw error;
       add({
         type: "success",
         message: "auth:forgotPassword.resetEmailSent",
@@ -57,7 +60,7 @@ export const SubmitEmail = () => {
       addFormSubmitError();
       return;
     }
-  };
+  }, [add, addFormSubmitError, form]);
 
   return (
     <button
@@ -78,7 +81,7 @@ export const SubmitPassword = ({ token }: { token: string }) => {
   } = useContextFormForgotPassword();
   const { navigateTo } = useAppNavigation();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.validateForm()) {
       addFormSubmitError();
@@ -112,7 +115,7 @@ export const SubmitPassword = ({ token }: { token: string }) => {
       addFormSubmitError();
       return;
     }
-  };
+  }, [add, addFormSubmitError, form, navigateTo, token]);
 
   return (
     <button
