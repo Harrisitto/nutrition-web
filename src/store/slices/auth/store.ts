@@ -43,6 +43,9 @@ const authSlice = createSlice({
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload
     },
+    clearData: (state) => {
+      Object.assign(state, initialState)
+    }
   },
   extraReducers: (builder) => {
     // Sign Up
@@ -129,7 +132,7 @@ const authSlice = createSlice({
 })
 
 // Export actions
-export const { clearError, setSession, setLoading } = authSlice.actions
+export const { clearError, setSession, setLoading, clearData } = authSlice.actions
 
 // Export async thunks
 export {

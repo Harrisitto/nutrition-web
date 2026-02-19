@@ -8,3 +8,12 @@ export const Title = () => {
         </h2>
     )
 }
+
+export const Disclaimer = () => {
+    const { t } = useTranslation();
+    return (
+        <p className="text-sm text-gray-600 mt-4 text-center">
+            {t("auth:signUp.disclaimer")}
+        </p>
+    )
+}

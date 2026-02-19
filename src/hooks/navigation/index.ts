@@ -1,23 +1,25 @@
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useCallback } from 'react'
 import { useAuth } from '../../store/slices/auth/hook'
 import { APP_ROUTES } from './routes'
 import type { AppRoute } from './routes'
 import { DEFAULT_ROUTE_METADATA, ROUTE_METADATA } from './metadata'
-import { useError } from '@src/store/slices/error/hook'
+import { addRouteToStack } from '@src/store/slices/error/store'
+import { useAppDispatch } from '@src/store/store'
 import useSearchParams from './search_params'
 
 export default function useAppNavigation() {
     const navigate = useNavigate();
     const location = useLocation();
     const { isAuthenticated } = useAuth();
-    const pushRouteToErrorStack = useError().pushRouteToStack;
+    const dispatch = useAppDispatch();
     const searchParams = useSearchParams();
 
-    const navigateTo = (route: AppRoute, options?: { replace?: boolean; state?: unknown }) => {
-
+    const navigateTo = useCallback((route: AppRoute, options?: { replace?: boolean; state?: unknown }) => {
         const routeMetadata = ROUTE_METADATA[route] || DEFAULT_ROUTE_METADATA;
-        let routeState = {};
+        let routeState: Record<string, unknown> = {};
         let finalRoute: AppRoute = route;
+
         if (routeMetadata.isProtected && !isAuthenticated) {
             routeState = {
                 from: route,
@@ -25,23 +27,25 @@ export default function useAppNavigation() {
             };
             finalRoute = APP_ROUTES.LOGIN;
         }
-
-        pushRouteToErrorStack(finalRoute);
+        dispatch(addRouteToStack(finalRoute));
+        const extraState = options?.state && typeof options.state === 'object'
+            ? (options.state as Record<string, unknown>)
+            : {};
 
         navigate(finalRoute, {
             replace: options?.replace,
-            state: { ...routeState, ...routeState }
+            state: { ...routeState, ...extraState }
         })
-    }
+    }, [dispatch, isAuthenticated, navigate]);
 
-    const goBack = () => {
+    const goBack = useCallback(() => {
         if (window.history.length > 1) {
-            pushRouteToErrorStack(null);
+            dispatch(addRouteToStack(null));
             navigate(-1);
         } else {
             navigateTo(APP_ROUTES.HOME);
         }
-    }
+    }, [dispatch, navigate, navigateTo]);
 
 
     return {
@@ -53,9 +57,5 @@ export default function useAppNavigation() {
         // Current state
         currentRoute: location.pathname as AppRoute,
         isAuthenticated,
-
-        // Constants
-        ROUTES: APP_ROUTES,
-        METADATA: ROUTE_METADATA,
     }
 }

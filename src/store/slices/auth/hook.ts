@@ -5,6 +5,7 @@ import {
   clearError,
   signOut,
   fetchSession,
+  clearData,
 } from './store'
 import { useAppDispatch, useAppSelector } from '@src/store/store'
 import { useNotification } from '../notification/hook'
@@ -30,6 +31,7 @@ export const useAuth = () => {
 
   const handleSignOut = useCallback(() => {
     dispatch(signOut())
+    dispatch(clearData())
   }, [dispatch])
 
   const fetchCurrentSession = useCallback(() => {

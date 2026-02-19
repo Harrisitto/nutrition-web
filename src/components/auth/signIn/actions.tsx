@@ -5,6 +5,7 @@ import { fieldIds } from "./form";
 import { useAuth } from "@src/store/slices/auth/hook";
 import useAppNavigation from "@src/hooks/navigation";
 import { useCallback } from "react";
+import { APP_ROUTES } from "@src/hooks/navigation/routes";
 
 export const SubmitForm = () => {
     const { t } = useTranslation();
@@ -46,11 +47,11 @@ export const SubmitForm = () => {
 
 export const RedirectLogIn = () => {
     const { t } = useTranslation();
-    const { ROUTES, navigateTo } = useAppNavigation();
+    const { navigateTo } = useAppNavigation();
 
     const handleRedirect = useCallback(() => {
-        navigateTo(ROUTES.LOGIN);
-    }, [navigateTo, ROUTES]);
+        navigateTo(APP_ROUTES.LOGIN);
+    }, [navigateTo]);
 
     return (
         <button
@@ -66,6 +67,21 @@ export const RedirectLogIn = () => {
 
 export const RedirectForgotPassword = () => {
 
-    return null
+    const { t } = useTranslation();
+    const { navigateTo } = useAppNavigation();
+
+    const handleRedirect = useCallback(() => {
+        navigateTo(APP_ROUTES.FORGOT_PASSWORD);
+    }, [navigateTo]);
+
+    return (
+        <button
+            type="button"
+            className="text-sm text-nutrition-green hover:underline focus:outline-none"
+            onClick={handleRedirect}
+        >
+            {t("auth:forgotPassword.navigateToForgotPassword")}
+        </button>
+    )
 
 }

@@ -1,4 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { composeRedirectUrl } from "@src/helpers/auth";
 import { APP_ROUTES } from "@src/hooks/navigation/routes";
 import { supabase } from "@src/services/supabase/client";
 
@@ -11,12 +12,11 @@ export const signUp = createAsyncThunk(
     'auth/signUp',
     async ({ email, password }: SignUpCredentials, { rejectWithValue }) => {
         try {
-            const baseUrl = window.location.href.split('#')[0];
             const { data, error } = await supabase.auth.signUp({
                 email,
                 password,
                 options: {
-                    emailRedirectTo: `${baseUrl}#${APP_ROUTES.EMAIL_VERIFICATION}`
+                    emailRedirectTo: composeRedirectUrl(APP_ROUTES.EMAIL_VERIFICATION),
                 },
             });
 

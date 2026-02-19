@@ -8,6 +8,8 @@ const SignInPage = lazy(() => import("./pages/auth/SignUpPage"));
 const EmailVerificationPage = lazy(
   () => import("./pages/auth/EmailVerification")
 );
+const PageAppDashboard = lazy(() => import("./pages/app/dashboard"));
+const PageForgotPassword = lazy(() => import("./pages/auth/ForgotPassword"));
 const PagePrivacyPolicy = lazy(() =>
   import("./pages/privacyPolicy/page").then((m) => ({
     default: m.PagePrivacyPolicy
@@ -33,12 +35,15 @@ function App() {
               path={APP_ROUTES.EMAIL_VERIFICATION}
               element={<EmailVerificationPage />}
             />
-
+            <Route
+              path={APP_ROUTES.FORGOT_PASSWORD}
+              element={<PageForgotPassword />}
+            />
             <Route
               path={APP_ROUTES.DASHBOARD}
               element={
                 <ProtectedRoute redirectTo={APP_ROUTES.LOGIN}>
-                  <></>
+                  <PageAppDashboard />
                 </ProtectedRoute>
               }
             />

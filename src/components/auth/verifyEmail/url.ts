@@ -54,7 +54,5 @@ export const useVerificationToken = () => {
         })();
     }, [token, dispatch]);
 
-
-
     return { token, isValid, loading };
 }

@@ -17,8 +17,10 @@ const SignUpPage = () => {
         <div className="w-full max-w-lg flex justify-between">
             <ComponentsSignIn.Actions.RedirectLogIn />
         </div>
-
-        
+        <div className="h-4" />
+        <div className="w-full max-w-lg">
+            <ComponentsSignIn.Text.Disclaimer />
+        </div>
       </div>
     </ComponentsSignIn.Fields.Provider>
   );

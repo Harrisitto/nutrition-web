@@ -2,16 +2,18 @@ import { ComponentsLogIn } from "@src/components/auth/logInIndex";
 import { useAuth } from "@src/store/slices/auth/hook";
 import useAppNavigation from "@src/hooks/navigation";
 import { useEffect } from "react";
+import { APP_ROUTES } from "@src/hooks/navigation/routes";
 
 const LogInPage = () => {
-    const { isAuthenticated } = useAuth();
-  const { navigateTo, ROUTES } = useAppNavigation();
+  const { isAuthenticated } = useAuth();
+  const { navigateTo } = useAppNavigation();
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigateTo(ROUTES.DASHBOARD);
+      navigateTo(APP_ROUTES.DASHBOARD);
     }
-  }, [isAuthenticated, navigateTo, ROUTES]);
+  }, [isAuthenticated, navigateTo]);
+  
   return (
     <ComponentsLogIn.Fields.Provider>
       <div className="min-h-screen flex flex-col items-center justify-center">
