@@ -1,21 +1,26 @@
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../../store/slices/auth/hook'
+import { APP_ROUTES } from '@src/hooks/navigation/routes'
 
 interface ProtectedRouteProps {
   children: React.ReactNode
-  redirectTo?: string
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
   children, 
-  redirectTo = '/' 
 }) => {
+
   const {
     loading,
-    isAuthenticated
+    isAuthenticated,
+    profile
   } = useAuth();
 
-  console.log("ProtectedRoute - loading:", loading, "isAuthenticated:", isAuthenticated);
+  console.log('ProtectedRoute - Auth State:', {
+    loading,
+    isAuthenticated,
+    profile
+  });
 
   // Show loading spinner while checking auth status
   if (loading) {
@@ -28,10 +33,24 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
-    return <Navigate to={redirectTo} replace />
+    return <Navigate to={APP_ROUTES.LOGIN} replace />
   }
 
-  // Render children if authenticated
+  if (!profile) {
+    return (
+      <Navigate to={APP_ROUTES.COMPLETE_PROFILE} replace />
+    )
+  }
+
+  if (!profile.is_nutritionist) {
+    return (
+      /* If user is authenticated but not a nutritionist, redirect to 404 page */
+      /* This is a simple way to prevent unauthorized access to nutritionist-only pages without exposing the existence of those pages to non-nutritionist users. */
+      <Navigate to={APP_ROUTES.NOT_FOUND} replace />
+    )
+  }
+
+  // Render children if authenticated and has profile and is a nutritionist
   return children
 }
 

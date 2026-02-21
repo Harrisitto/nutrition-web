@@ -51,6 +51,13 @@ export const useNotification = () => {
         });
     }, [addNotification]);
 
+    const addMutationError = useCallback(() => {
+        addNotification({
+            type: "error",
+            message: "system:messages.mutationError",
+        });
+    }, [addNotification]);
+
 
     return {
         ...notification,
@@ -60,5 +67,6 @@ export const useNotification = () => {
         addInvalidForm,
         addErrorIcon,
         addSuccessIcon,
+        addMutationError,
     }
 }

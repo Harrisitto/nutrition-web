@@ -6,16 +6,17 @@ import { APP_ROUTES } from "./hooks/navigation/routes";
 const LogInPage = lazy(() => import("./pages/auth/LogInPage"));
 const SignInPage = lazy(() => import("./pages/auth/SignUpPage"));
 const EmailVerificationPage = lazy(
-  () => import("./pages/auth/EmailVerification")
+  () => import("./pages/auth/EmailVerification"),
 );
 const PageAppDashboard = lazy(() => import("./pages/app/dashboard"));
 const PageForgotPassword = lazy(() => import("./pages/auth/ForgotPassword"));
 const PagePrivacyPolicy = lazy(() =>
   import("./pages/privacyPolicy/page").then((m) => ({
-    default: m.PagePrivacyPolicy
-  }))
+    default: m.PagePrivacyPolicy,
+  })),
 );
 const NotFoundPage = lazy(() => import("./pages/error/NotFoundPage"));
+const SetupProfile = lazy(() => import("./pages/auth/SetupProfile"));
 
 function App() {
   return (
@@ -25,12 +26,12 @@ function App() {
           <Routes>
             {/* Public routes */}
             <Route path={APP_ROUTES.HOME} element={<LogInPage />} />
+            <Route path={APP_ROUTES.LOGIN} element={<LogInPage />} />
+            <Route path={APP_ROUTES.SIGN_UP} element={<SignInPage />} />
             <Route
               path={APP_ROUTES.PRIVACY_POLICY}
               element={<PagePrivacyPolicy />}
             />
-            <Route path={APP_ROUTES.LOGIN} element={<LogInPage />} />
-            <Route path={APP_ROUTES.SIGN_UP} element={<SignInPage />} />
             <Route
               path={APP_ROUTES.EMAIL_VERIFICATION}
               element={<EmailVerificationPage />}
@@ -40,9 +41,13 @@ function App() {
               element={<PageForgotPassword />}
             />
             <Route
+              path={APP_ROUTES.COMPLETE_PROFILE}
+              element={<SetupProfile />} // NOT A PROTECTED ROUTE
+            />
+            <Route
               path={APP_ROUTES.DASHBOARD}
               element={
-                <ProtectedRoute redirectTo={APP_ROUTES.LOGIN}>
+                <ProtectedRoute>
                   <PageAppDashboard />
                 </ProtectedRoute>
               }

@@ -6,7 +6,8 @@
         "error": "An error occurred. Please try again.",
         "invalidForm": "Please correct the errors in the form.",
         "formSubmitted": "Form submitted successfully!",
-        "success": "Operation successful!"
+        "success": "Operation successful!",
+        "mutationError": "An error occurred while processing your request. Please try again."
     },
     "form": {
         "invalidEmail": "Please enter a valid email address",

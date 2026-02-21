@@ -7,6 +7,7 @@ export const APP_ROUTES = {
   FORGOT_PASSWORD: '/forgot-password',
   PRIVACY_POLICY: '/privacy-policy',
 
+  COMPLETE_PROFILE: '/profile-setup',
   DASHBOARD: '/dashboard',
 
   

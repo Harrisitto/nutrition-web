@@ -5,6 +5,8 @@ import { signIn } from './thunks/signIn'
 import { signUp } from './thunks/signUp'
 import { signOut } from './thunks/signOut'
 import { fetchSession } from './thunks/fetchSession'
+import type { Database } from '@src/services/supabase/types'
+import { fetchProfile } from './thunks/fetchProfile'
 
 
 
@@ -15,6 +17,7 @@ export interface AuthState {
   loading: boolean
   error: string | null
   isAuthenticated: boolean
+  profile: Database['public']['Tables']['all_users']['Row'] | null
 }
 
 // Initial state
@@ -24,6 +27,7 @@ const initialState: AuthState = {
   loading: false,
   error: null,
   isAuthenticated: false,
+  profile: null,
 }
 
 // Auth slice
@@ -45,6 +49,9 @@ const authSlice = createSlice({
     },
     clearData: (state) => {
       Object.assign(state, initialState)
+    },
+    setProfile: (state, action: PayloadAction<Database['public']['Tables']['all_users']['Row']>) => {
+      state.profile = action.payload
     }
   },
   extraReducers: (builder) => {
@@ -128,11 +135,27 @@ const authSlice = createSlice({
         state.session = null
         state.isAuthenticated = false
       })
+    
+    builder
+      .addCase(fetchProfile.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(fetchProfile.fulfilled, (state, action) => {
+        state.loading = false
+        state.profile = action.payload.profile
+        state.error = null
+      })
+      .addCase(fetchProfile.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload as string
+        state.profile = null
+      })
   },
 })
 
 // Export actions
-export const { clearError, setSession, setLoading, clearData } = authSlice.actions
+export const { clearError, setSession, setLoading, clearData, setProfile } = authSlice.actions
 
 // Export async thunks
 export {

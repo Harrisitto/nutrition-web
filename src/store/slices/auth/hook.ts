@@ -1,19 +1,17 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback } from 'react'
 import {
   signIn,
   signUp,
-  clearError,
   signOut,
   fetchSession,
   clearData,
 } from './store'
 import { useAppDispatch, useAppSelector } from '@src/store/store'
-import { useNotification } from '../notification/hook'
+import { fetchProfile } from './thunks/fetchProfile'
 
 export const useAuth = () => {
   const dispatch = useAppDispatch()
   const auth = useAppSelector((state) => state.auth)
-  const { addErrorIcon, addSuccessIcon } = useNotification();
 
   const handleSignIn = useCallback(
     (email: string, password: string) => {
@@ -38,16 +36,9 @@ export const useAuth = () => {
     dispatch(fetchSession());
   }, [dispatch]);
 
-
-  useEffect(() => {
-    if (auth.error) {
-      addErrorIcon();
-      dispatch(clearError());
-    }
-  }, [auth.error, auth.loading, addErrorIcon, addSuccessIcon, dispatch]);
-
-
-    
+  const fetchUserProfile = useCallback(() => {
+    dispatch(fetchProfile());
+  }, [dispatch]);
 
   return {
     ...auth,
@@ -55,5 +46,6 @@ export const useAuth = () => {
     signUp: handleSignUp,
     signOut: handleSignOut,
     fetchSession: fetchCurrentSession,
+    fetchProfile: fetchUserProfile,
   }
 }
