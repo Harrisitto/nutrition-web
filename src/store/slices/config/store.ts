@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
-import { dateNextMonday, dateNextSunday, saveDate } from '@src/helpers/dates'
+import { fromDate, saveDate } from '@src/helpers/dates'
 
 
 export interface ConfigState {
@@ -30,8 +30,8 @@ const initialState: ConfigState = {
      */
     selectedUserId: null,
     selectedDateRange: [
-        saveDate(dateNextMonday()),
-        saveDate(dateNextSunday()),
+        saveDate(fromDate().nextMonday()),
+        saveDate(fromDate().nextSunday()),
     ],
     selectedDay: null,
     /**

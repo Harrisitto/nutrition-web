@@ -77,17 +77,17 @@ export type Database = {
       all_meals: {
         Row: {
           id: number
-          name: Json | null
+          name: Json
           order: number
         }
         Insert: {
           id?: number
-          name?: Json | null
+          name: Json
           order?: number
         }
         Update: {
           id?: number
-          name?: Json | null
+          name?: Json
           order?: number
         }
         Relationships: []
@@ -262,6 +262,36 @@ export type Database = {
           },
         ]
       }
+      receipt_meals: {
+        Row: {
+          meal_id: number
+          type_id: number
+        }
+        Insert: {
+          meal_id: number
+          type_id: number
+        }
+        Update: {
+          meal_id?: number
+          type_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meal_receipts_meal_id_fkey"
+            columns: ["meal_id"]
+            isOneToOne: false
+            referencedRelation: "all_meals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meal_receipts_type_id_fkey"
+            columns: ["type_id"]
+            isOneToOne: false
+            referencedRelation: "receipt_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       receipt_types: {
         Row: {
           code: string | null
@@ -425,6 +455,32 @@ export type Database = {
           },
           {
             foreignKeyName: "user_planing_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "all_users"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      user_training: {
+        Row: {
+          date: string
+          training_hc: number[]
+          user_id: string
+        }
+        Insert: {
+          date: string
+          training_hc?: number[]
+          user_id: string
+        }
+        Update: {
+          date?: string
+          training_hc?: number[]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_training_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "all_users"

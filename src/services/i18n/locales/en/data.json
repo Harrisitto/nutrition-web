@@ -1,5 +1,8 @@
 {
     "misc": {
+        "Kcal": "kcal",
+        "resumeHeader": "Daily Summary",
+        "hcHeader": "Carbs Per Hour of Training",
         "daysOfWeek": {
             "0": "Monday",
             "1": "Tuesday",
