@@ -78,14 +78,17 @@ export type Database = {
         Row: {
           id: number
           name: Json | null
+          order: number
         }
         Insert: {
           id?: number
           name?: Json | null
+          order?: number
         }
         Update: {
           id?: number
           name?: Json | null
+          order?: number
         }
         Relationships: []
       }
@@ -144,60 +147,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      all_rls: {
-        Row: {
-          allowed: boolean
-          description: string | null
-          operation: string
-          role: string
-          sql_id: number | null
-          table_name: string
-        }
-        Insert: {
-          allowed: boolean
-          description?: string | null
-          operation: string
-          role: string
-          sql_id?: number | null
-          table_name?: string
-        }
-        Update: {
-          allowed?: boolean
-          description?: string | null
-          operation?: string
-          role?: string
-          sql_id?: number | null
-          table_name?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "all_rls_role_fkey"
-            columns: ["role"]
-            isOneToOne: false
-            referencedRelation: "all_roles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "all_rls_sql_id_fkey"
-            columns: ["sql_id"]
-            isOneToOne: false
-            referencedRelation: "rls_queries"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      all_roles: {
-        Row: {
-          id: string
-        }
-        Insert: {
-          id?: string
-        }
-        Update: {
-          id?: string
-        }
-        Relationships: []
       }
       all_users: {
         Row: {
@@ -342,23 +291,61 @@ export type Database = {
           },
         ]
       }
-      rls_queries: {
+      rls_policies: {
         Row: {
-          description: string
+          condition: string
+          description: string | null
           id: number
-          query: string
+          operation: string
+          policy_name: string
+          role: string | null
+          table_name: string
         }
         Insert: {
-          description: string
+          condition: string
+          description?: string | null
           id?: number
-          query: string
+          operation: string
+          policy_name: string
+          role?: string | null
+          table_name: string
         }
         Update: {
-          description?: string
+          condition?: string
+          description?: string | null
           id?: number
-          query?: string
+          operation?: string
+          policy_name?: string
+          role?: string | null
+          table_name?: string
         }
         Relationships: []
+      }
+      user_info: {
+        Row: {
+          birth_date: string | null
+          name: string
+          user_id: string
+        }
+        Insert: {
+          birth_date?: string | null
+          name?: string
+          user_id?: string
+        }
+        Update: {
+          birth_date?: string | null
+          name?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_info_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "all_users"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       user_measures: {
         Row: {
@@ -450,9 +437,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      rls_security: {
-        Args: { p_operation: string; p_table: unknown }
-        Returns: boolean
+      rls_apply_policy: {
+        Args: {
+          p_condition: string
+          p_operation: string
+          p_policy: string
+          p_role?: string
+          p_table: string
+        }
+        Returns: undefined
       }
     }
     Enums: {

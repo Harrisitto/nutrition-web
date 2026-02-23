@@ -1,7 +1,14 @@
 export const queryKeys = {
     user: {
         single: (userId: string) => ["user", "single", userId],
-        fromNutritionist: (nutritionistId: string) => ["user", "fromNutritionist", nutritionistId],
-        formBrand: (brandId: string) => ["user", "fromBrand", brandId],
+        fromNutritionist: ["user", "myUsers"],
+        formBrand: ["user", "brandUsers"],
+        planing: (userId: string | null, start: string, end: string) => ["user", "planing", userId, start, end],
     },
+    data: {
+        meals: (lang: string) => ["data", "meals", lang],
+        measures: ["data", "measures"],
+        receipts: ["data", "receipts"],
+        videos: ["data", "videos"],
+    }
 }

@@ -5,6 +5,7 @@ import type { TypedUseSelectorHook } from 'react-redux'
 import authReducer from './slices/auth/store'
 import errorReducer from './slices/error/store'
 import notificationReducer from './slices/notification/store'
+import configReducer from './slices/config/store'
 
 // NOTE: Intentionally omit the `config` reducer per request
 
@@ -13,6 +14,7 @@ export const store = configureStore({
 		auth: authReducer,
 		error: errorReducer,
 		notification: notificationReducer,
+		config: configReducer,
 	},
 })
 

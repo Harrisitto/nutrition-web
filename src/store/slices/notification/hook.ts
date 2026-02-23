@@ -2,6 +2,28 @@ import { useAppDispatch, useAppSelector } from "@src/store/store"
 import { add, remove, type Notification } from "./store";
 import { useCallback } from "react";
 
+const useAddNotification = () => {
+    const dispatch = useAppDispatch();
+    return useCallback((notification: Omit<Notification, "id">) => {
+        const debounceId = Math.round(Date.now() / 1000);
+        const id = `${debounceId}-${notification.type}`;
+        const duration = notification.duration || 3000; // Default duration 3 seconds
+        dispatch(add({ ...notification, id, duration }));
+        const timeOutId = setTimeout(() => {
+            dispatch(remove({ id }));
+            clearTimeout(timeOutId);
+        }, duration);
+    }, [dispatch]);
+
+}
+
+export const useNotificationErrorQuery = () => {
+    const add = useAddNotification();
+    return () => add({
+        type: "error",
+    });
+}
+
 
 export const useNotification = () => {
     const dispatch = useAppDispatch();

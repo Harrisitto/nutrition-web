@@ -35,6 +35,15 @@ export default {
         'gray-blue-600': '#4a6578',
         'gray-blue-700': '#3a515f',
       },
+      keyframes: {
+        'fade-in': {
+          '0%': { opacity: '0', transform: 'translateX(-10px)' },
+          '100%': { opacity: '1', transform: 'translateX(0)' },
+        },
+      },
+      animation: {
+        'fade-in': 'fade-in 0.5s ease-out forwards',
+      },
     },
   },
 }

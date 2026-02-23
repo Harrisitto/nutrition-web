@@ -4,14 +4,19 @@ import LanguageDetector from "i18next-browser-languagedetector";
 
 import enSystem from "./locales/en/system.json";
 import enAuth from "./locales/en/auth.json";
+import enApp from "./locales/en/data.json";
 
 const resources = {
     en: {
         system: enSystem,
-        auth: enAuth
+        auth: enAuth,
+        data: enApp,
 
     }, // English translations
 };
+
+export const supportedLngs = ["en"] as const;
+export type SupportedLanguage = typeof supportedLngs[number];
 
 i18next
     .use(LanguageDetector)
@@ -19,6 +24,8 @@ i18next
     .init({
         resources,
         fallbackLng: "en",
+        supportedLngs: supportedLngs,
+        load: "languageOnly",
         // detection options: prefer navigator languages, then querystring/localStorage/cookie
         detection: {
             order: ["navigator", "querystring", "localStorage", "cookie", "htmlTag", "path", "subdomain"],

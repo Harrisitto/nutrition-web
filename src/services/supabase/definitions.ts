@@ -10,6 +10,7 @@ export const tableBrandInfo = "brand_info"
 export const tableReceiptTypes = "receipt_types"
 export const userMeasures = "user_measures"
 export const userPlanning = "user_planing"
+export const userInfo = "user_info"
 
 const tables: Record<string, keyof Database['public']['Tables']> = {
     users: tableUsers,
@@ -22,6 +23,7 @@ const tables: Record<string, keyof Database['public']['Tables']> = {
     receiptTypes: tableReceiptTypes,
     userMeasures: userMeasures,
     userPlanning: userPlanning,
+    userInfo: userInfo,
 }
 
 export const colsTableUsers = {
@@ -33,6 +35,12 @@ export const colsTableUsers = {
     userId: 'user_id',
 } as const
 
+export const colsTableUserInfo = {
+    userId: 'user_id',
+    name: 'name',
+    birthday: 'birth_date',
+} as const
+
 export const colsTableAllBrands = {
     id: 'id',
 } as const
@@ -40,6 +48,7 @@ export const colsTableAllBrands = {
 export const colsTableAllMeals = {
     id: 'id',
     name: 'name',
+    order: 'order',
 } as const
 
 export const colsTableAllMeasures = {

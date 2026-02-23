@@ -1,10 +1,11 @@
 import { useMutation } from '@tanstack/react-query'
 import { useNotification } from '@src/store/slices/notification/hook'
 import { supabase } from '@src/services/supabase/client'
-import { tableUsers } from '@src/services/supabase/definitions'
+import { tableUsers, userInfo } from '@src/services/supabase/definitions'
 import { useAuth } from '@src/store/slices/auth/hook'
 import { useAppDispatch } from '@src/store/store'
 import { setProfile } from '@src/store/slices/auth/store'
+import type { TablesInsert } from '@src/services/supabase/types'
 
 /**
  * Hook to insert a new user into the database
@@ -34,36 +35,31 @@ export const useProfile = () => {
     onSuccess: (data) => {
       dispatch(setProfile(data));
     },
-    onError: (error) => {
+    onError: () => {
       addMutationError();
-      console.error('Error inserting user:', error)
     },
   })
 
-  return {
-    ...mutation
-  }
+  return mutation
 }
 
-/**
- * Example usage in a component:
- *
- * const { mutate: insertUser, isPending } = useInsertUser()
- *
- * const handleInsert = async () => {
- *   insertUser(
- *     {
- *       user_id: 'uuid',
- *       brand_id: 'brand-uuid',
- *       created_at: new Date().toISOString(),
- *       is_nutritionist: false,
- *       is_owner: false,
- *     },
- *     {
- *       onSuccess: (data) => {
- *         console.log('User inserted:', data)
- *       },
- *     }
- *   )
- * }
- */
+export const useInfo = () => {
+  const { addMutationError } = useNotification();
+  const { user } = useAuth()
+  const mutation = useMutation({
+    mutationFn: async (insertData: TablesInsert<'user_info'>) => {
+      if (!user) throw new Error('No authenticated user found')
+      const { data, error } = await supabase
+        .from(userInfo)
+        .upsert(insertData)
+        .select()
+        .single()
+        if (error) throw error
+        return data
+    },
+    onError: () => {
+      addMutationError();
+    },
+  })
+  return mutation
+}
