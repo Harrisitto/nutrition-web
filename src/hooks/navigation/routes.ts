@@ -6,7 +6,9 @@ export const APP_ROUTES = {
   EMAIL_VERIFICATION: '/verify-email',
   FORGOT_PASSWORD: '/forgot-password',
   PRIVACY_POLICY: '/privacy-policy',
+  REFERENCES: '/references',
 
+  // Protected routes
   COMPLETE_PROFILE: '/profile-setup',
   DASHBOARD: '/dashboard',
 

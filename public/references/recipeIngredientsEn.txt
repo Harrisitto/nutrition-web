@@ -1,0 +1,9 @@
+Important Notice Regarding Nutritional Information
+
+The macronutrient information for each ingredient within this application is calculated based on its standard description. Unless expressly stated otherwise, the ingredient is assumed to be in its raw state and without any additional preparation or accompaniment.
+
+By way of example, the entry "hake" reflects exclusively the nutritional values of raw hake fillet. In cases where reference is made to a specific preparation, such as "breaded hake," or data is provided per gram of cooked food, the user will be clearly informed of this distinction.
+
+To assist in the estimation process, the application provides users with a calculation tool to facilitate food weight conversions, allowing for an approximation of the raw weight based on its weight once cooked.
+
+It should be noted that this methodology provides an approximation which, although carefully calculated, is not exact. Consequently, the nutritional values offered in the application should be considered merely as a reference guide. It is not recommended to make decisions or draw conclusions based exclusively on this data without considering all the variable factors that may influence the final composition of a dish or recipe.

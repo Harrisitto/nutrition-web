@@ -1,6 +1,7 @@
-import { Navigate } from 'react-router-dom'
 import { useAuth } from '../../store/slices/auth/hook'
 import { APP_ROUTES } from '@src/hooks/navigation/routes'
+import { useEffect } from 'react'
+import useAppNavigation from '@src/hooks/navigation'
 
 interface ProtectedRouteProps {
   children: React.ReactNode
@@ -16,40 +17,26 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     profile
   } = useAuth();
 
-  console.log('ProtectedRoute - Auth State:', {
-    loading,
-    isAuthenticated,
-    profile
-  });
+  const { navigateTo } = useAppNavigation();
 
-  // Show loading spinner while checking auth status
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
-      </div>
-    )
+  useEffect(() => {
+    if (loading) return; // Don't do anything while loading
+    const timer = setTimeout(() => {
+      if (!isAuthenticated) {
+        navigateTo(APP_ROUTES.LOGIN);
+      } else if (!profile) {
+        navigateTo(APP_ROUTES.COMPLETE_PROFILE);
+      } else if (!profile.is_nutritionist) {
+        navigateTo(APP_ROUTES.NOT_FOUND);
+      }
+    }, 500); // Debounce 500ms - navigation only happens if state stabilizes
+    return () => clearTimeout(timer);
+  }, [loading, isAuthenticated, profile])
+
+  if (loading || !isAuthenticated || !profile || !profile.is_nutritionist) {
+    // While loading or if not authenticated or profile incomplete or not a nutritionist, render nothing (or a loader)
+    return null;
   }
-
-  // Redirect to login if not authenticated
-  if (!isAuthenticated) {
-    return <Navigate to={APP_ROUTES.LOGIN} replace />
-  }
-
-  if (!profile) {
-    return (
-      <Navigate to={APP_ROUTES.COMPLETE_PROFILE} replace />
-    )
-  }
-
-  if (!profile.is_nutritionist) {
-    return (
-      /* If user is authenticated but not a nutritionist, redirect to 404 page */
-      /* This is a simple way to prevent unauthorized access to nutritionist-only pages without exposing the existence of those pages to non-nutritionist users. */
-      <Navigate to={APP_ROUTES.NOT_FOUND} replace />
-    )
-  }
-
   // Render children if authenticated and has profile and is a nutritionist
   return children
 }

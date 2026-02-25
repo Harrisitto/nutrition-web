@@ -163,7 +163,7 @@ export const WeeklyMeals = ({
           <ResumeHeaderCell />
 
           {/** Daily kCal*/}
-          <MealNameCell name={t("data:misc.Kcal")} />
+          <MealNameCell name={t("data:dashboardTable.Kcal")} />
           {kcalState.map((kcal, index) => (
             <KcalCell key={`kcal-${index}`} kcal={kcal} />
           ))}

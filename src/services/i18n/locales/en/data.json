@@ -1,5 +1,5 @@
 {
-    "misc": {
+    "dashboardTable": {
         "Kcal": "kcal",
         "resumeHeader": "Daily Summary",
         "hcHeader": "Carbs Per Hour of Training",
@@ -11,6 +11,41 @@
             "4": "Friday",
             "5": "Saturday",
             "6": "Sunday"
+        }
+    },
+    "references": {
+        "title": "References",
+        "description": "This page contains the references for the information and calculations used in this application.",
+        "viewMore": "View more",
+        "calculators": {
+            "dehydration01": {
+                "title": "Dehydration",
+                "description": "Used to create the calculator under the 'Dehydration' section of the 'Calculators' page.",
+                "reference": "Gonzalez RR, Cheuvront SN, Montain SJ, Goodman DA, Blanchard LA, Berglund LG, et al. Expanded prediction equations of human sweat loss and water needs. J Appl Physiol [Internet]. 2009;107(2):379-88"
+            },
+            "osmolarity01": {
+                "title": "Osmolarity",
+                "description": "Used to create the calculator under the 'Osmolarity' section of the 'Calculators' page.",
+                "reference": "Rasouli, M. (2016). Basic concepts and practical equations on osmolality: Biochemical approach. Clinical Biochemistry, 49(12), 936-941.",
+                "url": "https://doi.org/10.1016/j.clinbiochem.2016.06.001"
+            },
+            "carbLoading01": {
+                "title": "Carb Loading",
+                "description": "Used to create the calculator under the 'Carb Loading' section of the 'Calculators' page.",
+                "reference": "Burke LM. Nutrition strategies for the marathon: fuel for training and racing. Sports Medicine. 2007;37:344-7."
+            },
+            "cookedIngredients01": {
+                "title": "Cooked Ingredients",
+                "description": "Used to create the calculator under the 'Cooked Ingredients' section of the 'Calculators' page.",
+                "reference": "Adikari, A. M. N. T., & Thamilini, J. (2018). Cooking conversion factor of commonly consumed Sri Lankan food items. MOJ Food Processing & Technology, 6(4), 371-374",
+                "url": "https://doi.org/10.15406/mojfpt.2018.06.00190"
+            }
+        },
+        "recipes": {
+            "ingredients": {
+                "title": "Ingredients",
+                "description": "Used to aproximate the ingredients macronutrients in the app"
+            }
         }
     }
 }

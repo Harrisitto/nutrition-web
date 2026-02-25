@@ -71,7 +71,7 @@ export const HCHeaderCell = () => {
 
   return (
   <div className="border border-nutrition-green/30 bg-nutrition-green p-3 flex items-center justify-center text-white-green font-semibold hover:bg-dark-green transition-colors col-span-8">
-    <div>{t("misc.hcHeader")}</div>
+    <div>{t("dashboardTable.hcHeader")}</div>
   </div>
 );
 } 
@@ -145,7 +145,7 @@ export const ResumeHeaderCell = () => {
 
   return (
   <div className="border border-nutrition-green/30 bg-nutrition-green p-3 flex items-center justify-center text-white-green font-semibold hover:bg-dark-green transition-colors col-span-8">
-    <div>{t("misc.resumeHeader")}</div>
+    <div>{t("dashboardTable.resumeHeader")}</div>
   </div>
 );
 }

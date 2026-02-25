@@ -15,6 +15,7 @@ const PagePrivacyPolicy = lazy(() =>
     default: m.PagePrivacyPolicy,
   })),
 );
+const PageReferences = lazy(() => import("./pages/references/page"));
 const NotFoundPage = lazy(() => import("./pages/error/NotFoundPage"));
 const SetupProfile = lazy(() => import("./pages/auth/SetupProfile"));
 
@@ -28,6 +29,7 @@ function App() {
             <Route path={APP_ROUTES.HOME} element={<LogInPage />} />
             <Route path={APP_ROUTES.LOGIN} element={<LogInPage />} />
             <Route path={APP_ROUTES.SIGN_UP} element={<SignInPage />} />
+            <Route path={APP_ROUTES.REFERENCES} element={<PageReferences />} />
             <Route
               path={APP_ROUTES.PRIVACY_POLICY}
               element={<PagePrivacyPolicy />}
