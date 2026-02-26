@@ -1,0 +1,1 @@
+import{u as n,w as a}from"./index-DKA3IecC.js";const c=()=>{const{i18n:s}=n(),e=s.language.split("-")[0];return a.includes(e)?e:a[0]},d=()=>{const{t:s}=n("data");return[s("misc.daysOfWeek.0"),s("misc.daysOfWeek.1"),s("misc.daysOfWeek.2"),s("misc.daysOfWeek.3"),s("misc.daysOfWeek.4"),s("misc.daysOfWeek.5"),s("misc.daysOfWeek.6")]};export{d as a,c as u};
