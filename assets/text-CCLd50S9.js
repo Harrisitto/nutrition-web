@@ -1,0 +1,1 @@
+import{r as s}from"./index-BxQMtYud.js";const x=({relativePath:t,extension:e="txt"})=>{const[r,o]=s.useState("");return s.useEffect(()=>{fetch(`/sports-nutrition-web/${t}.${e}`).then(c=>c.text()).then(o)},[t,e]),r};export{x as u};
