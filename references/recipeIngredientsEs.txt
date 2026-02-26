@@ -1,0 +1,9 @@
+Aviso Importante sobre la Información Nutricional
+
+La información relativa a los macronutrientes de cada ingrediente presente en esta aplicación se calcula en base a la descripción estándar del mismo. Salvo que se indique expresamente lo contrario, se asume que el ingrediente se encuentra en su estado crudo y sin preparación o acompañamiento adicional.
+
+A modo de ejemplo, la entrada "merluza" refleja exclusivamente los valores nutricionales del filete de merluza crudo. En aquellos casos en que se haga referencia a una preparación específica, como "merluza empanada", o se proporcionen datos por gramo de alimento ya cocinado, se informará claramente al usuario sobre esta distinción.
+
+Para asistir en el proceso de estimación, la aplicación pone a disposición del usuario una herramienta de cálculo que facilita la conversión del peso de los alimentos, permitiendo aproximar el peso en crudo a partir de su peso una vez cocinado.
+
+Se debe tener en cuenta que esta metodología proporciona una aproximación, la cual, aunque cuidadosamente calculada, no es exacta. Por consiguiente, los valores nutricionales ofrecidos en la aplicación deben ser considerados únicamente como una referencia orientativa. No se recomienda tomar decisiones o extraer conclusiones basándose exclusivamente en estos datos sin considerar todos los factores variables que pueden influir en la composición final de un plato o receta.
