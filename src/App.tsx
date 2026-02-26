@@ -2,22 +2,17 @@ import { Suspense, lazy } from "react";
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./components/global/ProtectedRoute";
 import { APP_ROUTES } from "./hooks/navigation/routes";
-
 const LogInPage = lazy(() => import("./pages/auth/LogInPage"));
 const SignInPage = lazy(() => import("./pages/auth/SignUpPage"));
-const EmailVerificationPage = lazy(
-  () => import("./pages/auth/EmailVerification"),
-);
 const PageAppDashboard = lazy(() => import("./pages/app/dashboard"));
 const PageForgotPassword = lazy(() => import("./pages/auth/ForgotPassword"));
-const PagePrivacyPolicy = lazy(() =>
-  import("./pages/privacyPolicy/page").then((m) => ({
-    default: m.PagePrivacyPolicy,
-  })),
-);
+const PagePrivacyPolicy = lazy(() => import("./pages/privacyPolicy/page"));
 const PageReferences = lazy(() => import("./pages/references/page"));
 const NotFoundPage = lazy(() => import("./pages/error/NotFoundPage"));
 const SetupProfile = lazy(() => import("./pages/auth/SetupProfile"));
+const EmailVerificationPage = lazy(
+  () => import("./pages/auth/EmailVerification"),
+);
 
 function App() {
   return (

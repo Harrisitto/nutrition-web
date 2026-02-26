@@ -1,6 +1,6 @@
 import CompPrivacyPolicy from "../../components/privacy";
 
-export const PagePrivacyPolicy = () => {
+const PagePrivacyPolicy = () => {
   return (
     <>
       <CompPrivacyPolicy.Text.Title />
@@ -11,3 +11,5 @@ export const PagePrivacyPolicy = () => {
     </>
   );
 };
+
+export default PagePrivacyPolicy;

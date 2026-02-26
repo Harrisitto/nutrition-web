@@ -11,25 +11,25 @@ const ReferenceItem = ({
   reference: string;
   url?: string;
 }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation("data");
 
   return (
-    <div className="border border-gray-blue-200 bg-gray-blue-50 p-4 rounded-lg">
+    <div className="border border-gray-blue-200 bg-gray-blue-50 p-4 rounded-lg w-full">
       <h3 className="text-lg font-semibold">{title}</h3>
       <p className="text-sm text-gray-700 mt-2">{description}</p>
       <p className="text-sm text-gray-500 mt-2">
         {reference}
-        {url ? (
+      </p>
+      {url ? (
           <a
             href={url}
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-600 hover:underline"
           >
-            {t("references.viewMore")}
+            {`\n${t("references.viewMore")}`}
           </a>
         ) : null}
-      </p>
     </div>
   );
 };
@@ -71,7 +71,7 @@ export const CarbLoading = () => {
   );
 };
 
-export const CookedIngredientsReference = () => {
+export const CookedIngredients = () => {
   const { t } = useTranslation();
 
   return (

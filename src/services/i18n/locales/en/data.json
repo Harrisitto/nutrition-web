@@ -43,7 +43,7 @@
         },
         "recipes": {
             "ingredients": {
-                "title": "Ingredients",
+                "title": "Disclaimer for Ingredients Macronutrients",
                 "description": "Used to aproximate the ingredients macronutrients in the app"
             }
         }
