@@ -420,41 +420,85 @@ export type Database = {
         Row: {
           date: string
           id: number
-          meal_id: number
-          type_id: number
+          training_hc: number[]
           user_id: string
         }
         Insert: {
           date: string
           id?: number
-          meal_id: number
-          type_id: number
-          user_id: string
+          training_hc: number[]
+          user_id?: string
         }
         Update: {
           date?: string
           id?: number
-          meal_id?: number
-          type_id?: number
+          training_hc?: number[]
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_planing_meal: {
+        Row: {
+          meal_id: number
+          planing_id: number
+          type_id: number
+        }
+        Insert: {
+          meal_id: number
+          planing_id: number
+          type_id: number
+        }
+        Update: {
+          meal_id?: number
+          planing_id?: number
+          type_id?: number
         }
         Relationships: [
           {
-            foreignKeyName: "user_planing_meal_id_fkey"
+            foreignKeyName: "user_planing_meal_meal_id_fkey"
             columns: ["meal_id"]
             isOneToOne: false
             referencedRelation: "all_meals"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "user_planing_type_id_fkey"
+            foreignKeyName: "user_planing_meal_planing_id_fkey"
+            columns: ["planing_id"]
+            isOneToOne: false
+            referencedRelation: "user_planing"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_planing_meal_type_id_fkey"
             columns: ["type_id"]
             isOneToOne: false
             referencedRelation: "receipt_types"
             referencedColumns: ["id"]
           },
+        ]
+      }
+      user_preset: {
+        Row: {
+          id: number
+          name: string
+          training_hc: number[]
+          user_id: string
+        }
+        Insert: {
+          id?: number
+          name: string
+          training_hc: number[]
+          user_id: string
+        }
+        Update: {
+          id?: number
+          name?: string
+          training_hc?: number[]
+          user_id?: string
+        }
+        Relationships: [
           {
-            foreignKeyName: "user_planing_user_id_fkey"
+            foreignKeyName: "user_preset_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "all_users"
@@ -462,29 +506,43 @@ export type Database = {
           },
         ]
       }
-      user_training: {
+      user_preset_meal: {
         Row: {
-          date: string
-          training_hc: number[]
-          user_id: string
+          meal_id: number
+          preset_id: number
+          type_id: number
         }
         Insert: {
-          date: string
-          training_hc?: number[]
-          user_id: string
+          meal_id: number
+          preset_id: number
+          type_id: number
         }
         Update: {
-          date?: string
-          training_hc?: number[]
-          user_id?: string
+          meal_id?: number
+          preset_id?: number
+          type_id?: number
         }
         Relationships: [
           {
-            foreignKeyName: "user_training_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: "user_preset_meal_meal_id_fkey"
+            columns: ["meal_id"]
             isOneToOne: false
-            referencedRelation: "all_users"
-            referencedColumns: ["user_id"]
+            referencedRelation: "all_meals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_preset_meal_preset_id_fkey"
+            columns: ["preset_id"]
+            isOneToOne: false
+            referencedRelation: "user_preset"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_preset_meal_type_id_fkey"
+            columns: ["type_id"]
+            isOneToOne: false
+            referencedRelation: "receipt_types"
+            referencedColumns: ["id"]
           },
         ]
       }

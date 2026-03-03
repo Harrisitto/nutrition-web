@@ -1,130 +1,95 @@
-import type { Database } from "./types"
-
-export const tableUsers = "all_users"
-export const tableAllBrands = "all_brands"
-export const tableAllMeals = "all_meals"
-export const tableAllMeasures = "all_measures"
-export const tableAllReceipts = "all_receipts"
-export const tableAllVideos = "all_videos"
-export const tableBrandInfo = "brand_info"
-export const tableReceiptTypes = "receipt_types"
-export const userMeasures = "user_measures"
-export const userPlanning = "user_planing"
-export const userInfo = "user_info"
-export const tableReceiptMeals = "receipt_meals"
-export const userTraining = "user_training"
-
-export const trainingHCId = 10;
-
-const tables: Record<string, keyof Database['public']['Tables']> = {
-    users: tableUsers,
-    allBrands: tableAllBrands,
-    allMeals: tableAllMeals,
-    allMeasures: tableAllMeasures,
-    allReceipts: tableAllReceipts,
-    allVideos: tableAllVideos,
-    brandInfo: tableBrandInfo,
-    receiptTypes: tableReceiptTypes,
-    userMeasures: userMeasures,
-    userPlanning: userPlanning,
-    userInfo: userInfo,
-    receiptMeals: tableReceiptMeals,
-}
-
-export const colsTableUserTraining = {
-    userId: 'user_id',
-    date: 'date',
-    trainingHc: 'training_hc',
+export const TABLE_USER_PLANING_MEAL = {
+    NAME: 'user_planing_meal',
+    COLS: {
+        MEAL_ID: 'meal_id',
+        PLANING_ID: 'planing_id',
+        TYPE_ID: 'type_id',
+    }
 } as const
 
-export const colsTableUsers = {
-    brandId: 'brand_id',
-    createdAt: 'created_at',
-    isNutritionist: 'is_nutritionist',
-    isOwner: 'is_owner',
-    nutriId: 'nutri_id',
-    userId: 'user_id',
+export const TABLE_USER_PLANING = {
+    NAME: 'user_planing',
+    COLS: {
+        ID: 'id',
+        USER_ID: 'user_id',
+        DATE: 'date',
+        TRAINING_HC: 'training_hc',
+    }
 } as const
 
-export const colsTableUserInfo = {
-    userId: 'user_id',
-    name: 'name',
-    birthday: 'birth_date',
+export const TABLE_RECEIPT_TYPES = {
+    NAME: 'receipt_types',
+    COLS: {
+        ID: 'id',
+        MACROS_ID: 'macros_id',
+        CODE: 'code',
+        NAME: 'name',
+    }
 } as const
 
-export const colsTableAllBrands = {
-    id: 'id',
+export const TABLE_ALL_MACROS = {
+    NAME: 'all_macros',
+    COLS: {
+        ID: 'id',
+        KCAL: 'kcal',
+        PROTEIN: 'prot',
+        CARBS: 'hc',
+        FAT: 'fat',
+    }
 } as const
 
-export const colsTableAllMeals = {
-    id: 'id',
-    name: 'name',
-    order: 'order',
+export const TABLE_USER_PRESET = {
+    NAME: 'user_preset',
+    COLS: {
+        ID: 'id',
+        USER_ID: 'user_id',
+        NAME: 'name',
+        TRAINING_HC: 'training_hc',
+    }
 } as const
 
-export const colsTableAllMeasures = {
-    id: 'id',
-    name: 'name',
-    description: 'description',
-    units: 'units',
+export const TABLE_USER_PRESET_MEAL = {
+    NAME: 'user_preset_meal',
+    COLS: {
+        PRESET_ID: 'preset_id',
+        MEAL_ID: 'meal_id',
+        TYPE_ID: 'type_id',
+    }
 } as const
 
-export const colsTableAllReceipts = {
-    id: 'id',
-    name: 'name',
-    description: 'description',
-    url: 'url',
-    foodTypeId: 'food_type_id',
-    ingredients: 'ingredients',
+export const TABLE_USER_INFO = {
+    NAME: 'user_info',
+    COLS: {
+        USER_ID: 'user_id',
+    }
 } as const
 
-export const colsTableAllVideos = {
-    id: 'id',
-    name: 'name',
-    description: 'description',
-    url: 'url',
-    lang: 'lang',
-    userId: 'user_id',
-} as const 
-
-export const colsTableBrandInfo = {
-    brandId: 'brand_id',
-    name: 'name',
-    email: 'email',
-    phoneNumber: 'phone_number',
-    location: 'location',
-    description: 'description',
-    webUrl: 'web_url',
-    socialMediaUrl: 'social_media_url',
-    logoUrl: 'logo_url',
-} as const 
-
-export const colsTableReceiptTypes = {
-    id: 'id',
-    name: 'name',
-    code: 'code',
-    macrosId: 'macros_id',
+export const TABLE_ALL_USERS = {
+    NAME: 'all_users',
+    COLS: {
+        USER_ID: 'user_id',
+        NUTRI_ID: 'nutri_id',
+        IS_NUTRI: 'is_nutritionist',
+        BRAND_ID: 'brand_id',
+        IS_OWNER: 'is_owner',
+        CREATED_AT: 'created_at',
+    }
 } as const
 
-export const colsTableUserMeasures = {
-    id: 'id',
-    userId: 'user_id',
-    measureId: 'measure_id',
-    relationship: 'relationship',
-    date: 'date',
+export const TABLE_ALL_MEALS = {
+    NAME: 'all_meals',
+    COLS: {
+        ID: 'id',
+        ORDER: 'order',
+        NAME: 'name',
+    }
 } as const
 
-export const colsTableUserPlanning = {
-    id: 'id',
-    userId: 'user_id',
-    mealId: 'meal_id',
-    typeId: 'type_id',
-    date: 'date',
+export const TABLE_RECEIPT_MEALS = {
+    NAME: 'receipt_meals',
+    COLS: {
+        MEAL_ID: 'meal_id',
+        TYPE_ID: 'type_id',
+    }
 } as const
-
-export const colsTableReceiptMeals = {
-    mealId: 'meal_id',
-    receiptId: 'receipt_id',
-} as const
-
-export { tables }
+        

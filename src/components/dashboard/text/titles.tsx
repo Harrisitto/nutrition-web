@@ -1,9 +1,9 @@
-import { TanstackUser } from "@src/services/tanstack";
+import { useFetchNutritionistUsers } from "@src/services/tanstack/user/profile";
 import { useConfigSelectedUserId } from "@src/store/slices/config/hook";
 
 export const UserName = () => {
     const selectedUserId = useConfigSelectedUserId();
-    const users = TanstackUser.Select.useFetchNutritionistUsers();
+    const users = useFetchNutritionistUsers();
     const selectedUser = users.data?.find(user => user.user_id === selectedUserId);
 
     if (!selectedUser) return null;

@@ -1,11 +1,11 @@
 import { addFormatToShortcut, compareEqualStringsforShortcut, containsFormat } from "@src/helpers/shortcut";
-import { TanstackUser } from "@src/services/tanstack"
+import { useFetchNutritionistUsers } from "@src/services/tanstack/user/profile";
 import { useConfigSetAvailableShortcuts, useConfigSetSelectedUserId } from "@src/store/slices/config/hook";
 import { useAppSelector } from "@src/store/store";
 import { useEffect, useMemo } from "react";
 
 export const useInitalizeShortcuts = () => {
-    const users = TanstackUser.Select.useFetchNutritionistUsers();
+    const users = useFetchNutritionistUsers();
     const userformat = useAppSelector(state => state.config.shortcutGroups.users.format);
     const setShortcut = useConfigSetAvailableShortcuts();
 
@@ -22,7 +22,7 @@ export const useInitalizeShortcuts = () => {
 }
 
 export const useListenerForShortcuts = () => {
-    const users = TanstackUser.Select.useFetchNutritionistUsers();
+    const users = useFetchNutritionistUsers();
     const selectedShortcut = useAppSelector(state => state.config.selectedShortcutId);
     const setSelectedUser = useConfigSetSelectedUserId();
     const userformat = useAppSelector(

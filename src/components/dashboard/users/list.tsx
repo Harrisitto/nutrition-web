@@ -1,11 +1,11 @@
 import { AnimationLoading } from "@src/components/global/Animations";
-import { TanstackUser } from "@src/services/tanstack";
 import { useEffect } from "react";
 import {
   useConfigSelectedUserId,
   useConfigSetSelectedUserId,
   useConfigSidebarOpen,
 } from "@src/store/slices/config/hook";
+import { useFetchNutritionistUsers } from "@src/services/tanstack/user/profile";
 
 const OpenSidebarClient = ({ name }: { name: string }) => {
   return (
@@ -77,7 +77,7 @@ const SingleClient = ({
 };
 
 export const List = () => {
-  const users = TanstackUser.Select.useFetchNutritionistUsers();
+  const users = useFetchNutritionistUsers();
 
   if (users.isLoading) return <AnimationLoading />;
 

@@ -15,12 +15,12 @@ export const useLanguageCode = (): SupportedLanguage => {
 export const useDaysOfWeek = (): string[] => {
     const { t } = useTranslation("data");
     return [
-        t("misc.daysOfWeek.0"),
-        t("misc.daysOfWeek.1"),
-        t("misc.daysOfWeek.2"),
-        t("misc.daysOfWeek.3"),
-        t("misc.daysOfWeek.4"),
-        t("misc.daysOfWeek.5"),
-        t("misc.daysOfWeek.6"),
+        t("dashboardTable.daysOfWeek.0"),
+        t("dashboardTable.daysOfWeek.1"),
+        t("dashboardTable.daysOfWeek.2"),
+        t("dashboardTable.daysOfWeek.3"),
+        t("dashboardTable.daysOfWeek.4"),
+        t("dashboardTable.daysOfWeek.5"),
+        t("dashboardTable.daysOfWeek.6"),
     ];
 }

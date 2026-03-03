@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { supabase } from "@src/services/supabase/client";
-import { colsTableUsers, tableUsers } from "@src/services/supabase/definitions";
+import { TABLE_ALL_USERS } from "@src/services/supabase/definitions";
 
 export const fetchProfile = createAsyncThunk(
     'auth/fetchProfile',
@@ -13,9 +13,9 @@ export const fetchProfile = createAsyncThunk(
             }
 
             const { data: profile, error: errProfile } = await supabase
-                .from(tableUsers)
+                .from(TABLE_ALL_USERS.NAME)
                 .select("*")
-                .eq(colsTableUsers.userId, user.user.id)
+                .eq(TABLE_ALL_USERS.COLS.USER_ID, user.user.id)
                 .single();
 
             if (errProfile) {

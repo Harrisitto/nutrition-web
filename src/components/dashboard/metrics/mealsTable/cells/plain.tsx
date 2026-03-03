@@ -1,9 +1,7 @@
-import { type FetchPlanningType } from "@src/services/tanstack/user/planing";
 import { useCallback, useRef, useState } from "react";
-import { SelectMealCell } from "./selectMeal";
-import { colorBasedOnKcal } from "./helper";
-import { useInsertTraining } from "@src/services/tanstack/user/training";
 import { useTranslation } from "react-i18next";
+import { useTableContext } from "../tableContext";
+import { useInsertPlaning } from "@src/services/tanstack/user/planing";
 
 export const CornerCell = () => (
   <div className="border border-nutrition-green/30 bg-dark-green p-3 font-bold text-white-green">
@@ -11,17 +9,30 @@ export const CornerCell = () => (
   </div>
 );
 
-export const HeaderCell = ({
-  dayOfWeek,
-  dayOfMonth,
-}: {
-  dayOfWeek: string;
-  dayOfMonth: number;
-}) => (
-  <div className="border border-nutrition-green/30 bg-nutrition-green p-3 font-semibold text-white-green text-center hover:bg-dark-green transition-colors">
-    {`${dayOfWeek} ${dayOfMonth}`}
-  </div>
+export const EmptyCell = () => (
+  <div className="border border-gray-blue-200 bg-gray-blue-50 p-3 flex items-center justify-center text-text-body hover:bg-gray-blue-100 transition-colors" />
 );
+
+export const ColSideElement = () => {
+  const { t } = useTranslation("data");
+  const { tableFragmentIndex, sideElement } = useTableContext();
+  const span = Math.max(
+    tableFragmentIndex.mealRows.end - tableFragmentIndex.mealRows.start + 1,
+    1,
+  );
+  return (
+    <div
+      className="border border-nutrition-green/30 bg-nutrition-green p-3 flex items-center justify-center text-white-green font-semibold hover:bg-dark-green transition-colors"
+      style={{ gridRow: `span ${span} / span ${span}` }}
+    >
+      {sideElement ? (
+        sideElement
+      ) : (
+        <div className="text-sm font-medium">{t("dashboardTable.search")}</div>
+      )}
+    </div>
+  );
+};
 
 export const MealNameCell = ({ name }: { name: string }) => (
   <div className="border border-nutrition-green/30 bg-white-green/30 p-3 font-semibold whitespace-nowrap text-text-title hover:bg-white-green/50 transition-colors">
@@ -35,47 +46,15 @@ export const KcalCell = ({ kcal }: { kcal: number }) => (
   </div>
 );
 
-interface PartialPlan {
-  meal_id: number;
-  date: string;
-  type_id: {
-    name: string;
-  };
-}
+export const HCHeaderCell = () => {
+  const { t } = useTranslation("data");
 
-export const MealCell = ({
-  plan,
-}: {
-  plan: FetchPlanningType | PartialPlan;
-}) => {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const kcal = "macros_id" in plan.type_id ? plan.type_id.macros_id.kcal : null;
-  const kcalColor = kcal !== null ? colorBasedOnKcal(kcal) : "";
   return (
-    <div
-      className={`relative overflow-hidden border cursor-pointer border-gray-blue-200 bg-gray-blue-50 p-3 flex items-center justify-center text-text-body hover:bg-gray-blue-100 transition-colors ${kcalColor}`}
-      ref={ref}
-    >
-      <div className="text-sm font-medium">{plan.type_id.name}</div>
-      <SelectMealCell
-        mealId={plan.meal_id}
-        date={new Date(plan.date)}
-        parentRef={ref}
-      />
+    <div className="border border-nutrition-green/30 bg-nutrition-green p-3 flex items-center justify-center text-white-green font-semibold hover:bg-dark-green transition-colors col-span-9">
+      <div>{t("dashboardTable.hcHeader")}</div>
     </div>
   );
 };
-
-export const HCHeaderCell = () => {
-  const { t } = useTranslation("data")
-
-  return (
-  <div className="border border-nutrition-green/30 bg-nutrition-green p-3 flex items-center justify-center text-white-green font-semibold hover:bg-dark-green transition-colors col-span-8">
-    <div>{t("dashboardTable.hcHeader")}</div>
-  </div>
-);
-} 
-
 
 export const HCCell = ({
   hourIndex,
@@ -87,7 +66,7 @@ export const HCCell = ({
   date: Date;
 }) => {
   const [buffer, setBuffer] = useState<number>(dayHc[hourIndex] || 0);
-  const insert = useInsertTraining();
+  const insert = useInsertPlaning();
 
   const saveData = useCallback(() => {
     const dayHcLength = dayHc.length;
@@ -100,7 +79,7 @@ export const HCCell = ({
         return 0;
       });
     } else {
-      result = dayHc.map((hc, idx) => (idx === hourIndex ? buffer : hc ?? 0));
+      result = dayHc.map((hc, idx) => (idx === hourIndex ? buffer : (hc ?? 0)));
     }
 
     // Trim trailing zeros
@@ -139,13 +118,12 @@ export const HCCell = ({
   );
 };
 
-
 export const ResumeHeaderCell = () => {
-  const { t } = useTranslation("data")
+  const { t } = useTranslation("data");
 
   return (
-  <div className="border border-nutrition-green/30 bg-nutrition-green p-3 flex items-center justify-center text-white-green font-semibold hover:bg-dark-green transition-colors col-span-8">
-    <div>{t("dashboardTable.resumeHeader")}</div>
-  </div>
-);
-}
+    <div className="border border-nutrition-green/30 bg-nutrition-green p-3 flex items-center justify-center text-white-green font-semibold hover:bg-dark-green transition-colors col-span-8">
+      <div>{t("dashboardTable.resumeHeader")}</div>
+    </div>
+  );
+};

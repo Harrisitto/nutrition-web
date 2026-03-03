@@ -16,24 +16,28 @@ export const getDayIndexForDate = (startDate: Date, targetDate: Date): number =>
 }
 
 
-export const generatePlaningKey = (mealId: string, date: Date) => {
-    const dateStr = date.toLocaleDateString(); // Get YYYY-MM-DD format
-    return `${mealId}#${dateStr}`;
-}
-
-export const generateTrainingKey = (date: Date) => {
-    const dateStr = date.toLocaleDateString();
-    return `training#${dateStr}`;
-}
-
-export const parseTrainingKey = (key: string) => {
-    const dateStr = key.split("#")[1];
-    return new Date(dateStr);
+export const generatePlaningKey = (date: Date | string) => {
+    if (typeof date === "string") {
+        return new Date(date).toLocaleDateString();
+    }
+    return date.toLocaleDateString(); // Get YYYY-MM-DD format
 }
 
 export const parsePlaningKey = (key: string) => {
-    const [mealId, dateStr] = key.split("#");
-    return { mealId, date: new Date(dateStr) };
+    return new Date(key);
+}
+
+export const generateMealKey = (mealId: number, date: Date | string) => {
+    const dateKey = generatePlaningKey(date);
+    return `${mealId}#${dateKey}`;
+}
+
+export const parseMealKey = (key: string) => {
+    const [mealIdStr, dateStr] = key.split("#");
+    return {
+        mealId: parseInt(mealIdStr, 10),
+        date: parsePlaningKey(dateStr),
+    }
 }
 
 export const colorBasedOnKcal = (kcal: number) => {
