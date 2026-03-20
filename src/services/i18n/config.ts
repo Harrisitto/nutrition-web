@@ -5,13 +5,14 @@ import LanguageDetector from "i18next-browser-languagedetector";
 import enSystem from "./locales/en/system.json";
 import enAuth from "./locales/en/auth.json";
 import enApp from "./locales/en/data.json";
+import enForms from "./locales/en/forms.json";
 
 const resources = {
     en: {
         system: enSystem,
         auth: enAuth,
         data: enApp,
-
+        forms: enForms,
     }, // English translations
 };
 

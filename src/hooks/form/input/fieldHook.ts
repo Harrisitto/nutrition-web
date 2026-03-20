@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Form } from "../class";
-import type { FormFieldUpdate } from "../types";
+import type { FormFieldUpdate, KeyofInputTypes } from "../types";
 
 /**
  * Hook used internally by Field component: returns live field state and
@@ -8,10 +8,10 @@ import type { FormFieldUpdate } from "../types";
  */
 export default function useFormInputHandler(form: Form, id: string) {
   const saved = form.getField(id);
-  const [field, setField] = useState<FormFieldUpdate | null>(saved ?? null);
+  const [field, setField] = useState<FormFieldUpdate<KeyofInputTypes> | null>(saved ?? null);
 
   // stable updater passed into the Form - receives the full InputState
-  const change = useCallback((newState: FormFieldUpdate) => {
+  const change = useCallback((newState: FormFieldUpdate<KeyofInputTypes>) => {
     setField((prev) => ({ ...(prev ?? {}), ...newState }));
   }, []);
 

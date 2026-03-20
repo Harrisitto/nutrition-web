@@ -1,4 +1,4 @@
-import { useTableContext } from "../tableContext";
+import { useTableContext } from "../../tableContext";
 
 const RowNameCell = ({ name }: { name: string }) => {
   return (

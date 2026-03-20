@@ -1,0 +1,12 @@
+{
+    "preset": {
+        "title": "User Presets For Planing",
+        "description": "Create and manage your own presets to quickly fill in the forms when creating a new plan or recipe.",
+        "fields": {
+            "newPreset": "New Preset",
+            "name": "Preset Name",
+            "meals": "Meals",
+            "comment": "Comment"
+        }
+    }
+}

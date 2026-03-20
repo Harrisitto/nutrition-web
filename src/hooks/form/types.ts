@@ -11,6 +11,13 @@ interface InputTypes {
     props: Partial<MultiLineTextInputProps>;
     value: string;
   };
+  selectOne: {
+    props: {
+      label?: string;
+      options: { value: string; label: string }[];
+    };
+    value: string;
+  };
 }
 
 export type ValueOfInputTypes = InputTypes[KeyofInputTypes]['value'];
@@ -21,8 +28,8 @@ export type FormConfig = InputState<KeyofInputTypes>[];
 
 export type DerivedStateUpdaterType = (state: Record<string, unknown>) => void;
 
-export interface FormFieldUpdate extends Partial<InputState<KeyofInputTypes>> {
-  changeState?: (newState: FormFieldUpdate) => void;
+export interface FormFieldUpdate<T extends KeyofInputTypes> extends Partial<InputState<T>> {
+  changeState?: (newState: FormFieldUpdate<T>) => void;
 }
 
 export type InputState<T extends KeyofInputTypes> = {

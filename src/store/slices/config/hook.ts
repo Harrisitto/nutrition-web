@@ -3,7 +3,7 @@ import { useAppSelector } from "@src/store/store"
 import { useCallback } from "react"
 import { changeFormatForGroup, selectShortcut, setAvailableShortcuts, setSelectedUserId, setShortcutConfig, setSidebarOpen, type ConfigState } from "./store"
 import { normalizeStringForShortcut } from "@src/helpers/shortcut"
-import { parseDate } from "@src/helpers/dates"
+import { loadDate } from "@src/helpers/dates"
 
 export const useConfigSelectedUserId = () => {
     return useAppSelector((state) => state.config.selectedUserId)
@@ -25,9 +25,14 @@ export const useConfigSelectedShortcutId = () => {
 export const useConfigDateRange = () => {
     const selectedDateRange = useAppSelector((state) => state.config.selectedDateRange);
     return {
-        start: parseDate(selectedDateRange[0]),
-        end: parseDate(selectedDateRange[1]),
+        start: loadDate(selectedDateRange[0]),
+        end: loadDate(selectedDateRange[1]),
     }
+}
+
+export const useConfigSelectedDay = () => {
+    const selectedDay = useAppSelector((state) => state.config.selectedDay);
+    return selectedDay ? loadDate(selectedDay) : null;
 }
 
 export const useConfigAvailableShortcuts = () => {

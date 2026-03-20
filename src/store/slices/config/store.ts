@@ -7,7 +7,7 @@ export interface ConfigState {
     sidebarOpen: boolean
     selectedUserId: string | null
     selectedDateRange: [string, string],
-    selectedDay: string | null
+    selectedDay: string
     selectedShortcutId: string
     shortcutGuess: string
     availableShortcuts: string[]
@@ -33,7 +33,7 @@ const initialState: ConfigState = {
         saveDate(fromDate().nextMonday()),
         saveDate(fromDate().nextSunday()),
     ],
-    selectedDay: null,
+    selectedDay: saveDate(new Date()),
     /**
      * SIDEBAR
      */
@@ -68,6 +68,9 @@ const configSlice = createSlice({
         setSidebarOpen: (state, action: PayloadAction<boolean>) => {
             state.sidebarOpen = action.payload
         },
+        setSelectedDay: (state, action: PayloadAction<string>) => {
+            state.selectedDay = action.payload
+        },
         selectShortcut: (state, action: PayloadAction<[string, string]>) => {
             state.selectedShortcutId = action.payload[0];
             state.shortcutGuess = action.payload[1];
@@ -91,5 +94,5 @@ const configSlice = createSlice({
     },
 })
 
-export const { setSidebarOpen, setSelectedUserId, selectShortcut, setAvailableShortcuts, changeFormatForGroup, setShortcutConfig } = configSlice.actions
+export const { setSidebarOpen, setSelectedUserId, selectShortcut, setAvailableShortcuts, changeFormatForGroup, setShortcutConfig, setSelectedDay } = configSlice.actions
 export default configSlice.reducer

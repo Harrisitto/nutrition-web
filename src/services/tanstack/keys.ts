@@ -12,7 +12,7 @@ export const queryKeys = {
     },
     data: {
         meals: (lang: string) => ["data", "meals", lang],
-        receiptsForMeal: (mealId: number) => ["data", "receiptsForMeal", mealId],
+        typesForMeal: (mealId: number) => ["data", "receiptsForMeal", mealId],
         measures: ["data", "measures"],
         receipts: ["data", "receipts"],
         videos: ["data", "videos"],

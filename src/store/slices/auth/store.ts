@@ -8,9 +8,6 @@ import { fetchSession } from './thunks/fetchSession'
 import type { Database } from '@src/services/supabase/types'
 import { fetchProfile } from './thunks/fetchProfile'
 
-
-
-
 export interface AuthState {
   user: User | null
   session: Session | null

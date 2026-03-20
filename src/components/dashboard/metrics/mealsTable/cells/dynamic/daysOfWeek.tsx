@@ -1,7 +1,7 @@
 import { useCallback } from "react";
-import { getDayOfMonth } from "../helper";
-import { useTableContext } from "../tableContext";
-import { CellWrapper } from "../cellWrap";
+import { getDayOfMonth } from "../../helper";
+import { useTableContext } from "../../tableContext";
+import { CellWrapper } from "../../cellWrap";
 
 const SideElement = () => {
   return (
@@ -22,7 +22,7 @@ const Cell = ({
 }) => {
   return (
     <div
-      className={`border p-3 font-semibold text-center transition-colors ${
+      className={`border p-3 font-semibold text-center transition-colors h-full ${
         isSelected
           ? "border-dark-green bg-dark-green text-white"
           : "border-nutrition-green/30 bg-nutrition-green text-white-green hover:bg-dark-green"

@@ -113,37 +113,37 @@ export type Database = {
         }
         Relationships: []
       }
-      all_receipts: {
+      all_recipes: {
         Row: {
           description: Json | null
-          food_type_id: number | null
           id: number
           ingredients: Json | null
           name: Json | null
+          type_id: number | null
           url: string
         }
         Insert: {
           description?: Json | null
-          food_type_id?: number | null
           id?: number
           ingredients?: Json | null
           name?: Json | null
+          type_id?: number | null
           url?: string
         }
         Update: {
           description?: Json | null
-          food_type_id?: number | null
           id?: number
           ingredients?: Json | null
           name?: Json | null
+          type_id?: number | null
           url?: string
         }
         Relationships: [
           {
-            foreignKeyName: "all_receipts_food_type_id_fkey"
-            columns: ["food_type_id"]
+            foreignKeyName: "all_recipes_type_id_fkey"
+            columns: ["type_id"]
             isOneToOne: false
-            referencedRelation: "receipt_types"
+            referencedRelation: "recipe_type"
             referencedColumns: ["id"]
           },
         ]
@@ -262,7 +262,33 @@ export type Database = {
           },
         ]
       }
-      receipt_meals: {
+      recipe_type: {
+        Row: {
+          id: number
+          macros_id: number | null
+          name: Json | null
+        }
+        Insert: {
+          id?: number
+          macros_id?: number | null
+          name?: Json | null
+        }
+        Update: {
+          id?: number
+          macros_id?: number | null
+          name?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "food_types_macros_id_fkey"
+            columns: ["macros_id"]
+            isOneToOne: false
+            referencedRelation: "all_macros"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recipe_type_meal: {
         Row: {
           meal_id: number
           type_id: number
@@ -287,36 +313,7 @@ export type Database = {
             foreignKeyName: "meal_receipts_type_id_fkey"
             columns: ["type_id"]
             isOneToOne: false
-            referencedRelation: "receipt_types"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      receipt_types: {
-        Row: {
-          code: string | null
-          id: number
-          macros_id: number | null
-          name: Json | null
-        }
-        Insert: {
-          code?: string | null
-          id?: number
-          macros_id?: number | null
-          name?: Json | null
-        }
-        Update: {
-          code?: string | null
-          id?: number
-          macros_id?: number | null
-          name?: Json | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "food_types_macros_id_fkey"
-            columns: ["macros_id"]
-            isOneToOne: false
-            referencedRelation: "all_macros"
+            referencedRelation: "recipe_type"
             referencedColumns: ["id"]
           },
         ]
@@ -472,7 +469,7 @@ export type Database = {
             foreignKeyName: "user_planing_meal_type_id_fkey"
             columns: ["type_id"]
             isOneToOne: false
-            referencedRelation: "receipt_types"
+            referencedRelation: "recipe_type"
             referencedColumns: ["id"]
           },
         ]
@@ -541,7 +538,7 @@ export type Database = {
             foreignKeyName: "user_preset_meal_type_id_fkey"
             columns: ["type_id"]
             isOneToOne: false
-            referencedRelation: "receipt_types"
+            referencedRelation: "recipe_type"
             referencedColumns: ["id"]
           },
         ]

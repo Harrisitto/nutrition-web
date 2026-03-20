@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTableContext } from "../tableContext";
 
 const formatString = (str: string) => {
@@ -22,15 +22,22 @@ export const SideSelectOptions = ({
 
     const { cancelFocus } = useTableContext();
     const [searchTerm, setSearchTerm] = useState("");
-    const [selectedIndex, setSelectedIndex] = useState<number>(
-        options.findIndex(([id]) => id === initialId) || 0
-    );
+    const [selectedIndex, setSelectedIndex] = useState<number>(() => {
+        const index = options.findIndex(([id]) => id === initialId);
+        return index >= 0 ? index : 0;
+    });
     const inputRef = useRef<HTMLInputElement>(null);
 
     const filteredOptions = useMemo(() => {
         if (!searchTerm) return options;
         return options.filter(([, label]) => compareStrings(label, searchTerm)) || [];
     }, [options, searchTerm]);
+
+    const applySelection = useCallback((optionId: string) => {
+        onSelect(optionId);
+        setSearchTerm("");
+        cancelFocus();
+    }, [onSelect, cancelFocus]);
 
     /**
      * Focus the input when the component mounts, so user can start typing immediately.
@@ -53,18 +60,23 @@ export const SideSelectOptions = ({
         const handleKeyDown = (e: KeyboardEvent) => {
             switch (e.key) {
                 case "ArrowDown":
+                    if (numOptions === 0) break;
                     e.preventDefault();
                     setSelectedIndex(prev => (prev + 1) % numOptions);
                     break;
                 case "ArrowUp":
+                    if (numOptions === 0) break;
                     e.preventDefault();
                     setSelectedIndex(prev => (prev - 1 + numOptions) % numOptions);
                     break;
                 case "Enter":
                     e.preventDefault();
+                    if (numOptions === 0) break;
                     if (selectedIndex >= 0 && selectedIndex < numOptions) {
-                        onSelect(filteredOptions[selectedIndex][0]);
+                        applySelection(filteredOptions[selectedIndex][0]);
                     }
+                    setSearchTerm("");
+                    cancelFocus();
                     break;
                 case "Escape":
                     e.preventDefault();
@@ -81,7 +93,7 @@ export const SideSelectOptions = ({
             window.removeEventListener("click", handleClickOutside);
             window.removeEventListener("keydown", handleKeyDown);
         }
-    }, [filteredOptions, selectedIndex, onSelect, cancelFocus]);
+    }, [applySelection, filteredOptions, selectedIndex, cancelFocus]);
 
     return (
         <div>
@@ -98,7 +110,7 @@ export const SideSelectOptions = ({
                     <div
                         key={id}
                         className={`px-2 py-1 cursor-pointer text-sm rounded ${index === selectedIndex ? "bg-gray-200" : "hover:bg-gray-100"}`}
-                        onClick={() => onSelect(id)}
+                        onClick={() => applySelection(id)}
                     >
                         {label}
                     </div>

@@ -11,13 +11,24 @@ export const saveDate = (date: Date) => {
     return date.toLocaleDateString('en-CA'); // Format: YYYY-MM-DD
 }
 
-export const parseDate = (dateString: string) => {
+export const loadDate = (dateString: string) => {
     const [year, month, day] = dateString.split('-').map(Number);
     return new Date(year, month - 1, day);  
 };
 
+export const nextDayDate = (date: Date | string) => {
+    const nextDate = new Date(date);
+    nextDate.setDate(nextDate.getDate() + 1);
+    return nextDate;
+}
+
 
 export const fromDate = (fromDate = new Date()) => ({
+    incrementDay: (days: number) => {
+        const newDate = new Date(fromDate);
+        newDate.setDate(newDate.getDate() + days);
+        return newDate;
+    },
     nextMonday: () => {
         const day = fromDate.getDay();
         const diff = (day === 0 ? 1 : 8) - day;

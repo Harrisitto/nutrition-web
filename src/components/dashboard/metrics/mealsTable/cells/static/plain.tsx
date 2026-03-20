@@ -1,6 +1,5 @@
 import { useCallback, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useTableContext } from "../tableContext";
 import { useInsertPlaning } from "@src/services/tanstack/user/planing";
 
 export const CornerCell = () => (
@@ -13,26 +12,7 @@ export const EmptyCell = () => (
   <div className="border border-gray-blue-200 bg-gray-blue-50 p-3 flex items-center justify-center text-text-body hover:bg-gray-blue-100 transition-colors" />
 );
 
-export const ColSideElement = () => {
-  const { t } = useTranslation("data");
-  const { tableFragmentIndex, sideElement } = useTableContext();
-  const span = Math.max(
-    tableFragmentIndex.mealRows.end - tableFragmentIndex.mealRows.start + 1,
-    1,
-  );
-  return (
-    <div
-      className="border border-nutrition-green/30 bg-nutrition-green p-3 flex items-center justify-center text-white-green font-semibold hover:bg-dark-green transition-colors"
-      style={{ gridRow: `span ${span} / span ${span}` }}
-    >
-      {sideElement ? (
-        sideElement
-      ) : (
-        <div className="text-sm font-medium">{t("dashboardTable.search")}</div>
-      )}
-    </div>
-  );
-};
+
 
 export const MealNameCell = ({ name }: { name: string }) => (
   <div className="border border-nutrition-green/30 bg-white-green/30 p-3 font-semibold whitespace-nowrap text-text-title hover:bg-white-green/50 transition-colors">

@@ -7,20 +7,14 @@ import { usePlaning } from "./hooks/planing";
 export const Provider = ({
   children,
   startMonday,
-  endSunday,
 }: {
   children: React.ReactNode;
   startMonday: Date;
-  endSunday: Date;
 }) => {
-  const dateRange = {
-    startDate: startMonday,
-    endDate: endSunday,
-  };
 
   const meals = useFetchMeals();
   const daysOfWeek = useDaysOfWeek();
-  const planing = usePlaning(dateRange);
+  const planing = usePlaning({ forDate: startMonday });
 
   const [cells, setCells] = useState<HTMLDivElement[][]>([]);
   const [selectedCell, setSelectedCell] = useState<{ x: number; y: number }>({
@@ -72,19 +66,16 @@ export const Provider = ({
         start: 1,
         end: mealslength + 1,
       },
-      trainingHeader: {
-        start: mealslength + 2,
-        end: mealslength + 2,
-      },
       trainingRows: {
-        start: mealslength + 3,
-        end: mealslength + trainingHours + 3,
+        start: mealslength + 1,
+        end: mealslength + trainingHours + 1,
       },
     };
   }, [meals.data, planing.maxTrainingHours]);
 
   const cancelFocus = useCallback(() => {
     setIsFocused(false);
+    setSideElement(null);
   }, []);
 
   useEffect(() => {
@@ -93,7 +84,7 @@ export const Provider = ({
     const handleClickOutside = (e: MouseEvent) => {
       if (
         cells.some((row) =>
-          row.some((cell) => cell?.contains(e.target as Node)),
+          Array.isArray(row) && row.some((cell) => cell?.contains(e.target as Node)),
         )
       )
         return;
@@ -143,9 +134,17 @@ export const Provider = ({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (cells.length === 0) return;
+
+      const eventTarget = e.target as Node | null;
+      const targetIsCurrentCellInput =
+        !!eventTarget && !!currentCell()?.contains(eventTarget);
+
       switch (e.key) {
         case "ArrowUp":
-          if (isFocused) return;
+          if (isFocused && !targetIsCurrentCellInput) return;
+          e.preventDefault();
+          setIsFocused(false);
+          setSideElement(null);
           setSelectedCell((prev) => {
             const nextY = (prev.y - 1 + cells.length) % cells.length;
             const nextRow = cells[nextY] ?? [];
@@ -155,7 +154,10 @@ export const Provider = ({
           });
           break;
         case "ArrowDown":
-          if (isFocused) return;
+          if (isFocused && !targetIsCurrentCellInput) return;
+          e.preventDefault();
+          setIsFocused(false);
+          setSideElement(null);
           setSelectedCell((prev) => {
             const nextY = (prev.y + 1) % cells.length;
             const nextRow = cells[nextY] ?? [];
@@ -210,7 +212,6 @@ export const Provider = ({
         sideElement,
         selectedCell,
         startMonday,
-        endSunday,
         isFocused,
         daysOfWeek,
         planing,

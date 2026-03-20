@@ -1,19 +1,26 @@
 import { supabase } from "@src/services/supabase/client";
 import { queryKeys } from "../keys";
-import { TABLE_RECEIPT_TYPES, TABLE_USER_PRESET, TABLE_USER_PRESET_MEAL } from "@src/services/supabase/definitions";
+import { TABLE_USER_PRESET, TABLE_USER_PRESET_MEAL } from "@src/services/supabase/definitions";
 import { useConfigSelectedUserId } from "@src/store/slices/config/hook";
 import { useQuery } from "@tanstack/react-query";
 import { useLanguageCode } from "@src/hooks/helpers/language";
 
 const selectFromMeal = (languageCode: ReturnType<typeof useLanguageCode>) => {
     return `*,
-        ${TABLE_USER_PRESET_MEAL.COLS.TYPE_ID}(
-        id,
-        name: name->>${languageCode},
-        ${TABLE_RECEIPT_TYPES.COLS.MACROS_ID}(*))` as const;
+        ${TABLE_USER_PRESET_MEAL.NAME}(
+        preset_id,
+        meal_id(
+            id,
+            name: name->>${languageCode}
+        ),
+        type_id(
+            id,
+            name: name->>${languageCode},
+            all_macros(*)
+        ))` as const;
 }
 
-export const useFetchPreset = () => {
+export const useFetchPresets = () => {
     const userId = useConfigSelectedUserId();
     const languageCode = useLanguageCode();
     
@@ -27,7 +34,6 @@ export const useFetchPreset = () => {
                 .eq(TABLE_USER_PRESET.COLS.USER_ID, userId)
             
             if (error) throw error;
-            
             return data;
         }
     })

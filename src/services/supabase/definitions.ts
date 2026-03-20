@@ -17,8 +17,8 @@ export const TABLE_USER_PLANING = {
     }
 } as const
 
-export const TABLE_RECEIPT_TYPES = {
-    NAME: 'receipt_types',
+export const TABLE_RECIPE_TYPES = {
+    NAME: 'recipe_type',
     COLS: {
         ID: 'id',
         MACROS_ID: 'macros_id',
@@ -85,8 +85,8 @@ export const TABLE_ALL_MEALS = {
     }
 } as const
 
-export const TABLE_RECEIPT_MEALS = {
-    NAME: 'receipt_meals',
+export const TABLE_RECIPE_TYPE_MEALS = {
+    NAME: 'recipe_type_meal',
     COLS: {
         MEAL_ID: 'meal_id',
         TYPE_ID: 'type_id',

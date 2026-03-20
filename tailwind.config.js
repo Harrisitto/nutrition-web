@@ -46,4 +46,7 @@ export default {
       },
     },
   },
+  safelist: [
+    { pattern: /^row-span-(1[0-9]|2[0-4]|[1-9])$/ },
+  ],
 }

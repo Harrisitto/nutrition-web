@@ -2,9 +2,11 @@ import { Suspense, lazy } from "react";
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./components/global/ProtectedRoute";
 import { APP_ROUTES } from "./hooks/navigation/routes";
+
 const LogInPage = lazy(() => import("./pages/auth/LogInPage"));
 const SignInPage = lazy(() => import("./pages/auth/SignUpPage"));
 const PageAppDashboard = lazy(() => import("./pages/app/dashboard"));
+const PageUserPreset = lazy(() => import("./pages/forms/preset"));
 const PageForgotPassword = lazy(() => import("./pages/auth/ForgotPassword"));
 const PagePrivacyPolicy = lazy(() => import("./pages/privacyPolicy/page"));
 const PageReferences = lazy(() => import("./pages/references/page"));
@@ -41,6 +43,7 @@ function App() {
               path={APP_ROUTES.COMPLETE_PROFILE}
               element={<SetupProfile />} // NOT A PROTECTED ROUTE
             />
+            {/* Protected routes */}
             <Route
               path={APP_ROUTES.DASHBOARD}
               element={
@@ -49,7 +52,14 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
+            <Route
+              path={APP_ROUTES.FORM_PRESET}
+              element={
+                <ProtectedRoute>
+                  <PageUserPreset />
+                </ProtectedRoute>
+              }
+            />
             {/* 404 - Catch all unmatched routes */}
             <Route path="*" element={<NotFoundPage />} />
           </Routes>

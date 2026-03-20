@@ -1,11 +1,14 @@
 import { useCallback, useMemo } from "react";
-import { CellWrapper } from "../cellWrap";
-import { generateMealKey, getDateForDayIndex } from "../helper";
-import { SideSelectOptions } from "../sideElement/selectOptions";
-import { useTableContext } from "../tableContext";
+import { CellWrapper } from "../../cellWrap";
+import { generateMealKey, getDateForDayIndex } from "../../helper";
+import { SideSelectOptions } from "../../sideElement/selectOptions";
+import { useTableContext } from "../../tableContext";
 import { useTranslation } from "react-i18next";
 import { useFetchTypesForMeal } from "@src/services/tanstack/data/meals";
-import { useDeleteMeal, useInsertMeal } from "@src/services/tanstack/user/planing";
+import {
+  useDeleteMeal,
+  useInsertMeal,
+} from "@src/services/tanstack/user/planing";
 
 const SideElement = ({
   mealId,
@@ -30,7 +33,8 @@ const SideElement = ({
     return [
       [clearOptionId, t("system:messages.clear")] as [string, string],
       ...mealTypes.map(
-        (opt) => [opt.type_id.id.toString(), opt.type_id.name] as [string, string],
+        (opt) =>
+          [opt.type_id.id.toString(), opt.type_id.name] as [string, string],
       ),
     ];
   }, [mealTypes, t]);
@@ -43,7 +47,7 @@ const SideElement = ({
         if (!planingData) {
           console.warn("No meal to delete for this cell");
           return;
-        };
+        }
         deleteMeal.mutateAsync({
           mealId,
           planingId: planingData.planing_id,
@@ -63,7 +67,13 @@ const SideElement = ({
     [insert, mealId, startMonday, dayIndex, planingData, deleteMeal],
   );
 
-  return <SideSelectOptions initialId={planingData?.type_id?.id?.toString()} options={options} onSelect={handleDBMeal} />;
+  return (
+    <SideSelectOptions
+      initialId={planingData?.type_id?.id?.toString()}
+      options={options}
+      onSelect={handleDBMeal}
+    />
+  );
 };
 
 const PlaningCell = ({
@@ -100,35 +110,33 @@ const PlaningCell = ({
 export const TablePlaning = () => {
   const { meals, daysOfWeek, tableFragmentIndex } = useTableContext();
 
-    return meals.map((meal, mealIndex) => {
-        return daysOfWeek.map((day, dayIndex) => {
-            const posX = dayIndex;
-            const posY = tableFragmentIndex.mealRows.start + mealIndex;
-            const gridX = posX + 2; // +1 for row name, +1 for 0-based index
-            const gridY = posY + 1; // +1 for header row
+  return meals.map((meal, mealIndex) => {
+    return daysOfWeek.map((day, dayIndex) => {
+      const posX = dayIndex;
+      const posY = tableFragmentIndex.mealRows.start + mealIndex;
+      const gridX = posX + 2; // +1 for row name, +1 for 0-based index
+      const gridY = posY + 1; // +1 for header row
 
-            return (
-                <CellWrapper
-                    key={`meal-${meal.id}-${day}`}
-                    posX={posX}
-                    posY={posY}
-                    SideElement={<SideElement mealId={meal.id} dayIndex={dayIndex} />}
-                    style={{
-                        gridColumn: gridX,
-                        gridRow: gridY
-                    }}
-                >
-                    {({ isSelected }) => (
-                        <PlaningCell
-                            mealId={meal.id}
-                            dayIndex={dayIndex}
-                            isSelected={isSelected}
-                        />
-                    )}
-                </CellWrapper>
-            );
-        });
+      return (
+        <CellWrapper
+          key={`meal-${meal.id}-${day}`}
+          posX={posX}
+          posY={posY}
+          SideElement={<SideElement mealId={meal.id} dayIndex={dayIndex} />}
+          style={{
+            gridColumn: gridX,
+            gridRow: gridY,
+          }}
+        >
+          {({ isSelected }) => (
+            <PlaningCell
+              mealId={meal.id}
+              dayIndex={dayIndex}
+              isSelected={isSelected}
+            />
+          )}
+        </CellWrapper>
+      );
     });
+  });
 };
-
-
