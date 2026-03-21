@@ -14,3 +14,13 @@ export const NewPreset = () => {
     const { t } = useTranslation();
     return <h3 className="py-2 text-dark-green text-xl font-bold">{t("forms:preset.fields.newPreset")}</h3>;
 }
+
+export const Meals = () => {
+    const { t } = useTranslation();
+    return <h4 className="text-lg font-semibold">{t("forms:preset.fields.meals")}</h4>;
+}
+
+export const TrainingHc = () => {
+    const { t } = useTranslation();
+    return <h4 className="text-lg font-semibold">{t("forms:preset.fields.trainingHc")}</h4>;
+}

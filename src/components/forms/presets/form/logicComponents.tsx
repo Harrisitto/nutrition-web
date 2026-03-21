@@ -1,4 +1,4 @@
-import { Context, useContextFormPreset, useFormPreset } from "./hook"
+import { Context, fieldIds, useContextFormPreset, useFormPreset } from "./hook"
 
 export const Provider = ({
     children,
@@ -14,17 +14,23 @@ export const Provider = ({
     )
 }
 
-export const FieldByMealId = ({
-    mealId,
-}: {
-    mealId: number;
-}) => {
-    const formPreset = useContextFormPreset();
-    return formPreset?.Fields.find((field) => field.key === mealId.toString()) ?? null;
-}
-
-export const RenderFields = () => {
+export const FieldMeal = () => {
     const formPreset = useContextFormPreset();
     if (!formPreset) return null;
-    return formPreset.Fields
+    return formPreset.Fields.filter((field) => fieldIds.meal.isId(field.key ?? ''));
+}
+
+export const FieldTrainingHc = () => {
+    const formPreset = useContextFormPreset();
+    if (!formPreset) return null;
+    return formPreset.Fields.filter((field) => fieldIds.trainingHc.isId(field.key ?? ''));
+}
+
+export const FieldText = () => {
+    const formPreset = useContextFormPreset();
+    if (!formPreset) return null;
+    return formPreset.Fields.filter((field) => {
+        const key = field.key ?? '';
+        return key === fieldIds.name || key === fieldIds.comment;
+    });
 }

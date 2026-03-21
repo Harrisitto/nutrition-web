@@ -10,6 +10,7 @@ const Field = ({ form, id }: { form: Form; id: string }) => {
   const { t } = useTranslation();
   const [showExplanation, setShowExplanation] = useState(false);
 
+  if(field?.isHidden) return null;
   return (
     <div
       className={`flex flex-col gap-4 mb-4 ${showExplanation ? "p-4" : ""} ${

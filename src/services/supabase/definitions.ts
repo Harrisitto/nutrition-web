@@ -45,6 +45,7 @@ export const TABLE_USER_PRESET = {
         USER_ID: 'user_id',
         NAME: 'name',
         TRAINING_HC: 'training_hc',
+        COMMENT: 'comment',
     }
 } as const
 

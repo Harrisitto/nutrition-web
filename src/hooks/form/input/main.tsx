@@ -54,6 +54,23 @@ const SwitchField = ({
         />
       );
     }
+    case "numeric": {
+      const thisField = field as FormFieldUpdate<"numeric">;
+      return (
+        <InputComponent.Numeric
+          label={thisField.inputProps?.label ?? ""}
+          value={thisField.currentValue === null ? "" : thisField.currentValue}
+          onChange={(newValue) => {
+            const parsedValue = parseFloat(newValue.target.value);
+            if (!isNaN(parsedValue)) {
+              form.requestUpdate(id, parsedValue);
+            } else {
+              form.requestUpdate(id, null);
+            }
+          }}
+        />
+      );
+    }
     default:
       return null;
   }

@@ -18,6 +18,12 @@ interface InputTypes {
     };
     value: string;
   };
+  numeric: {
+    props: {
+      label?: string;
+    };
+    value: number | "";
+  };
 }
 
 export type ValueOfInputTypes = InputTypes[KeyofInputTypes]['value'];
@@ -40,6 +46,7 @@ export type InputState<T extends KeyofInputTypes> = {
   errorMsg?: string; // T function key for error message
   searchContext?: string;
   isLocked?: boolean;
+  isHidden?: boolean;
   sharedRowElement?: ReactElement;
   controllers?: {
     subscribedIds: string[];

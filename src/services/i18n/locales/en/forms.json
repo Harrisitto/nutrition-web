@@ -6,6 +6,7 @@
             "newPreset": "New Preset",
             "name": "Preset Name",
             "meals": "Meals",
+            "trainingHc": "Training Carbs",
             "comment": "Comment"
         }
     }

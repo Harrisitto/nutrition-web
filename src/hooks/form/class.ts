@@ -5,7 +5,7 @@ import type { DerivedStateUpdaterType, FormConfig, FormFieldUpdate, InputState, 
  * and notifies registered controllers / field subscribers on changes.
  */
 export class Form {
-    private config: Map<string, FormFieldUpdate>;   // map of field id to field state
+    private config: Map<string, FormFieldUpdate<KeyofInputTypes>>;   // map of field id to field state
     private initialValues: Map<string, unknown>; // map of field id to initial value (for reset)
     derivedStateUpdater?: DerivedStateUpdaterType;  // optional derived state updater function
 
@@ -25,7 +25,7 @@ export class Form {
      * 
      * @param field Current field state and change handler
      */
-    addField(field: FormFieldUpdate & { id: string }) {
+    addField(field: FormFieldUpdate<KeyofInputTypes> & { id: string }) {
         const prev = this.config.get(field.id) || {};
         const merged = { ...prev, ...field };
         this.config.set(field.id, merged);
@@ -94,7 +94,7 @@ export class Form {
     ) {
         const field = this.config.get(id);      // get current field state
         if (!field) return;                     // field not found  
-        const updatedField: FormFieldUpdate = { // merge new state
+        const updatedField: FormFieldUpdate<KeyofInputTypes> = { // merge new state
             ...field,
             ...newState
         };

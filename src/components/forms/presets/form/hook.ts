@@ -12,6 +12,29 @@ type MealTypeRows = NonNullable<ReturnType<typeof useFetchTypesForAllMeals>[numb
 export const fieldIds = {
     name: "name",
     comment: "comment",
+    meal: {
+        generateId: (mealId: number) => `meal-${mealId}`,
+        isId: (fieldId: string) => fieldId.startsWith("meal-"),
+        parseId: (fieldId: string) => {
+            const prefix = "meal-";
+            if (!fieldId.startsWith(prefix)) return null;
+            const idPart = fieldId.slice(prefix.length);
+            const id = parseInt(idPart, 10);
+            return isNaN(id) ? null : id;
+        }
+    },
+    trainingHc: {
+        generateId: (index: number) => `training-hc-${index}`,
+        isId: (fieldId: string) => fieldId.startsWith("training-hc-"),
+        parseId: (fieldId: string) => {
+            const prefix = "training-hc-";
+            if (!fieldId.startsWith(prefix)) return null;
+            const indexPart = fieldId.slice(prefix.length);
+            const index = parseInt(indexPart, 10);
+            return isNaN(index) ? null : index;
+        }
+    },
+
 } as const;
 
 const nameField = {
@@ -33,7 +56,7 @@ const commentField = {
 } as InputState<"textarea">;
 
 const createFieldForMeal = (meal: Meal, mealOptions: MealTypeRows | undefined) => {
-    
+
     const unselectableOption = {
         value: "",
         label: " - ",
@@ -45,7 +68,7 @@ const createFieldForMeal = (meal: Meal, mealOptions: MealTypeRows | undefined) =
     }))] : [unselectableOption];
 
     return {
-        id: meal.id.toString(),
+        id: fieldIds.meal.generateId(meal.id),
         type: "selectOne",
         currentValue: "",
         inputProps: {
@@ -54,6 +77,32 @@ const createFieldForMeal = (meal: Meal, mealOptions: MealTypeRows | undefined) =
         },
     } as InputState<"selectOne">;
 };
+
+const createFieldForTrainingHc = (hcData: number[]) => {
+    return hcData.map((hcId, index) => ({
+        id: fieldIds.trainingHc.generateId(index),
+        type: "numeric",
+        currentValue: hcId || "",
+        inputProps: {
+            label: `${index + 1} H`,
+        },
+        isHidden: index > 4, // only show up to 5 HC fields by default
+        controllers: [{
+            subscribedIds: [
+                fieldIds.trainingHc.generateId(index),
+                fieldIds.trainingHc.generateId(index + 1)
+            ],
+            update: (hc1, hc2) => {
+                if (!hc1.currentValue) {
+                    return []; // if current HC is empty, do nothing
+                }
+                hc2.isHidden = false; // show next HC field
+                return [hc2];
+            }
+        }]
+    } as InputState<"numeric">));
+};
+
 
 const useCreateConfig = () => {
     const mealsQuery = useFetchMeals();
@@ -71,7 +120,12 @@ const useCreateConfig = () => {
         );
     }, [mealsQuery.data, mealOptionsQueries]);
 
-    return [nameField, commentField, ...mealsConfig];
+    const trainingHcConfig = useMemo(() => {
+        const hcData = Array.from({ length: 24 }, () => 0);
+        return createFieldForTrainingHc(hcData);
+    }, []);
+
+    return [nameField, commentField, ...mealsConfig, ...trainingHcConfig];
 };
 
 export const useFormPreset = () => {

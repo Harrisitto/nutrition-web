@@ -377,24 +377,21 @@ export type Database = {
       user_measures: {
         Row: {
           date: string
-          id: number
           measure_id: number
-          relationship: number
           user_id: string
+          value: number
         }
         Insert: {
           date?: string
-          id?: number
           measure_id: number
-          relationship: number
           user_id: string
+          value: number
         }
         Update: {
           date?: string
-          id?: number
           measure_id?: number
-          relationship?: number
           user_id?: string
+          value?: number
         }
         Relationships: [
           {
@@ -418,18 +415,21 @@ export type Database = {
           date: string
           id: number
           training_hc: number[]
+          training_kcal: number
           user_id: string
         }
         Insert: {
           date: string
           id?: number
           training_hc: number[]
+          training_kcal?: number
           user_id?: string
         }
         Update: {
           date?: string
           id?: number
           training_hc?: number[]
+          training_kcal?: number
           user_id?: string
         }
         Relationships: []
@@ -476,18 +476,21 @@ export type Database = {
       }
       user_preset: {
         Row: {
+          comment: string
           id: number
           name: string
           training_hc: number[]
           user_id: string
         }
         Insert: {
+          comment?: string
           id?: number
           name: string
           training_hc: number[]
           user_id: string
         }
         Update: {
+          comment?: string
           id?: number
           name?: string
           training_hc?: number[]
