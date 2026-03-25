@@ -7,8 +7,9 @@ import type { FormFieldUpdate, KeyofInputTypes } from "../types";
  * registers a stable change handler with the Form instance.
  */
 export default function useFormInputHandler(form: Form, id: string) {
-  const saved = form.getField(id);
-  const [field, setField] = useState<FormFieldUpdate<KeyofInputTypes> | null>(saved ?? null);
+  const [field, setField] = useState<FormFieldUpdate<KeyofInputTypes> | null>(() =>
+    form.getField(id) ?? null,
+  );
 
   // stable updater passed into the Form - receives the full InputState
   const change = useCallback((newState: FormFieldUpdate<KeyofInputTypes>) => {
@@ -16,9 +17,9 @@ export default function useFormInputHandler(form: Form, id: string) {
   }, []);
 
   useEffect(() => {
-    if(field?.changeState !== undefined) return; // already registered
-    form.addField({ id, changeState: change });  // register field with form
-  }, [form, id, change, field]);
+    setField(form.getField(id) ?? null);
+    form.addField({ id, changeState: change });
+  }, [form, id, change]);
 
   return { field };
 }

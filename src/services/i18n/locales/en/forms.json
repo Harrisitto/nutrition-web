@@ -6,8 +6,13 @@
             "newPreset": "New Preset",
             "name": "Preset Name",
             "meals": "Meals",
+            "formResume": "Form Resume",
             "trainingHc": "Training Carbs",
-            "comment": "Comment"
+            "comment": "Comment",
+            "mealsKcal": "Meals kcal",
+            "trainingKcal": "Training kcal",
+            "totalKcal": "Total kcal",
+            "submit": "Save Preset"
         }
     }
 }

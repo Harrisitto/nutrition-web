@@ -27,7 +27,9 @@ const updatePresetList = (
     newPreset: Preset
 ) => {
     queryClient.setQueryData<Preset[]>(
-        queryKeys.user.presets(newPreset.user_id),
+        queryKeys({
+            userId: newPreset.user_id,
+        }).user.presets,
         (oldData) => {
             if (!oldData) return [newPreset];
             const list = new Map(oldData.map(preset => [preset.id, preset]));
@@ -42,7 +44,9 @@ const removePresetFromList = (
     userId: string
 ) => {
     queryClient.setQueryData<Preset[]>(
-        queryKeys.user.presets(userId),
+        queryKeys({
+            userId,
+        }).user.presets,
         (oldData) => {
             if (!oldData) return [];
             return oldData.filter(preset => preset.id !== presetId);
@@ -55,7 +59,9 @@ export const useFetchPresets = () => {
     const languageCode = useLanguageCode();
 
     return useQuery({
-        queryKey: queryKeys.user.presets(userId),
+        queryKey: queryKeys({
+            userId,
+        }).user.presets,
         queryFn: async () => {
             if (!userId) throw new Error("User ID is required to fetch presets");
             const { data, error } = await supabase

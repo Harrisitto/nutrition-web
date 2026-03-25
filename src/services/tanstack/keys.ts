@@ -1,20 +1,27 @@
-export const queryKeys = {
+export const queryKeys = ({
+    userId = '',
+    language = '',
+} : {
+    userId?: string | null;
+    language?: string;
+} = {}) => ({
     user: {
-        single: (userId: string) => ["user", "single", userId],
+        single: ["user", "single", userId],
         fromNutritionist: ["user", "myUsers"],
         formBrand: ["user", "brandUsers"],
-        planingBase: (userId: string | null) => ["user", "planing", userId],
-        planingDay: (userId: string | null, date: string) => ["user", "planing", userId, date],
-        planing: (userId: string | null, start: string, end: string) => ["user", "planing", userId, start, end],
-        trainingBase: (userId: string | null) => ["user", "training", userId],
-        training: (userId: string | null, start: string, end: string) => ["user", "training", userId, start, end],
-        presets: (userId: string | null) => ["user", "presets", userId],
+        planingBase: ["user", "planing", userId],
+        planingDay: (date: string) => ["user", "planing", userId, date],
+        planing: (start: string, end: string) => ["user", "planing", userId, start, end],
+        trainingBase: ["user", "training", userId],
+        training: (start: string, end: string) => ["user", "training", userId, start, end],
+        presets: ["user", "presets", userId],
     },
     data: {
-        meals: (lang: string) => ["data", "meals", lang],
-        typesForMeal: (mealId: number) => ["data", "receiptsForMeal", mealId],
+        meals: ["data", "meals", language],
+        typesForMeal: (mealId: number) => ["data", "receiptsForMeal", mealId, language],
+        allTypes: ["data", "allTypes", language],
         measures: ["data", "measures"],
         receipts: ["data", "receipts"],
         videos: ["data", "videos"],
     }
-}
+});

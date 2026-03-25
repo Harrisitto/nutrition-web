@@ -55,7 +55,9 @@ export const useFetchSingleUser = ({
 } = {}) => {
     const selectedUser = useConfigSelectedUserId();
     return useQuery({
-        queryKey: queryKeys.user.single(userId ?? selectedUser ?? ""),
+        queryKey: queryKeys({
+            userId: userId ?? selectedUser ?? '',
+        }).user.single,
         queryFn: async () => {
             const { data, error } = await supabase
                 .from(TABLE_ALL_USERS.NAME)
@@ -72,7 +74,7 @@ export const useFetchNutritionistUsers = () => {
     const err = useNotificationErrorQuery()
 
     return useQuery({
-        queryKey: queryKeys.user.fromNutritionist,
+        queryKey: queryKeys().user.fromNutritionist,
         queryFn: async () => {
             try {
                 if (!userId) throw new Error("User ID is required to fetch nutritionist users");

@@ -30,7 +30,11 @@ const updatePlanningQueries = (
     updater: (oldData: PlanningData) => PlanningData,
 ) => {
     queryClient.setQueriesData<PlanningData>(
-        { queryKey: queryKeys.user.planingBase(userId) },
+        {
+            queryKey: queryKeys({
+                userId,
+            }).user.planingBase
+        },
         (oldData) => {
             if (!oldData) return oldData;
             return updater(oldData);
@@ -83,7 +87,10 @@ export const useFetchPlanning = ({
     };
 
     return useInfiniteQuery({
-        queryKey: queryKeys.user.planing(user, effectiveStartDate, effectiveEndDate),
+        queryKey: queryKeys({
+            userId: user,
+            language: languageCode,
+        }).user.planing(effectiveStartDate, effectiveEndDate),
         initialPageParam,
         queryFn: async ({
             pageParam
@@ -124,7 +131,10 @@ export const useInsertPlaning = () => {
     const userId = useConfigSelectedUserId();
     const languageCode = useLanguageCode();
     const mutation = useMutation({
-        mutationKey: queryKeys.user.planingBase(userId),
+        mutationKey: queryKeys({
+            userId,
+            language: languageCode,
+        }).user.planingBase,
         mutationFn: async ({ date, trainingHc }: { date: Date; trainingHc?: number[] }) => {
             if (!userId) throw new Error("User ID is required to insert planing data");
             const { data, error } = await supabase
@@ -155,7 +165,10 @@ export const useInsertMeal = () => {
     const languageCode = useLanguageCode();
 
     const mutation = useMutation({
-        mutationKey: queryKeys.user.planingBase(userId),
+        mutationKey: queryKeys({
+            userId,
+            language: languageCode,
+        }).user.planingBase,
         mutationFn: async ({
             planingId,
             mealId,
@@ -246,7 +259,9 @@ export const useDeleteMeal = () => {
     const { addErrorIcon } = useNotification();
 
     const mutation = useMutation({
-        mutationKey: queryKeys.user.planingBase(userId),
+        mutationKey: queryKeys({
+            userId,
+        }).user.planingBase,
         mutationFn: async ({
             planingId,
             mealId,

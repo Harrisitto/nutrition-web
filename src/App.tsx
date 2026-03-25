@@ -55,7 +55,9 @@ function App() {
             <Route
               path={APP_ROUTES.FORM_PRESET}
               element={
-                <ProtectedRoute>
+                <ProtectedRoute
+                  selectedUserRequired={true} // This page requires a user to be selected in the config
+                >
                   <PageUserPreset />
                 </ProtectedRoute>
               }

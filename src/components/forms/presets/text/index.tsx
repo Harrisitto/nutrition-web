@@ -24,3 +24,8 @@ export const TrainingHc = () => {
     const { t } = useTranslation();
     return <h4 className="text-lg font-semibold">{t("forms:preset.fields.trainingHc")}</h4>;
 }
+
+export const FormResume = () => {
+    const { t } = useTranslation();
+    return <h4 className="text-lg font-semibold">{t("forms:preset.fields.formResume")}</h4>;
+}

@@ -1,13 +1,16 @@
 import useForm from "@src/hooks/form";
 import type { InputState } from "@src/hooks/form/types";
+import { calculateKcalFromMacros } from "@src/hooks/helpers/constants";
 import {
+    useFetchAllMealTypes,
     useFetchMeals,
     useFetchTypesForAllMeals
 } from "@src/services/tanstack/data/meals";
-import { createContext, useContext, useMemo } from "react";
+import { createContext, useCallback, useContext, useMemo } from "react";
 
 type Meal = NonNullable<ReturnType<typeof useFetchMeals>["data"]>[number];
-type MealTypeRows = NonNullable<ReturnType<typeof useFetchTypesForAllMeals>[number]["data"]>;
+type MealTypeRows = ReturnType<typeof useFetchTypesForAllMeals>["byMealId"][number];
+type MealType = NonNullable<ReturnType<typeof useFetchAllMealTypes>["data"]>[number];
 
 export const fieldIds = {
     name: "name",
@@ -103,35 +106,89 @@ const createFieldForTrainingHc = (hcData: number[]) => {
     } as InputState<"numeric">));
 };
 
+const calculateDerivedState = (
+    fields: Record<string, unknown>,
+    mealsMap: Record<number, MealType>,
+) => {
+    const hcFields = Object.entries(fields)
+        .map(([key, value]) => fieldIds.trainingHc.isId(key) ? value : null)
+        .filter(Boolean) as InputState<"numeric">['currentValue'][];
+    const mealFields = Object.entries(fields)
+        .map(([key, value]) => fieldIds.meal.isId(key) ? value : null)
+        .filter(Boolean) as InputState<"selectOne">['currentValue'][];
+
+    const trainingKcal = hcFields.reduce<number>((total, currValue) => {
+        const value = typeof currValue === "number" ? currValue : 0;
+        const kcal = calculateKcalFromMacros({ carbs: value });
+        return total + Number(kcal);
+    }, 0);
+
+    const mealKcal = mealFields.reduce<number>((total, field) => {
+        const mealTypeId = field ? parseInt(field.toString(), 10) : null;
+        if (!mealTypeId || !mealsMap) return total;
+        const mealType = mealsMap[mealTypeId];
+        if (!mealType.macros_id) return total;
+        const kcal = calculateKcalFromMacros(mealType.macros_id);
+        return total + Number(kcal);
+    }, 0);
+
+    return {
+        trainingKcal,
+        mealKcal,
+        totalKcal: trainingKcal + mealKcal,
+    };
+}
+
 
 const useCreateConfig = () => {
     const mealsQuery = useFetchMeals();
-    const mealOptionsQueries = useFetchTypesForAllMeals(
-        (mealsQuery.data ?? []).map((meal) => meal.id)
+
+    const mealIds = useMemo(
+        () => (mealsQuery.data ?? []).map((meal) => meal.id),
+        [mealsQuery.data]
     );
+
+    const mealOptions = useFetchTypesForAllMeals(mealIds);
 
     const mealsConfig = useMemo(() => {
         if (!mealsQuery.data) return [];
         return mealsQuery.data.map((meal) =>
-            createFieldForMeal(
-                meal,
-                mealOptionsQueries.find((query) => query.data?.some((option) => option.meal_id === meal.id))?.data
-            ),
+            createFieldForMeal(meal, mealOptions.byMealId[meal.id])
         );
-    }, [mealsQuery.data, mealOptionsQueries]);
+    }, [mealsQuery.data, mealOptions.byMealId]);
 
     const trainingHcConfig = useMemo(() => {
         const hcData = Array.from({ length: 24 }, () => 0);
         return createFieldForTrainingHc(hcData);
     }, []);
 
-    return [nameField, commentField, ...mealsConfig, ...trainingHcConfig];
+    return useMemo(
+        () => [nameField, commentField, ...mealsConfig, ...trainingHcConfig],
+        [mealsConfig, trainingHcConfig]
+    );
 };
 
 export const useFormPreset = () => {
     const config = useCreateConfig();
+
+    const types = useFetchAllMealTypes();
+
+    const typesMap = useMemo(() => {
+        if (!types.data) return {};
+        return types.data.reduce((map, type) => {
+            map[type.id] = type;
+            return map;
+        }, {} as Record<number, MealType>);
+    }, [types.data]);
+
+    const derivedStateUpdater = useCallback(
+        (fields: Record<string, unknown>) => calculateDerivedState(fields, typesMap),
+        [typesMap]
+    );
+
     const formPreset = useForm({
         config,
+        calculateDerivedState: derivedStateUpdater,
     });
 
     return formPreset;
