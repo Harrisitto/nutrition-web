@@ -70,6 +70,10 @@ export const Provider = ({
         start: mealslength + 1,
         end: mealslength + trainingHours + 1,
       },
+      trainingKcalRows: {
+        start: mealslength + trainingHours + 2,
+        end: mealslength + trainingHours + 2,
+      },
     };
   }, [meals.data, planing.maxTrainingHours]);
 

@@ -6,9 +6,11 @@ import { ArrowLeft, ArrowRight, RefreshCw } from "lucide-react";
 import { useCallback } from "react";
 
 export const SelectDateHeader = () => {
-  const currentDate = useConfigSelectedDay() ?? new Date();
+  const currentDate = useConfigSelectedDay() ?? fromDate().nextMonday();
   const dispatch = useAppDispatch();
   const dateFn = fromDate(currentDate);
+
+  console.log("Current date in SelectDateHeader:", currentDate);
 
   const addOneWeek = useCallback(() => {
     dispatch(setSelectedDay(saveDate(dateFn.incrementDay(7))));

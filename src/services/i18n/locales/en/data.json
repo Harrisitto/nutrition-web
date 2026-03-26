@@ -3,6 +3,8 @@
         "Kcal": "kcal",
         "resumeHeader": "Daily Summary",
         "hcHeader": "Carbs Per Hour of Training",
+        "trainingKcalHeader": "Training Kcal",
+        "energyBalanceHeader": "Energy Balance",
         "search": "Search",
         "daysOfWeek": {
             "0": "Monday",

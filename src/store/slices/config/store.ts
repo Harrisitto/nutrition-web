@@ -7,7 +7,7 @@ export interface ConfigState {
     sidebarOpen: boolean
     selectedUserId: string | null
     selectedDateRange: [string, string],
-    selectedDay: string
+    selectedDay: string | null
     selectedShortcutId: string
     shortcutGuess: string
     availableShortcuts: string[]
@@ -33,7 +33,7 @@ const initialState: ConfigState = {
         saveDate(fromDate().nextMonday()),
         saveDate(fromDate().nextSunday()),
     ],
-    selectedDay: saveDate(new Date()),
+    selectedDay: null,
     /**
      * SIDEBAR
      */

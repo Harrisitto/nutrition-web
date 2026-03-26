@@ -7,6 +7,8 @@ import { TablePlaning } from "./cells/dynamic/weeklyPlan";
 import { ColSideElement } from "./cells/sideElement";
 import { ColTrainingHc, HCEmptyCol } from "./cells/static/trainingHc";
 import { TableTrainingCarbs } from "./cells/dynamic/trainingCarbs";
+import { EnergyBalanceEmptyCol, HeaderEnergyBalance, TrainingKcalCell } from "./cells/static/dailyEnergy";
+import { TableTrainingKcal } from "./cells/dynamic/trainingKcal";
 
 export const WeeklyMeals = ({
   startMonday,
@@ -34,7 +36,11 @@ export const WeeklyMeals = ({
             <ColTrainingHc />
             <HCEmptyCol />
             <TableTrainingCarbs />
-            
+            {/** ENERGY BALANCE */}
+            <HeaderEnergyBalance />
+            <EnergyBalanceEmptyCol />
+            <TrainingKcalCell />
+            <TableTrainingKcal />
           </div>
         </div>
     </Provider>

@@ -421,7 +421,7 @@ export type Database = {
         Insert: {
           date: string
           id?: number
-          training_hc: number[]
+          training_hc?: number[]
           training_kcal?: number
           user_id?: string
         }

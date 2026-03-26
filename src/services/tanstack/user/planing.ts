@@ -135,14 +135,14 @@ export const useInsertPlaning = () => {
             userId,
             language: languageCode,
         }).user.planingBase,
-        mutationFn: async ({ date, trainingHc }: { date: Date; trainingHc?: number[] }) => {
+        mutationFn: async (upsertData: { date: Date; trainingHc?: number[]; training_kcal?: number }) => {
             if (!userId) throw new Error("User ID is required to insert planing data");
             const { data, error } = await supabase
                 .from(TABLE_USER_PLANING.NAME)
                 .upsert({
                     user_id: userId,
-                    date: saveDate(date),
-                    training_hc: trainingHc || [],
+                    ...upsertData,
+                    date: saveDate(upsertData.date),
                 })
                 .select(selectFromPlaning(languageCode))
                 .single();
