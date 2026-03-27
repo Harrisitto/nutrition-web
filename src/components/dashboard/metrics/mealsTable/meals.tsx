@@ -7,7 +7,7 @@ import { TablePlaning } from "./cells/dynamic/weeklyPlan";
 import { ColSideElement } from "./cells/sideElement";
 import { ColTrainingHc, HCEmptyCol } from "./cells/static/trainingHc";
 import { TableTrainingCarbs } from "./cells/dynamic/trainingCarbs";
-import { EnergyBalanceEmptyCol, HeaderEnergyBalance, TrainingKcalCell } from "./cells/static/dailyEnergy";
+import { BalanceEnergyRow, DailyEnergyBalance, EnergyBalanceEmptyCol, HeaderEnergyBalance, TrainingKcalCell } from "./cells/static/dailyEnergy";
 import { TableTrainingKcal } from "./cells/dynamic/trainingKcal";
 
 export const WeeklyMeals = ({
@@ -41,6 +41,8 @@ export const WeeklyMeals = ({
             <EnergyBalanceEmptyCol />
             <TrainingKcalCell />
             <TableTrainingKcal />
+            <BalanceEnergyRow />
+            <DailyEnergyBalance />
           </div>
         </div>
     </Provider>

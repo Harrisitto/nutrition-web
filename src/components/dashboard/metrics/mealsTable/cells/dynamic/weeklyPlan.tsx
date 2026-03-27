@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { CellWrapper } from "../../cellWrap";
 import { generateMealKey, getDateForDayIndex } from "../../helper";
-import { SideSelectOptions } from "../../sideElement/selectOptions";
+import { SideSelectOptions } from "./inputs/selectOptions";
 import { useTableContext } from "../../tableContext";
 import { useTranslation } from "react-i18next";
 import { useFetchTypesForMeal } from "@src/services/tanstack/data/meals";

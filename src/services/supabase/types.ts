@@ -551,6 +551,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_bmr: { Args: { user_uuid: string }; Returns: number }
       rls_apply_policy: {
         Args: {
           p_condition: string

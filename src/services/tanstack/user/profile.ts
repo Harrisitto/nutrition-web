@@ -74,7 +74,9 @@ export const useFetchNutritionistUsers = () => {
     const err = useNotificationErrorQuery()
 
     return useQuery({
-        queryKey: queryKeys().user.fromNutritionist,
+        queryKey: queryKeys({
+            userId: userId ?? '',
+        }).user.fromNutritionist,
         queryFn: async () => {
             try {
                 if (!userId) throw new Error("User ID is required to fetch nutritionist users");

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useTableContext } from "../tableContext";
+import { useTableContext } from "../../../tableContext";
 
 const formatString = (str: string) => {
     if (!str) return "";

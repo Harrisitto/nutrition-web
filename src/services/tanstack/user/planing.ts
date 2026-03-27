@@ -135,7 +135,7 @@ export const useInsertPlaning = () => {
             userId,
             language: languageCode,
         }).user.planingBase,
-        mutationFn: async (upsertData: { date: Date; trainingHc?: number[]; training_kcal?: number }) => {
+        mutationFn: async (upsertData: { date: Date; training_hc?: number[]; training_kcal?: number }) => {
             if (!userId) throw new Error("User ID is required to insert planing data");
             const { data, error } = await supabase
                 .from(TABLE_USER_PLANING.NAME)
@@ -157,6 +157,93 @@ export const useInsertPlaning = () => {
         }
     })
     return mutation;
+}
+
+export const useInsertPlaningWithMeals = () => {
+    const userId = useConfigSelectedUserId();
+    const languageCode = useLanguageCode();
+    const { addErrorIcon } = useNotification();
+
+    return useMutation({
+        mutationKey: queryKeys({
+            userId,
+            language: languageCode,
+        }).user.planingBase,
+        mutationFn: async ({
+            date,
+            meals,
+            training_hc,
+            training_kcal,
+        }: {
+            date: Date;
+            meals: {
+                meal_id: number;
+                type_id: number;
+            }[];
+            training_hc?: number[];
+            training_kcal?: number;
+        }) => {
+            if (!userId) throw new Error("User ID is required to insert planing data");
+
+            const normalizedDate = saveDate(date);
+
+            const { data: planingData, error: planingError } = await supabase
+                .from(TABLE_USER_PLANING.NAME)
+                .upsert({
+                    [TABLE_USER_PLANING.COLS.USER_ID]: userId,
+                    [TABLE_USER_PLANING.COLS.DATE]: normalizedDate,
+                    ...(training_hc != null ? { [TABLE_USER_PLANING.COLS.TRAINING_HC]: training_hc } : {}),
+                    ...(training_kcal != null ? { training_kcal } : {}),
+                })
+                .select(TABLE_USER_PLANING.COLS.ID)
+                .single();
+
+            if (planingError) throw planingError;
+
+            const planingId = planingData?.id;
+            if (planingId == null) throw new Error("Failed to retrieve planing ID");
+
+            const uniqueMealsByMealId = new Map<number, { meal_id: number; type_id: number }>();
+            for (const meal of meals) {
+                uniqueMealsByMealId.set(meal.meal_id, meal);
+            }
+
+            const mealRows = Array.from(uniqueMealsByMealId.values()).map((meal) => ({
+                [TABLE_USER_PLANING_MEAL.COLS.PLANING_ID]: planingId,
+                [TABLE_USER_PLANING_MEAL.COLS.MEAL_ID]: meal.meal_id,
+                [TABLE_USER_PLANING_MEAL.COLS.TYPE_ID]: meal.type_id,
+            }));
+
+            if (mealRows.length > 0) {
+                const { error: mealError } = await supabase
+                    .from(TABLE_USER_PLANING_MEAL.NAME)
+                    .upsert(mealRows, {
+                        onConflict: `${TABLE_USER_PLANING_MEAL.COLS.PLANING_ID},${TABLE_USER_PLANING_MEAL.COLS.MEAL_ID}`,
+                    });
+
+                if (mealError) throw mealError;
+            }
+
+            const { data: fullPlaningData, error: fullPlaningError } = await supabase
+                .from(TABLE_USER_PLANING.NAME)
+                .select(selectFromPlaning(languageCode))
+                .eq(TABLE_USER_PLANING.COLS.ID, planingId)
+                .single();
+
+            if (fullPlaningError) throw fullPlaningError;
+            return fullPlaningData;
+        },
+        onSuccess: (data) => {
+            if (!data) return;
+            updatePlanningQueries(userId, (oldData) => {
+                return upsertPlanningDayInPages(oldData, data);
+            });
+        },
+        onError: (error) => {
+            console.error("Error inserting planing with meals:", error);
+            addErrorIcon();
+        }
+    });
 }
 
 export const useInsertMeal = () => {
@@ -306,3 +393,43 @@ export const useDeleteMeal = () => {
 
     return mutation;
 }
+
+export const useDeletePlaning = () => {
+    const userId = useConfigSelectedUserId();
+    const { addErrorIcon } = useNotification();
+
+    const mutation = useMutation({
+        mutationKey: queryKeys({
+            userId,
+        }).user.planingBase,
+        mutationFn: async (date: Date) => {
+            if (!userId) throw new Error("User ID is required to delete a planing");
+            const targetDate = saveDate(date);
+
+            const { data: existingPlaning, error: existingPlaningError } = await supabase
+                .from(TABLE_USER_PLANING.NAME)
+                .delete()
+                .eq(TABLE_USER_PLANING.COLS.DATE, targetDate)
+                .eq(TABLE_USER_PLANING.COLS.USER_ID, userId)
+                .select(TABLE_USER_PLANING.COLS.ID)
+                .single();
+
+            if (existingPlaningError) throw existingPlaningError;
+            return existingPlaning.id;
+        },
+        onSuccess: (planingId) => {
+            updatePlanningQueries(userId, (oldData) => {
+                return {
+                    ...oldData,
+                    pages: oldData.pages.map((page) => page.filter((day) => day.id !== planingId)),
+                };
+            });
+        },
+        onError: (error) => {
+            console.error("Error deleting planing:", error);
+            addErrorIcon();
+        }
+    });
+
+    return mutation;
+};

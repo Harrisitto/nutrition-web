@@ -3,7 +3,9 @@ import { TABLE_USER_INFO } from "@src/services/supabase/definitions"
 import { useAuthId } from "@src/store/slices/auth/hook"
 import { useNotification } from "@src/store/slices/notification/hook"
 import type { TablesInsert } from "@src/services/supabase/types"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
+import { useConfigSelectedUserId } from "@src/store/slices/config/hook"
+import { queryKeys } from "../keys"
 
 export const useInsertUserInfo = () => {
   const { addMutationError } = useNotification();
@@ -24,4 +26,20 @@ export const useInsertUserInfo = () => {
     },
   })
   return mutation
+}
+
+export const useFetchBmr = () => {
+  const userId = useConfigSelectedUserId();
+  const query = useQuery({
+    queryKey: queryKeys({
+      userId,
+    }).user.basalMetabolicRate,
+    queryFn: async () => {
+      if (!userId) throw new Error('No authenticated user found')
+      const { data, error } = await supabase.rpc('get_bmr', { user_uuid: userId })
+      if (error) throw error
+      return data
+    },
+  });
+  return query;
 }

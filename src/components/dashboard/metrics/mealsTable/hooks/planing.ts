@@ -2,6 +2,8 @@ import { useFetchPlanning, type PlanningPageParam } from "@src/services/tanstack
 import { generateMealKey, generatePlaningKey, getDayIndexForDate } from "../helper";
 import { useMemo } from "react";
 import { loadDate, saveDate } from "@src/helpers/dates";
+import { useFetchBmr } from "@src/services/tanstack/user/info";
+import { calculateKcalFromMacros } from "@src/hooks/helpers/constants";
 
 const daysInWeek = 7;
 
@@ -19,6 +21,8 @@ export const usePlaning = ({
     const planing = useFetchPlanning({
         forDate,
     });
+
+    const bmrQuery = useFetchBmr();
 
     /**
      * Maps meal planning data to a structure that allows quick access to meal plans for each meal and date.
@@ -56,12 +60,22 @@ export const usePlaning = ({
      * This is used to display the total kcal for each day in the meals table.
      */
     const kcalState = useMemo(() => {
-        const kcalPerDay: number[] = Array(daysInWeek).fill(0);
+        const kcalPerDay: {
+            meals: number;
+            training: number;
+            total: number;
+            balance: number;
+        }[] = Array.from({ length: daysInWeek }, () => ({
+            meals: 0,
+            training: 0,
+            total: 0,
+            balance: 0,
+        }));
         if (!planing.data) return kcalPerDay;
         const data = planing.data.pages[pageIndex] ?? [];
         const { start: startDate } = planing.data.pageParams[pageIndex] as PlanningPageParam;
         const fallbackStartDate = startDate ? loadDate(startDate) : new Date();
-
+        
         data.forEach((plan) => {
             const date = new Date(plan.date);
             const dayIndex = getDayIndexForDate(fallbackStartDate, date);
@@ -69,9 +83,14 @@ export const usePlaning = ({
                 console.warn(`Planing date ${saveDate(date)} is out of range for the current week starting on ${saveDate(fallbackStartDate)}`);
                 return; // Skip meals that are outside the current week
             }
-            kcalPerDay[dayIndex] = plan.user_planing_meal.reduce((total, meal) => {
+            kcalPerDay[dayIndex].meals = plan.user_planing_meal.reduce((total, meal) => {
                 return total + meal.type_id.macros_id.kcal;
             }, 0);
+            kcalPerDay[dayIndex].training = plan.training_hc.reduce((total, hc) => {
+                return total + calculateKcalFromMacros({ carbs: hc, protein: 0, fat: 0 });
+            }, 0);
+            kcalPerDay[dayIndex].total = kcalPerDay[dayIndex].meals + kcalPerDay[dayIndex].training;
+            kcalPerDay[dayIndex].balance = (bmrQuery.data ?? 0) - kcalPerDay[dayIndex].total;
         });
 
         return kcalPerDay;

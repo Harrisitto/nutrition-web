@@ -1,7 +1,8 @@
 import { ComponentsAuthManagement } from "@src/components/auth/managementIndex";
 import { AppDashboard, IdxDashboard } from "@src/components/dashboard";
 import { fromDate } from "@src/helpers/dates";
-import { useConfigSelectedDay } from "@src/store/slices/config/hook";
+import { useAuthId } from "@src/store/slices/auth/hook";
+import { useConfigSelectedDay, useConfigSelectedUserId } from "@src/store/slices/config/hook";
 
 export default function PageDashboard() {
   
@@ -9,6 +10,12 @@ export default function PageDashboard() {
   const thisDateMonday = date ?
     fromDate(date).thisMonday() :
     fromDate().nextMonday();
+
+    const authId = useAuthId();
+    const selectedUserId = useConfigSelectedUserId();
+
+    console.log("Dashboard", { authId, selectedUserId })
+  
 
   return (
     <AppDashboard>

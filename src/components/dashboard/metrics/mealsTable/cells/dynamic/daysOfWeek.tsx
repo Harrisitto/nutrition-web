@@ -1,13 +1,59 @@
-import { useCallback } from "react";
-import { getDayOfMonth } from "../../helper";
+import { useCallback, useMemo } from "react";
+import { getDateForDayIndex, getDayOfMonth } from "../../helper";
 import { useTableContext } from "../../tableContext";
 import { CellWrapper } from "../../cellWrap";
+import { SideSelectOptions } from "./inputs/selectOptions";
+import { useFetchPresets } from "@src/services/tanstack/user/preset";
+import { useTranslation } from "react-i18next";
+import { useDeletePlaning, useInsertPlaningWithMeals } from "@src/services/tanstack/user/planing";
 
-const SideElement = () => {
+const SideElement = ({
+  date,
+}: {
+  date: Date;
+}) => {
+  const { t } = useTranslation();
+  const presetQuery = useFetchPresets();
+  const insertPlaningQuery = useInsertPlaningWithMeals();
+  const deletePlaningQuery = useDeletePlaning();
+  const clearOption = {
+    id: "clear",
+    name: t('system:messages.clear'),
+  };
+
+  const options = useMemo(() => {
+    if (!presetQuery.data) return [];
+    const presetOptions = presetQuery.data.map((preset) => [preset.id.toString(), preset.name]);
+    return [
+      [clearOption.id, clearOption.name],
+      ...presetOptions,
+    ] as [string, string][];
+  }, [presetQuery.data, t]);
+
+  const insertPlaning = useCallback((presetId: string) => {
+    if (presetId === clearOption.id) {
+      deletePlaningQuery.mutateAsync(date);
+      return;
+    }
+
+    const preset = presetQuery.data?.find((p) => p.id.toString() === presetId);
+    if (!preset) return;
+
+    insertPlaningQuery.mutateAsync({
+      date,
+      training_hc: preset.training_hc,
+      meals: preset.user_preset_meal.map((upm) => ({
+        meal_id: upm.meal_id.id,
+        type_id: upm.type_id.id,
+      })),
+    });
+  }, [presetQuery.data, insertPlaningQuery, deletePlaningQuery, date]);
+
   return (
-    <div className="absolute top-0 left-full ml-4 w-64 p-4 bg-white-green/90 rounded-lg shadow-lg">
-      Side Element
-    </div>
+    <SideSelectOptions
+      options={options}
+      onSelect={insertPlaning}
+    />
   );
 };
 
@@ -48,7 +94,7 @@ export const HeaderDaysOfWeek = () => {
         key={`header-days-${index}`} 
         posX={index} 
         posY={tableFragmentIndex.weekDaysHeader.start}
-        SideElement={<SideElement />}
+        SideElement={<SideElement date={getDateForDayIndex(startMonday, index)} />}
     >
       {({ isSelected }) => (
         <Cell

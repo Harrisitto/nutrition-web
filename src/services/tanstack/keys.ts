@@ -7,7 +7,7 @@ export const queryKeys = ({
 } = {}) => ({
     user: {
         single: ["user", "single", userId],
-        fromNutritionist: ["user", "myUsers"],
+        fromNutritionist: ["user", "myUsers", userId],
         formBrand: ["user", "brandUsers"],
         planingBase: ["user", "planing", userId],
         planingDay: (date: string) => ["user", "planing", userId, date],
@@ -15,6 +15,7 @@ export const queryKeys = ({
         trainingBase: ["user", "training", userId],
         training: (start: string, end: string) => ["user", "training", userId, start, end],
         presets: ["user", "presets", userId],
+        basalMetabolicRate: ["user", "bmr", userId],
     },
     data: {
         meals: ["data", "meals", language],

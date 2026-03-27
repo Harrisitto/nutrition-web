@@ -29,7 +29,7 @@ const Cell = ({
     nextHours[trainingHourIndex] = normalizedValue;
     insertPlaning.mutateAsync({
       date,
-      trainingHc: nextHours,
+      training_hc: nextHours,
     });
   }, [current, insertPlaning, date, trainingHourIndex]);
 
