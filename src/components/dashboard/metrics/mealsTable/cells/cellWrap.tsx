@@ -1,15 +1,17 @@
 import { useEffect, useRef } from "react";
-import { useTableContext } from "./tableContext";
+import { useTableContext } from "../tableContext";
 
 export const CellWrapper = ({
   children,
   SideElement = null,
+  sideElementKey = null,
   posX,
   posY,
   ...props
 }: {
   children: (props: { isSelected: boolean }) => React.ReactNode;
   SideElement?: React.ReactNode;
+  sideElementKey?: string | number | null;
   posX: number;
   posY: number;
 } & Omit<React.HTMLAttributes<HTMLDivElement>, "children">) => {
@@ -20,7 +22,7 @@ export const CellWrapper = ({
   useEffect(() => {
     if (!ref.current) return;
     addCell(ref.current, posX, posY, SideElement);
-  }, [addCell, posX, posY]);
+  }, [addCell, posX, posY, sideElementKey]);
 
   return (
     <div ref={ref} {...props}>

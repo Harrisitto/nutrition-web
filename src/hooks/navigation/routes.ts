@@ -12,6 +12,7 @@ export const APP_ROUTES = {
   COMPLETE_PROFILE: '/profile-setup',
   DASHBOARD: '/dashboard',
   FORM_PRESET: '/form-preset',
+  FORM_MEASURE: '/form-measure',
 
   
   // Error routes

@@ -17,7 +17,7 @@ export const HCEmptyCol = () => {
       className="border p-3 font-semibold text-center transition-colors h-full flex items-center justify-center border-nutrition-green/30 bg-nutrition-green text-white-green hover:bg-dark-green"
       style={{
         gridColumn: 9,
-        gridRow: `${tableFragmentIndex.trainingRows.start + 2} / span ${planing.maxTrainingHours}`,
+        gridRow: `${tableFragmentIndex.trainingRows.start + 2} / span ${planing.maxTrainingHours + 1}`,
       }}
     />
   );

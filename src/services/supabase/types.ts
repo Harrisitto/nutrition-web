@@ -350,17 +350,14 @@ export type Database = {
       }
       user_info: {
         Row: {
-          birth_date: string | null
           name: string
           user_id: string
         }
         Insert: {
-          birth_date?: string | null
           name?: string
           user_id?: string
         }
         Update: {
-          birth_date?: string | null
           name?: string
           user_id?: string
         }
@@ -412,6 +409,7 @@ export type Database = {
       }
       user_planing: {
         Row: {
+          comment: string
           date: string
           id: number
           training_hc: number[]
@@ -419,6 +417,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          comment?: string
           date: string
           id?: number
           training_hc?: number[]
@@ -426,6 +425,7 @@ export type Database = {
           user_id?: string
         }
         Update: {
+          comment?: string
           date?: string
           id?: number
           training_hc?: number[]
@@ -551,7 +551,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_bmr: { Args: { user_uuid: string }; Returns: number }
+      get_bmr: {
+        Args: { end_date: string; start_date: string; user_uuid: string }
+        Returns: number
+      }
+      get_weight: {
+        Args: { end_date: string; start_date: string; user_uuid: string }
+        Returns: number
+      }
       rls_apply_policy: {
         Args: {
           p_condition: string

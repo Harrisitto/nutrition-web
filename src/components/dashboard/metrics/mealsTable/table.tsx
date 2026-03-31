@@ -7,8 +7,11 @@ import { TablePlaning } from "./cells/dynamic/weeklyPlan";
 import { ColSideElement } from "./cells/sideElement";
 import { ColTrainingHc, HCEmptyCol } from "./cells/static/trainingHc";
 import { TableTrainingCarbs } from "./cells/dynamic/trainingCarbs";
-import { BalanceEnergyRow, DailyEnergyBalance, EnergyBalanceEmptyCol, HeaderEnergyBalance, TrainingKcalCell } from "./cells/static/dailyEnergy";
+import { BalanceEnergyRow, DailyEnergyBalance, HeaderEnergyBalance, TrainingKcalCell } from "./cells/static/dailyEnergy";
 import { TableTrainingKcal } from "./cells/dynamic/trainingKcal";
+import { DailyMacrosCarbsPerKg, DailyMacrosFatsPerKg, DailyMacrosProteinPerKg, HeaderMacros, ResumeMacrosCarbsPerKg, ResumeMacrosFatsPerKg, ResumeMacrosProteinPerKg, RowCarbsPerKg, RowFatsPerKg, RowProteinPerKgHeader } from "./cells/static/macros";
+import { HeaderComments, RowComments } from "./cells/static/comments";
+import { TableComments } from "./cells/dynamic/daysComments";
 
 export const WeeklyMeals = ({
   startMonday,
@@ -36,45 +39,33 @@ export const WeeklyMeals = ({
             <ColTrainingHc />
             <HCEmptyCol />
             <TableTrainingCarbs />
-            {/** ENERGY BALANCE */}
-            <HeaderEnergyBalance />
-            <EnergyBalanceEmptyCol />
             <TrainingKcalCell />
             <TableTrainingKcal />
+            {/** ENERGY BALANCE */}
+            <HeaderEnergyBalance />
             <BalanceEnergyRow />
             <DailyEnergyBalance />
+            {/** MACROS */}
+            <HeaderMacros />
+            {/** CARBS PER KG ROW */}
+            <RowCarbsPerKg />
+            <DailyMacrosCarbsPerKg />
+            <ResumeMacrosCarbsPerKg />
+            {/** PROTEIN PER KG ROW */}
+            <RowProteinPerKgHeader />
+            <DailyMacrosProteinPerKg />
+            <ResumeMacrosProteinPerKg />
+            {/** FATS PER KG ROW */}
+            <RowFatsPerKg />
+            <DailyMacrosFatsPerKg />
+            <ResumeMacrosFatsPerKg />
+            {/** COMMENTS ROW */}
+            <HeaderComments />
+            <RowComments />
+            <TableComments />
+
           </div>
         </div>
     </Provider>
   );
 };
-
-/*
-
-{Array.from({ length: maxTrainingHours + 1 }).map((_, hourIndex) => (
-              <Fragment key={hourIndex}>
-                <MealNameCell name={`${hourIndex + 1}h`} />
-                {daysOfWeek.map((_, dayIndex) => {
-                  const date = getDateForDayIndex(startDate, dayIndex);
-                  const training = trainingMap.get(generateTrainingKey(date));
-                  return (
-                    <HCCell
-                      key={`hc-${hourIndex}`}
-                      hourIndex={hourIndex}
-                      dayHc={training ?? []}
-                      date={getDateForDayIndex(startDate, dayIndex)}
-                    />
-                  );
-                })}
-              </Fragment>
-            ))}
-
-            <ResumeHeaderCell />
-
-            {/** Daily kCal
-            <MealNameCell name={t("data:dashboardTable.Kcal")} />
-            {kcalState.map((kcal, index) => (
-              <KcalCell key={`kcal-${index}`} kcal={kcal} />
-            ))}
-
-            */

@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from "react";
-import { CellWrapper } from "../../cellWrap";
-import { generateMealKey, getDateForDayIndex } from "../../helper";
+import { CellWrapper } from "../cellWrap";
+import { generateMealKey, getDateForDayIndex } from "../../helperFunctions";
 import { SideSelectOptions } from "./inputs/selectOptions";
 import { useTableContext } from "../../tableContext";
 import { useTranslation } from "react-i18next";
@@ -9,6 +9,7 @@ import {
   useDeleteMeal,
   useInsertMeal,
 } from "@src/services/tanstack/user/planing";
+import { saveDate } from "@src/helpers/dates";
 
 const SideElement = ({
   mealId,
@@ -108,7 +109,7 @@ const PlaningCell = ({
 };
 
 export const TablePlaning = () => {
-  const { meals, daysOfWeek, tableFragmentIndex } = useTableContext();
+  const { meals, daysOfWeek, tableFragmentIndex, startMonday } = useTableContext();
 
   return meals.map((meal, mealIndex) => {
     return daysOfWeek.map((day, dayIndex) => {
@@ -123,6 +124,7 @@ export const TablePlaning = () => {
           posX={posX}
           posY={posY}
           SideElement={<SideElement mealId={meal.id} dayIndex={dayIndex} />}
+          sideElementKey={`${meal.id}-${dayIndex}-${saveDate(getDateForDayIndex(startMonday, dayIndex))}`}
           style={{
             gridColumn: gridX,
             gridRow: gridY,

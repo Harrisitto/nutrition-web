@@ -16,3 +16,17 @@ export const NavigateUserPreset = () => {
         </div>
     )
 }
+
+export const NavigateMeasures = () => {
+    const navigate = useAppNavigation();
+
+    const handleClick = useCallback(() => {
+        navigate.navigateTo(APP_ROUTES.FORM_MEASURE);
+    }, [navigate]);
+
+    return (
+        <div className="flex items-center justify-center h-full" onClick={handleClick}>
+            <ForkKnifeCrossedIcon className="text-nutrition-green" size={48} />
+        </div>
+    )
+}

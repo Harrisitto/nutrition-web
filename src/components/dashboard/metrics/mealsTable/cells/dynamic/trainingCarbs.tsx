@@ -1,6 +1,6 @@
-import { CellWrapper } from "../../cellWrap";
+import { CellWrapper } from "../cellWrap";
 import { useTableContext } from "../../tableContext";
-import { generatePlaningKey, getDateForDayIndex } from "../../helper";
+import { generatePlaningKey, getDateForDayIndex } from "../../helperFunctions";
 import { useCallback, useMemo } from "react";
 import { useInsertPlaning } from "@src/services/tanstack/user/planing";
 import { CellNumericInput } from "./inputs/numericCell";

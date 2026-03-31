@@ -71,6 +71,30 @@ const SwitchField = ({
         />
       );
     }
+    case "date": {
+      const thisField = field as FormFieldUpdate<"date">;
+      return (
+        <InputComponent.Date.SingleDate
+          label={thisField.inputProps?.label ?? ""}
+          value={thisField.currentValue}
+          onChange={(newValue) => {
+            form.requestUpdate(id, newValue);
+          }}
+        />
+      );
+    }
+    case "dateRange": {
+      const thisField = field as FormFieldUpdate<"dateRange">;
+      return (
+        <InputComponent.Date.RangeDate
+          label={thisField.inputProps?.label ?? ""}
+          value={thisField.currentValue}
+          onChange={(startDate, endDate) => {
+            form.requestUpdate(id, { startDate, endDate });
+          }}
+        />
+      );
+    }
     default:
       return null;
   }

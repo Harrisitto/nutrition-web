@@ -38,6 +38,16 @@ export const TABLE_ALL_MACROS = {
     }
 } as const
 
+export const TABLE_ALL_MEASURES = {
+    NAME: 'all_measures',
+    COLS: {
+        ID: 'id',
+        NAME: 'name',
+        UNITS: 'units',
+        DESCRIPTION: 'description',
+    }
+} as const
+
 export const TABLE_USER_PRESET = {
     NAME: 'user_preset',
     COLS: {
@@ -91,6 +101,16 @@ export const TABLE_RECIPE_TYPE_MEALS = {
     COLS: {
         MEAL_ID: 'meal_id',
         TYPE_ID: 'type_id',
+    }
+} as const
+
+export const TABLE_USER_MEASURES = {
+    NAME: 'user_measures',
+    COLS: {
+        USER_ID: 'user_id',
+        MEASURE_ID: 'measure_id',
+        DATE: 'date',
+        VALUE: 'value',
     }
 } as const
         

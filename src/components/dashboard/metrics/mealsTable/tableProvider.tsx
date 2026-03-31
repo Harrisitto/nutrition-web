@@ -54,6 +54,22 @@ export const Provider = ({
     return cells[selectedCell.y]?.[selectedCell.x] || null;
   }, [cells, selectedCell]);
 
+  const centerCellInViewport = useCallback((cell: HTMLDivElement | null) => {
+    if (!cell) return;
+
+    const rect = cell.getBoundingClientRect();
+    const isVerticallyVisible = rect.top >= 0 && rect.bottom <= window.innerHeight;
+    const isHorizontallyVisible = rect.left >= 0 && rect.right <= window.innerWidth;
+
+    if (isVerticallyVisible && isHorizontallyVisible) return;
+
+    cell.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+      inline: "center",
+    });
+  }, []);
+
   const tableFragmentIndex = useMemo(() => {
     const mealslength = meals.data?.length ?? 0;
     const trainingHours = planing.maxTrainingHours;
@@ -73,6 +89,10 @@ export const Provider = ({
       trainingKcalRows: {
         start: mealslength + trainingHours + 2,
         end: mealslength + trainingHours + 2,
+      },
+      commentsRows: {
+        start: mealslength + trainingHours + 3,
+        end: mealslength + trainingHours + 3, 
       },
     };
   }, [meals.data, planing.maxTrainingHours]);
@@ -109,11 +129,17 @@ export const Provider = ({
 
           // ensure DOM focus actually moves to this cell
           cell.focus();
+          centerCellInViewport(cell);
         };
 
         const blurHandler = () => {
-          setIsFocused(false);
-          setSideElement(null);
+          // Do not collapse focus when moving from the cell wrapper to an input inside it.
+          requestAnimationFrame(() => {
+            const activeElement = document.activeElement;
+            if (activeElement && cell.contains(activeElement)) return;
+            setIsFocused(false);
+            setSideElement(null);
+          });
         };
 
         cell.addEventListener("focusout", blurHandler);
@@ -133,7 +159,12 @@ export const Provider = ({
       });
       window.removeEventListener("click", handleClickOutside);
     };
-  }, [cells]);
+  }, [cells, centerCellInViewport]);
+
+  useEffect(() => {
+    if (cells.length === 0) return;
+    centerCellInViewport(currentCell());
+  }, [cells, currentCell, selectedCell, centerCellInViewport]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -142,6 +173,14 @@ export const Provider = ({
       const eventTarget = e.target as Node | null;
       const targetIsCurrentCellInput =
         !!eventTarget && !!currentCell()?.contains(eventTarget);
+
+      if (
+        isFocused &&
+        targetIsCurrentCellInput &&
+        ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Enter"].includes(e.key)
+      ) {
+        return;
+      }
 
       switch (e.key) {
         case "ArrowUp":
@@ -195,7 +234,6 @@ export const Provider = ({
           currentCell()?.click();
           break;
         case "Escape":
-            console.log("Escape pressed, cancelling focus", { isFocused, currentCell: currentCell() });
           if (!isFocused) break;
           setIsFocused(false);
           setSideElement(null);

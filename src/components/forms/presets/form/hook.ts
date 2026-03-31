@@ -117,25 +117,49 @@ const calculateDerivedState = (
         .map(([key, value]) => fieldIds.meal.isId(key) ? value : null)
         .filter(Boolean) as InputState<"selectOne">['currentValue'][];
 
-    const trainingKcal = hcFields.reduce<number>((total, currValue) => {
+    const trainingCarbs = hcFields.reduce<number>((total, currValue) => {
         const value = typeof currValue === "number" ? currValue : 0;
-        const kcal = calculateKcalFromMacros({ carbs: value });
-        return total + Number(kcal);
+        return total + value;
     }, 0);
 
-    const mealKcal = mealFields.reduce<number>((total, field) => {
+    const trainingKcal = calculateKcalFromMacros({ carbs: trainingCarbs });
+
+    const mealTotals = mealFields.reduce<{
+        kcal: number;
+        carbs: number;
+        protein: number;
+        fat: number;
+    }>((totals, field) => {
         const mealTypeId = field ? parseInt(field.toString(), 10) : null;
-        if (!mealTypeId || !mealsMap) return total;
+        if (!mealTypeId || !mealsMap) return totals;
         const mealType = mealsMap[mealTypeId];
-        if (!mealType.macros_id) return total;
-        const kcal = calculateKcalFromMacros(mealType.macros_id);
-        return total + Number(kcal);
-    }, 0);
+        const macros = mealType?.macros_id;
+        if (!macros) return totals;
+
+        totals.kcal += Number(calculateKcalFromMacros({
+            carbs: macros.hc,
+            protein: macros.prot,
+            fat: macros.fat,
+        }));
+        totals.carbs += Number(macros.hc ?? 0);
+        totals.protein += Number(macros.prot ?? 0);
+        totals.fat += Number(macros.fat ?? 0);
+
+        return totals;
+    }, { kcal: 0, carbs: 0, protein: 0, fat: 0 });
+
+    const mealKcal = mealTotals.kcal;
+    const totalCarbs = mealTotals.carbs + trainingCarbs;
+    const totalProtein = mealTotals.protein;
+    const totalFat = mealTotals.fat;
 
     return {
         trainingKcal,
         mealKcal,
         totalKcal: trainingKcal + mealKcal,
+        totalCarbs,
+        totalProtein,
+        totalFat,
     };
 }
 

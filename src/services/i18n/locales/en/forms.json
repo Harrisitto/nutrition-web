@@ -12,7 +12,26 @@
             "mealsKcal": "Meals kcal",
             "trainingKcal": "Training kcal",
             "totalKcal": "Total kcal",
+
+            "balanceKcal": "Balance kcal",
+            
+            "carbsPerKg": "Carbs per kg",
+            "fatsPerKg": "Fats per kg",
+            "proteinPerKg": "Protein per kg",
+
             "submit": "Save Preset"
+        }
+    },
+    "measures": {
+        "title": "Measures",
+        "description": "Create and manage your clients data.",
+        "fields": {
+            "newMeasure": "New Measure",
+            "selectMeasure": "Select Measure",
+            "date": "Date",
+            "submit": "Save Measure",
+            "dateRangeStart": "Start Date",
+            "dateRangeEnd": "End Date"
         }
     }
 }

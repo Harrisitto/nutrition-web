@@ -69,7 +69,7 @@ export const HCCell = ({
 
     insert.mutate({
       date,
-      trainingHc: result,
+      training_hc: result,
     });
   }, [buffer, dayHc, hourIndex, insert, date]);
 

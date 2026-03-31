@@ -5,7 +5,15 @@
         "hcHeader": "Carbs Per Hour of Training",
         "trainingKcalHeader": "Training Kcal",
         "energyBalanceHeader": "Energy Balance",
+        "weekBalance": "Week Balance",
         "search": "Search",
+        "dailyMacros": {
+            "header": "Daily Macronutrients",
+            "carbsPerkg": "Carbs/kg",
+            "proteinPerkg": "Protein/kg",
+            "fatsPerkg": "Fats/kg",
+            "weeklyAvg": "Weekly Average"
+        },
         "daysOfWeek": {
             "0": "Monday",
             "1": "Tuesday",

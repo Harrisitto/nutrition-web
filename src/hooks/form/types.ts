@@ -24,6 +24,21 @@ interface InputTypes {
     };
     value: number | "";
   };
+  date: {
+    props: {
+      label?: string;
+    };
+    value: string; // ISO date string (e.g., "2024-01-31")
+  };
+  dateRange: {
+    props: {
+      label?: string;
+    };
+    value: {
+      startDate: string; // ISO date string
+      endDate: string;   // ISO date string
+    };
+  };
 }
 
 export type ValueOfInputTypes = InputTypes[KeyofInputTypes]['value'];

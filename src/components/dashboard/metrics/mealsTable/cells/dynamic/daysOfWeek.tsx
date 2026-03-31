@@ -1,11 +1,12 @@
 import { useCallback, useMemo } from "react";
-import { getDateForDayIndex, getDayOfMonth } from "../../helper";
+import { getDateForDayIndex, getDayOfMonth } from "../../helperFunctions";
 import { useTableContext } from "../../tableContext";
-import { CellWrapper } from "../../cellWrap";
+import { CellWrapper } from "../cellWrap";
 import { SideSelectOptions } from "./inputs/selectOptions";
 import { useFetchPresets } from "@src/services/tanstack/user/preset";
 import { useTranslation } from "react-i18next";
 import { useDeletePlaning, useInsertPlaningWithMeals } from "@src/services/tanstack/user/planing";
+import { saveDate } from "@src/helpers/dates";
 
 const SideElement = ({
   date,
@@ -89,20 +90,24 @@ export const HeaderDaysOfWeek = () => {
     [startMonday],
   );
 
-  return daysOfWeek.map((day, index) => (
-    <CellWrapper 
-        key={`header-days-${index}`} 
-        posX={index} 
+  return daysOfWeek.map((day, index) => {
+    const date = getDateForDayIndex(startMonday, index);
+    return (
+      <CellWrapper
+        key={`header-days-${index}`}
+        posX={index}
         posY={tableFragmentIndex.weekDaysHeader.start}
-        SideElement={<SideElement date={getDateForDayIndex(startMonday, index)} />}
-    >
-      {({ isSelected }) => (
-        <Cell
-          dayOfWeek={day}
-          dayOfMonth={dayOfMonth(index)}
-          isSelected={isSelected}
-        />
-      )}
-    </CellWrapper>
-  ));
+        SideElement={<SideElement date={date} />}
+        sideElementKey={saveDate(date)}
+      >
+        {({ isSelected }) => (
+          <Cell
+            dayOfWeek={day}
+            dayOfMonth={dayOfMonth(index)}
+            isSelected={isSelected}
+          />
+        )}
+      </CellWrapper>
+    );
+  });
 };

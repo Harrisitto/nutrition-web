@@ -12,6 +12,7 @@ const PagePrivacyPolicy = lazy(() => import("./pages/privacyPolicy/page"));
 const PageReferences = lazy(() => import("./pages/references/page"));
 const NotFoundPage = lazy(() => import("./pages/error/NotFoundPage"));
 const SetupProfile = lazy(() => import("./pages/auth/SetupProfile"));
+const PageMeasures = lazy(() => import("./pages/forms/measures"));
 const EmailVerificationPage = lazy(
   () => import("./pages/auth/EmailVerification"),
 );
@@ -59,6 +60,17 @@ function App() {
                   selectedUserRequired={true} // This page requires a user to be selected in the config
                 >
                   <PageUserPreset />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path={APP_ROUTES.FORM_MEASURE}
+              element={
+                <ProtectedRoute
+                  selectedUserRequired={true} // This page requires a user to be selected in the config
+                >
+                  <PageMeasures />
                 </ProtectedRoute>
               }
             />

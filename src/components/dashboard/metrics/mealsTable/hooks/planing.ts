@@ -1,8 +1,8 @@
-import { useFetchPlanning, type PlanningPageParam } from "@src/services/tanstack/user/planing";
-import { generateMealKey, generatePlaningKey, getDayIndexForDate } from "../helper";
+import { useFetchPlanning } from "@src/services/tanstack/user/planing";
+import { generateMealKey, generatePlaningKey, getDayIndexForDate } from "../helperFunctions";
 import { useMemo } from "react";
-import { loadDate, saveDate } from "@src/helpers/dates";
-import { useFetchBmr } from "@src/services/tanstack/user/info";
+import { fromDate, loadDate, saveDate } from "@src/helpers/dates";
+import { useFetchBmr, useFetchUserWeightForDateRange } from "@src/services/tanstack/user/info";
 import { calculateKcalFromMacros } from "@src/hooks/helpers/constants";
 
 const daysInWeek = 7;
@@ -10,10 +10,8 @@ const daysInWeek = 7;
 
 export const usePlaning = ({
     forDate,
-    pageIndex = 0,
 }: {
     forDate?: Date;
-    pageIndex?: number;
 } = {}) => {
     /**
      * Fetches the meal planning data for the specified date range using the useFetchPlanning hook.
@@ -22,13 +20,32 @@ export const usePlaning = ({
         forDate,
     });
 
-    const bmrQuery = useFetchBmr();
+    const fallbackStartDate = useMemo(() => {
+        const baseDate = forDate || new Date();
+        return fromDate(baseDate).thisMonday();
+    }, [forDate]);
+
+    const currentWeek = useMemo(() => {
+        const firstDate = planing.data?.[0]?.date;
+        if (!firstDate) return fallbackStartDate;
+        return loadDate(firstDate);
+    }, [fallbackStartDate, planing.data]);
+
+    const bmrQuery = useFetchBmr({
+        startDate: fromDate(currentWeek).thisMonday(),
+        endDate: fromDate(currentWeek).thisSunday(),
+    });
+
+    const userWeight = useFetchUserWeightForDateRange({
+        startDate: fromDate(currentWeek).thisMonday(),
+        endDate: fromDate(currentWeek).thisSunday(),
+    });
 
     /**
      * Maps meal planning data to a structure that allows quick access to meal plans for each meal and date.
      */
     const planningMap = useMemo(() => {
-        const data = planing.data?.pages[pageIndex] ?? [];
+        const data = planing.data ?? [];
         const map = new Map(
             data.map((plan) => {
                 return [
@@ -38,10 +55,10 @@ export const usePlaning = ({
             }),
         );
         return map;
-    }, [pageIndex, planing.data]);
+    }, [planing.data]);
 
     const mealsMap = useMemo(() => {
-        const data = planing.data?.pages[pageIndex] ?? [];
+        const data = planing.data ?? [];
         const map = new Map(
             data.flatMap((plan) => {
                 return plan.user_planing_meal.map((meal) => {
@@ -53,7 +70,7 @@ export const usePlaning = ({
             }),
         );
         return map;
-    }, [pageIndex, planing.data]);
+    }, [planing.data]);
 
     /**
      * Calculates the total kcal for each day of the week based on the meal planning data.
@@ -65,18 +82,44 @@ export const usePlaning = ({
             training: number;
             total: number;
             balance: number;
+            macros: {
+                carbs: number;
+                carbsPerKg: number;
+                protein: number;
+                proteinPerKg: number;
+                fat: number;
+                fatPerKg: number;
+            }
         }[] = Array.from({ length: daysInWeek }, () => ({
             meals: 0,
             training: 0,
             total: 0,
             balance: 0,
+            macros: {
+                carbs: 0,
+                carbsPerKg: 0,
+                protein: 0,
+                proteinPerKg: 0,
+                fat: 0,
+                fatPerKg: 0,
+            },
         }));
-        if (!planing.data) return kcalPerDay;
-        const data = planing.data.pages[pageIndex] ?? [];
-        const { start: startDate } = planing.data.pageParams[pageIndex] as PlanningPageParam;
-        const fallbackStartDate = startDate ? loadDate(startDate) : new Date();
+        const data = planing.data ?? [];
+        if (data.length === 0) return kcalPerDay;
         
         data.forEach((plan) => {
+            if (!plan.date) {
+                console.warn("Planing entry is missing date:", plan);
+                return; // Skip entries without a date
+            }
+            if (!userWeight.data) {
+                console.warn("User weight data is not available, cannot calculate kcal balance.");
+                return; // Skip calculation if user weight is not available
+            }
+            if(!bmrQuery.data) {
+                console.warn("BMR data is not available, cannot calculate kcal balance.");
+                return; // Skip calculation if BMR data is not available
+            }
             const date = new Date(plan.date);
             const dayIndex = getDayIndexForDate(fallbackStartDate, date);
             if (dayIndex < 0 || dayIndex >= daysInWeek) {
@@ -89,15 +132,24 @@ export const usePlaning = ({
             kcalPerDay[dayIndex].training = plan.training_hc.reduce((total, hc) => {
                 return total + calculateKcalFromMacros({ carbs: hc, protein: 0, fat: 0 });
             }, 0);
+            kcalPerDay[dayIndex].macros = plan.user_planing_meal.reduce((totals, meal) => {
+                totals.carbs += meal.type_id.macros_id.hc;
+                totals.protein += meal.type_id.macros_id.prot;
+                totals.fat += meal.type_id.macros_id.fat;
+                return totals;
+            }, { carbs: 0, protein: 0, fat: 0, carbsPerKg: 0, proteinPerKg: 0, fatPerKg: 0 });
+            kcalPerDay[dayIndex].macros.carbsPerKg = kcalPerDay[dayIndex].macros.carbs / userWeight.data;
+            kcalPerDay[dayIndex].macros.proteinPerKg = kcalPerDay[dayIndex].macros.protein / userWeight.data;
+            kcalPerDay[dayIndex].macros.fatPerKg = kcalPerDay[dayIndex].macros.fat / userWeight.data;
             kcalPerDay[dayIndex].total = kcalPerDay[dayIndex].meals + kcalPerDay[dayIndex].training;
-            kcalPerDay[dayIndex].balance = (bmrQuery.data ?? 0) - kcalPerDay[dayIndex].total;
+            kcalPerDay[dayIndex].balance = kcalPerDay[dayIndex].total - (bmrQuery.data ?? 0);
         });
 
         return kcalPerDay;
-    }, [forDate, pageIndex, planing.data]);
+    }, [bmrQuery.data, fallbackStartDate, planing.data, userWeight.data]);
 
     const maxTrainingHours = useMemo(() => {
-        const data = planing.data?.pages.flat() ?? [];
+        const data = planing.data ?? [];
         if (data.length === 0) return 3; // Default to 3 training hours if no data is available
 
         const maxFilledHours = Math.max(

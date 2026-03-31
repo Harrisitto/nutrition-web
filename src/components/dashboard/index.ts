@@ -2,10 +2,10 @@ import * as UserList from "./users/list";
 import * as Shortcuts from "./shortcut/hook";
 import * as ShortcutComponent from "./shortcut/Shortcuts";
 import AppDashboard from "./main/dashboard";
-import * as Meals from "./metrics/mealsTable/meals";
+import * as Meals from "./metrics/mealsTable/table";
 import * as Titles from "./misc/titles";
 import { SelectDateHeader } from "./metrics/selectDate/date";
-import { NavigateUserPreset } from "./misc/navigate";
+import * as Navigation from "./misc/navigate";
 
 export const IdxDashboard = {
     Users: UserList,
@@ -23,8 +23,8 @@ export const IdxDashboard = {
         Select: SelectDateHeader,
     },
     Buttons: {
-        NavigateUserPreset,
-    }
+        ...Navigation,
+    },
 }
 
 export { AppDashboard }

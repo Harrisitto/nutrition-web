@@ -1,6 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { Context, fieldIds, useContextFormPreset, useFormPreset } from "./hook";
 import { useInsert } from "./insert";
+import { useFetchBmr, useFetchUserWeightForDateRange } from "@src/services/tanstack/user/info";
+import { fromDate } from "@src/helpers/dates";
 
 export const Provider = ({ children }: { children: React.ReactNode }) => {
   const value = useFormPreset();
@@ -35,10 +37,29 @@ export const FieldText = () => {
 
 export const Resume = () => {
   const formPreset = useContextFormPreset();
+  const weekDate = fromDate(new Date());
+  
+  const userBmr = useFetchBmr({
+    startDate: weekDate.thisMonday(),
+    endDate: weekDate.thisSunday(),
+  });
+  const userWeight = useFetchUserWeightForDateRange({
+    startDate: weekDate.thisMonday(),
+    endDate: weekDate.thisSunday(),
+  });
+
   const { t } = useTranslation();
   if (!formPreset) return null;
   const data = formPreset.derivedState;
   if (!data) return null;
+
+  const weight = userWeight.data ?? 0;
+  const bmr = userBmr.data ?? 0;
+  const balanceKcal = data.totalKcal - bmr;
+  const carbsPerKg = weight > 0 ? data.totalCarbs / weight : 0;
+  const fatsPerKg = weight > 0 ? data.totalFat / weight : 0;
+  const proteinPerKg = weight > 0 ? data.totalProtein / weight : 0;
+
   return (
     <div className="mt-3">
       <div className="grid grid-cols-1 gap-3">
@@ -62,6 +83,36 @@ export const Resume = () => {
           </h3>
           <p className="text-lg font-bold text-dark-green">{data.totalKcal}</p>
         </div>
+
+        <div className="flex items-center justify-between rounded-md bg-white px-3 py-2">
+          <h3 className="text-sm font-medium text-text-muted">
+            {t("forms:preset.fields.balanceKcal")}
+          </h3>
+          <p className="text-base font-semibold text-text-title">{balanceKcal.toFixed(0)}</p>
+        </div>
+
+        <div className="flex items-center justify-between rounded-md bg-white px-3 py-2">
+          <h3 className="text-sm font-medium text-text-muted">
+            {t("forms:preset.fields.carbsPerKg")}
+          </h3>
+          <p className="text-base font-semibold text-text-title">{carbsPerKg.toFixed(2)}</p>
+        </div>
+
+        <div className="flex items-center justify-between rounded-md bg-white px-3 py-2">
+          <h3 className="text-sm font-medium text-text-muted">
+            {t("forms:preset.fields.fatsPerKg")}
+          </h3>
+          <p className="text-base font-semibold text-text-title">{fatsPerKg.toFixed(2)}</p>
+        </div>
+
+        <div className="flex items-center justify-between rounded-md bg-white px-3 py-2">
+          <h3 className="text-sm font-medium text-text-muted">
+            {t("forms:preset.fields.proteinPerKg")}
+          </h3>
+          <p className="text-base font-semibold text-text-title">{proteinPerKg.toFixed(2)}</p>
+        </div>
+        
+
       </div>
     </div>
   );
