@@ -11,6 +11,7 @@ export const APP_ROUTES = {
   // Protected routes
   COMPLETE_PROFILE: '/profile-setup',
   DASHBOARD: '/dashboard',
+  CONFIG: '/config',
   FORM_PRESET: '/form-preset',
   FORM_MEASURE: '/form-measure',
 

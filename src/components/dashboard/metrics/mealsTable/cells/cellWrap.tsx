@@ -25,7 +25,10 @@ export const CellWrapper = ({
   }, [addCell, posX, posY, sideElementKey]);
 
   return (
-    <div ref={ref} {...props}>
+    <div
+      ref={ref}
+      {...props}
+    >
       {children({ isSelected })}
     </div>
   );

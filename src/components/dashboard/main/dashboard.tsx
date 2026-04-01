@@ -1,28 +1,19 @@
-import { IdxDashboard } from "@src/components/dashboard";
+import { List as SidebarUserList } from "@src/components/dashboard/sideBar/list";
 import {
   useConfigSetSidebarOpen,
   useConfigSidebarOpen,
 } from "@src/store/slices/config/hook";
-import { useAppSelector } from "@src/store/store";
-import { useRef } from "react";
 
 const AppDashboard = ({
   children,
-  allowShortcuts = false,
 }: {
   children?: React.ReactNode;
-  allowShortcuts?: boolean;
 }) => {
   const sidebarOpen = useConfigSidebarOpen();
   const setSidebarOpen = useConfigSetSidebarOpen();
-  const containerRef = useRef<HTMLDivElement>(null);
-  const visibleShortcut = useAppSelector((state) => state.config.shortcutConfig.isVisible);
-  IdxDashboard.Hooks.useInitalizeShortcuts();
-  IdxDashboard.Hooks.useListenerForShortcuts();
   
   return (
     <div
-      ref={containerRef}
       className={`h-screen grid grid-cols-[auto_1fr] ${sidebarOpen ? "gap-4" : "gap-0"} overflow-hidden`}
     >
       <div
@@ -31,14 +22,12 @@ const AppDashboard = ({
         onMouseLeave={() => setSidebarOpen(false)}
       >
         {/* ADD SETTINGS ICON */}
-        <IdxDashboard.Users.List />
+        <SidebarUserList />
       </div>
       
       <div className="h-screen overflow-y-auto">
         {children}
       </div>
-      
-      {allowShortcuts && visibleShortcut && <IdxDashboard.AppShortcuts parentRef={containerRef} />}
     </div>
   );
 };

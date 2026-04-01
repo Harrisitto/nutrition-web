@@ -2,10 +2,18 @@ import { useMemo } from "react";
 import { CellWrapper } from "../cellWrap";
 import { generatePlaningKey, getDateForDayIndex } from "../../helperFunctions";
 import { useTableContext } from "../../tableContext";
-import { CellNumericInput } from "./inputs/numericCell";
 import { useInsertPlaning } from "@src/services/tanstack/user/planing";
+import { CellTextInput } from "./inputs/textCell";
 
-const Cell = ({ isSelected, date }: { isSelected: boolean; date: Date }) => {
+const Cell = ({
+  isSelected,
+  date,
+  day,
+}: {
+  isSelected: boolean;
+  date: Date;
+  day: string;
+}) => {
   const { planing } = useTableContext();
   const insertPlaningQuery = useInsertPlaning();
 
@@ -15,33 +23,42 @@ const Cell = ({ isSelected, date }: { isSelected: boolean; date: Date }) => {
   }, [planing.planningMap, date]);
 
   return (
-    <CellNumericInput
+    <CellTextInput
       isSelected={isSelected}
-      numValue={planingDay?.training_kcal ?? 0}
+      textValue={planingDay?.event ?? ""}
       onSave={(value) => {
-        const normalizedValue = Number.isFinite(value) && value > 0 ? value : 0;
         insertPlaningQuery.mutateAsync({
           date,
-          training_kcal: normalizedValue,
+          event: value,
         });
       }}
+      placeholder={day}
     />
   );
 };
 
-export const TableTrainingKcal = () => {
+export const TableEvents = () => {
   const { daysOfWeek, tableFragmentIndex, startMonday } = useTableContext();
 
-  return daysOfWeek.map((_, dayIndex) => {
+  return daysOfWeek.map((day, dayIndex) => {
     const date = getDateForDayIndex(startMonday, dayIndex);
+    const commentsRowY = tableFragmentIndex.commentsRows.start;
+
     return (
       <CellWrapper
-        key={`training-kcal-${dayIndex}`}
+        key={`comment-${dayIndex}`}
         posX={dayIndex}
-        posY={tableFragmentIndex.trainingKcalRows.start}
+        posY={tableFragmentIndex.eventsRow.start}
         SideElement={null}
+        style={{
+          gridColumn: `${dayIndex + 2}`,
+          gridRow: `${commentsRowY + 11}`,
+          zIndex: 1,
+        }}
       >
-        {({ isSelected }) => <Cell date={date} isSelected={isSelected} />}
+        {({ isSelected }) => (
+          <Cell date={date} isSelected={isSelected} day={day} />
+        )}
       </CellWrapper>
     );
   });

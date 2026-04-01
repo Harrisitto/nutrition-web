@@ -1,4 +1,7 @@
 export const cellStyles = {
+    sticky: {
+        top: "sticky top-0 z-40"
+    },
     longHeader: {
         background: "border col-start-1 col-end-10 p-3 font-semibold text-center transition-colors h-full flex items-center justify-center border-nutrition-green/30 bg-nutrition-green text-white-green hover:bg-dark-green",
         backgroundSpan8: "border col-start-1 col-end-9 p-3 font-semibold text-center transition-colors h-full flex items-center justify-center border-nutrition-green/30 bg-nutrition-green text-white-green hover:bg-dark-green"

@@ -84,16 +84,20 @@ export const Provider = ({
       },
       trainingRows: {
         start: mealslength + 1,
-        end: mealslength + trainingHours + 1,
+        end: mealslength + trainingHours + 0,
       },
       trainingKcalRows: {
-        start: mealslength + trainingHours + 2,
-        end: mealslength + trainingHours + 2,
+        start: mealslength + trainingHours + 1,
+        end: mealslength + trainingHours + 1,
       },
       commentsRows: {
+        start: mealslength + trainingHours + 2,
+        end: mealslength + trainingHours + 2, 
+      },
+      eventsRow: {
         start: mealslength + trainingHours + 3,
         end: mealslength + trainingHours + 3, 
-      },
+      }
     };
   }, [meals.data, planing.maxTrainingHours]);
 
@@ -105,13 +109,25 @@ export const Provider = ({
   useEffect(() => {
     if (cells.length === 0) return;
 
+    const isInCell = (node: Node | null) => {
+      if (!node) return false;
+      return cells.some(
+        (row) => Array.isArray(row) && row.some((cell) => !!cell && cell.contains(node)),
+      );
+    };
+
+    const isInEditorPortal = (node: Node | null) => {
+      if (!node) return false;
+      const element = node instanceof Element ? node : node.parentElement;
+      return !!element?.closest("[data-table-editor-portal='true']");
+    };
+
+    const isInTableInteractionScope = (node: Node | null) => {
+      return isInCell(node) || isInEditorPortal(node);
+    };
+
     const handleClickOutside = (e: MouseEvent) => {
-      if (
-        cells.some((row) =>
-          Array.isArray(row) && row.some((cell) => cell?.contains(e.target as Node)),
-        )
-      )
-        return;
+      if (isInTableInteractionScope(e.target as Node | null)) return;
       setIsFocused(false);
       setSideElement(null);
     };
@@ -132,14 +148,14 @@ export const Provider = ({
           centerCellInViewport(cell);
         };
 
-        const blurHandler = () => {
-          // Do not collapse focus when moving from the cell wrapper to an input inside it.
-          requestAnimationFrame(() => {
-            const activeElement = document.activeElement;
-            if (activeElement && cell.contains(activeElement)) return;
-            setIsFocused(false);
-            setSideElement(null);
-          });
+        const blurHandler = (e: FocusEvent) => {
+          // Keep table focus while moving between cells or into the floating editor portal.
+          const nextFocusedNode =
+            (e.relatedTarget as Node | null) ?? document.activeElement;
+          if (isInTableInteractionScope(nextFocusedNode)) return;
+
+          setIsFocused(false);
+          setSideElement(null);
         };
 
         cell.addEventListener("focusout", blurHandler);

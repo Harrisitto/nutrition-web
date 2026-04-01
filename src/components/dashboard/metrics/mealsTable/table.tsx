@@ -10,8 +10,10 @@ import { TableTrainingCarbs } from "./cells/dynamic/trainingCarbs";
 import { BalanceEnergyRow, DailyEnergyBalance, HeaderEnergyBalance, TrainingKcalCell } from "./cells/static/dailyEnergy";
 import { TableTrainingKcal } from "./cells/dynamic/trainingKcal";
 import { DailyMacrosCarbsPerKg, DailyMacrosFatsPerKg, DailyMacrosProteinPerKg, HeaderMacros, ResumeMacrosCarbsPerKg, ResumeMacrosFatsPerKg, ResumeMacrosProteinPerKg, RowCarbsPerKg, RowFatsPerKg, RowProteinPerKgHeader } from "./cells/static/macros";
-import { HeaderComments, RowComments } from "./cells/static/comments";
+import { EmptyCellComments, HeaderComments, RowComments } from "./cells/static/comments";
 import { TableComments } from "./cells/dynamic/daysComments";
+import { EmptyCellEvents, HeaderEvents, RowEvents } from "./cells/static/events";
+import { TableEvents } from "./cells/dynamic/daysEvents";
 
 export const WeeklyMeals = ({
   startMonday,
@@ -63,6 +65,13 @@ export const WeeklyMeals = ({
             <HeaderComments />
             <RowComments />
             <TableComments />
+            <EmptyCellComments />
+            {/** EVENTS ROW */}
+            <HeaderEvents />
+            <RowEvents />
+            <TableEvents />
+            <EmptyCellEvents />
+
 
           </div>
         </div>

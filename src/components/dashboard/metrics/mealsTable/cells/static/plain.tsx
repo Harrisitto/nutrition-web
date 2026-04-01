@@ -1,9 +1,13 @@
 import { useCallback, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useInsertPlaning } from "@src/services/tanstack/user/planing";
+import { cellStyles } from "../defaultStyles";
 
 export const CornerCell = () => (
-  <div className="border border-nutrition-green/30 bg-dark-green p-3 font-bold text-white-green">
+  <div className={
+    `border border-nutrition-green/30 bg-dark-green p-3 font-bold text-white-green
+    ${cellStyles.sticky.top}`
+  }>
     -
   </div>
 );

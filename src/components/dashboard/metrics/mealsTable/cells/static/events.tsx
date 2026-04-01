@@ -1,20 +1,20 @@
 import { useTranslation } from "react-i18next";
 import { cellStyles } from "../defaultStyles";
 
-export const HeaderComments = () => {
-  const { t } = useTranslation();
+export const HeaderEvents = () => {
+    const { t } = useTranslation();
   return <div className={cellStyles.longHeader.background}>
-    {t("data:dashboardTable.commentsRows.header")}
+    {t("data:dashboardTable.eventsRow.header")}
   </div>;
-};
+}
 
-export const RowComments = () => {
-  const { t } = useTranslation();
+export const RowEvents = () => {
+    const { t } = useTranslation();
   return <div className={cellStyles.leftColumnCell.background}>
-    {t("data:dashboardTable.commentsRows.rowHeader")}
+    {t("data:dashboardTable.eventsRow.rowHeader")}
   </div>;
-};
+}
 
-export const EmptyCellComments = () => {
+export const EmptyCellEvents = () => {
   return <div className={cellStyles.rightColumnCell.background} />;
 };

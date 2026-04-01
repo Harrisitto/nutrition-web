@@ -411,6 +411,7 @@ export type Database = {
         Row: {
           comment: string
           date: string
+          event: string
           id: number
           training_hc: number[]
           training_kcal: number
@@ -419,6 +420,7 @@ export type Database = {
         Insert: {
           comment?: string
           date: string
+          event?: string
           id?: number
           training_hc?: number[]
           training_kcal?: number
@@ -427,6 +429,7 @@ export type Database = {
         Update: {
           comment?: string
           date?: string
+          event?: string
           id?: number
           training_hc?: number[]
           training_kcal?: number

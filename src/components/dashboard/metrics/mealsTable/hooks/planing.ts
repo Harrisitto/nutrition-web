@@ -106,21 +106,23 @@ export const usePlaning = ({
         }));
         const data = planing.data ?? [];
         if (data.length === 0) return kcalPerDay;
+
+        if (!userWeight.data) {
+            console.warn("User weight data is not available, cannot calculate kcal balance.");
+            return kcalPerDay;
+        }
+
+        if(!bmrQuery.data) {
+            console.warn("BMR data is not available, cannot calculate kcal balance.");
+            return kcalPerDay;
+        }
         
         data.forEach((plan) => {
             if (!plan.date) {
                 console.warn("Planing entry is missing date:", plan);
                 return; // Skip entries without a date
             }
-            if (!userWeight.data) {
-                console.warn("User weight data is not available, cannot calculate kcal balance.");
-                return; // Skip calculation if user weight is not available
-            }
-            if(!bmrQuery.data) {
-                console.warn("BMR data is not available, cannot calculate kcal balance.");
-                return; // Skip calculation if BMR data is not available
-            }
-            const date = new Date(plan.date);
+            const date = loadDate(plan.date);
             const dayIndex = getDayIndexForDate(fallbackStartDate, date);
             if (dayIndex < 0 || dayIndex >= daysInWeek) {
                 console.warn(`Planing date ${saveDate(date)} is out of range for the current week starting on ${saveDate(fallbackStartDate)}`);

@@ -12,7 +12,6 @@ export const queryKeys = ({
         fromNutritionist: ["user", "myUsers", userId],
         formBrand: ["user", "brandUsers"],
         planingBase: ["user", "planing", userId],
-        planingDay: (date: string) => ["user", "planing", userId, date],
         planing: (start: string, end: string) => ["user", "planing", userId, start, end],
         trainingBase: ["user", "training", userId],
         training: (start: string, end: string) => ["user", "training", userId, start, end],

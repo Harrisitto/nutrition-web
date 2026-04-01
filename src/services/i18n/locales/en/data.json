@@ -22,6 +22,28 @@
             "4": "Friday",
             "5": "Saturday",
             "6": "Sunday"
+        },
+        "commentsRows": {
+            "header": "Comments",
+            "pressEsc": "Press ESC to close",
+            "writeComment": "Write here",
+            "rowHeader": "For"
+        },
+        "eventsRow": {
+            "header": "Events",
+            "rowHeader": "For"
+        },
+        "calendar": {
+            "training": "Training",
+            "planing": "Planing",
+            "event": "Event",
+            "selectedWeek": "Selected Week"
+        },
+        "navigation": {
+            "header": "Navigate to",
+            "presets": "Presets",
+            "measures": "Measures",
+            "config": "Nutritionist configuration"
         }
     },
     "references": {

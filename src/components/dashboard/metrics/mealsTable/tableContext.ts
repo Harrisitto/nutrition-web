@@ -2,7 +2,7 @@ import { createContext, useContext, type ReactNode } from "react";
 import type { usePlaning } from "./hooks/planing";
 import type { useFetchMeals } from "@src/services/tanstack/data/meals";
 
-type TableFragmentIndexKey = "weekDaysHeader" | "mealRows" | "trainingRows" | "trainingKcalRows" | "commentsRows";
+type TableFragmentIndexKey = "weekDaysHeader" | "mealRows" | "trainingRows" | "trainingKcalRows" | "commentsRows" | "eventsRow";
 
 interface TableContextType {
     addCell: (cell: HTMLDivElement, posX: number, posY: number, SideElement: ReactNode) => void;

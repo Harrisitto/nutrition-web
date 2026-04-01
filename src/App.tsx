@@ -1,7 +1,13 @@
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./components/global/ProtectedRoute";
 import { APP_ROUTES } from "./hooks/navigation/routes";
+import { useConfigSelectedUserId } from "./store/slices/config/hook";
+import { useLanguageCode } from "./hooks/helpers/language";
+import { fetchPlanningWeek } from "./services/tanstack/user/planing";
+import { queryClient } from "./services/tanstack/queryClient";
+import { fromDate, saveDate } from "./helpers/dates";
+import { queryKeys } from "./services/tanstack/keys";
 
 const LogInPage = lazy(() => import("./pages/auth/LogInPage"));
 const SignInPage = lazy(() => import("./pages/auth/SignUpPage"));
@@ -18,6 +24,49 @@ const EmailVerificationPage = lazy(
 );
 
 function App() {
+  const selectedUserId = useConfigSelectedUserId();
+  const languageCode = useLanguageCode();
+
+  // Prefetch current week plus nearby weeks for smoother dashboard navigation.
+  useEffect(() => {
+    if (!selectedUserId) return;
+    const today = fromDate(new Date());
+    const thisMonday = fromDate(today.thisMonday());
+    const thisSunday = fromDate(today.thisSunday());
+    const dateRanges = [
+      { start: thisMonday.incrementDay(0), end: thisSunday.incrementDay(0) }, // Current week
+      { start: thisMonday.incrementDay(-7), end: thisSunday.incrementDay(-7) }, // Previous week
+      { start: thisMonday.incrementDay(7), end: thisSunday.incrementDay(7) }, // Next week
+      {
+        start: thisMonday.incrementDay(-14),
+        end: thisSunday.incrementDay(-14),
+      }, // Two weeks ago
+      { start: thisMonday.incrementDay(14), end: thisSunday.incrementDay(14) }, // Two weeks ahead
+      { start: thisMonday.incrementDay(21), end: thisSunday.incrementDay(21) }, // Three weeks ahead
+      { start: thisMonday.incrementDay(28), end: thisSunday.incrementDay(28) }, // Four weeks ahead
+    ];
+
+    void Promise.all(
+      dateRanges.map(({ start, end }) =>
+        queryClient.prefetchQuery({
+          queryKey: queryKeys({ userId: selectedUserId }).user.planing(
+            saveDate(start),
+            saveDate(end),
+          ),
+          queryFn: () =>
+            fetchPlanningWeek({
+              userId: selectedUserId,
+              languageCode,
+              dateRange: {
+                start: saveDate(start),
+                end: saveDate(end),
+              },
+            }),
+        }),
+      ),
+    );
+  }, [selectedUserId, languageCode]);
+
   return (
     <Router>
       <main className="w-full min-h-screen bg-white-green text-black-green">
@@ -74,6 +123,19 @@ function App() {
                 </ProtectedRoute>
               }
             />
+
+            <Route
+              path={APP_ROUTES.CONFIG}
+              element={
+                <ProtectedRoute>
+                  <div className="p-6">
+                    <h1 className="text-2xl font-bold mb-4">Config Page</h1>
+                    <p>This is a placeholder for the config page.</p>
+                  </div>
+                </ProtectedRoute>
+              }
+            />
+
             {/* 404 - Catch all unmatched routes */}
             <Route path="*" element={<NotFoundPage />} />
           </Routes>

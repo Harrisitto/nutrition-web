@@ -86,6 +86,28 @@ const upsertPlanningDayInWeek = (oldData: PlanningData, dayData: PlanningDay) =>
   return [...oldData, dayData].sort((a, b) => a.date.localeCompare(b.date));
 };
 
+export const fetchPlanningWeek = async ({
+  userId,
+  languageCode,
+  dateRange,
+}: {
+  userId: string;
+  languageCode: ReturnType<typeof useLanguageCode>;
+  dateRange: { start: string; end: string };
+}) => {
+  if (!userId) return [];
+  const { data, error } = await supabase
+    .from(TABLE_USER_PLANING.NAME)
+    .select(selectFromPlaning(languageCode))
+    .eq(TABLE_USER_PLANING.COLS.USER_ID, userId)
+    .gte(TABLE_USER_PLANING.COLS.DATE, dateRange.start)
+    .lte(TABLE_USER_PLANING.COLS.DATE, dateRange.end)
+    .order(TABLE_USER_PLANING.COLS.DATE);
+  if (error) throw error;
+  return data || [];
+};
+
+
 export const useFetchPlanning = ({
   forDate,
 }: {
@@ -104,18 +126,13 @@ export const useFetchPlanning = ({
       userId: user,
       language: languageCode,
     }).user.planing(effectiveStartDate, effectiveEndDate),
-    queryFn: async () => {
-      if (!user) return [];
-      const { data, error } = await supabase
-        .from(TABLE_USER_PLANING.NAME)
-        .select(selectFromPlaning(languageCode))
-        .eq(TABLE_USER_PLANING.COLS.USER_ID, user)
-        .gte(TABLE_USER_PLANING.COLS.DATE, effectiveStartDate)
-        .lte(TABLE_USER_PLANING.COLS.DATE, effectiveEndDate)
-        .order(TABLE_USER_PLANING.COLS.DATE);
-      if (error) throw error;
-      return data || [];
-    },
+    queryFn: async () => fetchPlanningWeek({
+      userId: user || "",
+      languageCode,
+      dateRange: { start: effectiveStartDate, end: effectiveEndDate },
+    }),
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
@@ -128,7 +145,13 @@ export const useInsertPlaning = () => {
       userId,
       language: languageCode,
     }).user.planingBase,
-    mutationFn: async (upsertData: { date: Date; training_hc?: number[]; training_kcal?: number, comment?: string }) => {
+    mutationFn: async (upsertData: {
+      date: Date;
+      training_hc?: number[];
+      training_kcal?: number,
+      comment?: string,
+      event?: string
+    }) => {
       if (!userId) throw new Error("User ID is required to insert planing data");
       const { data, error } = await supabase
         .from(TABLE_USER_PLANING.NAME)

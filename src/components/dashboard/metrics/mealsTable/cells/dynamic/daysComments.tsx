@@ -38,13 +38,11 @@ const Cell = ({
 };
 
 export const TableComments = () => {
-  const { daysOfWeek, tableFragmentIndex, startMonday, isFocused, selectedCell } = useTableContext();
+  const { daysOfWeek, tableFragmentIndex, startMonday } = useTableContext();
 
   return daysOfWeek.map((day, dayIndex) => {
     const date = getDateForDayIndex(startMonday, dayIndex);
     const commentsRowY = tableFragmentIndex.commentsRows.start;
-    const isExpanded =
-      isFocused && selectedCell.x === dayIndex && selectedCell.y === commentsRowY;
 
     return (
       <CellWrapper
@@ -53,9 +51,9 @@ export const TableComments = () => {
         posY={tableFragmentIndex.commentsRows.start}
         SideElement={null}
         style={{
-          gridColumn: isExpanded ? "2 / 9" : `${dayIndex + 2}`,
-          gridRow: `${commentsRowY + 8}`,
-          zIndex: isExpanded ? 20 : 1,
+          gridColumn: `${dayIndex + 2}`,
+          gridRow: `${commentsRowY + 9}`,
+          zIndex: 1,
         }}
       >
         {({ isSelected }) => (

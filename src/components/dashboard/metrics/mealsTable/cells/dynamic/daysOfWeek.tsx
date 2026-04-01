@@ -7,6 +7,7 @@ import { useFetchPresets } from "@src/services/tanstack/user/preset";
 import { useTranslation } from "react-i18next";
 import { useDeletePlaning, useInsertPlaningWithMeals } from "@src/services/tanstack/user/planing";
 import { saveDate } from "@src/helpers/dates";
+import { cellStyles } from "../defaultStyles";
 
 const SideElement = ({
   date,
@@ -95,6 +96,7 @@ export const HeaderDaysOfWeek = () => {
     return (
       <CellWrapper
         key={`header-days-${index}`}
+        className={cellStyles.sticky.top}
         posX={index}
         posY={tableFragmentIndex.weekDaysHeader.start}
         SideElement={<SideElement date={date} />}
