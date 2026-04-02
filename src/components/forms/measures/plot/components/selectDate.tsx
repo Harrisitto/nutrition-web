@@ -52,14 +52,14 @@ export const SelectDateRange = () => {
 };
 
 export const SelectFocusedDateRange = () => {
-    const { focusedDateRange, minDate, maxDate, setFocusedDateRange } = usePlotContext();
+    const { focusedDateRange, dateRange, setFocusedDateRange } = usePlotContext();
 
     const DAY_IN_MS = 24 * 60 * 60 * 1000;
     const toStartOfDayTimestamp = (date: Date) =>
         new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
 
-    const minTimestamp = toStartOfDayTimestamp(minDate);
-    const maxTimestamp = toStartOfDayTimestamp(maxDate);
+    const minTimestamp = toStartOfDayTimestamp(dateRange.startDate);
+    const maxTimestamp = toStartOfDayTimestamp(dateRange.endDate);
     const totalDays = Math.max(0, Math.round((maxTimestamp - minTimestamp) / DAY_IN_MS));
 
     const startDay = Math.max(
