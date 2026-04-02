@@ -54,18 +54,21 @@ export const useFetchSingleUser = ({
     userId?: string
 } = {}) => {
     const selectedUser = useConfigSelectedUserId();
+    const effectiveUserId = userId ?? selectedUser ?? "";
     return useQuery({
         queryKey: queryKeys({
-            userId: userId ?? selectedUser ?? '',
+            userId: effectiveUserId,
         }).user.single,
         queryFn: async () => {
             const { data, error } = await supabase
                 .from(TABLE_ALL_USERS.NAME)
                 .select(selectUser())
-                .single()
+                .eq(TABLE_ALL_USERS.COLS.USER_ID, effectiveUserId)
+                .maybeSingle()
             if (error) throw error
             return data
-        }
+        },
+        enabled: !!effectiveUserId,
     })
 }
 

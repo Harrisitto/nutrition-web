@@ -108,12 +108,10 @@ export const usePlaning = ({
         if (data.length === 0) return kcalPerDay;
 
         if (!userWeight.data) {
-            console.warn("User weight data is not available, cannot calculate kcal balance.");
             return kcalPerDay;
         }
 
         if(!bmrQuery.data) {
-            console.warn("BMR data is not available, cannot calculate kcal balance.");
             return kcalPerDay;
         }
         

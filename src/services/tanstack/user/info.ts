@@ -6,7 +6,7 @@ import type { TablesInsert } from "@src/services/supabase/types"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { useConfigSelectedUserId } from "@src/store/slices/config/hook"
 import { queryKeys } from "../keys"
-import { saveDate } from "@src/helpers/dates"
+import { dateToSupabaseFormat } from "@src/helpers/dates"
 
 export const useInsertUserInfo = () => {
   const { addMutationError } = useNotification();
@@ -37,6 +37,8 @@ export const useFetchBmr = ({
   endDate: Date;
 }) => {
   const userId = useConfigSelectedUserId();
+  const start = dateToSupabaseFormat(startDate);
+  const end = dateToSupabaseFormat(endDate);
 
   const query = useQuery({
     queryKey: queryKeys({
@@ -46,12 +48,13 @@ export const useFetchBmr = ({
       if (!userId) throw new Error('No authenticated user found')
       const { data, error } = await supabase.rpc('get_bmr', {
         user_uuid: userId,
-        start_date: saveDate(startDate),
-        end_date: saveDate(endDate),
+        start_date: start,
+        end_date: end,
       });
       if (error) throw error
       return data
     },
+    enabled: !!userId,
   });
   return query;
 }
@@ -64,6 +67,8 @@ export const useFetchUserWeightForDateRange = ({
   endDate: Date;
 }) => {
   const userId = useConfigSelectedUserId();
+  const start = dateToSupabaseFormat(startDate);
+  const end = dateToSupabaseFormat(endDate);
 
   const query = useQuery({
     queryKey: queryKeys({
@@ -73,12 +78,13 @@ export const useFetchUserWeightForDateRange = ({
       if (!userId) throw new Error('No authenticated user found')
       const { data, error } = await supabase.rpc('get_weight', {
         user_uuid: userId,
-        start_date: saveDate(startDate),
-        end_date: saveDate(endDate),
+        start_date: start,
+        end_date: end,
       });
       if (error) throw error
       return data
-    }
+    },
+    enabled: !!userId,
   });
   return query;
 }

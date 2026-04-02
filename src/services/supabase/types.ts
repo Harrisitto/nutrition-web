@@ -350,15 +350,27 @@ export type Database = {
       }
       user_info: {
         Row: {
+          birth_date: string | null
+          email: string
+          gender: string | null
           name: string
+          phone: string
           user_id: string
         }
         Insert: {
+          birth_date?: string | null
+          email?: string
+          gender?: string | null
           name?: string
+          phone?: string
           user_id?: string
         }
         Update: {
+          birth_date?: string | null
+          email?: string
+          gender?: string | null
           name?: string
+          phone?: string
           user_id?: string
         }
         Relationships: [

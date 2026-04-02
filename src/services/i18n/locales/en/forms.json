@@ -31,7 +31,23 @@
             "date": "Date",
             "submit": "Save Measure",
             "dateRangeStart": "Start Date",
-            "dateRangeEnd": "End Date"
+            "dateRangeEnd": "End Date",
+            "gender": {
+                "male": "Male",
+                "female": "Female"
+            }
+        },
+        "management": {
+            "displayedMeasuresTitle": "Displayed measures",
+            "hideAll": "Hide all",
+            "showAll": "Show all",
+            "visibleMeasuresTitle": "Visible Measures",
+            "visibleMeasuresDescription": "Delete a measure type from the selected date range.",
+            "noVisibleMeasuresInRange": "No visible measures in this range.",
+            "delete": "Delete",
+            "noVisibleMeasuresSelected": "No visible measures selected.",
+            "noDataInFocusRange": "No data in the selected focus range.",
+            "measureFallback": "Measure {{id}}"
         }
     }
 }

@@ -5,12 +5,19 @@ import * as Graph from "./plot/components/graph";
 import * as Time from "./plot/components/selectDate";
 import { PlotProvider } from "./plot/plotProvider";
 import { usePlotContext } from "./plot/plotContext";
+import { DisplayedMeasures } from "./plot/components/displayedMeasures";
+import { ManageMeasures } from "./plot/components/manageMeasure";
 
 const IdxMeasures = {
     Text,
     Form,
     Actions,
-    ...Graph,
+    Graph: {
+        ...Graph,
+        DisplayedMeasures,
+        ManageMeasures
+    },
+
     Time,
     PlotProvider,
 }

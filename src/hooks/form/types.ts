@@ -57,6 +57,7 @@ export type InputState<T extends KeyofInputTypes> = {
   id: string;
   type: T;
   currentValue: InputTypes[T]['value'];
+  derivedValue?: InputTypes[T]['value'];
   inputProps: InputTypes[T]['props'];
   errorMsg?: string; // T function key for error message
   searchContext?: string;

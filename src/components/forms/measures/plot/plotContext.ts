@@ -1,8 +1,18 @@
+import type { useFetchAllMeasures, useFetchUserMeasuresForDateRange } from "@src/services/tanstack/user/measures";
 import { createContext, useContext } from "react";
 
-type DateRange = {
+export type DateRange = {
   startDate: Date;
   endDate: Date;
+};
+
+type M = NonNullable<ReturnType<typeof useFetchUserMeasuresForDateRange>["data"]>[number];
+type AM = NonNullable<ReturnType<typeof useFetchAllMeasures>["data"]>[number];
+
+export type MesureInfo = {
+  visible: boolean;
+  colorClass: string;
+  data: AM;
 };
 
 export type PlotContextType = {
@@ -10,8 +20,11 @@ export type PlotContextType = {
   maxDate: Date;
   dateRange: DateRange;
   focusedDateRange: DateRange;
+  measureInfo: Record<number, MesureInfo>;
+  focusedMeasures: M[];
   setDateRange: (value: DateRange) => void;
   setFocusedDateRange: (value: DateRange) => void;
+  setMeasureVisible: (visibility: { id: number; visible: boolean }[]) => void;
 };
 
 export const PlotContext = createContext<PlotContextType | undefined>(undefined);

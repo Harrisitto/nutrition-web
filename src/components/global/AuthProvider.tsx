@@ -37,7 +37,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       auth.isAuthenticated && 
       !auth.profile
     ) {
-      console.log('Fetching user profile for:', auth.user.email)
       dispatch(fetchProfile());
     }
   }, [auth.isAuthenticated, auth.user, auth.profile, dispatch]);

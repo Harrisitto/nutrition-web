@@ -7,7 +7,7 @@ export const SelectDateRange = () => {
     const { dateRange, minDate, maxDate, setDateRange } = usePlotContext();
 
     return (
-        <div className="mt-3 w-full rounded-lg border border-slate-200 bg-slate-50 p-3">
+        <div className="w-full rounded-lg border border-slate-200 bg-slate-50 p-3">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <label className="flex flex-col gap-1">
                     <span className="text-xs font-medium uppercase tracking-wide text-slate-600">

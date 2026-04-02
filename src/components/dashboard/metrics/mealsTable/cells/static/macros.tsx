@@ -61,7 +61,7 @@ export const EmptyMacrosCell = () => {
 export const DailyMacrosCarbsPerKg = () => {
     const { daysOfWeek, planing } = useTableContext();
 
-    return daysOfWeek.map((day, dayIndex) => {
+    return daysOfWeek.map((_, dayIndex) => {
         const carbsPerKg = planing.kcalState[dayIndex]?.macros.carbsPerKg ?? 0;
         return (
             <div
@@ -89,7 +89,7 @@ export const ResumeMacrosCarbsPerKg = () => {
 export const DailyMacrosProteinPerKg = () => {
     const { daysOfWeek, planing } = useTableContext();
 
-    return daysOfWeek.map((day, dayIndex) => {
+    return daysOfWeek.map((_, dayIndex) => {
         const proteinPerKg = planing.kcalState[dayIndex]?.macros.proteinPerKg ?? 0;
         return (
             <div
@@ -116,7 +116,7 @@ export const ResumeMacrosProteinPerKg = () => {
 
 export const DailyMacrosFatsPerKg = () => {
     const { daysOfWeek, planing } = useTableContext();
-    return daysOfWeek.map((day, dayIndex) => {
+    return daysOfWeek.map((_, dayIndex) => {
         const fatPerKg = planing.kcalState[dayIndex]?.macros.fatPerKg ?? 0;
         return (
             <div

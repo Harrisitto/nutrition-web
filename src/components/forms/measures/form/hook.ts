@@ -18,9 +18,9 @@ export const fieldIds = {
             const measureIdStr = id.slice(prefix.length);
             const measureId = parseInt(measureIdStr, 10);
             return isNaN(measureId) ? null : measureId;
-        }
-    }
-};
+        },
+    },
+} as const;
 
 const createDateField = (label: string) => ({
     id: fieldIds.date,
@@ -29,6 +29,8 @@ const createDateField = (label: string) => ({
     inputProps: {
         label,
     },
+    explanation: "",
+    isHidden: false,
 } as InputState<"date">);
 
 const createMeasureField = (
@@ -39,12 +41,13 @@ const createMeasureField = (
         type: "numeric",
         currentValue: "",
         inputProps: {
-            label: `${measure.name} (${measure.units})`,
+            label: `${measure.name} ${measure.units || ""}`,
         },
         explanation: measure.description,
         isHidden: true,
     } as InputState<"numeric">;
 }
+
 
 const createSelectMeasureField = (
     label: string,
@@ -91,7 +94,15 @@ const createSelectMeasureField = (
                 }
 
             }
-        ]
+        ],
+        validation: [
+            (value) => {
+                if (typeof value !== "string" || value === "") return "";
+                return measures.some(measure => measure.id.toString() === value)
+                    ? ""
+                    : "system:messages.error";
+            },
+        ],
     } as InputState<"selectOne">;
 }
 
@@ -109,11 +120,13 @@ const useConfig = () => {
         if (!measures.data) return null;
         return createSelectMeasureField(t("forms:measures.fields.selectMeasure"), measures.data);
     }, [measures.data, t]);
+        
 
     return [
         createDateField(t("forms:measures.fields.date")),
         ...(selectMeasureField ? [selectMeasureField] : []),
         ...measureFields,
+        
     ] as InputState<"date" | "numeric" | "selectOne">[];
 }
 
