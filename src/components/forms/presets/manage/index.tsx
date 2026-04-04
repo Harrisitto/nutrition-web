@@ -1,10 +1,14 @@
-import { useDeletePreset, useFetchPresets } from "@src/services/tanstack/user/preset";
+import {
+  useDeletePreset,
+  useFetchPresets,
+} from "@src/services/tanstack/user/preset";
 import { ChevronDown, Trash } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Chart } from "./trainingHcChart";
 import { KcalResume } from "./kcalResume";
 import { calculateKcalFromMacros } from "@src/hooks/helpers/constants";
+import { MacrosResume } from "./macrosResume";
 
 type Preset = NonNullable<ReturnType<typeof useFetchPresets>["data"]>[number];
 
@@ -72,7 +76,6 @@ const Details = ({
             >
               <span className="text-xs text-text-muted">
                 {meal.meal_id.name}
-                
               </span>
               <br />
               {meal.type_id.name || t("forms:preset.fields.unknownMealType")}
@@ -102,18 +105,16 @@ const Details = ({
           kcal: meal.type_id.all_macros.kcal,
           name: meal.meal_id.name,
         }))}
-        trainingKcal={trainingHc.reduce((total, hc) => total + calculateKcalFromMacros({ carbs: hc }), 0)}
-       />
+        trainingKcal={trainingHc.reduce(
+          (total, hc) => total + calculateKcalFromMacros({ carbs: hc }),
+          0,
+        )}
+      />
     </div>
   );
 };
 
-
-const RenderOne = ({
-  preset,
-}: {
-  preset: Preset;
-}) => {
+const RenderOne = ({ preset }: { preset: Preset }) => {
   const [viewDetails, setViewDetails] = useState(false);
   return (
     <div className="">
@@ -124,11 +125,14 @@ const RenderOne = ({
         viewDetails={() => setViewDetails((prev) => !prev)}
       />
       {viewDetails && (
-        <Details
-          meals={preset.user_preset_meal}
-          trainingHc={preset.training_hc}
-          comment={preset.comment}
-        />
+        <>
+          <Details
+            meals={preset.user_preset_meal}
+            trainingHc={preset.training_hc}
+            comment={preset.comment}
+          />
+          <MacrosResume preset={preset} />
+        </>
       )}
     </div>
   );

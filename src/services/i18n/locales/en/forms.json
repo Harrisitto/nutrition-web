@@ -18,6 +18,15 @@
             "carbsPerKg": "Carbs per kg",
             "fatsPerKg": "Fats per kg",
             "proteinPerKg": "Protein per kg",
+            "macrosDistribution": "Macros distribution",
+            "calculatedWithWeekWeight": "Calculated with this week's user weight",
+            "totalCarbs": "Total carbs: {{value}} g",
+            "totalFat": "Total fat: {{value}} g",
+            "totalProtein": "Total protein: {{value}} g",
+            "carbs": "Carbs",
+            "fat": "Fat",
+            "protein": "Protein",
+            "macro": "Macro",
 
             "submit": "Save Preset"
         }

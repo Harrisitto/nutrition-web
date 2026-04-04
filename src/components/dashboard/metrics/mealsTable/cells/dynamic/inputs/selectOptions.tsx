@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTableContext } from "../../../tableContext";
+import { useAppSelector } from "@src/store/store";
 
 const formatString = (str: string) => {
     if (!str) return "";
@@ -21,6 +22,7 @@ export const SideSelectOptions = ({
 }) => {
 
     const { cancelFocus } = useTableContext();
+    const selectOptionsCommands = useAppSelector((state) => state.config.keyboardCommands.selectOptions);
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedIndex, setSelectedIndex] = useState<number>(() => {
         const index = options.findIndex(([id]) => id === initialId);
@@ -59,17 +61,17 @@ export const SideSelectOptions = ({
 
         const handleKeyDown = (e: KeyboardEvent) => {
             switch (e.key) {
-                case "ArrowDown":
+                case selectOptionsCommands.optionDown:
                     if (numOptions === 0) break;
                     e.preventDefault();
                     setSelectedIndex(prev => (prev + 1) % numOptions);
                     break;
-                case "ArrowUp":
+                case selectOptionsCommands.optionUp:
                     if (numOptions === 0) break;
                     e.preventDefault();
                     setSelectedIndex(prev => (prev - 1 + numOptions) % numOptions);
                     break;
-                case "Enter":
+                case selectOptionsCommands.confirmOption:
                     e.preventDefault();
                     if (numOptions === 0) break;
                     if (selectedIndex >= 0 && selectedIndex < numOptions) {
@@ -78,7 +80,7 @@ export const SideSelectOptions = ({
                     setSearchTerm("");
                     cancelFocus();
                     break;
-                case "Escape":
+                case selectOptionsCommands.cancelOption:
                     e.preventDefault();
                     setSearchTerm("");
                     cancelFocus();
@@ -93,7 +95,7 @@ export const SideSelectOptions = ({
             window.removeEventListener("click", handleClickOutside);
             window.removeEventListener("keydown", handleKeyDown);
         }
-    }, [applySelection, filteredOptions, selectedIndex, cancelFocus]);
+    }, [applySelection, filteredOptions, selectedIndex, cancelFocus, selectOptionsCommands]);
 
     return (
         <div>

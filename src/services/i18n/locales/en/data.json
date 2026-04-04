@@ -80,5 +80,59 @@
                 "description": "Used to aproximate the ingredients macronutrients in the app"
             }
         }
+    },
+    "configuration": {
+        "title": "Configuration",
+        "description": "Customize your experience and set up the application according to your preferences.",
+        "sections": {
+            "keyboard": {
+                "title": "Keyboard Shortcuts",
+                "description": "Configure your keyboard shortcuts for quick access to various features and actions within the application.",
+                "pressKey": "Press any key...",
+                "tableCommands": "Table Commands",
+                "groups": {
+                    "table": "Table",
+                    "searchOptions": "Search Options",
+                    "comments": "Comments"
+                },
+                "commands": {
+                    "selectCell": "Select Cell",
+                    "saveData": "Save Data",
+                    "exitCell": "Exit Cell",
+                    "moveUp": "Move Up",
+                    "moveDown": "Move Down",
+                    "moveLeft": "Move Left",
+                    "moveRight": "Move Right",
+                    "optionUp": "Previous Option",
+                    "optionDown": "Next Option",
+                    "confirmOption": "Confirm Option",
+                    "cancelOption": "Cancel Option",
+                    "closeEditor": "Close Editor"
+                }
+            },
+            "invitations": {
+                "title": "User Invitations",
+                "invitedTitle": "Invited Clients",
+                "description": "Manage your user invitations and control who has access to your nutritionist account.",
+                "invitationCode": "Invitation Code",
+                "client": "Client",
+                "writeMessage": "Write a message to the invited user",
+                "messagePlaceholder": "Write a message...",
+                "searchPlaceholder": "Search by invitation code...",
+                "loading": "Loading invitations...",
+                "error": "An error occurred while loading invitations.",
+                "noResults": "No available clients found.",
+                "noInvitations": "No invitations sent yet.",
+                "message": "Message: {{message}}",
+                "sendInvitation": "Send Invitation",
+                "revoke": "Revoke",
+                "messageTooShort": "Message must be at least 10 characters long."
+            },
+            "authManagement": {
+                "title": "Auth Management",
+                "description": "Manage authentication actions for your account.",
+                "comingSoon": "This section is under development. Please check back later."
+            }
+        }
     }
 }

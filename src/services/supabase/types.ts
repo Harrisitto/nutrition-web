@@ -152,6 +152,7 @@ export type Database = {
         Row: {
           brand_id: string | null
           created_at: string
+          invitation_code: string
           is_nutritionist: boolean
           is_owner: boolean
           nutri_id: string | null
@@ -160,6 +161,7 @@ export type Database = {
         Insert: {
           brand_id?: string | null
           created_at?: string
+          invitation_code?: string
           is_nutritionist?: boolean
           is_owner?: boolean
           nutri_id?: string | null
@@ -168,6 +170,7 @@ export type Database = {
         Update: {
           brand_id?: string | null
           created_at?: string
+          invitation_code?: string
           is_nutritionist?: boolean
           is_owner?: boolean
           nutri_id?: string | null
@@ -175,7 +178,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "clients_brand_id_fkey"
+            foreignKeyName: "all_users_brand_id_fkey"
             columns: ["brand_id"]
             isOneToOne: false
             referencedRelation: "all_brands"
@@ -378,6 +381,39 @@ export type Database = {
             foreignKeyName: "user_info_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
+            referencedRelation: "all_users"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      user_invitation: {
+        Row: {
+          client_id: string
+          created_at: string
+          nutri_id: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          nutri_id?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          nutri_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_invitation_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "all_users"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_invitation_nutri_id_fkey"
+            columns: ["nutri_id"]
+            isOneToOne: false
             referencedRelation: "all_users"
             referencedColumns: ["user_id"]
           },

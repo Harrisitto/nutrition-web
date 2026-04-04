@@ -8,6 +8,8 @@ export const queryKeys = ({
     language?: string;
 } = {}) => ({
     user: {
+        invitationsBase : ["user", "invitations", userId],
+        invitations: (code: string) => ["user", "invitations", userId, code],
         single: ["user", "single", userId],
         fromNutritionist: ["user", "myUsers", userId],
         formBrand: ["user", "brandUsers"],

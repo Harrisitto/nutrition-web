@@ -19,6 +19,7 @@ const PageReferences = lazy(() => import("./pages/references/page"));
 const NotFoundPage = lazy(() => import("./pages/error/NotFoundPage"));
 const SetupProfile = lazy(() => import("./pages/auth/SetupProfile"));
 const PageMeasures = lazy(() => import("./pages/forms/measures"));
+const PageNutritionistConfiguration = lazy(() => import("./pages/app/configuration"));
 const EmailVerificationPage = lazy(
   () => import("./pages/auth/EmailVerification"),
 );
@@ -128,10 +129,7 @@ function App() {
               path={APP_ROUTES.CONFIG}
               element={
                 <ProtectedRoute>
-                  <div className="p-6">
-                    <h1 className="text-2xl font-bold mb-4">Config Page</h1>
-                    <p>This is a placeholder for the config page.</p>
-                  </div>
+                  <PageNutritionistConfiguration />
                 </ProtectedRoute>
               }
             />

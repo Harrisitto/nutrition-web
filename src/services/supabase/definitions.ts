@@ -38,6 +38,15 @@ export const TABLE_ALL_MACROS = {
     }
 } as const
 
+export const TABLE_USER_INVITATIONS = {
+    NAME: 'user_invitation',
+    COLS: {
+        NUTRI_ID: 'nutri_id',
+        CLIENT_ID: 'client_id',
+        CREATED_AT: 'created_at',
+    }
+} as const
+
 export const TABLE_ALL_MEASURES = {
     NAME: 'all_measures',
     COLS: {
@@ -84,6 +93,7 @@ export const TABLE_ALL_USERS = {
         BRAND_ID: 'brand_id',
         IS_OWNER: 'is_owner',
         CREATED_AT: 'created_at',
+        INVITATION_CODE: 'invitation_code',
     }
 } as const
 

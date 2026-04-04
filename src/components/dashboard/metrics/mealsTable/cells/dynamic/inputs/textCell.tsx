@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTableContext } from "../../../tableContext";
 import { useTranslation } from "react-i18next";
+import { useAppSelector } from "@src/store/store";
 
 type FloatingBox = {
   top: number;
@@ -23,6 +24,7 @@ export const CellTextInput = ({
 }) => {
   const { t } = useTranslation();
   const { isFocused } = useTableContext();
+  const closeEditorKey = useAppSelector((state) => state.config.keyboardCommands.commentsEditor.closeEditor);
   const cellRef = useRef<HTMLDivElement>(null);
   const floatingPanelRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -138,14 +140,14 @@ export const CellTextInput = ({
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (e.key !== "Escape") {
+      if (e.key !== closeEditorKey) {
         e.stopPropagation();
         return;
       }
       saveHandler(text);
       inputRef.current?.blur();
     },
-    [saveHandler, text],
+    [closeEditorKey, saveHandler, text],
   );
 
   useEffect(() => {
@@ -217,7 +219,7 @@ export const CellTextInput = ({
                 {t("data:dashboardTable.commentsRows.writeComment")}
               </span>
               <span className="rounded-full border border-nutrition-green/30 bg-white px-2 py-0.5 text-[10px] font-medium text-dark-green/80">
-                {t("data:dashboardTable.commentsRows.pressEsc")}
+                {`${t("data:dashboardTable.commentsRows.pressEsc")} (${closeEditorKey})`}
               </span>
             </div>
             <div className="p-3">

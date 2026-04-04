@@ -1,5 +1,6 @@
 import { useTableContext } from "../../../tableContext";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useAppSelector } from "@src/store/store";
 
 export const CellNumericInput = ({
   isSelected,
@@ -11,6 +12,7 @@ export const CellNumericInput = ({
   onSave: (value: number) => void;
 }) => {
   const { isFocused } = useTableContext();
+  const saveDataKey = useAppSelector((state) => state.config.keyboardCommands.tableNavigation.saveData);
   const inputRef = useRef<HTMLInputElement>(null);
   const wasActiveRef = useRef(false);
   const dirtyRef = useRef(false);
@@ -28,13 +30,13 @@ export const CellNumericInput = ({
 
   const handleEnterSave = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key !== "Enter") return;
+      if (e.key !== saveDataKey) return;
       e.preventDefault();
       e.stopPropagation();
       saveHandler(value);
       inputRef.current?.blur();
     },
-    [saveHandler, value],
+    [saveDataKey, saveHandler, value],
   );
 
   useEffect(() => {

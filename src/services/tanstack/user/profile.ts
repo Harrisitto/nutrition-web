@@ -87,6 +87,7 @@ export const useFetchNutritionistUsers = () => {
                     .from(TABLE_ALL_USERS.NAME)
                     .select(selectUser())
                     .eq(TABLE_ALL_USERS.COLS.NUTRI_ID, userId)
+                    .eq(TABLE_ALL_USERS.COLS.IS_NUTRI, false)
                 if (error) throw error
                 return data
             } catch (error) {

@@ -43,7 +43,8 @@ const SideElement = ({
 
     insertPlaningQuery.mutateAsync({
       date,
-      training_hc: preset.training_hc,
+      training_hc: preset.training_hc || undefined,
+      comment: preset.comment || undefined,
       meals: preset.user_preset_meal.map((upm) => ({
         meal_id: upm.meal_id.id,
         type_id: upm.type_id.id,

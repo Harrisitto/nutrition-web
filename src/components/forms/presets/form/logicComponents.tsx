@@ -43,6 +43,7 @@ export const Resume = () => {
     startDate: weekDate.thisMonday(),
     endDate: weekDate.thisSunday(),
   });
+  
   const userWeight = useFetchUserWeightForDateRange({
     startDate: weekDate.thisMonday(),
     endDate: weekDate.thisSunday(),

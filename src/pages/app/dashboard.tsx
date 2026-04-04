@@ -1,4 +1,3 @@
-import { ComponentsAuthManagement } from "@src/components/auth/managementIndex";
 import { AppDashboard, IdxDashboard } from "@src/components/dashboard";
 import { fromDate } from "@src/helpers/dates";
 import { useConfigSelectedDay } from "@src/store/slices/config/hook";
@@ -28,7 +27,6 @@ export default function PageDashboard() {
         </div>
         <div className="my-4" />
         <IdxDashboard.Metrics.Meals.WeeklyMeals startMonday={thisDateMonday} />
-        <ComponentsAuthManagement.Buttons.SignOut />
       </div>
     </AppDashboard>
   );

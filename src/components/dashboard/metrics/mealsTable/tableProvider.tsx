@@ -3,6 +3,7 @@ import { Context } from "./tableContext";
 import { useFetchMeals } from "@src/services/tanstack/data/meals";
 import { useDaysOfWeek } from "@src/hooks/helpers/language";
 import { usePlaning } from "./hooks/planing";
+import { useAppSelector } from "@src/store/store";
 
 export const Provider = ({
   children,
@@ -15,6 +16,7 @@ export const Provider = ({
   const meals = useFetchMeals();
   const daysOfWeek = useDaysOfWeek();
   const planing = usePlaning({ forDate: startMonday });
+  const tableNavigation = useAppSelector((state) => state.config.keyboardCommands.tableNavigation);
 
   const [cells, setCells] = useState<HTMLDivElement[][]>([]);
   const [selectedCell, setSelectedCell] = useState<{ x: number; y: number }>({
@@ -193,13 +195,19 @@ export const Provider = ({
       if (
         isFocused &&
         targetIsCurrentCellInput &&
-        ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Enter"].includes(e.key)
+        [
+          tableNavigation.moveUp,
+          tableNavigation.moveDown,
+          tableNavigation.moveLeft,
+          tableNavigation.moveRight,
+          tableNavigation.selectCell,
+        ].includes(e.key)
       ) {
         return;
       }
 
       switch (e.key) {
-        case "ArrowUp":
+        case tableNavigation.moveUp:
           if (isFocused && !targetIsCurrentCellInput) return;
           e.preventDefault();
           setIsFocused(false);
@@ -212,7 +220,7 @@ export const Provider = ({
             return { x: nextX, y: nextY };
           });
           break;
-        case "ArrowDown":
+        case tableNavigation.moveDown:
           if (isFocused && !targetIsCurrentCellInput) return;
           e.preventDefault();
           setIsFocused(false);
@@ -225,7 +233,7 @@ export const Provider = ({
             return { x: nextX, y: nextY };
           });
           break;
-        case "ArrowLeft":
+        case tableNavigation.moveLeft:
           setIsFocused(false);
           setSideElement(null);
           setSelectedCell((prev) => {
@@ -235,7 +243,7 @@ export const Provider = ({
             return { x: nextX, y: prev.y };
           });
           break;
-        case "ArrowRight":
+        case tableNavigation.moveRight:
           setIsFocused(false);
           setSideElement(null);
           setSelectedCell((prev) => {
@@ -245,11 +253,11 @@ export const Provider = ({
             return { x: nextX, y: prev.y };
           });
           break;
-        case "Enter":
+        case tableNavigation.selectCell:
           if (isFocused) break;
           currentCell()?.click();
           break;
-        case "Escape":
+        case tableNavigation.exitCell:
           if (!isFocused) break;
           setIsFocused(false);
           setSideElement(null);
@@ -258,7 +266,7 @@ export const Provider = ({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [cells, currentCell, isFocused]);
+  }, [cells, currentCell, isFocused, tableNavigation]);
 
   return (
     <Context.Provider

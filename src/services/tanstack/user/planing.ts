@@ -191,6 +191,7 @@ export const useInsertPlaningWithMeals = () => {
       meals,
       training_hc,
       training_kcal,
+      comment
     }: {
       date: Date;
       meals: {
@@ -199,6 +200,7 @@ export const useInsertPlaningWithMeals = () => {
       }[];
       training_hc?: number[];
       training_kcal?: number;
+      comment?: string;
     }) => {
       if (!userId) throw new Error("User ID is required to insert planing data");
 
@@ -211,6 +213,7 @@ export const useInsertPlaningWithMeals = () => {
           [TABLE_USER_PLANING.COLS.DATE]: normalizedDate,
           ...(training_hc != null ? { [TABLE_USER_PLANING.COLS.TRAINING_HC]: training_hc } : {}),
           ...(training_kcal != null ? { training_kcal } : {}),
+          ...(comment != null ? { comment } : {}),
         })
         .select(TABLE_USER_PLANING.COLS.ID)
         .single();
