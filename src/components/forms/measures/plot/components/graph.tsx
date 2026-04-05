@@ -85,7 +85,8 @@ export const Graph = () => {
 
   return (
     <div className="w-full min-w-0 rounded-lg border border-slate-200 bg-white p-3">
-      <ResponsiveContainer width="100%" height="100%" aspect={2.2} minWidth={0} minHeight={280}>
+      <div className="h-[clamp(16rem,40vh,24rem)] w-full min-w-0">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
         <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
           <XAxis
@@ -147,7 +148,8 @@ export const Graph = () => {
             />
           ))}
         </LineChart>
-      </ResponsiveContainer>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 };

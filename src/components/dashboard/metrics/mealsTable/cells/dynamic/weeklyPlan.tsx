@@ -91,17 +91,31 @@ const PlaningCell = ({
   const planingKey = generateMealKey(mealId, date);
   const planingData = planing.mealsMap.get(planingKey);
 
+  const kcalStyle = useMemo(() => {
+    if (!planingData) return "";
+    const type = planingData.type_id;
+    if(type.macros_id.kcal < 200) {
+      return "border-green-500 bg-green-100/30 hover:bg-green-100/50";
+    } else if (type.macros_id.kcal < 500) {
+      return "border-yellow-500 bg-yellow-100/30 hover:bg-yellow-100/50";
+    } else if (type.macros_id.kcal < 800) {
+      return "border-orange-500 bg-orange-100/30 hover:bg-orange-100/50";
+    } else {
+      return "border-red-500 bg-red-100/30 hover:bg-red-100/50";
+    }
+  }, [planingData]);
+
   if (!planingData) {
     return (
       <div
-        className={`border p-3 text-center transition-colors h-full flex items-center justify-center ${isSelected ? "border-dark-green bg-light-green text-white" : "border-nutrition-green/30 bg-nutrition-green/20 text-white-green hover:bg-nutrition-green/30"}`}
+        className={`border p-3 text-center transition-colors h-full flex items-center justify-center text-fade-dark-green font-bold cursor-pointer ${isSelected ? "border-dark-green bg-light-green" : "border-nutrition-green/30 bg-nutrition-green/20 text-white-green hover:bg-nutrition-green/30"}`}
       />
     );
   }
 
   return (
     <div
-      className={`border p-3 text-center transition-colors h-full flex items-center justify-center ${isSelected ? "border-dark-green bg-light-green text-white" : "border-nutrition-green/30 bg-nutrition-green/20 text-white-green hover:bg-nutrition-green/30"}`}
+      className={`border p-3 text-center transition-colors h-full flex items-center justify-center text-fade-dark-green font-bold cursor-pointer ${isSelected ? "border-dark-green bg-light-green" : `${kcalStyle}`}`}
     >
       {planingData.type_id.name}
     </div>

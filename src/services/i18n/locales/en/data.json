@@ -44,6 +44,15 @@
             "presets": "Presets",
             "measures": "Measures",
             "config": "Nutritionist configuration"
+        },
+        "userInfo": {
+            "email": "Email",
+            "phone": "Phone",
+            "age": "Age",
+            "weight": "Weight",
+            "goal": "Goal",
+            "lastSeen": "Last seen {{days}} days ago",
+            "neverSeen": "Last seen never"
         }
     },
     "references": {

@@ -27,6 +27,12 @@ export const PlotProvider = ({ children }: { children: ReactNode }) => {
     endDate: maxDate,
   });
 
+  const [debouncedFocusedDateRange, setDebouncedFocusedDateRange] =
+    useState<DateRange>({
+      startDate: minDate,
+      endDate: maxDate,
+    });
+
   const [dateRange, setDateRange] = useState<DateRange>({
     startDate: minDate,
     endDate: maxDate,
@@ -51,19 +57,29 @@ export const PlotProvider = ({ children }: { children: ReactNode }) => {
     });
   }, []);
 
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setDebouncedFocusedDateRange(focusedDateRange);
+    }, 1000);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [focusedDateRange]);
+
   const focusedMeasures = useMemo(() => {
     if (!measuresInRange.data) return [];
 
     const start = new Date(
-      focusedDateRange.startDate.getFullYear(),
-      focusedDateRange.startDate.getMonth(),
-      focusedDateRange.startDate.getDate(),
+      debouncedFocusedDateRange.startDate.getFullYear(),
+      debouncedFocusedDateRange.startDate.getMonth(),
+      debouncedFocusedDateRange.startDate.getDate(),
     ).getTime();
 
     const end = new Date(
-      focusedDateRange.endDate.getFullYear(),
-      focusedDateRange.endDate.getMonth(),
-      focusedDateRange.endDate.getDate(),
+      debouncedFocusedDateRange.endDate.getFullYear(),
+      debouncedFocusedDateRange.endDate.getMonth(),
+      debouncedFocusedDateRange.endDate.getDate(),
       23,
       59,
       59,
@@ -81,7 +97,7 @@ export const PlotProvider = ({ children }: { children: ReactNode }) => {
       const dateB = new Date(`${b.date}T00:00:00`).getTime();
       return dateA - dateB;
     });
-  }, [focusedDateRange.endDate, focusedDateRange.startDate, measureInfo, measuresInRange.data]);
+  }, [debouncedFocusedDateRange.endDate, debouncedFocusedDateRange.startDate, measureInfo, measuresInRange.data]);
 
 
   useEffect(() => {

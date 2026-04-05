@@ -88,3 +88,4 @@ export const useFetchUserWeightForDateRange = ({
   });
   return query;
 }
+

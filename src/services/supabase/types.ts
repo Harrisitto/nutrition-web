@@ -356,6 +356,8 @@ export type Database = {
           birth_date: string | null
           email: string
           gender: string | null
+          goal: string
+          last_seen: string | null
           name: string
           phone: string
           user_id: string
@@ -364,6 +366,8 @@ export type Database = {
           birth_date?: string | null
           email?: string
           gender?: string | null
+          goal?: string
+          last_seen?: string | null
           name?: string
           phone?: string
           user_id?: string
@@ -372,6 +376,8 @@ export type Database = {
           birth_date?: string | null
           email?: string
           gender?: string | null
+          goal?: string
+          last_seen?: string | null
           name?: string
           phone?: string
           user_id?: string
@@ -390,16 +396,19 @@ export type Database = {
         Row: {
           client_id: string
           created_at: string
+          message: string
           nutri_id: string
         }
         Insert: {
           client_id: string
           created_at?: string
+          message?: string
           nutri_id?: string
         }
         Update: {
           client_id?: string
           created_at?: string
+          message?: string
           nutri_id?: string
         }
         Relationships: [
