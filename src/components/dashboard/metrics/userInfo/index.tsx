@@ -29,7 +29,7 @@ export const Email = () => {
 
   if (!infoQuery.data) return null;
 
-  const email = infoQuery.data.user_info?.email ?? "";
+  const email = infoQuery.data?.email ?? "";
   const emailLabel = t("data:dashboardTable.userInfo.email");
 
   return (
@@ -54,7 +54,7 @@ export const Phone = () => {
 
   if (!infoQuery.data) return null;
 
-  const phone = infoQuery.data.user_info?.phone ?? "";
+  const phone = infoQuery.data?.phone ?? "";
   const normalizedPhone = phone.replace(/\D/g, "");
   const hasValidWhatsAppTarget = normalizedPhone.length > 7;
   const whatsAppUrl = hasValidWhatsAppTarget
@@ -88,8 +88,8 @@ export const Age = () => {
   const infoQuery = useFetchSingleUser();
   const { t } = useTranslation();
   const age = useMemo(() => {
-    if (!infoQuery.data || !infoQuery.data.user_info?.birth_date) return null;
-    const birthDate = infoQuery.data.user_info.birth_date;
+    if (!infoQuery.data || !infoQuery.data?.birth_date) return null;
+    const birthDate = infoQuery.data.birth_date;
     const today = new Date();
     const birth = new Date(birthDate);
     let age = today.getFullYear() - birth.getFullYear();
@@ -137,7 +137,7 @@ export const Goal = () => {
 
   useEffect(() => {
     if (infoQuery.data) {
-      setGoalText(infoQuery.data.user_info?.goal ?? "");
+      setGoalText(infoQuery.data?.goal ?? "");
     }
   }, [infoQuery.data]);
 
@@ -164,7 +164,7 @@ export const LastSeen = () => {
   const { t } = useTranslation();
 
   const formattedLastSeen = useMemo(() => {
-    const lastSeen = infoQuery.data?.user_info?.last_seen;
+    const lastSeen = infoQuery.data?.last_seen;
     const neverSeen = t("data:dashboardTable.userInfo.neverSeen");
     if (!lastSeen) return neverSeen;
 

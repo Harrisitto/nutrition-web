@@ -3,7 +3,6 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryKeys } from "../keys";
 import { supabase } from "@src/services/supabase/client";
 import {
-  TABLE_RECIPE_TYPES,
   TABLE_USER_PLANING,
   TABLE_USER_PLANING_MEAL,
 } from "@src/services/supabase/definitions";
@@ -15,9 +14,8 @@ import { useNotification } from "@src/store/slices/notification/hook";
 const selectFromMeal = (languageCode: ReturnType<typeof useLanguageCode>) => {
   return `*,
         ${TABLE_USER_PLANING_MEAL.COLS.TYPE_ID}(
-        id,
-        name: name->>${languageCode},
-        ${TABLE_RECIPE_TYPES.COLS.MACROS_ID}(*))` as const;
+        *,
+  name: name->>${languageCode})` as const;
 };
 
 const selectFromPlaning = (languageCode: ReturnType<typeof useLanguageCode>) => {

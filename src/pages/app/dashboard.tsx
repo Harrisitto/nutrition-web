@@ -1,5 +1,7 @@
+import IdxConfiguration from "@src/components/configuration";
 import { AppDashboard, IdxDashboard } from "@src/components/dashboard";
 import { fromDate } from "@src/helpers/dates";
+import { useFetchNutritionistUsers } from "@src/services/tanstack/user/profile";
 import { useConfigSelectedDay } from "@src/store/slices/config/hook";
 
 export default function PageDashboard() {
@@ -7,6 +9,16 @@ export default function PageDashboard() {
   const thisDateMonday = date
     ? fromDate(date).thisMonday()
     : fromDate().nextMonday();
+  const allClients = useFetchNutritionistUsers();
+
+  if (allClients.data?.length === 0) {
+    return (
+      <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2">
+        <IdxConfiguration.Invitations.InviteClient />
+        <IdxConfiguration.Invitations.InvitedClients />
+      </div>
+    );
+  }
 
   return (
     <AppDashboard>

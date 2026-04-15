@@ -9,9 +9,8 @@ const fetchTypesForMeal = async (mealId: number, langCode: ReturnType<typeof use
     .from(TABLE_RECIPE_TYPE_MEALS.NAME)
     .select(`meal_id, 
       type_id(
-      id,
-      name: name->>${langCode},
-      macros_id(*)
+      *,
+      name: name->>${langCode}
       )`)
     .eq(TABLE_RECIPE_TYPE_MEALS.COLS.MEAL_ID, mealId);
   if (error) throw error;
@@ -58,7 +57,7 @@ export const useFetchTypesForAllMeals = (mealListIds: number[]) => {
     combine: (results) => {
       const byMealId = results.reduce((acc, result) => {
         if (result.isSuccess && result.data) {
-          acc[result.data[0]?.meal_id ?? -1] = result.data;
+          acc[result.data[0].meal_id] = result.data;
         }
         return acc;
       }, {} as Record<number, Awaited<ReturnType<typeof fetchTypesForMeal>>>);
@@ -81,10 +80,9 @@ export const useFetchAllMealTypes = () => {
       const { data, error } = await supabase
         .from(TABLE_RECIPE_TYPES.NAME)
         .select(`
-          id,
-          name: name->>${langCode},
-          macros_id(*)
-        `);
+          *,
+          name: name->>${langCode}
+          `);
       if (error) throw error;
       return data;
     }

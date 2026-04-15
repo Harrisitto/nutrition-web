@@ -14,7 +14,7 @@ export interface AuthState {
   loading: boolean
   error: string | null
   isAuthenticated: boolean
-  profile: Database['public']['Tables']['all_users']['Row'] | null
+  profile: Database['public']['Tables']['all_nutritionist']['Row'] | null
 }
 
 // Initial state
@@ -47,7 +47,7 @@ const authSlice = createSlice({
     clearData: (state) => {
       Object.assign(state, initialState)
     },
-    setProfile: (state, action: PayloadAction<Database['public']['Tables']['all_users']['Row']>) => {
+    setProfile: (state, action: PayloadAction<Database['public']['Tables']['all_nutritionist']['Row']>) => {
       state.profile = action.payload
     }
   },

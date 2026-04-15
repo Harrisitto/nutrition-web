@@ -102,7 +102,7 @@ const Details = ({
 
       <KcalResume
         mealKcal={meals.map((meal) => ({
-          kcal: meal.type_id.all_macros.kcal,
+          kcal: meal.type_id.kcal,
           name: meal.meal_id.name,
         }))}
         trainingKcal={trainingHc.reduce(

@@ -97,6 +97,14 @@ export const TABLE_ALL_USERS = {
     }
 } as const
 
+export const TABLE_ALL_NUTRITIONISTS = {
+    NAME: 'all_nutritionist',
+    COLS: {
+        USER_ID: 'nutri_id',
+        NAME: 'name',
+    }
+} as const
+
 export const TABLE_ALL_MEALS = {
     NAME: 'all_meals',
     COLS: {

@@ -94,11 +94,11 @@ const PlaningCell = ({
   const kcalStyle = useMemo(() => {
     if (!planingData) return "";
     const type = planingData.type_id;
-    if(type.macros_id.kcal < 200) {
+    if(type.kcal < 200) {
       return "border-green-500 bg-green-100/30 hover:bg-green-100/50";
-    } else if (type.macros_id.kcal < 500) {
+    } else if (type.kcal < 500) {
       return "border-yellow-500 bg-yellow-100/30 hover:bg-yellow-100/50";
-    } else if (type.macros_id.kcal < 800) {
+    } else if (type.kcal < 800) {
       return "border-orange-500 bg-orange-100/30 hover:bg-orange-100/50";
     } else {
       return "border-red-500 bg-red-100/30 hover:bg-red-100/50";

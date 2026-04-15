@@ -14,66 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      all_brands: {
-        Row: {
-          id: string
-        }
-        Insert: {
-          id?: string
-        }
-        Update: {
-          id?: string
-        }
-        Relationships: []
-      }
-      all_errors: {
-        Row: {
-          cause: string
-          code: number
-          created_at: string
-          function: string
-          id: number
-        }
-        Insert: {
-          cause: string
-          code?: number
-          created_at?: string
-          function: string
-          id?: number
-        }
-        Update: {
-          cause?: string
-          code?: number
-          created_at?: string
-          function?: string
-          id?: number
-        }
-        Relationships: []
-      }
-      all_macros: {
-        Row: {
-          fat: number
-          hc: number
-          id: number
-          kcal: number
-          prot: number
-        }
-        Insert: {
-          fat?: number
-          hc?: number
-          id?: number
-          kcal?: number
-          prot?: number
-        }
-        Update: {
-          fat?: number
-          hc?: number
-          id?: number
-          kcal?: number
-          prot?: number
-        }
-        Relationships: []
-      }
       all_meals: {
         Row: {
           id: number
@@ -110,6 +50,24 @@ export type Database = {
           id?: number
           name?: Json | null
           units?: Json | null
+        }
+        Relationships: []
+      }
+      all_nutritionist: {
+        Row: {
+          created_at: string
+          name: string
+          nutri_id: string
+        }
+        Insert: {
+          created_at?: string
+          name?: string
+          nutri_id: string
+        }
+        Update: {
+          created_at?: string
+          name?: string
+          nutri_id?: string
         }
         Relationships: []
       }
@@ -150,39 +108,51 @@ export type Database = {
       }
       all_users: {
         Row: {
-          brand_id: string | null
+          birth_date: string | null
           created_at: string
+          email: string
+          gender: string
+          goal: string
           invitation_code: string
-          is_nutritionist: boolean
-          is_owner: boolean
+          last_seen: string | null
+          name: string
           nutri_id: string | null
+          phone: string
           user_id: string
         }
         Insert: {
-          brand_id?: string | null
+          birth_date?: string | null
           created_at?: string
+          email?: string
+          gender?: string
+          goal?: string
           invitation_code?: string
-          is_nutritionist?: boolean
-          is_owner?: boolean
+          last_seen?: string | null
+          name?: string
           nutri_id?: string | null
+          phone?: string
           user_id?: string
         }
         Update: {
-          brand_id?: string | null
+          birth_date?: string | null
           created_at?: string
+          email?: string
+          gender?: string
+          goal?: string
           invitation_code?: string
-          is_nutritionist?: boolean
-          is_owner?: boolean
+          last_seen?: string | null
+          name?: string
           nutri_id?: string | null
+          phone?: string
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "all_users_brand_id_fkey"
-            columns: ["brand_id"]
+            foreignKeyName: "all_users_nutri_id_fkey"
+            columns: ["nutri_id"]
             isOneToOne: false
-            referencedRelation: "all_brands"
-            referencedColumns: ["id"]
+            referencedRelation: "all_nutritionist"
+            referencedColumns: ["nutri_id"]
           },
         ]
       }
@@ -190,106 +160,49 @@ export type Database = {
         Row: {
           description: string
           id: number
-          lang: string
           name: string
           url: string
-          user_id: string | null
         }
         Insert: {
           description?: string
           id?: number
-          lang?: string
           name: string
           url: string
-          user_id?: string | null
         }
         Update: {
           description?: string
           id?: number
-          lang?: string
           name?: string
           url?: string
-          user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "all_videos_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "all_users"
-            referencedColumns: ["user_id"]
-          },
-        ]
-      }
-      brand_info: {
-        Row: {
-          brand_id: string
-          description: string
-          email: string
-          location: string
-          logo_url: string | null
-          name: string
-          phone_number: string
-          social_media_url: string
-          web_url: string
-        }
-        Insert: {
-          brand_id: string
-          description?: string
-          email?: string
-          location?: string
-          logo_url?: string | null
-          name?: string
-          phone_number?: string
-          social_media_url?: string
-          web_url?: string
-        }
-        Update: {
-          brand_id?: string
-          description?: string
-          email?: string
-          location?: string
-          logo_url?: string | null
-          name?: string
-          phone_number?: string
-          social_media_url?: string
-          web_url?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "brand_info_brand_id_fkey"
-            columns: ["brand_id"]
-            isOneToOne: true
-            referencedRelation: "all_brands"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       recipe_type: {
         Row: {
+          fat: number
+          hc: number
           id: number
-          macros_id: number | null
+          kcal: number
           name: Json | null
+          prot: number
         }
         Insert: {
+          fat?: number
+          hc?: number
           id?: number
-          macros_id?: number | null
+          kcal?: number
           name?: Json | null
+          prot?: number
         }
         Update: {
+          fat?: number
+          hc?: number
           id?: number
-          macros_id?: number | null
+          kcal?: number
           name?: Json | null
+          prot?: number
         }
-        Relationships: [
-          {
-            foreignKeyName: "food_types_macros_id_fkey"
-            columns: ["macros_id"]
-            isOneToOne: false
-            referencedRelation: "all_macros"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       recipe_type_meal: {
         Row: {
@@ -318,77 +231,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "recipe_type"
             referencedColumns: ["id"]
-          },
-        ]
-      }
-      rls_policies: {
-        Row: {
-          condition: string
-          description: string | null
-          id: number
-          operation: string
-          policy_name: string
-          role: string | null
-          table_name: string
-        }
-        Insert: {
-          condition: string
-          description?: string | null
-          id?: number
-          operation: string
-          policy_name: string
-          role?: string | null
-          table_name: string
-        }
-        Update: {
-          condition?: string
-          description?: string | null
-          id?: number
-          operation?: string
-          policy_name?: string
-          role?: string | null
-          table_name?: string
-        }
-        Relationships: []
-      }
-      user_info: {
-        Row: {
-          birth_date: string | null
-          email: string
-          gender: string | null
-          goal: string
-          last_seen: string | null
-          name: string
-          phone: string
-          user_id: string
-        }
-        Insert: {
-          birth_date?: string | null
-          email?: string
-          gender?: string | null
-          goal?: string
-          last_seen?: string | null
-          name?: string
-          phone?: string
-          user_id?: string
-        }
-        Update: {
-          birth_date?: string | null
-          email?: string
-          gender?: string | null
-          goal?: string
-          last_seen?: string | null
-          name?: string
-          phone?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_info_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "all_users"
-            referencedColumns: ["user_id"]
           },
         ]
       }
@@ -423,8 +265,8 @@ export type Database = {
             foreignKeyName: "user_invitation_nutri_id_fkey"
             columns: ["nutri_id"]
             isOneToOne: false
-            referencedRelation: "all_users"
-            referencedColumns: ["user_id"]
+            referencedRelation: "all_nutritionist"
+            referencedColumns: ["nutri_id"]
           },
         ]
       }
@@ -618,16 +460,6 @@ export type Database = {
       get_weight: {
         Args: { end_date: string; start_date: string; user_uuid: string }
         Returns: number
-      }
-      rls_apply_policy: {
-        Args: {
-          p_condition: string
-          p_operation: string
-          p_policy: string
-          p_role?: string
-          p_table: string
-        }
-        Returns: undefined
       }
     }
     Enums: {

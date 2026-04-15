@@ -1,5 +1,5 @@
-TEST ETSA ( Transtonro alimenticio como medicion )
-MEJORAR LA CALCULADORA DE OSMOLARIDAD CON MALTODEXTRINA, FRUCTOSA, Y IDENTIFICACION DE BEBIDAS ISOTONICAS
-HACER LA DESCRIPCION DE LOS VIDEOS QUE SE VEA CUANDO LE PULSAS A VERLA
-DONE: CAMBIAR COLORES DE DES 1 EN LA TABLA PARA QUE SEAN MAS LEIBLES. COLOREAR SEGUN LAS KCAL
-DONE: ANADIR G/KG DE AZUCAR Y TMB A LOS USER PRESETS
+## FUTURE 
+    1- Improve measures plot.
+        Allow weekly averages to calculate new data based on weekly average
+        Allow calculation of regression lines
+    2- Add copy last week button

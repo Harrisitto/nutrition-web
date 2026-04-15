@@ -17,9 +17,8 @@ const selectFromMeal = (languageCode: ReturnType<typeof useLanguageCode>) => {
             name: name->>${languageCode}
         ),
         type_id(
-            id,
-            name: name->>${languageCode},
-            all_macros(*)
+            *,
+            name: name->>${languageCode}
         ))` as const;
 }
 

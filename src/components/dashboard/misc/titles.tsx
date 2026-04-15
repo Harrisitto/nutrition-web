@@ -9,7 +9,7 @@ export const UserName = () => {
     const selectedUser = users.data?.find(user => user.user_id === selectedUserId);
 
     if (!selectedUser) return null;
-    return <h1 className="text-3xl font-bold text-text-title">{selectedUser.user_info?.name}</h1>;
+    return <h1 className="text-3xl font-bold text-text-title">{selectedUser?.name}</h1>;
 }
 
 export const Navigation = () => {

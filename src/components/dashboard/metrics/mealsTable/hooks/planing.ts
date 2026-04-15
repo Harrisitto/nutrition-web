@@ -127,15 +127,15 @@ export const usePlaning = ({
                 return; // Skip meals that are outside the current week
             }
             kcalPerDay[dayIndex].meals = plan.user_planing_meal.reduce((total, meal) => {
-                return total + meal.type_id.macros_id.kcal;
+                return total + meal.type_id.kcal;
             }, 0);
             kcalPerDay[dayIndex].training = plan.training_hc.reduce((total, hc) => {
                 return total + calculateKcalFromMacros({ carbs: hc, protein: 0, fat: 0 });
             }, 0);
             kcalPerDay[dayIndex].macros = plan.user_planing_meal.reduce((totals, meal) => {
-                totals.carbs += meal.type_id.macros_id.hc;
-                totals.protein += meal.type_id.macros_id.prot;
-                totals.fat += meal.type_id.macros_id.fat;
+                totals.carbs += meal.type_id.hc;
+                totals.protein += meal.type_id.prot;
+                totals.fat += meal.type_id.fat;
                 return totals;
             }, { carbs: 0, protein: 0, fat: 0, carbsPerKg: 0, proteinPerKg: 0, fatPerKg: 0 });
             kcalPerDay[dayIndex].macros.carbsPerKg = kcalPerDay[dayIndex].macros.carbs / userWeight.data;

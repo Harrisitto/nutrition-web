@@ -87,7 +87,7 @@ export const List = () => {
     return (
       <SingleClient
         key={user.user_id}
-        name={user.user_info?.name || "Unnamed User"}
+        name={user?.name || "Unnamed User"}
         id={user.user_id}
         idx={index}
       />

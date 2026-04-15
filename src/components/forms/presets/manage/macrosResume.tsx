@@ -93,9 +93,9 @@ export const MacrosResume = ({
     
     const presetMacros = useMemo(() => {
         const data = preset.user_preset_meal.reduce((acc, meal) => {
-            acc.carbs += meal.type_id.all_macros.hc;
-            acc.fat += meal.type_id.all_macros.fat;
-            acc.protein += meal.type_id.all_macros.prot;
+            acc.carbs += meal.type_id.hc;
+            acc.fat += meal.type_id.fat;
+            acc.protein += meal.type_id.prot;
             return acc;
         }, { carbs: 0, fat: 0, protein: 0 });
 

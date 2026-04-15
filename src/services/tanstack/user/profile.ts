@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { useNotification, useNotificationErrorQuery } from '@src/store/slices/notification/hook'
 import { supabase } from '@src/services/supabase/client'
 import type { Database } from '@src/services/supabase/types'
-import { TABLE_ALL_USERS, TABLE_USER_INFO } from '@src/services/supabase/definitions'
+import { TABLE_ALL_NUTRITIONISTS, TABLE_ALL_USERS } from '@src/services/supabase/definitions'
 import { useAuth, useAuthId } from '@src/store/slices/auth/hook'
 import { useAppDispatch } from '@src/store/store'
 import { setProfile } from '@src/store/slices/auth/store'
@@ -10,13 +10,10 @@ import { useConfigSelectedUserId } from '@src/store/slices/config/hook'
 import { queryKeys } from '../keys'
 import { queryClient } from '../queryClient'
 
-type UserInfoRow = Database['public']['Tables']['user_info']['Row']
-type UserWithInfo = Database['public']['Tables']['all_users']['Row'] & {
-    user_info: UserInfoRow | null
-}
+type UserWithInfo = Database['public']['Tables']['all_users']['Row']
 
 const selectUser = () => {
-    return `*, user_info(*)` as const;
+    return `*` as const;
 }
 
 /**
@@ -27,16 +24,17 @@ export const useInsertProfile = () => {
   const { user } = useAuth()
   const dispatch = useAppDispatch()
   const mutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async ({
+        name,
+    }: {
+        name: string
+    }) => {
       if (!user) throw new Error('No authenticated user found')
       const { data, error } = await supabase
-        .from(TABLE_ALL_USERS.NAME)
+        .from(TABLE_ALL_NUTRITIONISTS.NAME)
         .insert({
-            user_id: user.id,
-            brand_id: null,
-            created_at: new Date().toISOString(),
-            is_nutritionist: true,
-            is_owner: false,
+            nutri_id: user.id,
+            name,
         })
         .select()
         .single()
@@ -115,9 +113,11 @@ export const useUpdateClientGoal = () => {
     mutationFn: async (goal: string) => {
       if (!clientId) throw new Error('No authenticated user found')
       const { data, error } = await supabase
-        .from(TABLE_USER_INFO.NAME)
-        .update({ goal })
-        .eq(TABLE_USER_INFO.COLS.USER_ID, clientId)
+        .from(TABLE_ALL_USERS.NAME)
+        .update({ 
+            goal,
+         })
+        .eq(TABLE_ALL_USERS.COLS.USER_ID, clientId)
         .select()
         .single()
       if (error) throw error
@@ -139,10 +139,8 @@ export const useUpdateClientGoal = () => {
             (oldData = []) => {
                 return oldData.map(user => {
                     if (user.user_id === clientId) {
-                        return {
-                            ...user,
-                            user_info: data,
-                        }
+                        user.goal = data.goal
+                        return user;
                     }
                     return user;
                 }

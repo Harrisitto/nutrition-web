@@ -133,7 +133,7 @@ const calculateDerivedState = (
         const mealTypeId = field ? parseInt(field.toString(), 10) : null;
         if (!mealTypeId || !mealsMap) return totals;
         const mealType = mealsMap[mealTypeId];
-        const macros = mealType?.macros_id;
+        const macros = mealType;
         if (!macros) return totals;
 
         totals.kcal += Number(calculateKcalFromMacros({

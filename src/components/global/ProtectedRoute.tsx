@@ -31,8 +31,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
         navigateTo(APP_ROUTES.LOGIN);
       } else if (!profile) {
         navigateTo(APP_ROUTES.COMPLETE_PROFILE);
-      } else if (!profile.is_nutritionist) {
-        navigateTo(APP_ROUTES.NOT_FOUND);
       }
     }, 500); // Debounce 500ms - navigation only happens if state stabilizes
     return () => clearTimeout(timer);
@@ -46,7 +44,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     }
   }, [loading, selectedUserId, selectedUserRequired])
 
-  if (loading || !isAuthenticated || !profile || !profile.is_nutritionist) {
+  if (loading || !isAuthenticated || !profile) {
     // While loading or if not authenticated or profile incomplete or not a nutritionist, render nothing (or a loader)
     return null;
   }
