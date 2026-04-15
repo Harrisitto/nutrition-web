@@ -1,0 +1,1 @@
+import{r}from"./index-DGBbRVOL.js";const x=({relativePath:t,extension:e="txt"})=>{const[s,c]=r.useState("");return r.useEffect(()=>{fetch(`/nutrition-web/${t}.${e}`).then(o=>o.text()).then(c)},[t,e]),s};export{x as u};
