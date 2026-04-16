@@ -36,9 +36,8 @@ export const useFetchAvailableClients = ({
                 .from(TABLE_ALL_USERS.NAME)
                 .select()
                 .is(TABLE_ALL_USERS.COLS.NUTRI_ID, null)
-                .eq(TABLE_ALL_USERS.COLS.IS_NUTRI, false)
-                .limit(pageSize)
                 .ilike(TABLE_ALL_USERS.COLS.INVITATION_CODE, `%${debouncedInvitationCode}%`)
+                .limit(pageSize)
 
             if (error) throw error
             return data
