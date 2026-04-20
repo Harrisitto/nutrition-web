@@ -4,7 +4,7 @@ import { generateMealKey, getDateForDayIndex } from "../../helperFunctions";
 import { SideSelectOptions } from "./inputs/selectOptions";
 import { useTableContext } from "../../tableContext";
 import { useTranslation } from "react-i18next";
-import { useFetchTypesForMeal } from "@src/services/tanstack/data/meals";
+import { useFetchAllMealTypes } from "@src/services/tanstack/data/meals";
 import {
   useDeleteMeal,
   useInsertMeal,
@@ -19,7 +19,7 @@ const SideElement = ({
   dayIndex: number;
 }) => {
   const { t } = useTranslation();
-  const mealsQuery = useFetchTypesForMeal(mealId);
+  const mealsQuery = useFetchAllMealTypes();
   const insert = useInsertMeal();
   const deleteMeal = useDeleteMeal();
   const { startMonday, planing } = useTableContext();

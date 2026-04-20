@@ -142,7 +142,7 @@ export const usePlaning = ({
             kcalPerDay[dayIndex].macros.proteinPerKg = kcalPerDay[dayIndex].macros.protein / userWeight.data;
             kcalPerDay[dayIndex].macros.fatPerKg = kcalPerDay[dayIndex].macros.fat / userWeight.data;
             kcalPerDay[dayIndex].total = kcalPerDay[dayIndex].meals + kcalPerDay[dayIndex].training;
-            kcalPerDay[dayIndex].balance = kcalPerDay[dayIndex].total - (bmrQuery.data ?? 0);
+            kcalPerDay[dayIndex].balance = kcalPerDay[dayIndex].total - (bmrQuery.data ?? 0) - (plan.training_kcal ?? 0);
         });
 
         return kcalPerDay;
