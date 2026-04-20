@@ -35,7 +35,7 @@ const SideElement = ({
       [clearOptionId, t("system:messages.clear")] as [string, string],
       ...mealTypes.map(
         (opt) =>
-          [opt.type_id.id.toString(), opt.type_id.name] as [string, string],
+          [opt.id.toString(), opt.name] as [string, string],
       ),
     ];
   }, [mealTypes, t]);

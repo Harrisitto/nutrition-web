@@ -1,18 +1,13 @@
 import { useQueries, useQuery } from "@tanstack/react-query"
-import { TABLE_ALL_MEALS, TABLE_RECIPE_TYPE_MEALS, TABLE_RECIPE_TYPES } from "@src/services/supabase/definitions";
+import { TABLE_ALL_MEALS, TABLE_RECIPE_TYPES } from "@src/services/supabase/definitions";
 import { queryKeys } from "../keys";
 import { supabase } from "@src/services/supabase/client";
 import { useLanguageCode } from "@src/hooks/helpers/language";
 
-const fetchTypesForMeal = async (mealId: number, langCode: ReturnType<typeof useLanguageCode>) => {
+const fetchTypesForMeal = async (langCode: ReturnType<typeof useLanguageCode>) => {
   const { data, error } = await supabase
-    .from(TABLE_RECIPE_TYPE_MEALS.NAME)
-    .select(`meal_id, 
-      type_id(
-      *,
-      name: name->>${langCode}
-      )`)
-    .eq(TABLE_RECIPE_TYPE_MEALS.COLS.MEAL_ID, mealId);
+    .from(TABLE_RECIPE_TYPES.NAME)
+    .select(`fat, hc, id, kcal, prot, name: name->>${langCode}`)
   if (error) throw error;
   return data;
 };
@@ -42,7 +37,7 @@ export const useFetchTypesForMeal = (mealId: number) => {
   const langCode = useLanguageCode();
   return useQuery({
     queryKey: queryKeys().data.typesForMeal(mealId),
-    queryFn: () => fetchTypesForMeal(mealId, langCode)
+    queryFn: () => fetchTypesForMeal(langCode)
   })
 }
 
@@ -52,12 +47,12 @@ export const useFetchTypesForAllMeals = (mealListIds: number[]) => {
   return useQueries({
     queries: mealListIds.map((mealId) => ({
       queryKey: queryKeys().data.typesForMeal(mealId),
-      queryFn: () => fetchTypesForMeal(mealId, langCode),
+      queryFn: () => fetchTypesForMeal(langCode),
     })),
     combine: (results) => {
       const byMealId = results.reduce((acc, result) => {
         if (result.isSuccess && result.data) {
-          acc[result.data[0].meal_id] = result.data;
+          acc[result.data[0].id] = result.data;
         }
         return acc;
       }, {} as Record<number, Awaited<ReturnType<typeof fetchTypesForMeal>>>);

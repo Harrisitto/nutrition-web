@@ -14,18 +14,56 @@ export type Database = {
   }
   public: {
     Tables: {
+      all_ingredients: {
+        Row: {
+          amount: Json
+          comment: Json
+          id: number
+          name: Json
+          recipe_id: number
+        }
+        Insert: {
+          amount: Json
+          comment: Json
+          id?: number
+          name: Json
+          recipe_id: number
+        }
+        Update: {
+          amount?: Json
+          comment?: Json
+          id?: number
+          name?: Json
+          recipe_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "all_ingredients_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "all_recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       all_meals: {
         Row: {
+          hour_end: number | null
+          hour_start: number | null
           id: number
           name: Json
           order: number
         }
         Insert: {
+          hour_end?: number | null
+          hour_start?: number | null
           id?: number
           name: Json
           order?: number
         }
         Update: {
+          hour_end?: number | null
+          hour_start?: number | null
           id?: number
           name?: Json
           order?: number
@@ -34,18 +72,21 @@ export type Database = {
       }
       all_measures: {
         Row: {
+          allow_client: boolean
           description: Json | null
           id: number
           name: Json | null
           units: Json | null
         }
         Insert: {
+          allow_client?: boolean
           description?: Json | null
           id?: number
           name?: Json | null
           units?: Json | null
         }
         Update: {
+          allow_client?: boolean
           description?: Json | null
           id?: number
           name?: Json | null
@@ -203,36 +244,6 @@ export type Database = {
           prot?: number
         }
         Relationships: []
-      }
-      recipe_type_meal: {
-        Row: {
-          meal_id: number
-          type_id: number
-        }
-        Insert: {
-          meal_id: number
-          type_id: number
-        }
-        Update: {
-          meal_id?: number
-          type_id?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "meal_receipts_meal_id_fkey"
-            columns: ["meal_id"]
-            isOneToOne: false
-            referencedRelation: "all_meals"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "meal_receipts_type_id_fkey"
-            columns: ["type_id"]
-            isOneToOne: false
-            referencedRelation: "recipe_type"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       user_invitation: {
         Row: {

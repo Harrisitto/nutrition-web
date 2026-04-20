@@ -66,8 +66,8 @@ const createFieldForMeal = (meal: Meal, mealOptions: MealTypeRows | undefined) =
     };
 
     const options = mealOptions ? [unselectableOption, ...mealOptions.map((option) => ({
-        value: option.type_id?.id?.toString(),
-        label: option.type_id?.name,
+        value: option?.id?.toString(),
+        label: option?.name,
     }))] : [unselectableOption];
 
     return {
