@@ -15,6 +15,7 @@ const PageReferences = () => {
         <IdxReferences.Calculators.Text.CarbLoading />
         <IdxReferences.Calculators.Text.CookedIngredients />
         <IdxReferences.Calculators.Text.Osmolarity />
+        <IdxReferences.Calculators.Text.EatingDisorder />
       </div>
     </div>
   );
