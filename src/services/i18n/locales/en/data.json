@@ -81,6 +81,12 @@
                 "description": "Used to create the calculator under the 'Cooked Ingredients' section of the 'Calculators' page.",
                 "reference": "Adikari, A. M. N. T., & Thamilini, J. (2018). Cooking conversion factor of commonly consumed Sri Lankan food items. MOJ Food Processing & Technology, 6(4), 371-374",
                 "url": "https://doi.org/10.15406/mojfpt.2018.06.00190"
+            },
+            "eatingDisorder01": {
+                "title": "Eating Disorder",
+                "description": "Used to create the calculator under the 'Eating Disorder' section of the 'Calculators' page.",
+                "reference": "Fairburn CG, Beglin SJ. Assessment of eating disorders: Interview or self-report questionnaire? International Journal of Eating Disorders. 1994;16(4):363-370.",
+                "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7392177/"
             }
         },
         "recipes": {

@@ -85,3 +85,18 @@ export const CookedIngredients = () => {
     />
   );
 };
+
+export const EatingDisorder = () => {
+  const { t } = useTranslation();
+
+  return (
+    <ReferenceItem
+      title={t("data:references.calculators.eatingDisorder01.title")}
+      description={t(
+        "data:references.calculators.eatingDisorder01.description",
+      )}
+      reference={t("data:references.calculators.eatingDisorder01.reference")}
+      url={t("data:references.calculators.eatingDisorder01.url")}
+    />
+  );
+};
