@@ -1,4 +1,4 @@
-import{I as c,g as d,q as u,s as n,J as M,K as w,h as l,i as _,L as s,M as o,k as C}from"./index-Dp1_Mz8O.js";const h=async e=>{const{data:t,error:r}=await n.from(w.NAME).select(`fat, hc, id, kcal, prot, name: name->>${e}`);if(r)throw r;return t},T=()=>{const e=c();return d({queryKey:u({language:e}).data.meals,queryFn:async()=>{const{data:t,error:r}=await n.from(M.NAME).select(`
+import{I as c,g as d,q as u,s as n,J as M,K as w,h as l,i as _,L as s,M as o,k as C}from"./index-CzBo9fwa.js";const h=async e=>{const{data:t,error:r}=await n.from(w.NAME).select(`fat, hc, id, kcal, prot, name: name->>${e}`);if(r)throw r;return t},T=()=>{const e=c();return d({queryKey:u({language:e}).data.meals,queryFn:async()=>{const{data:t,error:r}=await n.from(M.NAME).select(`
           id,
           order,
           name: name->>${e}
