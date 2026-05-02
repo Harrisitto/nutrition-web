@@ -5,7 +5,7 @@ import path from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '/',
+  base: '/nutrition-web/',
   plugins: [react(), visualizer({ open: true })],
   resolve: {
     alias: {
