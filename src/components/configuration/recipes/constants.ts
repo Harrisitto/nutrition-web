@@ -1,0 +1,1 @@
+export const placeholderRecipeImg = "https://tyagos.com/wp-content/uploads/2023/03/19-1.jpg";

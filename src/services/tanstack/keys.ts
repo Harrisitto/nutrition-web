@@ -3,9 +3,11 @@ import { saveDate } from "@src/helpers/dates";
 export const queryKeys = ({
     userId = '',
     language = '',
+    searchStr = '',
 } : {
     userId?: string | null;
     language?: string;
+    searchStr?: string;
 } = {}) => ({
     user: {
         invitationsBase : ["user", "invitations", userId],
@@ -29,5 +31,7 @@ export const queryKeys = ({
         measures: ["data", "measures"],
         receipts: ["data", "receipts"],
         videos: ["data", "videos"],
+        singleRecipe: (id: number) => ["data", "recipe", id, language],
+        recipes: ["data", "recipes", language, searchStr],
     }
 });

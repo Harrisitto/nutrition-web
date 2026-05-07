@@ -21,6 +21,7 @@ export type Database = {
           id: number
           name: Json
           recipe_id: number
+          url: string
         }
         Insert: {
           amount: Json
@@ -28,6 +29,7 @@ export type Database = {
           id?: number
           name: Json
           recipe_id: number
+          url?: string
         }
         Update: {
           amount?: Json
@@ -35,6 +37,7 @@ export type Database = {
           id?: number
           name?: Json
           recipe_id?: number
+          url?: string
         }
         Relationships: [
           {
@@ -116,25 +119,25 @@ export type Database = {
         Row: {
           description: Json | null
           id: number
-          ingredients: Json | null
+          image_url: string
           name: Json | null
-          type_id: number | null
+          type_id: number
           url: string
         }
         Insert: {
           description?: Json | null
           id?: number
-          ingredients?: Json | null
+          image_url?: string
           name?: Json | null
-          type_id?: number | null
+          type_id: number
           url?: string
         }
         Update: {
           description?: Json | null
           id?: number
-          ingredients?: Json | null
+          image_url?: string
           name?: Json | null
-          type_id?: number | null
+          type_id?: number
           url?: string
         }
         Relationships: [
@@ -202,21 +205,57 @@ export type Database = {
           description: string
           id: number
           name: string
+          updated: string
           url: string
         }
         Insert: {
           description?: string
           id?: number
           name: string
+          updated?: string
           url: string
         }
         Update: {
           description?: string
           id?: number
           name?: string
+          updated?: string
           url?: string
         }
         Relationships: []
+      }
+      nutri_recipe: {
+        Row: {
+          nutri_id: string
+          rating: number
+          recipe_id: number
+        }
+        Insert: {
+          nutri_id?: string
+          rating?: number
+          recipe_id: number
+        }
+        Update: {
+          nutri_id?: string
+          rating?: number
+          recipe_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nutri_recipe_nutri_id_fkey"
+            columns: ["nutri_id"]
+            isOneToOne: false
+            referencedRelation: "all_nutritionist"
+            referencedColumns: ["nutri_id"]
+          },
+          {
+            foreignKeyName: "nutri_recipe_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "all_recipes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       recipe_type: {
         Row: {
@@ -351,16 +390,19 @@ export type Database = {
         Row: {
           meal_id: number
           planing_id: number
+          recipe_id: number | null
           type_id: number
         }
         Insert: {
           meal_id: number
           planing_id: number
+          recipe_id?: number | null
           type_id: number
         }
         Update: {
           meal_id?: number
           planing_id?: number
+          recipe_id?: number | null
           type_id?: number
         }
         Relationships: [
@@ -376,6 +418,13 @@ export type Database = {
             columns: ["planing_id"]
             isOneToOne: false
             referencedRelation: "user_planing"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_planing_meal_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "all_recipes"
             referencedColumns: ["id"]
           },
           {
@@ -456,6 +505,45 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "recipe_type"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_recipe: {
+        Row: {
+          rating: number
+          recipe_id: number
+          times_interacted: number
+          times_used: number
+          user_id: string
+        }
+        Insert: {
+          rating?: number
+          recipe_id: number
+          times_interacted?: number
+          times_used?: number
+          user_id?: string
+        }
+        Update: {
+          rating?: number
+          recipe_id?: number
+          times_interacted?: number
+          times_used?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_recipe_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "all_recipes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_recipe_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "all_users"
+            referencedColumns: ["user_id"]
           },
         ]
       }

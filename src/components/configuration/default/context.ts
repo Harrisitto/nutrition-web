@@ -1,6 +1,6 @@
 import { createContext, useContext } from "react";
 
-export type ConfigurationSectionKey = "inviteClient" | "invitedClients" | "keyboard" | "authManagement";
+export type ConfigurationSectionKey = "inviteClient" | "recipesConfig" | "keyboard" | "authManagement";
 
 export type ConfigurationContextValue = {
   selectedSection: ConfigurationSectionKey;

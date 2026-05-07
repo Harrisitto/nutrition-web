@@ -143,11 +143,32 @@
                 "revoke": "Revoke",
                 "messageTooShort": "Message must be at least 10 characters long."
             },
+            "recipes": {
+                "title": "Recipes Configuration",
+                "description": "Manage your recipes and customize your meal plans according to your preferences.",
+                "ingredients": "Ingredients",
+                "rating": "Rating",
+                "macros": "Recipe Macronutrients",
+                "showAllTypes": "Show all"
+            },
             "authManagement": {
                 "title": "Auth Management",
                 "description": "Manage authentication actions for your account.",
                 "comingSoon": "This section is under development. Please check back later."
             }
         }
+    },
+    "macronutrients": {
+        "carbs": "Carbs",
+        "shortCarbs": "hc",
+        "protein": "Protein",
+        "shortProtein": "prot",
+        "fats": "Fats",
+        "shortFats": "fat",
+        "kcal": "kcal",
+        "carbsPerKg": "Carbs per kg",
+        "proteinPerKg": "Protein per kg",
+        "fatsPerKg": "Fats per kg"
     }
+    
 }
