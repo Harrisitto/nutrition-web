@@ -10,7 +10,7 @@ export const NavigateToDashboard = () => {
   const { t } = useTranslation();
   const { navigateTo } = useAppNavigation();
   const handleClick = useCallback(() => {
-    navigateTo(APP_ROUTES.LOGIN);
+    navigateTo(APP_ROUTES.DASHBOARD);
   }, [navigateTo]);
   return (
     <p

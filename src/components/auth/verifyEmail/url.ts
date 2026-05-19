@@ -1,4 +1,7 @@
-import { useMemo } from "react";
+import { supabase } from "@src/services/supabase/client";
+import { setSession } from "@src/store/slices/auth/store";
+import { useAppDispatch } from "@src/store/store";
+import { useEffect, useMemo, useState } from "react";
 
 const parseVerificationTokenFromURL = (url: string) => {
     try {
@@ -16,10 +19,6 @@ const parseVerificationTokenFromURL = (url: string) => {
             params.set(key, value);
         });
 
-        if (!params.has("token")) {
-            return null;
-        }
-
         return params;
     } catch (error) {
         console.error("Invalid URL:", error);
@@ -36,8 +35,46 @@ const findMobileVerified = (token: URLSearchParams | null) => {
 export const useVerificationToken = () => {
     const token = useMemo(() => parseVerificationTokenFromURL(window.location.href), []);
     const isAppVerified = useMemo(() => findMobileVerified(token), [token]);
+    const [isValid, setIsValid] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const dispatch = useAppDispatch();
 
+    useEffect(() => {
+        (async () => {
+            if (!token) {
+                setIsValid(false);
+                setLoading(false);
+                return;
+            }
 
+            if(isAppVerified) {
+                setIsValid(true);
+                setLoading(false);
+                return;
+            }
 
-    return { token, isAppVerified };
+            try {
+                const { data, error: verifyError } = await supabase.auth.setSession({
+                    access_token: token.get("access_token") ?? "",
+                    refresh_token: token.get("refresh_token") ?? "",
+                });
+
+                if (verifyError) {
+                    setIsValid(false);
+                } else if (data.user && data.session) {
+                    setIsValid(true);
+                    dispatch(setSession(data));
+                    
+                } else {
+                    setIsValid(false);
+                }
+            } catch {
+                setIsValid(false);
+            } finally {
+                setLoading(false);
+            }
+        })();
+    }, [token, isMobileVerified, dispatch]);
+
+    return { token, isValid, loading, isAppVerified };
 }
