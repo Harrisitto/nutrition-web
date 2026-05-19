@@ -1,4 +1,4 @@
-import{h as c,I,g as M,i as L,s as a,J as t,K as n,k as _,q as E}from"./index-BacgfKwW.js";const q=({carbs:e,protein:s,fat:r})=>{const o=e?e*4:0,u=s?s*4:0,i=r?r*9:0;return o+u+i},C=e=>`*,
+import{h as c,I,g as M,i as L,s as a,J as t,K as n,k as _,q as E}from"./index-B_tXYj50.js";const q=({carbs:e,protein:s,fat:r})=>{const o=e?e*4:0,u=s?s*4:0,i=r?r*9:0;return o+u+i},C=e=>`*,
         ${n.NAME}(
         preset_id,
         meal_id(
