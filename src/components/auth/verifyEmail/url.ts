@@ -61,20 +61,23 @@ export const useVerificationToken = () => {
 
                 if (verifyError) {
                     setIsValid(false);
+                    setLoading(false);
                 } else if (data.user && data.session) {
                     setIsValid(true);
                     dispatch(setSession(data));
-                    
+                    setLoading(false);
                 } else {
                     setIsValid(false);
+                    setLoading(false);
                 }
             } catch {
                 setIsValid(false);
+                setLoading(false);
             } finally {
                 setLoading(false);
             }
         })();
-    }, [token, isMobileVerified, dispatch]);
+    }, [token, isAppVerified, dispatch]);
 
     return { token, isValid, loading, isAppVerified };
 }
