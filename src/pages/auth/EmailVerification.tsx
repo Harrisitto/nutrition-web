@@ -6,6 +6,7 @@ const EmailVerificationPage = () => {
     
     const {
         token,
+        isMobileVerified,
         isValid,
         loading
     } = ComponentsVerifyEmail.useVerificationToken();
@@ -14,6 +15,17 @@ const EmailVerificationPage = () => {
         return (
             <div className="flex items-center justify-center h-screen">
                 <AnimationLoading />
+            </div>
+        );
+    }
+
+    if(token && isMobileVerified) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
+                    <ComponentsVerifyEmail.Text.Title />
+                    <ComponentsVerifyEmail.Text.MobileVerified />
+                </div>
             </div>
         );
     }

@@ -91,8 +91,6 @@ src/
 1. **Connect to Backend API:**
    - Update `API_BASE_URL` in `src/services/queryClient.ts`
    - Enable queries in components by setting `enabled: true`
-
-2. **Add Redux Slices:**
    - Create feature-specific slices in `src/store/`
    - Add them to the store configuration
 
@@ -100,7 +98,6 @@ src/
    - Add more pages and components
    - Implement forms with validation
    - Add charts and data visualizations
-
 4. **Styling:**
    - Add a UI library (e.g., Tailwind CSS, MUI, Chakra UI)
    - Implement your design system

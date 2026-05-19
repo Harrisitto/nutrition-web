@@ -17,8 +17,15 @@ const parseVerificationTokenFromURL = (url: string) => {
     }
 }
 
+const findMobileVerified = (token: URLSearchParams | null) => {
+    if (!token) return false;
+    const mobileVerified = token.get("mobile_verified");
+    return mobileVerified === "true";
+}
+
 export const useVerificationToken = () => {
     const token = useMemo(() => parseVerificationTokenFromURL(window.location.href), []);
+    const isMobileVerified = useMemo(() => findMobileVerified(token), [token]);
     const [isValid, setIsValid] = useState(false);
     const [loading, setLoading] = useState(true);
     const dispatch = useAppDispatch();
@@ -27,6 +34,12 @@ export const useVerificationToken = () => {
         (async () => {
             if (!token) {
                 setIsValid(false);
+                setLoading(false);
+                return;
+            }
+
+            if(isMobileVerified) {
+                setIsValid(true);
                 setLoading(false);
                 return;
             }
@@ -54,5 +67,5 @@ export const useVerificationToken = () => {
         })();
     }, [token, dispatch]);
 
-    return { token, isValid, loading };
+    return { token, isValid, loading, isMobileVerified };
 }

@@ -26,3 +26,12 @@ export const Error = () => {
         </p>
     )
 }
+
+export const MobileVerified = () => {
+    const { t } = useTranslation();
+    return (
+        <p className="text-center text-green-500">
+            {t("auth:verifyEmail.mobileVerified")}
+        </p>
+    )
+}
