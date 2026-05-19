@@ -6,11 +6,20 @@ import { useEffect, useMemo, useState } from "react";
 const parseVerificationTokenFromURL = (url: string) => {
     try {
         const urlObj = new URL(url);
-        // Grab the last hash segment: "#/verify-email#access_token=..." -> "access_token=..."
+        const params = new URLSearchParams(urlObj.search);
+
+        // Hash can include a route and/or params: "#/verify-email?isAppVerified=true"
+        // or "#/verify-email#access_token=..."
         const rawHash = urlObj.hash.startsWith("#") ? urlObj.hash.slice(1) : urlObj.hash;
         const hashPart = rawHash.includes("#") ? rawHash.split("#").pop() ?? "" : rawHash;
-        const hashParams = new URLSearchParams(hashPart.startsWith("?") ? hashPart.slice(1) : hashPart);
-        return (hashParams);
+        const hashQuery = hashPart.includes("?") ? hashPart.split("?").pop() ?? "" : hashPart;
+        const hashParams = new URLSearchParams(hashQuery.startsWith("?") ? hashQuery.slice(1) : hashQuery);
+
+        hashParams.forEach((value, key) => {
+            params.set(key, value);
+        });
+
+        return params;
     } catch (error) {
         console.error("Invalid URL:", error);
         return null;
@@ -19,13 +28,13 @@ const parseVerificationTokenFromURL = (url: string) => {
 
 const findMobileVerified = (token: URLSearchParams | null) => {
     if (!token) return false;
-    const mobileVerified = token.get("mobile_verified");
-    return mobileVerified === "true";
+    const isAppVerified = token.get("isAppVerified");
+    return isAppVerified === "true";
 }
 
 export const useVerificationToken = () => {
     const token = useMemo(() => parseVerificationTokenFromURL(window.location.href), []);
-    const isMobileVerified = useMemo(() => findMobileVerified(token), [token]);
+    const isAppVerified = useMemo(() => findMobileVerified(token), [token]);
     const [isValid, setIsValid] = useState(false);
     const [loading, setLoading] = useState(true);
     const dispatch = useAppDispatch();
@@ -38,7 +47,7 @@ export const useVerificationToken = () => {
                 return;
             }
 
-            if(isMobileVerified) {
+            if(isAppVerified) {
                 setIsValid(true);
                 setLoading(false);
                 return;
@@ -65,7 +74,7 @@ export const useVerificationToken = () => {
                 setLoading(false);
             }
         })();
-    }, [token, dispatch]);
+    }, [token, isMobileVerified, dispatch]);
 
-    return { token, isValid, loading, isMobileVerified };
+    return { token, isValid, loading, isAppVerified };
 }
