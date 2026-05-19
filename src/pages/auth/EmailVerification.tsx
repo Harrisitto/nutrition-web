@@ -1,17 +1,9 @@
 import { ComponentsVerifyEmail } from "@src/components/auth/verifyEmailIndex";
-import { AnimationLoading } from "@src/components/global/Animations";
 
 const EmailVerificationPage = () => {
-  const { token, isValid, loading, isAppVerified } =
+  const { token, isAppVerified } =
     ComponentsVerifyEmail.useVerificationToken();
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <AnimationLoading />
-      </div>
-    );
-  }
 
   if (token && isAppVerified) {
     return (
@@ -28,7 +20,7 @@ const EmailVerificationPage = () => {
     <div className="flex items-center justify-center h-screen">
       <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
         <ComponentsVerifyEmail.Text.Title />
-        {isValid ? (
+        {token ? (
           <>
             <ComponentsVerifyEmail.Text.Sucess />
             <ComponentsVerifyEmail.Actions.NavigateToDashboard />
