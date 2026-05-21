@@ -14,6 +14,7 @@ export default function PageDashboard() {
   if (allClients.data?.length === 0) {
     return (
       <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2">
+        <IdxConfiguration.AuthManagement.ManageAuthState />
         <IdxConfiguration.Invitations.InviteClient />
         <IdxConfiguration.Invitations.InvitedClients />
       </div>

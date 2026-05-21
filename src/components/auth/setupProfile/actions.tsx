@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next";
 import { fieldIds, useFormSetupContext } from "./form";
 import { useAuthId } from "@src/store/slices/auth/hook";
 import { useInsertUserInfo } from "@src/services/tanstack/user/info";
+import useAppNavigation from "@src/hooks/navigation";
+import { APP_ROUTES } from "@src/hooks/navigation/routes";
 
 export const ConfirmSetup = () => {
   const { t } = useTranslation();
@@ -10,6 +12,7 @@ export const ConfirmSetup = () => {
   const { setupForm } = useFormSetupContext();
   const { mutateAsync: insertInfo, isPending: isPendindInfo } =
     useInsertUserInfo();
+    const { navigateTo } = useAppNavigation();
 
   const handleConfirm = useCallback(() => {
     const form = setupForm.form;
@@ -19,8 +22,11 @@ export const ConfirmSetup = () => {
       insertInfo({
         nutri_id: userId,
         name: state[fieldIds.name] as string,
+      }).then(() => {
+        navigateTo(APP_ROUTES.DASHBOARD);
       });
-  }, [insertInfo, setupForm.form, userId]);
+
+  }, [insertInfo, setupForm.form, userId, navigateTo]);
 
   return (
     <button
