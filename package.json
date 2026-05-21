@@ -5,8 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
-    "postbuild": "cp CNAME dist/CNAME",
+    "build": "tsc -b && vite build && cp CNAME dist/CNAME",
     "lint": "eslint .",
     "preview": "vite preview",
     "deploy": "gh-pages -d dist",

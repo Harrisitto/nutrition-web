@@ -14,7 +14,7 @@ export const signUp = createAsyncThunk(
                 email,
                 password,
                 options: {
-                    emailRedirectTo: "https://ezfood.fit/#/verify-email?shouldRedirectToApp=true&isNutritionistAccount=false",
+                    emailRedirectTo: "https://ezfood.fit/#/verify-email?shouldRedirectToApp=false&isNutritionistAccount=true",
                 },
             });
 
