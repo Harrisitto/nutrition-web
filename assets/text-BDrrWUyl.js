@@ -1,0 +1,1 @@
+import{r as s}from"./index-D5DKn4ws.js";const u=({relativePath:t,extension:e="txt"})=>{const[r,c]=s.useState("");return s.useEffect(()=>{fetch(`/${t}.${e}`).then(x=>x.text()).then(c)},[t,e]),r};export{u};
