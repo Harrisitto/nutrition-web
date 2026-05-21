@@ -9,22 +9,23 @@ const parseVerificationTokenFromURL = (url: string) => {
     const params = new URLSearchParams(urlObj.search);
 
     // Hash can include a route and/or params: "#/verify-email?isAppVerified=true"
-    // or "#/verify-email#access_token=..."
+    // or "#/verify-email#access_token=..." or both in one hash.
     const rawHash = urlObj.hash.startsWith("#")
       ? urlObj.hash.slice(1)
       : urlObj.hash;
-    const hashPart = rawHash.includes("#")
-      ? (rawHash.split("#").pop() ?? "")
-      : rawHash;
-    const hashQuery = hashPart.includes("?")
-      ? (hashPart.split("?").pop() ?? "")
-      : hashPart;
-    const hashParams = new URLSearchParams(
-      hashQuery.startsWith("?") ? hashQuery.slice(1) : hashQuery,
-    );
+    const hashSegments = rawHash.split("#").filter(Boolean);
 
-    hashParams.forEach((value, key) => {
-      params.set(key, value);
+    hashSegments.forEach((segment) => {
+      const segmentQuery = segment.includes("?")
+        ? (segment.split("?").pop() ?? "")
+        : segment;
+      const hashParams = new URLSearchParams(
+        segmentQuery.startsWith("?") ? segmentQuery.slice(1) : segmentQuery,
+      );
+
+      hashParams.forEach((value, key) => {
+        params.set(key, value);
+      });
     });
 
     return params;
