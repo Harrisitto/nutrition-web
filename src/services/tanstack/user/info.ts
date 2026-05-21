@@ -7,10 +7,14 @@ import { useMutation, useQuery } from "@tanstack/react-query"
 import { useConfigSelectedUserId } from "@src/store/slices/config/hook"
 import { queryKeys } from "../keys"
 import { dateToSupabaseFormat } from "@src/helpers/dates"
+import { useAppDispatch } from "@src/store/store"
+import { setProfile } from "@src/store/slices/auth/store"
 
 export const useInsertUserInfo = () => {
   const { addMutationError } = useNotification();
   const userId = useAuthId()
+  const dispatch = useAppDispatch();
+
   const mutation = useMutation({
     mutationFn: async (insertData: TablesInsert<typeof TABLE_ALL_NUTRITIONISTS.NAME>) => {
       if (!userId) throw new Error('No authenticated user found')
@@ -24,6 +28,9 @@ export const useInsertUserInfo = () => {
     },
     onError: () => {
       addMutationError();
+    },
+    onSuccess: (data) => {
+      dispatch(setProfile(data));
     },
   })
   return mutation

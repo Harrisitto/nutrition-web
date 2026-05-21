@@ -10,22 +10,28 @@ export const ConfirmSetup = () => {
   const { t } = useTranslation();
   const userId = useAuthId();
   const { setupForm } = useFormSetupContext();
-  const { mutateAsync: insertInfo, isPending: isPendindInfo } =
-    useInsertUserInfo();
-    const { navigateTo } = useAppNavigation();
+  const {
+    mutateAsync: insertInfo,
+    isPending: isPendindInfo,
+  } = useInsertUserInfo();
+  const { navigateTo } = useAppNavigation();
 
   const handleConfirm = useCallback(() => {
     const form = setupForm.form;
     if (!form.validateForm()) return;
     const state = form.getState();
     if (!state[fieldIds.name]) return;
-      insertInfo({
+    insertInfo(
+      {
         nutri_id: userId,
         name: state[fieldIds.name] as string,
-      }).then(() => {
-        navigateTo(APP_ROUTES.DASHBOARD);
-      });
-
+      },
+      {
+        onSuccess: () => {
+          navigateTo(APP_ROUTES.DASHBOARD, { replace: true });
+        },
+      },
+    );
   }, [insertInfo, setupForm.form, userId, navigateTo]);
 
   return (
