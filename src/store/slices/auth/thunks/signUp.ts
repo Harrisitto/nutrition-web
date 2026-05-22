@@ -1,4 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { verificationEmailRedirectUrl } from "@src/helpers/externalNavigation";
 import { supabase } from "@src/services/supabase/client";
 
 interface SignUpCredentials {
@@ -14,7 +15,10 @@ export const signUp = createAsyncThunk(
                 email,
                 password,
                 options: {
-                    emailRedirectTo: "https://ezfood.fit/#/verify-email?shouldRedirectToApp=false&isNutritionistAccount=true",
+                    emailRedirectTo: verificationEmailRedirectUrl({
+                        isNutritionist: true, 
+                        redirectToApp: false, 
+                    }), // Ensure this URL is correctly defined in your environment variables
                 },
             });
 

@@ -4,7 +4,7 @@ import { supabase } from "@src/services/supabase/client";
 import { useAuth } from "@src/store/slices/auth/hook";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { composeRedirectUrl } from "../../../helpers/auth";
+import { verificationEmailRedirectUrl } from "@src/helpers/externalNavigation";
 
 export const NavigateToDashboard = () => {
   const { t } = useTranslation();
@@ -32,7 +32,10 @@ export const ResendEmail = () => {
       type: "signup",
       email: user.email,
       options: {
-        emailRedirectTo: composeRedirectUrl(APP_ROUTES.EMAIL_VERIFICATION),
+        emailRedirectTo: verificationEmailRedirectUrl({
+          isNutritionist: true, 
+          redirectToApp: false, 
+        }), // Ensure this URL is correctly defined in your environment variables
       },
     });
   }, [user?.email]);
