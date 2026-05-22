@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { fieldIds, useContextFormForgotPassword } from "./form";
 import { useNotification } from "@src/store/slices/notification/hook";
 import { supabase } from "@src/services/supabase/client";
-import { composeRedirectUrl } from "@src/helpers/auth";
+import { passwordResetEmailRedirectUrl } from "@src/helpers/externalNavigation";
 
 export const NavigateLogIn = () => {
   const { navigateTo } = useAppNavigation();
@@ -48,7 +48,7 @@ export const SubmitEmail = () => {
     try {
       console.log("Attempting to send password reset email to:", email);
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: composeRedirectUrl(APP_ROUTES.FORGOT_PASSWORD),
+        redirectTo: passwordResetEmailRedirectUrl({ redirectToApp: true }),
       });
       if (error) throw error;
       add({

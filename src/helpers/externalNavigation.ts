@@ -34,3 +34,17 @@ export const verificationEmailRedirectUrl = ({
 
     return `${base}?${params.toString()}`;
 };
+
+export const passwordResetEmailRedirectUrl = ({
+    redirectToApp = false
+}: {
+    redirectToApp: boolean;
+}) => {
+    // https://ezfood.fit/#/reset-password?shouldRedirectToApp=false
+    const base = "https://ezfood.fit/#/reset-password";
+    const params = new URLSearchParams({
+        shouldRedirectToApp: redirectToApp.toString()
+    });
+
+    return `${base}?${params.toString()}`;
+};
