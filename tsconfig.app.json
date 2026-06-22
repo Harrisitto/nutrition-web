@@ -25,11 +25,11 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
 
-
     "outDir": "./out-tsc",
-      "paths": {
-        "@src/*": ["./src/*"],
-        "@src": ["./src"]
-      }
-  }
+    "paths": {
+      "@src/*": ["./src/*"],
+      "@src": ["./src"]
+    }
+  },
+  "include": ["src"]
 }

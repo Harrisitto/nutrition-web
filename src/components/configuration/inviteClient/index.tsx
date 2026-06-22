@@ -2,6 +2,8 @@ import { useDeleteUserInvitation, useFetchAvailableClients, useFetchInvitedClien
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ConfigurationPages } from "../default/pages";
+import { useFetchNutritionistUsers, useRemoveClient } from "@src/services/tanstack/user/profile";
+
 
 const Invitation = ({
     id,
@@ -144,6 +146,40 @@ export const InvitedClients = () => {
                     </ul>
                 )}
             </section>
+        </ConfigurationPages>
+    )
+}
+
+export const ManageClients = () => {
+    const { t } = useTranslation();
+    const clients = useFetchNutritionistUsers();
+    const remove = useRemoveClient();
+
+    return (
+        <ConfigurationPages
+            title={t("data:configuration.sections.invitations.manageClientsTitle")}
+            description={t("data:configuration.sections.invitations.manageClientsDescription")}
+        >
+            {clients.data?.map((client) => (
+                <div key={client.user_id} className="rounded-xl border border-nutrition-green/20 bg-white-green/60 p-4 shadow-sm transition-colors hover:border-nutrition-green/35">
+                    <div className="mb-2 flex items-center justify-between gap-2">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">
+                            {t("data:configuration.sections.invitations.client")}
+                        </p>
+                        <span className="rounded-full border border-nutrition-green/25 bg-white px-3 py-1 text-xs font-semibold text-dark-green">
+                            {client.name}
+                        </span>
+                    </div>
+                    <button
+                        className="mt-3 inline-flex items-center justify-center rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+                        onClick={() => {
+                            remove.mutate();
+                        }}
+                    >
+                        {t("data:configuration.sections.invitations.removeClient")}
+                    </button>
+                </div>
+            ))}
         </ConfigurationPages>
     )
 }

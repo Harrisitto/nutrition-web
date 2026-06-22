@@ -32,6 +32,7 @@ const ConfigurationContent = () => {
         <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2">
           <IdxConfiguration.Invitations.InviteClient />
           <IdxConfiguration.Invitations.InvitedClients />
+          <IdxConfiguration.Invitations.ManageClients />
         </div>
       ) : null}
       {selectedSection === "recipesConfig" ? (

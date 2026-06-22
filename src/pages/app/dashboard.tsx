@@ -31,8 +31,13 @@ export default function PageDashboard() {
           <div className="flex flex-col gap-2">
             <IdxDashboard.Text.Titles.Navigation />
             <IdxDashboard.Buttons.NavigateUserPreset />
+
             <IdxDashboard.Buttons.NavigateMeasures />
+
             <IdxDashboard.Buttons.NavigateConfig />
+          </div>
+          <div>
+            <IdxDashboard.Buttons.CloneLastWeek startMonday={thisDateMonday} />
           </div>
           <div className="flex flex-1 flex-row flex-wrap justify-evenly gap-2">
             <IdxDashboard.Users.Info.LastSeen />

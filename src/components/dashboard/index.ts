@@ -5,6 +5,7 @@ import * as Titles from "./misc/titles";
 import * as Navigation from "./misc/navigate";
 import { SelectDateHeader } from "./metrics/selectDate/date";
 import * as Info from "./metrics/userInfo";
+import { CloneLastWeek } from "./misc/cloneWeek";
 
 export const IdxDashboard = {
     Users: {
@@ -22,6 +23,7 @@ export const IdxDashboard = {
     },
     Buttons: {
         ...Navigation,
+        CloneLastWeek
     },
 }
 

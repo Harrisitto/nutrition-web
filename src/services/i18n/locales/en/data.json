@@ -45,6 +45,17 @@
             "measures": "Measures",
             "config": "Nutritionist configuration"
         },
+        "actions": {
+            "cloneWeek": "Clone last week",
+            "cloneTitle": "Clone week",
+            "selectWeekLabel": "Select date (week to clone)",
+            "thisMonday": "This Monday",
+            "cloneSelectedWeek": "Clone selected week",
+            "cloning": "Cloning...",
+            "loadingWeek": "Loading week...",
+            "cloneSuccess": "Week cloned successfully",
+            "cloneError": "An error occurred while cloning the week. Please try again."
+        },
         "userInfo": {
             "email": "Email",
             "phone": "Phone",
@@ -138,6 +149,9 @@
                 "error": "An error occurred while loading invitations.",
                 "noResults": "No available clients found.",
                 "noInvitations": "No invitations sent yet.",
+                "manageClientsTitle": "Manage Clients",
+                "manageClientsDescription": "Manage your clients.",
+                "removeClient": "Remove Client",
                 "message": "Message: {{message}}",
                 "sendInvitation": "Send Invitation",
                 "revoke": "Revoke",

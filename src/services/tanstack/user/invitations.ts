@@ -6,6 +6,8 @@ import { useEffect, useState } from "react"
 import { queryKeys } from "../keys"
 import { queryClient } from "../queryClient"
 
+//type AvailableClient = NonNullable<ReturnType<typeof useFetchAvailableClients>["data"]>[number]
+
 
 export const useFetchAvailableClients = ({
     invitationCode,

@@ -150,3 +150,49 @@ export const useUpdateClientGoal = () => {
     }
   })
 }
+
+export const useRemoveClient = () => {
+  const clientId = useConfigSelectedUserId();
+  const nutritionistId = useAuthId();
+  const { addMutationError } = useNotification();
+
+  return useMutation({
+    mutationKey: queryKeys({
+        userId: nutritionistId ?? '',
+    }).user.fromNutritionist,
+    mutationFn: async () => {
+      if (!clientId) throw new Error('No authenticated user found')
+      const { data, error } = await supabase
+        .from(TABLE_ALL_USERS.NAME)
+        .update({ 
+            nutri_id: null,
+         })
+        .eq(TABLE_ALL_USERS.COLS.USER_ID, clientId)
+        .select()
+        .single()
+      if (error) throw error
+      return data
+    },
+    onSuccess: async () => {
+        await queryClient.invalidateQueries({
+            queryKey: queryKeys({
+                userId: clientId,
+            }).user.single,
+        })
+
+        if (!nutritionistId) return
+
+        queryClient.setQueryData<UserWithInfo[]>(
+            queryKeys({
+                userId: nutritionistId,
+            }).user.fromNutritionist,
+            (oldData = []) => {
+                return oldData.filter(user => user.user_id !== clientId)
+            }
+        )
+    },
+    onError: () => {
+      addMutationError();
+    },
+  })
+}
