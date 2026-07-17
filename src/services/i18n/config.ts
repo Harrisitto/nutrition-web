@@ -7,6 +7,11 @@ import enAuth from "./locales/en/auth.json";
 import enApp from "./locales/en/data.json";
 import enForms from "./locales/en/forms.json";
 
+import esSystem from "./locales/es/system.json";
+import esAuth from "./locales/es/auth.json";
+import esApp from "./locales/es/data.json";
+import esForms from "./locales/es/forms.json";
+
 const resources = {
     en: {
         system: enSystem,
@@ -14,9 +19,15 @@ const resources = {
         data: enApp,
         forms: enForms,
     }, // English translations
+    es: {
+        system: esSystem,
+        auth: esAuth,
+        data: esApp,
+        forms: esForms,
+    }, // Spanish translations
 };
 
-export const supportedLngs = ["en"] as const;
+export const supportedLngs = ["en", 'es'] as const;
 export type SupportedLanguage = typeof supportedLngs[number];
 
 i18next

@@ -1,0 +1,59 @@
+{
+    "preset": {
+        "title": "Preajustes de usuario para planificacion",
+        "description": "Crea y gestiona tus propios preajustes para completar rapidamente los formularios al crear un nuevo plan o receta.",
+        "fields": {
+            "newPreset": "Nuevo preajuste",
+            "name": "Nombre del preajuste",
+            "meals": "Comidas",
+            "formResume": "Resumen del formulario",
+            "trainingHc": "Carbohidratos de entrenamiento",
+            "comment": "Comentario",
+            "mealsKcal": "Kcal de comidas",
+            "trainingKcal": "Kcal de entrenamiento",
+            "totalKcal": "Kcal totales",
+            "balanceKcal": "Balance kcal",
+            "carbsPerKg": "Carbohidratos por kg",
+            "fatsPerKg": "Grasas por kg",
+            "proteinPerKg": "Proteina por kg",
+            "macrosDistribution": "Distribucion de macros",
+            "calculatedWithWeekWeight": "Calculado con el peso del usuario de esta semana",
+            "totalCarbs": "Carbohidratos totales: {{value}} g",
+            "totalFat": "Grasa total: {{value}} g",
+            "totalProtein": "Proteina total: {{value}} g",
+            "carbs": "Carbohidratos",
+            "fat": "Grasa",
+            "protein": "Proteina",
+            "macro": "Macro",
+            "submit": "Guardar preajuste"
+        }
+    },
+    "measures": {
+        "title": "Medidas",
+        "description": "Crea y gestiona los datos de tus clientes.",
+        "fields": {
+            "newMeasure": "Nueva medida",
+            "selectMeasure": "Seleccionar medida",
+            "date": "Fecha",
+            "submit": "Guardar medida",
+            "dateRangeStart": "Fecha de inicio",
+            "dateRangeEnd": "Fecha de fin",
+            "gender": {
+                "male": "Masculino",
+                "female": "Femenino"
+            }
+        },
+        "management": {
+            "displayedMeasuresTitle": "Medidas mostradas",
+            "hideAll": "Ocultar todo",
+            "showAll": "Mostrar todo",
+            "visibleMeasuresTitle": "Medidas visibles",
+            "visibleMeasuresDescription": "Elimina un tipo de medida del rango de fechas seleccionado.",
+            "noVisibleMeasuresInRange": "No hay medidas visibles en este rango.",
+            "delete": "Eliminar",
+            "noVisibleMeasuresSelected": "No hay medidas visibles seleccionadas.",
+            "noDataInFocusRange": "No hay datos en el rango de enfoque seleccionado.",
+            "measureFallback": "Medida {{id}}"
+        }
+    }
+}

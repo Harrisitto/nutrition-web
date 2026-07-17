@@ -1,0 +1,187 @@
+{
+    "dashboardTable": {
+        "Kcal": "kcal",
+        "resumeHeader": "Resumen diario",
+        "hcHeader": "Carbohidratos por hora de entrenamiento",
+        "trainingKcalHeader": "Kcal de entrenamiento",
+        "energyBalanceHeader": "Balance energetico",
+        "weekBalance": "Balance semanal",
+        "search": "Buscar",
+        "dailyMacros": {
+            "header": "Macronutrientes diarios",
+            "carbsPerkg": "Carbohidratos/kg",
+            "proteinPerkg": "Proteina/kg",
+            "fatsPerkg": "Grasas/kg",
+            "weeklyAvg": "Promedio semanal"
+        },
+        "daysOfWeek": {
+            "0": "Lunes",
+            "1": "Martes",
+            "2": "Miercoles",
+            "3": "Jueves",
+            "4": "Viernes",
+            "5": "Sabado",
+            "6": "Domingo"
+        },
+        "commentsRows": {
+            "header": "Comentarios",
+            "pressEsc": "Pulsa ESC para cerrar",
+            "writeComment": "Escribe aqui",
+            "rowHeader": "Para"
+        },
+        "eventsRow": {
+            "header": "Eventos",
+            "rowHeader": "Para"
+        },
+        "calendar": {
+            "training": "Entrenamiento",
+            "planing": "Planificacion",
+            "event": "Evento",
+            "selectedWeek": "Semana seleccionada"
+        },
+        "navigation": {
+            "header": "Ir a",
+            "presets": "Preajustes",
+            "measures": "Medidas",
+            "config": "Configuracion del nutricionista"
+        },
+        "actions": {
+            "cloneWeek": "Clonar semana anterior",
+            "cloneTitle": "Clonar semana",
+            "selectWeekLabel": "Selecciona fecha (semana a clonar)",
+            "thisMonday": "Este lunes",
+            "cloneSelectedWeek": "Clonar semana seleccionada",
+            "cloning": "Clonando...",
+            "loadingWeek": "Cargando semana...",
+            "cloneSuccess": "Semana clonada correctamente",
+            "cloneError": "Ocurrio un error al clonar la semana. Intentalo de nuevo."
+        },
+        "userInfo": {
+            "email": "Correo",
+            "phone": "Telefono",
+            "age": "Edad",
+            "weight": "Peso",
+            "goal": "Objetivo",
+            "lastSeen": "Visto por ultima vez hace {{days}} dias",
+            "neverSeen": "Visto por ultima vez: nunca"
+        }
+    },
+    "references": {
+        "title": "Referencias",
+        "description": "Esta pagina contiene las referencias de la informacion y los calculos utilizados en esta aplicacion.",
+        "viewMore": "Ver mas",
+        "calculators": {
+            "dehydration01": {
+                "title": "Deshidratacion",
+                "description": "Se utilizo para crear la calculadora de la seccion 'Deshidratacion' de la pagina 'Calculadoras'.",
+                "reference": "Gonzalez RR, Cheuvront SN, Montain SJ, Goodman DA, Blanchard LA, Berglund LG, et al. Expanded prediction equations of human sweat loss and water needs. J Appl Physiol [Internet]. 2009;107(2):379-88"
+            },
+            "osmolarity01": {
+                "title": "Osmolaridad",
+                "description": "Se utilizo para crear la calculadora de la seccion 'Osmolaridad' de la pagina 'Calculadoras'.",
+                "reference": "Rasouli, M. (2016). Basic concepts and practical equations on osmolality: Biochemical approach. Clinical Biochemistry, 49(12), 936-941.",
+                "url": "https://doi.org/10.1016/j.clinbiochem.2016.06.001"
+            },
+            "carbLoading01": {
+                "title": "Carga de carbohidratos",
+                "description": "Se utilizo para crear la calculadora de la seccion 'Carga de carbohidratos' de la pagina 'Calculadoras'.",
+                "reference": "Burke LM. Nutrition strategies for the marathon: fuel for training and racing. Sports Medicine. 2007;37:344-7."
+            },
+            "cookedIngredients01": {
+                "title": "Ingredientes cocidos",
+                "description": "Se utilizo para crear la calculadora de la seccion 'Ingredientes cocidos' de la pagina 'Calculadoras'.",
+                "reference": "Adikari, A. M. N. T., & Thamilini, J. (2018). Cooking conversion factor of commonly consumed Sri Lankan food items. MOJ Food Processing & Technology, 6(4), 371-374",
+                "url": "https://doi.org/10.15406/mojfpt.2018.06.00190"
+            },
+            "eatingDisorder01": {
+                "title": "Trastorno alimentario",
+                "description": "Se utilizo para crear la calculadora de la seccion 'Trastorno alimentario' de la pagina 'Calculadoras'.",
+                "reference": "Fairburn CG, Beglin SJ. Assessment of eating disorders: Interview or self-report questionnaire? International Journal of Eating Disorders. 1994;16(4):363-370.",
+                "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7392177/"
+            }
+        },
+        "recipes": {
+            "ingredients": {
+                "title": "Aviso sobre macronutrientes de ingredientes",
+                "description": "Se utiliza para aproximar los macronutrientes de los ingredientes en la app"
+            }
+        }
+    },
+    "configuration": {
+        "title": "Configuracion",
+        "description": "Personaliza tu experiencia y configura la aplicacion segun tus preferencias.",
+        "sections": {
+            "keyboard": {
+                "title": "Atajos de teclado",
+                "description": "Configura tus atajos de teclado para acceder rapidamente a diferentes funciones y acciones dentro de la aplicacion.",
+                "pressKey": "Pulsa cualquier tecla...",
+                "tableCommands": "Comandos de tabla",
+                "groups": {
+                    "table": "Tabla",
+                    "searchOptions": "Opciones de busqueda",
+                    "comments": "Comentarios"
+                },
+                "commands": {
+                    "selectCell": "Seleccionar celda",
+                    "saveData": "Guardar datos",
+                    "exitCell": "Salir de celda",
+                    "moveUp": "Mover arriba",
+                    "moveDown": "Mover abajo",
+                    "moveLeft": "Mover izquierda",
+                    "moveRight": "Mover derecha",
+                    "optionUp": "Opcion anterior",
+                    "optionDown": "Opcion siguiente",
+                    "confirmOption": "Confirmar opcion",
+                    "cancelOption": "Cancelar opcion",
+                    "closeEditor": "Cerrar editor"
+                }
+            },
+            "invitations": {
+                "title": "Invitaciones de usuarios",
+                "invitedTitle": "Clientes invitados",
+                "description": "Gestiona tus invitaciones de usuarios y controla quien tiene acceso a tu cuenta de nutricionista.",
+                "invitationCode": "Codigo de invitacion",
+                "client": "Cliente",
+                "writeMessage": "Escribe un mensaje al usuario invitado",
+                "messagePlaceholder": "Escribe un mensaje...",
+                "searchPlaceholder": "Buscar por codigo de invitacion...",
+                "loading": "Cargando invitaciones...",
+                "error": "Ocurrio un error al cargar las invitaciones.",
+                "noResults": "No se encontraron clientes disponibles.",
+                "noInvitations": "Aun no se han enviado invitaciones.",
+                "manageClientsTitle": "Gestionar clientes",
+                "manageClientsDescription": "Gestiona a tus clientes.",
+                "removeClient": "Eliminar cliente",
+                "message": "Mensaje: {{message}}",
+                "sendInvitation": "Enviar invitacion",
+                "revoke": "Revocar",
+                "messageTooShort": "El mensaje debe tener al menos 10 caracteres."
+            },
+            "recipes": {
+                "title": "Configuracion de recetas",
+                "description": "Gestiona tus recetas y personaliza tus planes de comida segun tus preferencias.",
+                "ingredients": "Ingredientes",
+                "rating": "Calificacion",
+                "macros": "Macronutrientes de la receta",
+                "showAllTypes": "Mostrar todo"
+            },
+            "authManagement": {
+                "title": "Gestion de autenticacion",
+                "description": "Gestiona las acciones de autenticacion de tu cuenta.",
+                "comingSoon": "Esta seccion esta en desarrollo. Vuelve mas tarde."
+            }
+        }
+    },
+    "macronutrients": {
+        "carbs": "Carbohidratos",
+        "shortCarbs": "hc",
+        "protein": "Proteina",
+        "shortProtein": "prot",
+        "fats": "Grasas",
+        "shortFats": "gras",
+        "kcal": "kcal",
+        "carbsPerKg": "Carbohidratos por kg",
+        "proteinPerKg": "Proteina por kg",
+        "fatsPerKg": "Grasas por kg"
+    }
+}

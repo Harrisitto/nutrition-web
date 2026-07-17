@@ -1,0 +1,27 @@
+{
+    "messages": {
+        "submit": "Enviar",
+        "cancel": "Cancelar",
+        "loading": "Cargando...",
+        "error": "Ocurrio un error. Intentalo de nuevo.",
+        "invalidForm": "Corrige los errores del formulario.",
+        "formSubmitted": "Formulario enviado correctamente!",
+        "success": "Operacion completada con exito!",
+        "mutationError": "Ocurrio un error al procesar tu solicitud. Intentalo de nuevo.",
+        "clear": "Limpiar",
+        "search": "Buscar",
+        "noResults": "Sin resultados"
+    },
+    "form": {
+        "invalidEmail": "Ingresa una direccion de correo valida",
+        "minLength": "Se necesitan mas caracteres",
+        "maxLength": "Demasiados caracteres",
+        "minValue": "El valor es demasiado bajo",
+        "maxValue": "El valor es demasiado alto",
+        "required": "Este campo es obligatorio"
+    },
+    "privacyPolicy": {
+        "title": "Politica de privacidad",
+        "description": "Esta Politica de privacidad describe como recopilamos, usamos y protegemos tu informacion personal cuando usas nuestro sitio web."
+    }
+}
