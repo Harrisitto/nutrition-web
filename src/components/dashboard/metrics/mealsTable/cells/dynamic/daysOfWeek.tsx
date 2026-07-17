@@ -23,13 +23,41 @@ const SideElement = ({
     name: t('system:messages.clear'),
   };
 
-  const options = useMemo(() => {
-    if (!presetQuery.data) return [];
-    const presetOptions = presetQuery.data.map((preset) => [preset.id.toString(), preset.name]);
-    return [
+  type PresetMeta = {
+    comment: string;
+    name: string;
+    energy: number;
+  };
+
+  const { options, map } = useMemo(() => {
+    if (!presetQuery.data) return {
+      options: [[clearOption.id, clearOption.name]] as [string, string][],
+      map: new Map<string, PresetMeta>(),
+    };
+    const presetOptions: [string, string][] = presetQuery.data.map(
+      (preset): [string, string] => [preset.id.toString(), preset.name],
+    );
+    const mapOptions: [string, PresetMeta][] = presetQuery.data.map(
+      (preset): [string, PresetMeta] => [
+        preset.id.toString(),
+        {
+          comment: preset.comment,
+          name: preset.name,
+          energy: preset.user_preset_meal.reduce(
+            (acc, meal) => acc + meal.type_id.kcal,
+            0,
+          ),
+        },
+      ],
+    );
+    const opt = [
       [clearOption.id, clearOption.name],
       ...presetOptions,
     ] as [string, string][];
+    return {
+      options: opt,
+      map: new Map<string, PresetMeta>(mapOptions),
+    };
   }, [presetQuery.data, t]);
 
   const insertPlaning = useCallback((presetId: string) => {
@@ -56,6 +84,23 @@ const SideElement = ({
     <SideSelectOptions
       options={options}
       onSelect={insertPlaning}
+      render={(id: string) => {
+        if (id === clearOption.id) return null;
+        const preset = map.get(id);
+        if (!preset) return null;
+        return (
+          <div className="mt-2 space-y-1.5">
+            <div className="inline-flex items-center rounded-full border border-dark-green/20 bg-dark-green/10 px-2 py-0.5 text-xs font-medium text-dark-green">
+              {preset.energy} {t("data:dashboardTable.Kcal")}
+            </div>
+            {!!preset.comment && (
+              <div className="text-xs leading-relaxed text-gray-600">
+                {preset.comment}
+              </div>
+            )}
+          </div>
+        );
+      }}
     />
   );
 };

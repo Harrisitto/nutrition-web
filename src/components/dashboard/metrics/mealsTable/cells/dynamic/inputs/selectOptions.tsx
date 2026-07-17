@@ -14,10 +14,12 @@ const compareStrings = (str1: string, str2: string) => {
 export const SideSelectOptions = ({
     initialId,
     options,
+    render,
     onSelect,
 }: {
     initialId?: string;
     options: [string, string][];
+    render?: (optionId: string) => React.ReactNode;
     onSelect: (optionId: string) => void;
 }) => {
 
@@ -29,6 +31,7 @@ export const SideSelectOptions = ({
         return index >= 0 ? index : 0;
     });
     const inputRef = useRef<HTMLInputElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
 
     const filteredOptions = useMemo(() => {
         if (!searchTerm) return options;
@@ -41,23 +44,9 @@ export const SideSelectOptions = ({
         cancelFocus();
     }, [onSelect, cancelFocus]);
 
-    /**
-     * Focus the input when the component mounts, so user can start typing immediately.
-     */
-    useEffect(() => {
-        if (!inputRef.current) return;
-        inputRef.current.focus();
-    }, []);
-
-
     useEffect(() => {
 
         const numOptions = filteredOptions.length;
-
-        const handleClickOutside = (e: MouseEvent) => {
-            if (inputRef.current?.contains(e.target as Node)) return;
-            setSearchTerm("");
-        };
 
         const handleKeyDown = (e: KeyboardEvent) => {
             switch (e.key) {
@@ -88,33 +77,36 @@ export const SideSelectOptions = ({
             }
         };
 
-        window.addEventListener("click", handleClickOutside);
         window.addEventListener("keydown", handleKeyDown);
 
         return () => {
-            window.removeEventListener("click", handleClickOutside);
             window.removeEventListener("keydown", handleKeyDown);
         }
     }, [applySelection, filteredOptions, selectedIndex, cancelFocus, selectOptionsCommands]);
 
     return (
-        <div>
+        <div ref={containerRef}>
             <input
                 ref={inputRef}
                 type="text"
-                className="w-full p-2 border border-gray-300 rounded mb-2"
+                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 outline-none transition focus:border-nutrition-green focus:ring-2 focus:ring-nutrition-green/20 mb-3"
                 placeholder="..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <div className="max-h-48 overflow-y-auto">
+            <div className="max-h-64 space-y-2 overflow-y-auto pr-1">
                 {filteredOptions.map(([id, label], index) => (
                     <div
                         key={id}
-                        className={`px-2 py-1 cursor-pointer text-sm rounded ${index === selectedIndex ? "bg-gray-200" : "hover:bg-gray-100"}`}
+                        className={`cursor-pointer rounded-lg border px-3 py-2 text-sm transition ${
+                            index === selectedIndex
+                                ? "border-dark-green/40 bg-dark-green/10 text-dark-green shadow-sm"
+                                : "border-gray-200 bg-white text-gray-800 hover:border-nutrition-green/40 hover:bg-nutrition-green/5"
+                        }`}
                         onClick={() => applySelection(id)}
                     >
-                        {label}
+                        <div className="font-medium">{label}</div>
+                        {render?.(id)}
                     </div>
                 ))}
             </div>

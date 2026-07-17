@@ -30,14 +30,23 @@ const SideElement = ({
   const mealTypes = mealsQuery.data || [];
   const clearOptionId = "clear";
 
-  const options = useMemo(() => {
-    return [
+  const {options, map } = useMemo(() => {
+    return {
+      options: [
       [clearOptionId, t("system:messages.clear")] as [string, string],
       ...mealTypes.map(
         (opt) =>
           [opt.id.toString(), opt.name] as [string, string],
       ),
-    ];
+    ],
+    map: new Map(
+      mealTypes.map((opt) => [
+        opt.id.toString(),
+        opt
+      ]),
+    ),
+  };
+    
   }, [mealTypes, t]);
 
   const handleDBMeal = useCallback(
@@ -73,6 +82,31 @@ const SideElement = ({
       initialId={planingData?.type_id?.id?.toString()}
       options={options}
       onSelect={handleDBMeal}
+      render={(id: string) => {
+        if (id === clearOptionId) return null;
+        const mealType = map.get(id);
+        if (!mealType) return null;
+        return (
+            <div className="grid grid-cols-2 gap-2 text-[11px] sm:grid-cols-4">
+              <div className="rounded-md border border-dark-green/20 bg-dark-green/10 px-2 py-1 text-center text-dark-green">
+                <div className="text-[10px] font-semibold uppercase tracking-wide">{t("data:dashboardTable.Kcal")}</div>
+                <div className="text-xs font-semibold">{mealType.kcal}</div>
+              </div>
+              <div className="rounded-md border border-blue-200 bg-blue-50 px-2 py-1 text-center text-blue-700">
+                <div className="text-[10px] font-semibold uppercase tracking-wide">{t("data:macronutrients.shortProtein")}</div>
+                <div className="text-xs font-semibold">{mealType.prot} g</div>
+              </div>
+              <div className="rounded-md border border-amber-200 bg-amber-50 px-2 py-1 text-center text-amber-700">
+                <div className="text-[10px] font-semibold uppercase tracking-wide">{t("data:macronutrients.shortFats")}</div>
+                <div className="text-xs font-semibold">{mealType.fat} g</div>
+              </div>
+              <div className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1 text-center text-emerald-700">
+                <div className="text-[10px] font-semibold uppercase tracking-wide">{t("data:macronutrients.shortCarbs")}</div>
+                <div className="text-xs font-semibold">{mealType.hc} g</div>
+              </div>
+            </div>
+        );
+      }}
     />
   );
 };
