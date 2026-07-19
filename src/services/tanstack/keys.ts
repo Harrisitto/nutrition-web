@@ -27,7 +27,8 @@ export const queryKeys = ({
     },
     data: {
         meals: ["data", "meals", language],
-        allTypes: ["data", "allTypes", language],
+      allTypes: ["data", "allTypes", language],
+        orderedTypes: ["data", "orderedTypes", language],
         measures: ["data", "measures"],
         receipts: ["data", "receipts"],
         videos: ["data", "videos"],

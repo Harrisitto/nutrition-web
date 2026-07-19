@@ -4,7 +4,7 @@ import { generateMealKey, getDateForDayIndex } from "../../helperFunctions";
 import { SideSelectOptions } from "./inputs/selectOptions";
 import { useTableContext } from "../../tableContext";
 import { useTranslation } from "react-i18next";
-import { useFetchAllMealTypes } from "@src/services/tanstack/data/meals";
+import { useFetchOrderedMealsForId } from "@src/services/tanstack/data/meals";
 import {
   useDeleteMeal,
   useInsertMeal,
@@ -19,34 +19,31 @@ const SideElement = ({
   dayIndex: number;
 }) => {
   const { t } = useTranslation();
-  const mealsQuery = useFetchAllMealTypes();
+
   const insert = useInsertMeal();
   const deleteMeal = useDeleteMeal();
   const { startMonday, planing } = useTableContext();
   const date = getDateForDayIndex(startMonday, dayIndex);
   const planingKey = generateMealKey(mealId, date);
   const planingData = planing.mealsMap.get(planingKey);
+  const mealsQuery = useFetchOrderedMealsForId({
+    mealId,
+    date: new Date(startMonday),
+  });
 
-  const mealTypes = mealsQuery.data || [];
   const clearOptionId = "clear";
+  const mealTypes = mealsQuery.data ?? [];
 
-  const {options, map } = useMemo(() => {
+  const { options, map } = useMemo(() => {
     return {
       options: [
-      [clearOptionId, t("system:messages.clear")] as [string, string],
-      ...mealTypes.map(
-        (opt) =>
-          [opt.id.toString(), opt.name] as [string, string],
-      ),
-    ],
-    map: new Map(
-      mealTypes.map((opt) => [
-        opt.id.toString(),
-        opt
-      ]),
-    ),
-  };
-    
+        [clearOptionId, t("system:messages.clear")] as [string, string],
+        ...mealTypes.map(
+          (opt) => [opt.id.toString(), opt.name] as [string, string],
+        ),
+      ],
+      map: new Map(mealTypes.map((opt) => [opt.id.toString(), opt])),
+    };
   }, [mealTypes, t]);
 
   const handleDBMeal = useCallback(
@@ -87,24 +84,32 @@ const SideElement = ({
         const mealType = map.get(id);
         if (!mealType) return null;
         return (
-            <div className="grid grid-cols-2 gap-2 text-[11px] sm:grid-cols-4">
-              <div className="rounded-md border border-dark-green/20 bg-dark-green/10 px-2 py-1 text-center text-dark-green">
-                <div className="text-[10px] font-semibold uppercase tracking-wide">{t("data:dashboardTable.Kcal")}</div>
-                <div className="text-xs font-semibold">{mealType.kcal}</div>
+          <div className="grid grid-cols-2 gap-2 text-[11px] sm:grid-cols-4">
+            <div className="rounded-md border border-dark-green/20 bg-dark-green/10 px-2 py-1 text-center text-dark-green">
+              <div className="text-[10px] font-semibold uppercase tracking-wide">
+                {t("data:dashboardTable.Kcal")}
               </div>
-              <div className="rounded-md border border-blue-200 bg-blue-50 px-2 py-1 text-center text-blue-700">
-                <div className="text-[10px] font-semibold uppercase tracking-wide">{t("data:macronutrients.shortProtein")}</div>
-                <div className="text-xs font-semibold">{mealType.prot} g</div>
-              </div>
-              <div className="rounded-md border border-amber-200 bg-amber-50 px-2 py-1 text-center text-amber-700">
-                <div className="text-[10px] font-semibold uppercase tracking-wide">{t("data:macronutrients.shortFats")}</div>
-                <div className="text-xs font-semibold">{mealType.fat} g</div>
-              </div>
-              <div className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1 text-center text-emerald-700">
-                <div className="text-[10px] font-semibold uppercase tracking-wide">{t("data:macronutrients.shortCarbs")}</div>
-                <div className="text-xs font-semibold">{mealType.hc} g</div>
-              </div>
+              <div className="text-xs font-semibold">{mealType.kcal}</div>
             </div>
+            <div className="rounded-md border border-blue-200 bg-blue-50 px-2 py-1 text-center text-blue-700">
+              <div className="text-[10px] font-semibold uppercase tracking-wide">
+                {t("data:macronutrients.shortProtein")}
+              </div>
+              <div className="text-xs font-semibold">{mealType.prot} g</div>
+            </div>
+            <div className="rounded-md border border-amber-200 bg-amber-50 px-2 py-1 text-center text-amber-700">
+              <div className="text-[10px] font-semibold uppercase tracking-wide">
+                {t("data:macronutrients.shortFats")}
+              </div>
+              <div className="text-xs font-semibold">{mealType.fat} g</div>
+            </div>
+            <div className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1 text-center text-emerald-700">
+              <div className="text-[10px] font-semibold uppercase tracking-wide">
+                {t("data:macronutrients.shortCarbs")}
+              </div>
+              <div className="text-xs font-semibold">{mealType.hc} g</div>
+            </div>
+          </div>
         );
       }}
     />
@@ -128,7 +133,7 @@ const PlaningCell = ({
   const kcalStyle = useMemo(() => {
     if (!planingData) return "";
     const type = planingData.type_id;
-    if(type.kcal < 200) {
+    if (type.kcal < 200) {
       return "border-green-500 bg-green-100/30 hover:bg-green-100/50";
     } else if (type.kcal < 500) {
       return "border-yellow-500 bg-yellow-100/30 hover:bg-yellow-100/50";
@@ -157,7 +162,8 @@ const PlaningCell = ({
 };
 
 export const TablePlaning = () => {
-  const { meals, daysOfWeek, tableFragmentIndex, startMonday } = useTableContext();
+  const { meals, daysOfWeek, tableFragmentIndex, startMonday } =
+    useTableContext();
 
   return meals.map((meal, mealIndex) => {
     return daysOfWeek.map((day, dayIndex) => {

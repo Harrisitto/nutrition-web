@@ -14,8 +14,8 @@ interface TableContextType {
     isFocused: boolean;
     startMonday: Date;
     daysOfWeek: string[];
-    meals: NonNullable<ReturnType<typeof useFetchMeals>["data"]>;
-    planing: ReturnType<typeof usePlaning>;
+    meals: NonNullable<ReturnType<typeof useFetchMeals>["data"]>; // All meals data.
+    planing: ReturnType<typeof usePlaning>; // Selected week planing data.
 }
 
 export const Context = createContext<TableContextType | undefined>(undefined);

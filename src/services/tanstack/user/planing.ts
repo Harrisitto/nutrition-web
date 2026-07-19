@@ -24,7 +24,7 @@ const selectFromMeal = (languageCode: ReturnType<typeof useLanguageCode>) => {
 const selectFromPlaning = (
   languageCode: ReturnType<typeof useLanguageCode>,
 ) => {
-  return `*, 
+  return `*,
         ${TABLE_USER_PLANING_MEAL.NAME}(${selectFromMeal(languageCode)})` as const;
 };
 
@@ -115,8 +115,10 @@ export const fetchPlanningWeek = async ({
 
 export const useFetchPlanning = ({
   forDate,
+  rangeInWeeks = 0,
 }: {
   forDate?: Date;
+  rangeInWeeks?: number;
 } = {}) => {
   const savedDate = useConfigSelectedDay();
   const user = useConfigSelectedUserId();
@@ -125,8 +127,10 @@ export const useFetchPlanning = ({
   const paramStartDate = forDate || savedDate || new Date();
   const effectiveStartDate = saveDate(fromDate(paramStartDate).thisMonday());
   const effectiveEndDate = saveDate(
-    fromDate(new Date(paramStartDate)).thisSunday(),
+    fromDate(fromDate(paramStartDate).incrementDay(rangeInWeeks * 7)).thisSunday(),
   );
+
+  console.log(effectiveEndDate, effectiveStartDate)
 
   return useQuery({
     queryKey: queryKeys({
@@ -201,6 +205,7 @@ export const useInsertPlaningWithMeals = () => {
       training_hc,
       training_kcal,
       comment,
+      event
     }: {
       date: Date;
       meals: {
@@ -210,6 +215,7 @@ export const useInsertPlaningWithMeals = () => {
       training_hc?: number[];
       training_kcal?: number;
       comment?: string;
+      event?: string;
     }) => {
       if (!userId)
         throw new Error("User ID is required to insert planing data");
@@ -226,6 +232,7 @@ export const useInsertPlaningWithMeals = () => {
             : {}),
           ...(training_kcal != null ? { training_kcal } : {}),
           ...(comment != null ? { comment } : {}),
+          ...(event != null ? { event } : {}),
         })
         .select(TABLE_USER_PLANING.COLS.ID)
         .single();

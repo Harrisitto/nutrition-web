@@ -33,11 +33,13 @@ export const CloneLastWeek = ({ startMonday }: { startMonday: Date }) => {
           upsertDay.mutateAsync({
             ...day,
             meals: day.user_planing_meal.map((meal) => ({
-                meal_id: meal.meal_id,
-                type_id: meal.type_id.id,
+              meal_id: meal.meal_id,
+              type_id: meal.type_id.id,
             })),
-          })
-        )
+            comment: "",
+            event: "",
+          }),
+        ),
       );
     } catch (err) {
       console.error(err);

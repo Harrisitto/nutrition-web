@@ -43,6 +43,8 @@ export const usePlaning = ({
 
     /**
      * Maps meal planning data to a structure that allows quick access to meal plans for each meal and date.
+     * Key ~ Date
+     * Value ~ All planing info for that day.
      */
     const planningMap = useMemo(() => {
         const data = planing.data ?? [];
@@ -57,6 +59,11 @@ export const usePlaning = ({
         return map;
     }, [planing.data]);
 
+    /**
+     * Maps meal planning data to a structure that allows quick access to meal plans for each meal and date.
+     * Key ~ Meal ID + Date
+     * Value ~ Meal plan data for that meal and date.
+     */
     const mealsMap = useMemo(() => {
         const data = planing.data ?? [];
         const map = new Map(
@@ -114,7 +121,7 @@ export const usePlaning = ({
         if(!bmrQuery.data) {
             return kcalPerDay;
         }
-        
+
         data.forEach((plan) => {
             if (!plan.date) {
                 console.warn("Planing entry is missing date:", plan);
@@ -173,5 +180,6 @@ export const usePlaning = ({
         mealsMap,
         maxTrainingHours,
         kcalState,
+        bmr: bmrQuery.data,
     };
 };

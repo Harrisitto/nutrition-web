@@ -36,7 +36,7 @@ export const BalanceEnergyRow = () => {
       {t("data:dashboardTable.energyBalanceHeader")}
     </div>
   );
-}
+};
 
 export const DailyEnergyBalance = () => {
   const { daysOfWeek, planing } = useTableContext();
@@ -44,17 +44,18 @@ export const DailyEnergyBalance = () => {
 
   const getTone = (balance: number) => {
     if (Math.abs(balance) <= closeBalanceThreshold) return "warning" as const;
-    return balance > 0 ? "good" as const : "bad" as const;
+    return balance > 0 ? ("good" as const) : ("bad" as const);
   };
 
   const getToneClasses = (tone: "good" | "warning" | "bad") => {
-    if (tone === "warning") return "border-amber-300/80 bg-amber-50 text-amber-700";
-    if (tone === "good") return "border-emerald-300/80 bg-emerald-50 text-emerald-700";
+    if (tone === "warning")
+      return "border-amber-300/80 bg-amber-50 text-amber-700";
+    if (tone === "good")
+      return "border-emerald-300/80 bg-emerald-50 text-emerald-700";
     return "border-rose-200/70 bg-rose-50/60 text-rose-600";
   };
 
   const weeklyEnergy = useMemo(() => {
-    
     const weekTotal = planing.kcalState.reduce((acc, day) => {
       acc += day.balance;
       return acc;
@@ -65,10 +66,11 @@ export const DailyEnergyBalance = () => {
     };
   }, [planing.kcalState]);
 
-  const baseBalanceCellClass = "border p-3 text-center transition-colors h-full flex items-center justify-center font-semibold tabular-nums";
+  const baseBalanceCellClass =
+    "border p-3 text-center transition-colors h-full flex items-center justify-center font-semibold tabular-nums";
 
-  return [...daysOfWeek, 'total'].map((day, dayIndex) => {
-    if (day === 'total') {
+  return [...daysOfWeek, "total"].map((day, dayIndex) => {
+    if (day === "total") {
       const weeklyTone = getTone(weeklyEnergy.balance);
       return (
         <div
@@ -79,16 +81,23 @@ export const DailyEnergyBalance = () => {
         </div>
       );
     }
-    const dayTone = getTone(planing.kcalState[dayIndex].balance);
+    const calculatedBalance = planing.kcalState[dayIndex].balance;
+    const isPlaningLoaded = planing.kcalState[dayIndex]?.total > 0;
+    const balance = isPlaningLoaded
+      ? calculatedBalance
+      : planing.bmr
+        ? -planing.bmr
+        : 0;
+
+    const dayTone = getTone(balance);
+
     return (
       <div
         key={`energy-balance-${dayIndex}`}
         className={`${baseBalanceCellClass} ${getToneClasses(dayTone)}`}
       >
-        {Math.round(planing.kcalState[dayIndex].balance)} kcal
+        {Math.round(balance)} kcal
       </div>
     );
   });
-}
-
-
+};
