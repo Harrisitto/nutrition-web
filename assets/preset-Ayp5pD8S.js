@@ -1,4 +1,4 @@
-import{e as c,D as I,E as M,F as L,G as a,T as t,H as n,y as _,z as E}from"./index-CAkSZ6Ck.js";const O=({carbs:e,protein:s,fat:r})=>{const o=e?e*4:0,u=s?s*4:0,i=r?r*9:0;return o+u+i},C=e=>`*,
+import{e as c,D as I,E as M,F as L,G as a,T as t,H as n,y as _,z as E}from"./index-B_nlBGVt.js";const O=({carbs:e,protein:s,fat:r})=>{const o=e?e*4:0,u=s?s*4:0,i=r?r*9:0;return o+u+i},C=e=>`*,
         ${n.NAME}(
         preset_id,
         meal_id(
