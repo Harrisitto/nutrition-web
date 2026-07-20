@@ -32,7 +32,9 @@ export const SideSelectOptions = ({
     return index >= 0 ? index : 0;
   });
   const inputRef = useRef<HTMLInputElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+
+  // 1. Apuntamos este ref directamente al contenedor con scroll
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const filteredOptions = useMemo(() => {
     if (!searchTerm) return options;
@@ -40,6 +42,29 @@ export const SideSelectOptions = ({
       options.filter(([, label]) => compareStrings(label, searchTerm)) || []
     );
   }, [options, searchTerm]);
+
+  // Resetear el índice a 0 si el término de búsqueda cambia y reduce las opciones
+  useEffect(() => {
+    setSelectedIndex(0);
+  }, [searchTerm]);
+
+  // 2. EFECTO MAGICO: Centrar el scroll cuando cambia selectedIndex
+  useEffect(() => {
+    if (!scrollContainerRef.current) return;
+
+    // Buscamos el elemento hijo que tenga nuestro atributo personalizado activo
+    const activeElement = scrollContainerRef.current.querySelector(
+      '[data-active="true"]',
+    ) as HTMLElement;
+
+    if (activeElement) {
+      activeElement.scrollIntoView({
+        behavior: "smooth", // Cambia a "auto" si prefieres que sea instantáneo
+        block: "center",
+        inline: "nearest",
+      });
+    }
+  }, [selectedIndex]); // Solo se dispara si cambia la selección
 
   const applySelection = useCallback(
     (optionId: string) => {
@@ -96,7 +121,7 @@ export const SideSelectOptions = ({
   ]);
 
   return (
-    <div ref={containerRef}>
+    <div>
       <input
         ref={inputRef}
         type="text"
@@ -105,21 +130,32 @@ export const SideSelectOptions = ({
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-      <div className="max-h-[70vh] space-y-2 overflow-y-auto pr-1">
-        {filteredOptions.map(([id, label], index) => (
-          <div
-            key={id}
-            className={`cursor-pointer rounded-lg border px-3 py-2 text-sm transition ${
-              index === selectedIndex
-                ? "border-dark-green/40 bg-dark-green/10 text-dark-green shadow-sm"
-                : "border-gray-200 bg-white text-gray-800 hover:border-nutrition-green/40 hover:bg-nutrition-green/5"
-            }`}
-            onClick={() => applySelection(id)}
-          >
-            <div className="font-medium">{label}</div>
-            {render?.(id)}
-          </div>
-        ))}
+
+      {/* 3. Colocamos el scrollContainerRef aquí (donde está el overflow-y-auto) */}
+      <div
+        ref={scrollContainerRef}
+        className="max-h-[70vh] space-y-2 overflow-y-auto pr-1"
+      >
+        {filteredOptions.map(([id, label], index) => {
+          const isActive = index === selectedIndex;
+
+          return (
+            <div
+              key={id}
+              // 4. Inyectamos data-active para que el querySelector lo encuentre fácilmente
+              data-active={isActive}
+              className={`cursor-pointer rounded-lg border px-3 py-2 text-sm transition ${
+                isActive
+                  ? "border-dark-green/40 bg-dark-green/10 text-dark-green shadow-sm"
+                  : "border-gray-200 bg-white text-gray-800 hover:border-nutrition-green/40 hover:bg-nutrition-green/5"
+              }`}
+              onClick={() => applySelection(id)}
+            >
+              <div className="font-medium">{label}</div>
+              {render?.(id)}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
