@@ -62,7 +62,7 @@ export const DailyEnergyBalance = () => {
     }, 0);
 
     return {
-      balance: weekTotal,
+      balance: weekTotal - (7 - planing.kcalState.length) * (planing.bmr ?? 0),
     };
   }, [planing.kcalState]);
 

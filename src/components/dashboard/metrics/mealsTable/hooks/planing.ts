@@ -14,7 +14,7 @@ export const usePlaning = ({
     forDate?: Date;
 } = {}) => {
     /**
-     * Fetches the meal planning data for the specified date range using the useFetchPlanning hook.
+     * Fetches the meal planning data for the specified date range using the useFetchPlanning hook
      */
     const planing = useFetchPlanning({
         forDate,
