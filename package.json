@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "deploy": "gh-pages -d dist",
-    "supabase-types": "SUPABASE_ACCESS_TOKEN=\"$(tr -d '\\r\\n' < /home/josep/Vaults/Tokens/supabase-nutrition.txt)\" npx --yes supabase gen types typescript --project-id iivsjutltecehnnhmjok > /tmp/supabase-types.ts && mv /tmp/supabase-types.ts src/services/supabase/types.ts"
+    "supabase-types": "npx --yes supabase gen types typescript --project-id iivsjutltecehnnhmjok > /tmp/supabase-types.ts && mv /tmp/supabase-types.ts src/services/supabase/types.ts"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.9.0",

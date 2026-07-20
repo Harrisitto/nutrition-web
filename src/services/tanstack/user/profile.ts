@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { useNotification, useNotificationErrorQuery } from '@src/store/slices/notification/hook'
 import { supabase } from '@src/services/supabase/client'
 import type { Database } from '@src/services/supabase/types'
-import { TABLE_ALL_NUTRITIONISTS, TABLE_ALL_USERS } from '@src/services/supabase/definitions'
+import { TABLE_ALL_NUTRITIONISTS, TABLE_ALL_USERS, TABLE_USER_PLANING, TABLE_USER_PLANING_MEAL } from '@src/services/supabase/definitions'
 import { useAuth, useAuthId } from '@src/store/slices/auth/hook'
 import { useAppDispatch } from '@src/store/store'
 import { setProfile } from '@src/store/slices/auth/store'
@@ -13,7 +13,13 @@ import { queryClient } from '../queryClient'
 type UserWithInfo = Database['public']['Tables']['all_users']['Row']
 
 const selectUser = () => {
-    return `*` as const;
+  // Si tu clave foránea se llama, por ejemplo, "user_planing_user_id_fkey"
+  return `*,
+    user_planing(
+      date,
+      user_planing_meal(planing_id)
+    )
+  ` as const;
 }
 
 /**
@@ -66,11 +72,11 @@ export const useFetchSingleUser = ({
         }).user.single,
         queryFn: async () => {
             const { data, error } = await supabase
-                .from(TABLE_ALL_USERS.NAME)
-                .select(selectUser())
-                .eq(TABLE_ALL_USERS.COLS.USER_ID, effectiveUserId)
-                .maybeSingle()
-            if (error) throw error
+              .from(TABLE_ALL_USERS.NAME)
+              .select(selectUser())
+              .eq(TABLE_ALL_USERS.COLS.USER_ID, effectiveUserId)
+              .maybeSingle();
+          if (error) throw error
             return data
         },
         enabled: !!effectiveUserId,
@@ -92,7 +98,10 @@ export const useFetchNutritionistUsers = () => {
                     .from(TABLE_ALL_USERS.NAME)
                     .select(selectUser())
                     .eq(TABLE_ALL_USERS.COLS.NUTRI_ID, userId)
-                    //.eq(TABLE_ALL_USERS.COLS.IS_NUTRI, false)
+                    .order(TABLE_USER_PLANING.COLS.DATE, { referencedTable: TABLE_USER_PLANING.NAME, ascending: false })
+                    .limit(1, { referencedTable: TABLE_USER_PLANING.NAME })
+                    .limit(1, { referencedTable: `${TABLE_USER_PLANING.NAME}.${TABLE_USER_PLANING_MEAL.NAME}` })
+              //.eq(TABLE_ALL_USERS.COLS.IS_NUTRI, false)
                 if (error) throw error
                 return data
             } catch (error) {
@@ -114,7 +123,7 @@ export const useUpdateClientGoal = () => {
       if (!clientId) throw new Error('No authenticated user found')
       const { data, error } = await supabase
         .from(TABLE_ALL_USERS.NAME)
-        .update({ 
+        .update({
             goal,
          })
         .eq(TABLE_ALL_USERS.COLS.USER_ID, clientId)
@@ -164,7 +173,7 @@ export const useRemoveClient = () => {
       if (!clientId) throw new Error('No authenticated user found')
       const { data, error } = await supabase
         .from(TABLE_ALL_USERS.NAME)
-        .update({ 
+        .update({
             nutri_id: null,
          })
         .eq(TABLE_ALL_USERS.COLS.USER_ID, clientId)

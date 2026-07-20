@@ -78,6 +78,7 @@ export type Database = {
           allow_client: boolean
           description: Json | null
           id: number
+          imageUrl: string | null
           name: Json | null
           units: Json | null
         }
@@ -85,6 +86,7 @@ export type Database = {
           allow_client?: boolean
           description?: Json | null
           id?: number
+          imageUrl?: string | null
           name?: Json | null
           units?: Json | null
         }
@@ -92,6 +94,7 @@ export type Database = {
           allow_client?: boolean
           description?: Json | null
           id?: number
+          imageUrl?: string | null
           name?: Json | null
           units?: Json | null
         }
@@ -259,6 +262,7 @@ export type Database = {
       }
       recipe_type: {
         Row: {
+          comment: Json | null
           fat: number
           hc: number
           id: number
@@ -267,6 +271,7 @@ export type Database = {
           prot: number
         }
         Insert: {
+          comment?: Json | null
           fat?: number
           hc?: number
           id?: number
@@ -275,6 +280,7 @@ export type Database = {
           prot?: number
         }
         Update: {
+          comment?: Json | null
           fat?: number
           hc?: number
           id?: number
@@ -384,7 +390,15 @@ export type Database = {
           training_kcal?: number
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "user_planing_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "all_users"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       user_planing_meal: {
         Row: {
