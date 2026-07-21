@@ -1,18 +1,17 @@
 import { supabase } from "@src/services/supabase/client"
 import { TABLE_ALL_NUTRITIONISTS } from "@src/services/supabase/definitions"
-import { useAuthId } from "@src/store/slices/auth/hook"
 import { useNotification } from "@src/store/slices/notification/hook"
 import type { TablesInsert } from "@src/services/supabase/types"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { useConfigSelectedUserId } from "@src/store/slices/config/hook"
 import { queryKeys } from "../keys"
 import { dateToSupabaseFormat } from "@src/helpers/dates"
-import { useAppDispatch } from "@src/store/store"
+import { useAppDispatch, useAppSelector } from "@src/store/store"
 import { setProfile } from "@src/store/slices/auth/store"
 
 export const useInsertUserInfo = () => {
   const { addMutationError } = useNotification();
-  const userId = useAuthId()
+  const userId = useAppSelector((state) => state.auth.user?.id ?? "");
   const dispatch = useAppDispatch();
 
   const mutation = useMutation({

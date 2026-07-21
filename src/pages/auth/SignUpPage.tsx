@@ -14,10 +14,6 @@ const SignUpPage = () => {
           />
         </div>
         <div className="h-4" />
-        <div className="w-full max-w-lg">
-          <ComponentsSignIn.Actions.RedirectLogIn />
-        </div>
-        <div className="h-4" />
       </div>
     );
   }
@@ -32,10 +28,6 @@ const SignUpPage = () => {
         <div className="h-4" />
         <div className="w-full max-w-lg">
           <ComponentsSignIn.Actions.SubmitForm />
-        </div>
-        <div className="h-4" />
-        <div className="w-full max-w-lg flex justify-between">
-          <ComponentsSignIn.Actions.RedirectLogIn />
         </div>
         <div className="h-4" />
         <div className="w-full max-w-lg">

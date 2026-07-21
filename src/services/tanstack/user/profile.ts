@@ -3,8 +3,7 @@ import { useNotification, useNotificationErrorQuery } from '@src/store/slices/no
 import { supabase } from '@src/services/supabase/client'
 import type { Database } from '@src/services/supabase/types'
 import { TABLE_ALL_NUTRITIONISTS, TABLE_ALL_USERS, TABLE_USER_PLANING, TABLE_USER_PLANING_MEAL } from '@src/services/supabase/definitions'
-import { useAuth, useAuthId } from '@src/store/slices/auth/hook'
-import { useAppDispatch } from '@src/store/store'
+import { useAppDispatch, useAppSelector } from '@src/store/store'
 import { setProfile } from '@src/store/slices/auth/store'
 import { useConfigSelectedUserId } from '@src/store/slices/config/hook'
 import { queryKeys } from '../keys'
@@ -27,7 +26,7 @@ const selectUser = () => {
  */
 export const useInsertProfile = () => {
   const { addMutationError } = useNotification();
-  const { user } = useAuth()
+  const { user } = useAppSelector((state) => state.auth)
   const dispatch = useAppDispatch()
   const mutation = useMutation({
     mutationFn: async ({
@@ -84,7 +83,7 @@ export const useFetchSingleUser = ({
 }
 
 export const useFetchNutritionistUsers = () => {
-    const userId = useAuthId();
+  const userId = useAppSelector((state) => state.auth.user?.id);
     const err = useNotificationErrorQuery()
 
     return useQuery({
@@ -116,7 +115,7 @@ export const useFetchNutritionistUsers = () => {
 
 export const useUpdateClientGoal = () => {
   const clientId = useConfigSelectedUserId();
-    const nutritionistId = useAuthId();
+    const nutritionistId = useAppSelector((state) => state.auth.user?.id);
 
   return useMutation({
     mutationFn: async (goal: string) => {
@@ -162,7 +161,7 @@ export const useUpdateClientGoal = () => {
 
 export const useRemoveClient = () => {
   const clientId = useConfigSelectedUserId();
-  const nutritionistId = useAuthId();
+  const nutritionistId = useAppSelector((state) => state.auth.user?.id);
   const { addMutationError } = useNotification();
 
   return useMutation({

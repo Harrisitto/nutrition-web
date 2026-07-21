@@ -13,8 +13,12 @@ export default function useFormInputHandler(form: Form, id: string) {
 
   // stable updater passed into the Form - receives the full InputState
   const change = useCallback((newState: FormFieldUpdate<KeyofInputTypes>) => {
-    setField((prev) => ({ ...(prev ?? {}), ...newState }));
-  }, []);
+    setField((prev) => {
+      const nextField = { ...(prev ?? {}), ...newState };
+      form.addField({ id, ...nextField, changeState: change });
+      return nextField;
+    });
+  }, [form, id]);
 
   useEffect(() => {
     setField(form.getField(id) ?? null);

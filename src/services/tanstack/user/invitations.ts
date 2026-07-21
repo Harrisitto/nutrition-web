@@ -1,10 +1,10 @@
 import { supabase } from "@src/services/supabase/client"
 import { TABLE_ALL_USERS, TABLE_USER_INVITATIONS } from "@src/services/supabase/definitions"
-import { useAuth } from "@src/store/slices/auth/hook"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { useEffect, useState } from "react"
 import { queryKeys } from "../keys"
 import { queryClient } from "../queryClient"
+import { useAppSelector } from "@src/store/store"
 
 //type AvailableClient = NonNullable<ReturnType<typeof useFetchAvailableClients>["data"]>[number]
 
@@ -17,7 +17,7 @@ export const useFetchAvailableClients = ({
     pageSize?: number;
 }) => {
 
-    const nutriId = useAuth().user?.id;
+    const nutriId = useAppSelector((state) => state.auth.user?.id);
     const [debouncedInvitationCode, setDebouncedInvitationCode] = useState(invitationCode ?? "");
 
     useEffect(() => {
@@ -48,7 +48,7 @@ export const useFetchAvailableClients = ({
 }
 
 export const useFetchInvitedClients = () => {
-    const nutriId = useAuth().user?.id;
+    const nutriId = useAppSelector((state) => state.auth.user?.id);
 
     return useQuery({
         queryKey: queryKeys({ userId: nutriId }).user.invitations("all"),
@@ -67,7 +67,7 @@ export const useFetchInvitedClients = () => {
 }
 
 export const useMutateUserInvitations = () => {
-    const nutriId = useAuth().user?.id;
+    const nutriId = useAppSelector((state) => state.auth.user?.id);
 
     return useMutation({
         mutationKey: queryKeys({ userId: nutriId }).user.invitationsBase,
@@ -98,7 +98,7 @@ export const useMutateUserInvitations = () => {
 }
 
 export const useDeleteUserInvitation = () => {
-    const nutriId = useAuth().user?.id;
+    const nutriId = useAppSelector((state) => state.auth.user?.id);
 
     return useMutation({
         mutationKey: queryKeys({ userId: nutriId }).user.invitationsBase,

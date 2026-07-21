@@ -2,7 +2,6 @@ import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import type { User, Session } from '@supabase/supabase-js'
 import { signIn } from './thunks/signIn'
-import { signUp } from './thunks/signUp'
 import { signOut } from './thunks/signOut'
 import { fetchSession } from './thunks/fetchSession'
 import type { Database } from '@src/services/supabase/types'
@@ -13,7 +12,6 @@ export interface AuthState {
   session: Session | null
   loading: boolean
   error: string | null
-  isAuthenticated: boolean
   profile: Database['public']['Tables']['all_nutritionist']['Row'] | null
 }
 
@@ -23,7 +21,6 @@ const initialState: AuthState = {
   session: null,
   loading: false,
   error: null,
-  isAuthenticated: false,
   profile: null,
 }
 
@@ -38,7 +35,6 @@ const authSlice = createSlice({
     setSession: (state, action: PayloadAction<{ user: User | null; session: Session | null }>) => {
       state.user = action.payload.user
       state.session = action.payload.session
-      state.isAuthenticated = !!action.payload.user?.email_confirmed_at
       state.loading = false
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
@@ -52,27 +48,6 @@ const authSlice = createSlice({
     }
   },
   extraReducers: (builder) => {
-    // Sign Up
-    builder
-      .addCase(signUp.pending, (state) => {
-        state.loading = true
-        state.error = null
-      })
-      .addCase(signUp.fulfilled, (state, action) => {
-        state.loading = false
-        state.user = action.payload.user
-        state.session = action.payload.session
-        state.isAuthenticated = !!action.payload.user?.email_confirmed_at
-        state.error = null
-      })
-      .addCase(signUp.rejected, (state, action) => {
-        state.loading = false
-        state.error = action.payload as string
-        state.user = null
-        state.session = null
-        state.isAuthenticated = false
-      })
-
     // Sign In
     builder
       .addCase(signIn.pending, (state) => {
@@ -83,7 +58,6 @@ const authSlice = createSlice({
         state.loading = false
         state.user = action.payload.user
         state.session = action.payload.session
-        state.isAuthenticated = !!action.payload.user
         state.error = null
       })
       .addCase(signIn.rejected, (state, action) => {
@@ -91,7 +65,6 @@ const authSlice = createSlice({
         state.error = action.payload as string
         state.user = null
         state.session = null
-        state.isAuthenticated = false
       })
 
     // Sign Out
@@ -104,7 +77,6 @@ const authSlice = createSlice({
         state.loading = false
         state.user = null
         state.session = null
-        state.isAuthenticated = false
         state.error = null
       })
       .addCase(signOut.rejected, (state, action) => {
@@ -122,7 +94,6 @@ const authSlice = createSlice({
         state.loading = false
         state.user = action.payload.user
         state.session = action.payload.session
-        state.isAuthenticated = !!action.payload.user
         state.error = null
       })
       .addCase(fetchSession.rejected, (state, action) => {
@@ -130,9 +101,8 @@ const authSlice = createSlice({
         state.error = action.payload as string
         state.user = null
         state.session = null
-        state.isAuthenticated = false
       })
-    
+
     builder
       .addCase(fetchProfile.pending, (state) => {
         state.loading = true
@@ -156,7 +126,6 @@ export const { clearError, setSession, setLoading, clearData, setProfile } = aut
 
 // Export async thunks
 export {
-  signUp,
   signIn,
   signOut,
   fetchSession,

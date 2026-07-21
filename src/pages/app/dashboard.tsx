@@ -1,5 +1,6 @@
 import IdxConfiguration from "@src/components/configuration";
 import { AppDashboard, IdxDashboard } from "@src/components/dashboard";
+import { AnimationLoading } from "@src/components/global/Animations";
 import { fromDate } from "@src/helpers/dates";
 import { useFetchNutritionistUsers } from "@src/services/tanstack/user/profile";
 import { useConfigSelectedDay } from "@src/store/slices/config/hook";
@@ -11,7 +12,11 @@ export default function PageDashboard() {
     : fromDate().nextMonday();
   const allClients = useFetchNutritionistUsers();
 
-  if (allClients.data?.length === 0) {
+  if (allClients.isLoading) {
+    return <AnimationLoading />;
+  }
+
+  if (allClients.data?.length === 0 && allClients.isLoading === false) {
     return (
       <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2">
         <IdxConfiguration.AuthManagement.ManageAuthState />
@@ -31,9 +36,7 @@ export default function PageDashboard() {
           <div className="flex flex-col gap-2">
             <IdxDashboard.Text.Titles.Navigation />
             <IdxDashboard.Buttons.NavigateUserPreset />
-
             <IdxDashboard.Buttons.NavigateMeasures />
-
             <IdxDashboard.Buttons.NavigateConfig />
           </div>
           <div>

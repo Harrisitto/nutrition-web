@@ -1,15 +1,13 @@
 import useForm from "@src/hooks/form";
-import { ValidateEmail, ValidateMinLength, ValidateStringRequired } from "@src/hooks/form/service/validate";
+import { ValidateEmail, ValidateMaxLength, ValidateStringRequired } from "@src/hooks/form/service/validate";
 import type { InputState } from "@src/hooks/form/types";
 
 const idEmail = 'email';
-const idPassword = 'password';
-const idConfirmPassword = 'confirmPassword';
+const idToken = 'token';
 
 export const fieldIds = {
     email: idEmail,
-    password: idPassword,
-    confirmPassword: idConfirmPassword,
+    token: idToken
 }
 
 const config = [
@@ -19,44 +17,23 @@ const config = [
         currentValue: '',
         validation: [ValidateEmail, ValidateStringRequired],
         inputProps: {
-            label: 'auth:form.email',
-            type: 'email',
+          label: 'auth:form.email',
+          type: 'email',
         }
     } as InputState<'text'>,
     {
-        id: idPassword,
+        id: idToken,
         type: 'text',
         currentValue: '',
-        validation: [(value) => ValidateMinLength(value as string, 6), ValidateStringRequired],
+        validation: [(text: string) => ValidateMaxLength(text, 6)],
         inputProps: {
-            label: 'auth:form.password',
-            type: 'password'
-        }
-    } as InputState<'text'>,
-    {
-        id: idConfirmPassword,
-        type: 'text',
-        validation: [(value) => ValidateMinLength(value as string, 6), ValidateStringRequired],
-        inputProps: {
-            label: 'auth:form.confirmPassword',
-            type: 'password'
+          label: 'auth:form.token',
+          type: 'text',
+          className: '',
+          maxLength: 6,
+          
         },
-        currentValue: '',
-        controllers: [
-            {
-                subscribedIds: [idPassword, idConfirmPassword],
-                update: (password: InputState<'text'>, confirm: InputState<'text'>): InputState<'text'>[] => {
-
-                    if (password.currentValue !== confirm.currentValue) {
-                        confirm.errorMsg = 'auth:form.passwordsDoNotMatch';
-                        return [confirm];
-                    }
-
-                    confirm.errorMsg = undefined;
-                    return [confirm];
-                }
-            }
-        ]
+        isHidden: true
     } as InputState<'text'>,
 ]
 

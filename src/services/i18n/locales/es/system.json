@@ -1,6 +1,8 @@
 {
     "messages": {
         "submit": "Enviar",
+        "submitToken": "Enviar Codigo",
+        "validate": "Validar",
         "cancel": "Cancelar",
         "loading": "Cargando...",
         "error": "Ocurrio un error. Intentalo de nuevo.",

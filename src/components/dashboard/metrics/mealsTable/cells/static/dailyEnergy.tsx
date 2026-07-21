@@ -61,10 +61,12 @@ export const DailyEnergyBalance = () => {
       return acc;
     }, 0);
 
+    const loadedDays = planing.kcalState.filter((day) => day.total > 0).length;
+
     return {
-      balance: weekTotal - (7 - planing.kcalState.length) * (planing.bmr ?? 0),
+      balance: weekTotal - (7 - loadedDays) * (planing.bmr ?? 0),
     };
-  }, [planing.kcalState]);
+  }, [planing.bmr, planing.kcalState]);
 
   const baseBalanceCellClass =
     "border p-3 text-center transition-colors h-full flex items-center justify-center font-semibold tabular-nums";

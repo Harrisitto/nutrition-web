@@ -3,25 +3,41 @@ import { supabase } from "@src/services/supabase/client";
 
 interface SignInCredentials {
     email: string;
-    password: string;
+    token: string;
+}
+
+interface UserMetadata {
+  isNutritionist: boolean;
+  isClient: boolean;
 }
 
 export const signIn = createAsyncThunk(
     'auth/signIn',
-    async ({ email, password }: SignInCredentials, { rejectWithValue }) => {
+    async ({ email, token }: SignInCredentials, { rejectWithValue }) => {
         try {
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email,
-                password,
-            });
+          const { data, error } = await supabase.auth.verifyOtp({
+            email,
+            token,
+            type: 'email'
+            })
 
             if (error) {
-                return rejectWithValue(error.message);
+              return rejectWithValue(error.message);
             }
 
-            return {
-                user: data.user,
-                session: data.session,
+          if (!data.user) {
+            return rejectWithValue('User not found');
+          }
+
+          const { isClient } = data.user.user_metadata as UserMetadata;
+
+          if (isClient) {
+            return rejectWithValue('Client users are not allowed to sign in');
+          }
+
+          return {
+              user: data.user,
+              session: data.session,
             };
         } catch (error) {
             return rejectWithValue(

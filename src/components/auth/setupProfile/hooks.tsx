@@ -1,21 +1,15 @@
 import useAppNavigation from "@src/hooks/navigation"
 import { APP_ROUTES } from "@src/hooks/navigation/routes"
-import { useAuth } from "@src/store/slices/auth/hook"
 import { useEffect } from "react"
+import { useAppSelector } from "@src/store/store"
 
 export const useRedirect = () => {
     const { navigateTo } = useAppNavigation()
-    const { profile, isAuthenticated } = useAuth()
+    const { profile } = useAppSelector((state) => state.auth)
 
     useEffect(() => {
         if (profile) {
             navigateTo(APP_ROUTES.DASHBOARD)
         }
     }, [profile, navigateTo])
-
-    useEffect(() => {
-        if (!isAuthenticated) {
-            navigateTo(APP_ROUTES.LOGIN)
-        }
-    }, [isAuthenticated, navigateTo])
 }

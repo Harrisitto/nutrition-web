@@ -88,7 +88,7 @@ export class Form {
      * @param newState New state to overRide
      * @returns void
      */
-    private updateField(
+    updateField(
         id: string,
         newState: Partial<InputState<KeyofInputTypes>>
     ) {

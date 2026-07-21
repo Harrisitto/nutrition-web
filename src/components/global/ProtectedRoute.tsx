@@ -1,8 +1,8 @@
-import { useAuth } from '../../store/slices/auth/hook'
 import { APP_ROUTES } from '@src/hooks/navigation/routes'
 import { useEffect } from 'react'
 import useAppNavigation from '@src/hooks/navigation'
 import { useConfigSelectedUserId } from '@src/store/slices/config/hook'
+import { useAppSelector } from '../../store/store'
 
 interface ProtectedRouteProps {
   children: React.ReactNode
@@ -16,25 +16,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   const {
     loading,
-    isAuthenticated,
     profile
-  } = useAuth();
+  } = useAppSelector((state) => state.auth)
 
   const selectedUserId = useConfigSelectedUserId();
-
   const { navigateTo } = useAppNavigation();
-
-  useEffect(() => {
-    if (loading) return; // Don't do anything while loading
-    const timer = setTimeout(() => {
-      if (!isAuthenticated) {
-        navigateTo(APP_ROUTES.LOGIN);
-      } else if (!profile) {
-        navigateTo(APP_ROUTES.COMPLETE_PROFILE);
-      }
-    }, 500); // Debounce 500ms - navigation only happens if state stabilizes
-    return () => clearTimeout(timer);
-  }, [loading, isAuthenticated, profile])
 
   useEffect(() => {
     if (loading) return;
@@ -44,7 +30,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     }
   }, [loading, selectedUserId, selectedUserRequired])
 
-  if (loading || !isAuthenticated || !profile) {
+  if (loading || !profile) {
     // While loading or if not authenticated or profile incomplete or not a nutritionist, render nothing (or a loader)
     return null;
   }

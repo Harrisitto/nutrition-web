@@ -1,14 +1,14 @@
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { fieldIds, useFormSetupContext } from "./form";
-import { useAuthId } from "@src/store/slices/auth/hook";
 import { useInsertUserInfo } from "@src/services/tanstack/user/info";
 import useAppNavigation from "@src/hooks/navigation";
 import { APP_ROUTES } from "@src/hooks/navigation/routes";
+import { useAppSelector } from "../../../store/store";
 
 export const ConfirmSetup = () => {
   const { t } = useTranslation();
-  const userId = useAuthId();
+  const userId = useAppSelector((state) => state.auth.user?.id ?? "");
   const { setupForm } = useFormSetupContext();
   const {
     mutateAsync: insertInfo,

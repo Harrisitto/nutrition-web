@@ -16,7 +16,8 @@ export const fetchProfile = createAsyncThunk(
                 .from(TABLE_ALL_NUTRITIONISTS.NAME)
                 .select("*")
                 .eq(TABLE_ALL_NUTRITIONISTS.COLS.USER_ID, user.user.id)
-                .single();
+                .limit(1)
+                .maybeSingle();
 
             if (errProfile) {
                 return rejectWithValue(errProfile.message);

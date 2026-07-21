@@ -1,6 +1,8 @@
 {
     "messages": {
         "submit": "Submit",
+        "submitToken": "Submit Token",
+        "validate": "Validate",
         "cancel": "Cancel",
         "loading": "Loading...",
         "error": "An error occurred. Please try again.",
