@@ -1,7 +1,7 @@
 import { IdxSetUpProfile } from "@src/components/auth/setUpProfileIndex";
 
 const PageSetupProfile = () => {
-    IdxSetUpProfile.Hooks.useRedirect()
+  IdxSetUpProfile.Hooks.useRedirect()
   return (
     <IdxSetUpProfile.Provider>
       <div className="min-h-screen flex items-center justify-center bg-gray-100">

@@ -1,12 +1,14 @@
 import IdxConfiguration from "@src/components/configuration";
 import { AppDashboard, IdxDashboard } from "@src/components/dashboard";
 import { AnimationLoading } from "@src/components/global/Animations";
-import { fromDate } from "@src/helpers/dates";
+import { fromDate, loadDate } from "@src/helpers/dates";
 import { useFetchNutritionistUsers } from "@src/services/tanstack/user/profile";
-import { useConfigSelectedDay } from "@src/store/slices/config/hook";
+import { useAppSelector } from "@src/store/store";
 
 export default function PageDashboard() {
-  const date = useConfigSelectedDay();
+  const d = useAppSelector((state) => state.config.selectedDay);
+  const date = loadDate(d ?? '')
+
   const thisDateMonday = date
     ? fromDate(date).thisMonday()
     : fromDate().nextMonday();
@@ -35,6 +37,7 @@ export default function PageDashboard() {
           <IdxDashboard.Dates.SelectDateHeader />
           <div className="flex flex-col gap-2">
             <IdxDashboard.Text.Titles.Navigation />
+            <IdxDashboard.Buttons.NavigateInfo />
             <IdxDashboard.Buttons.NavigateUserPreset />
             <IdxDashboard.Buttons.NavigateMeasures />
             <IdxDashboard.Buttons.NavigateConfig />

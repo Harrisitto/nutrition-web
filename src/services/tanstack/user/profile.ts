@@ -4,10 +4,9 @@ import { supabase } from '@src/services/supabase/client'
 import type { Database } from '@src/services/supabase/types'
 import { TABLE_ALL_NUTRITIONISTS, TABLE_ALL_USERS, TABLE_USER_PLANING, TABLE_USER_PLANING_MEAL } from '@src/services/supabase/definitions'
 import { useAppDispatch, useAppSelector } from '@src/store/store'
-import { setProfile } from '@src/store/slices/auth/store'
-import { useConfigSelectedUserId } from '@src/store/slices/config/hook'
 import { queryKeys } from '../keys'
 import { queryClient } from '../queryClient'
+import { useGetAuthSession } from '../auth/get'
 
 type UserWithInfo = Database['public']['Tables']['all_users']['Row']
 
@@ -21,49 +20,12 @@ const selectUser = () => {
   ` as const;
 }
 
-/**
- * Hook to insert a new user into the database
- */
-export const useInsertProfile = () => {
-  const { addMutationError } = useNotification();
-  const { user } = useAppSelector((state) => state.auth)
-  const dispatch = useAppDispatch()
-  const mutation = useMutation({
-    mutationFn: async ({
-        name,
-    }: {
-        name: string
-    }) => {
-      if (!user) throw new Error('No authenticated user found')
-      const { data, error } = await supabase
-        .from(TABLE_ALL_NUTRITIONISTS.NAME)
-        .insert({
-            nutri_id: user.id,
-            name,
-        })
-        .select()
-        .single()
-
-      if (error) throw error
-      return data
-    },
-    onSuccess: (data) => {
-      dispatch(setProfile(data));
-    },
-    onError: () => {
-      addMutationError();
-    },
-  })
-
-  return mutation
-}
-
 export const useFetchSingleUser = ({
     userId
 }: {
     userId?: string
 } = {}) => {
-    const selectedUser = useConfigSelectedUserId();
+    const selectedUser = useAppSelector((state) => state.config.selectedUserId);
     const effectiveUserId = userId ?? selectedUser ?? "";
     return useQuery({
         queryKey: queryKeys({
@@ -83,8 +45,9 @@ export const useFetchSingleUser = ({
 }
 
 export const useFetchNutritionistUsers = () => {
-  const userId = useAppSelector((state) => state.auth.user?.id);
-    const err = useNotificationErrorQuery()
+  const { data: authData } = useGetAuthSession()
+  const userId = authData?.userId
+  const err = useNotificationErrorQuery()
 
     return useQuery({
         queryKey: queryKeys({
@@ -114,8 +77,9 @@ export const useFetchNutritionistUsers = () => {
 }
 
 export const useUpdateClientGoal = () => {
-  const clientId = useConfigSelectedUserId();
-    const nutritionistId = useAppSelector((state) => state.auth.user?.id);
+  const clientId = useAppSelector((state) => state.config.selectedUserId);
+  const { data: authData } = useGetAuthSession()
+  const nutritionistId = authData?.userId
 
   return useMutation({
     mutationFn: async (goal: string) => {
@@ -160,8 +124,9 @@ export const useUpdateClientGoal = () => {
 }
 
 export const useRemoveClient = () => {
-  const clientId = useConfigSelectedUserId();
-  const nutritionistId = useAppSelector((state) => state.auth.user?.id);
+  const clientId = useAppSelector((state) => state.config.selectedUserId);
+  const { data: authData } = useGetAuthSession()
+  const nutritionistId = authData?.userId
   const { addMutationError } = useNotification();
 
   return useMutation({

@@ -1,10 +1,10 @@
 import { supabase } from "@src/services/supabase/client";
 import { queryKeys } from "../keys";
 import { TABLE_USER_PRESET, TABLE_USER_PRESET_MEAL } from "@src/services/supabase/definitions";
-import { useConfigSelectedUserId } from "@src/store/slices/config/hook";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLanguageCode } from "@src/hooks/helpers/language";
 import { queryClient } from "../queryClient";
+import { useAppSelector } from "@src/store/store";
 
 type Preset = NonNullable<ReturnType<typeof useFetchPresets>["data"]>[number];
 
@@ -54,7 +54,7 @@ const removePresetFromList = (
 }
 
 export const useFetchPresets = () => {
-    const userId = useConfigSelectedUserId();
+    const userId = useAppSelector((state) => state.config.selectedUserId);
     const languageCode = useLanguageCode();
 
     return useQuery({
@@ -75,7 +75,7 @@ export const useFetchPresets = () => {
 }
 
 export const useInsertPreset = () => {
-    const userId = useConfigSelectedUserId();
+    const userId = useAppSelector((state) => state.config.selectedUserId);
     const languageCode = useLanguageCode();
 
     return useMutation({
@@ -137,7 +137,7 @@ export const useInsertPreset = () => {
 }
 
 export const useDeletePreset = () => {
-    const userId = useConfigSelectedUserId();
+    const userId = useAppSelector((state) => state.config.selectedUserId);
 
     return useMutation({
         mutationFn: async (presetId: number) => {
@@ -147,7 +147,7 @@ export const useDeletePreset = () => {
                 .delete()
                 .eq(TABLE_USER_PRESET.COLS.ID, presetId)
                 .eq(TABLE_USER_PRESET.COLS.USER_ID, userId);
-            
+
             if (error) throw error;
             return presetId;
         },
@@ -157,5 +157,3 @@ export const useDeletePreset = () => {
         }
     })
 }
-
-

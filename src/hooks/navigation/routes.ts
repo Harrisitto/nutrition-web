@@ -1,10 +1,8 @@
 export const APP_ROUTES = {
   // Public routes
   HOME: '/',
-  LOGIN: '/log-in',
+  INFO: '/info',
   SIGN_UP: '/sign-up',
-  EMAIL_VERIFICATION: '/verify-email',
-  FORGOT_PASSWORD: '/forgot-password',
   PRIVACY_POLICY: '/privacy-policy',
   REFERENCES: '/references',
 
@@ -15,7 +13,7 @@ export const APP_ROUTES = {
   FORM_PRESET: '/form-preset',
   FORM_MEASURE: '/form-measure',
 
-  
+
   // Error routes
   NOT_FOUND: '/404',
 } as const

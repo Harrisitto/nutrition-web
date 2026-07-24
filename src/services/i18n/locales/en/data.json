@@ -43,7 +43,8 @@
             "header": "Navigate to",
             "presets": "Presets",
             "measures": "Measures",
-            "config": "Nutritionist configuration"
+            "config": "Nutritionist configuration",
+            "info": "See app info"
         },
         "actions": {
             "cloneWeek": "Clone last week",
@@ -184,5 +185,5 @@
         "proteinPerKg": "Protein per kg",
         "fatsPerKg": "Fats per kg"
     }
-    
+
 }

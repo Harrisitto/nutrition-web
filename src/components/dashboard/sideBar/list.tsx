@@ -1,12 +1,10 @@
 import { AnimationLoading } from "@src/components/global/Animations";
 import { useEffect, useMemo, useState } from "react";
-import {
-  useConfigSelectedUserId,
-  useConfigSetSelectedUserId,
-  useConfigSidebarOpen,
-} from "@src/store/slices/config/hook";
 import { useFetchNutritionistUsers } from "@src/services/tanstack/user/profile";
 import { RefreshCcwIcon, SearchIcon } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "@src/store/store";
+import { setSelectedUserId } from "@src/store/slices/config/store";
+
 
 const checkUpcomingMeals = (planingDateStr: string | undefined): boolean => {
   if (!planingDateStr) return false;
@@ -51,9 +49,13 @@ const SingleClient = ({
   idx: number;
   hasNextWeek: boolean;
 }) => {
-  const selectedUser = useConfigSelectedUserId();
-  const setSelectedUser = useConfigSetSelectedUserId();
-  const sidebarOpen = useConfigSidebarOpen();
+  const selectedUser = useAppSelector((state) => state.config.selectedUserId);
+  const sidebarOpen = useAppSelector((state) => state.config.sidebarOpen);
+  const dispatch = useAppDispatch();
+  const setSelectedUser = (id: string) => {
+    dispatch(setSelectedUserId(id));
+  };
+
 
   useEffect(() => {
     if (idx === 0 && id && !selectedUser) {
@@ -99,7 +101,7 @@ const SingleClient = ({
 export const List = () => {
   const [search, setSearch] = useState("");
   const users = useFetchNutritionistUsers();
-  const sidebarOpen = useConfigSidebarOpen();
+  const sidebarOpen = useAppSelector((state) => state.config.sidebarOpen);
 
   const displayUsers = useMemo(() => {
     if (!users.data) return [];
@@ -152,14 +154,10 @@ export const List = () => {
       <div className="flex flex-col gap-1 w-full">
         {displayUsers.map((user, index) => {
           if (!user) return null;
-
           // Extraemos la última fecha de planificación que trajo tu query de Supabase
           const latestDate = user.user_planing?.[0]?.date;
-
           // Evaluamos si tiene comidas programadas para de aquí a 5 días en adelante
           const hasUpcomingMeals = checkUpcomingMeals(latestDate);
-          console.log(latestDate, user.user_planing, hasUpcomingMeals);
-
           return (
             <SingleClient
               key={user.user_id}

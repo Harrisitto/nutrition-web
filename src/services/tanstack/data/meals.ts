@@ -80,9 +80,6 @@ export const useFetchOrderedMealsForId = ({
       countMap.set(key, currentCount + 1);
     }
 
-    console.log("Conteos reales cargados:", Array.from(countMap.entries()).map(([key, value]) => `${key.toString()}: ${value}`));
-    console.log(countMap.values());
-
     return [...types].sort((a, b) => {
       const countA = countMap.get(a.id) ?? 0;
       const countB = countMap.get(b.id) ?? 0;

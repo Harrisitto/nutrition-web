@@ -4,27 +4,28 @@ import { APP_ROUTES } from './routes'
 import type { AppRoute } from './routes'
 import { DEFAULT_ROUTE_METADATA, ROUTE_METADATA } from './metadata'
 import { addRouteToStack } from '@src/store/slices/error/store'
-import { useAppDispatch, useAppSelector } from '@src/store/store'
+import { useAppDispatch } from '@src/store/store'
 import useSearchParams from './search_params'
+import { useGetAuthSession } from '@src/services/tanstack/auth/get'
 
 export default function useAppNavigation() {
     const navigate = useNavigate();
     const location = useLocation();
     const dispatch = useAppDispatch();
     const searchParams = useSearchParams();
-    const user = useAppSelector((state) => state.auth.user);
+    const { data: session } = useGetAuthSession();
 
     const navigateTo = useCallback((route: AppRoute, options?: { replace?: boolean; state?: unknown }) => {
         const routeMetadata = ROUTE_METADATA[route] || DEFAULT_ROUTE_METADATA;
         let routeState: Record<string, unknown> = {};
         let finalRoute: AppRoute = route;
 
-        if (routeMetadata.isProtected && !user) {
+        if (routeMetadata.isProtected && !session?.session) {
             routeState = {
                 from: route,
                 message: 'Please sign in to access this page'
             };
-            finalRoute = APP_ROUTES.LOGIN;
+            finalRoute = APP_ROUTES.HOME;
         }
         dispatch(addRouteToStack(finalRoute));
         const extraState = options?.state && typeof options.state === 'object'
@@ -35,7 +36,7 @@ export default function useAppNavigation() {
             replace: options?.replace,
             state: { ...routeState, ...extraState }
         })
-    }, [dispatch, user, navigate]);
+    }, [dispatch, session, navigate]);
 
     const goBack = useCallback(() => {
         if (window.history.length > 1) {

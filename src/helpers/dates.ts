@@ -11,9 +11,10 @@ export const saveDate = (date: Date) => {
     return date.toLocaleDateString('en-CA'); // Format: YYYY-MM-DD
 }
 
-export const loadDate = (dateString: string) => {
+export const loadDate = (dateString: string | null) => {
+    if (!dateString) return new Date();
     const [year, month, day] = dateString.split('-').map(Number);
-    return new Date(year, month - 1, day);  
+    return new Date(year, month - 1, day);
 };
 
 export const nextDayDate = (date: Date | string) => {

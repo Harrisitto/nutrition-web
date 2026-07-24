@@ -3,8 +3,7 @@ import { APP_ROUTES } from "@src/hooks/navigation/routes";
 import { ActivityIcon, CogIcon, ForkKnifeCrossedIcon } from "lucide-react";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
-
-
+import { HomeIcon } from "lucide-react";
 
 type NavigateButtonProps = {
     label: string;
@@ -74,6 +73,23 @@ export const NavigateConfig = () => {
             onClick={handleClick}
             label={t("data:dashboardTable.navigation.config")}
             icon={<CogIcon className="h-3.5 w-3.5" />}
+        />
+    );
+};
+
+export const NavigateInfo = () => {
+    const navigate = useAppNavigation();
+    const { t } = useTranslation();
+
+    const handleClick = useCallback(() => {
+        navigate.navigateTo(APP_ROUTES.INFO);
+    }, [navigate]);
+
+    return (
+        <NavigateButton
+            onClick={handleClick}
+            label={t("data:dashboardTable.navigation.info")}
+            icon={<HomeIcon className="h-3.5 w-3.5" />}
         />
     );
 };

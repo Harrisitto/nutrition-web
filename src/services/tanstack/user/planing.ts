@@ -1,7 +1,3 @@
-import {
-  useConfigSelectedDay,
-  useConfigSelectedUserId,
-} from "@src/store/slices/config/hook";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryKeys } from "../keys";
 import { supabase } from "@src/services/supabase/client";
@@ -9,10 +5,13 @@ import {
   TABLE_USER_PLANING,
   TABLE_USER_PLANING_MEAL,
 } from "@src/services/supabase/definitions";
-import { fromDate, saveDate } from "@src/helpers/dates";
+import { fromDate, loadDate, saveDate } from "@src/helpers/dates";
 import { useLanguageCode } from "@src/hooks/helpers/language";
 import { queryClient } from "../queryClient";
 import { useNotification } from "@src/store/slices/notification/hook";
+import { useAppSelector } from "@src/store/store";
+import { useEffect } from "react";
+
 
 const selectFromMeal = (languageCode: ReturnType<typeof useLanguageCode>) => {
   return `*,
@@ -120,17 +119,15 @@ export const useFetchPlanning = ({
   forDate?: Date;
   rangeInWeeks?: number;
 } = {}) => {
-  const savedDate = useConfigSelectedDay();
-  const user = useConfigSelectedUserId();
+  const savedDate = useAppSelector((state) => state.config.selectedDay);
+  const user = useAppSelector((state) => state.config.selectedUserId);
   const languageCode = useLanguageCode();
 
-  const paramStartDate = forDate || savedDate || new Date();
+  const paramStartDate = forDate || loadDate(savedDate);
   const effectiveStartDate = saveDate(fromDate(paramStartDate).thisMonday());
   const effectiveEndDate = saveDate(
     fromDate(fromDate(paramStartDate).incrementDay(rangeInWeeks * 7)).thisSunday(),
   );
-
-  console.log(effectiveEndDate, effectiveStartDate)
 
   return useQuery({
     queryKey: queryKeys({
@@ -149,7 +146,7 @@ export const useFetchPlanning = ({
 };
 
 export const useInsertPlaning = () => {
-  const userId = useConfigSelectedUserId();
+  const userId = useAppSelector((state) => state.config.selectedUserId);
   const languageCode = useLanguageCode();
 
   const mutation = useMutation({
@@ -190,7 +187,7 @@ export const useInsertPlaning = () => {
 };
 
 export const useInsertPlaningWithMeals = () => {
-  const userId = useConfigSelectedUserId();
+  const userId = useAppSelector((state) => state.config.selectedUserId);
   const languageCode = useLanguageCode();
   const { addErrorIcon } = useNotification();
 
@@ -289,7 +286,7 @@ export const useInsertPlaningWithMeals = () => {
 };
 
 export const useInsertMeal = () => {
-  const userId = useConfigSelectedUserId();
+  const userId = useAppSelector((state) => state.config.selectedUserId);
   const { addErrorIcon } = useNotification();
   const languageCode = useLanguageCode();
 
@@ -392,7 +389,7 @@ export const useInsertMeal = () => {
 };
 
 export const useDeleteMeal = () => {
-  const userId = useConfigSelectedUserId();
+  const userId = useAppSelector((state) => state.config.selectedUserId);
   const languageCode = useLanguageCode();
   const { addErrorIcon } = useNotification();
 
@@ -442,7 +439,7 @@ export const useDeleteMeal = () => {
 };
 
 export const useDeletePlaning = () => {
-  const userId = useConfigSelectedUserId();
+  const userId = useAppSelector((state) => state.config.selectedUserId);
   const languageCode = useLanguageCode();
   const { addErrorIcon } = useNotification();
 
@@ -480,4 +477,47 @@ export const useDeletePlaning = () => {
   });
 
   return mutation;
+};
+
+export const usePrefetchPlaning = () => {
+
+  const selectedUserId = useAppSelector((state) => state.config.selectedUserId);
+  const languageCode = useLanguageCode();
+
+  // Prefetch current week plus nearby weeks for smoother dashboard navigation.
+  useEffect(() => {
+    if (!selectedUserId) return;
+    const today = fromDate(new Date());
+    const thisMonday = fromDate(today.thisMonday());
+    const thisSunday = fromDate(today.thisSunday());
+    const dateRanges = [
+      { start: thisMonday.incrementDay(0), end: thisSunday.incrementDay(0) }, // Current week
+      { start: thisMonday.incrementDay(-7), end: thisSunday.incrementDay(-7) }, // Previous week
+      { start: thisMonday.incrementDay(7), end: thisSunday.incrementDay(7) }, // Next week
+      { start: thisMonday.incrementDay(-14), end: thisSunday.incrementDay(-14) }, // Two weeks ago
+      { start: thisMonday.incrementDay(14), end: thisSunday.incrementDay(14) }, // Two weeks ahead
+      // { start: thisMonday.incrementDay(21), end: thisSunday.incrementDay(21) }, // Three weeks ahead
+      // { start: thisMonday.incrementDay(28), end: thisSunday.incrementDay(28) }, // Four weeks ahead
+    ];
+
+    void Promise.all(
+      dateRanges.map(({ start, end }) =>
+        queryClient.prefetchQuery({
+          queryKey: queryKeys({ userId: selectedUserId }).user.planing(
+            saveDate(start),
+            saveDate(end),
+          ),
+          queryFn: () =>
+            fetchPlanningWeek({
+              userId: selectedUserId,
+              languageCode,
+              dateRange: {
+                start: saveDate(start),
+                end: saveDate(end),
+              },
+            }),
+        }),
+      ),
+    );
+  }, [selectedUserId, languageCode]);
 };

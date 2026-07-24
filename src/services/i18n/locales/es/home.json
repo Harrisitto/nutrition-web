@@ -1,0 +1,91 @@
+{
+  "nav": {
+    "brand": "EzFood",
+    "features": "Ventajas",
+    "instagram": "Comunidad",
+    "pricing": "Precios",
+    "login": "Entrar",
+    "register": "Empieza Gratis"
+  },
+  "hero": {
+    "badge": "⚡ Una herramienta esencial para nutricionistas",
+    "title": "Simplifica la gestión de dietas y conecta con tus clientes",
+    "subtitle": "EzFood agiliza la creación y envío de planificaciones nutricionales para que ahorres tiempo y te concentres en lo que importa. Tus clientes tendrán su menú accesible en cualquier momento desde su teléfono.",
+    "cta_primary": "Probar Gratis 14 Días",
+    "cta_secondary": "Ver Demostración",
+    "nutritionist_benefit": "Planifica en minutos",
+    "client_benefit": "App móvil para tus pacientes"
+  },
+  "features": {
+    "badge": "Diseñado para ganar tiempo",
+    "title": "Todo lo que necesitas para escalar tu consulta nutricional",
+    "subtitle": "Elimina el caos de hojas de cálculo y mensajes dispersos. Un flujo de trabajo fluido para ti y fácil para tus usuarios.",
+    "item1_title": "Planificación Ultra-rápida",
+    "item1_desc": "Asigna y modifica planes de alimentación en cuestión de minutos gracias a nuestras plantillas inteligentes.",
+    "item2_title": "Siempre a mano en el móvil",
+    "item2_desc": "Los clientes consultan su dieta diaria al instante desde su smartphone, clara, limpia y bien organizada.",
+    "item3_title": "Más tiempo para tus clientes",
+    "item3_desc": "Automatiza la entrega de menús y dedicación de tiempo administrativo para ofrecer un seguimiento de mayor calidad."
+  },
+  "instagram": {
+    "badge": "Comunidad EzFood",
+    "title": "Síguenos en Instagram",
+    "subtitle": "Descubre consejos de nutrición, actualizaciones de la plataforma y casos de éxito de otros nutricionistas.",
+    "follow_btn": "Seguir a @ezfood.app",
+    "posts": [
+      {
+        "id": 1,
+        "title": "5 Consejos para aumentar la adherencia al menú semanal 🥗",
+        "date": "Hace 2 días",
+        "likes": "342 me gusta"
+      },
+      {
+        "id": 2,
+        "title": "Nueva funcionalidad: Ajustes rápidos en dietas personalizadas 🚀",
+        "date": "Hace 4 días",
+        "likes": "512 me gusta"
+      },
+      {
+        "id": 3,
+        "title": "¿Cómo ahorrar hasta 6 horas a la semana administrando pacientes? ⏱️",
+        "date": "Hace 1 semana",
+        "likes": "289 me gusta"
+      },
+      {
+        "id": 4,
+        "title": "Nutrición clínica vs. Nutrición deportiva en la app EzFood 📊",
+        "date": "Hace 2 semanas",
+        "likes": "415 me gusta"
+      }
+    ]
+  },
+  "pricing": {
+    "badge": "Integración con Stripe",
+    "title": "Planes transparentes para nutricionistas",
+    "subtitle": "Comienza con una prueba gratuita de 14 días. Sin permanencia, cancela cuando quieras.",
+    "billing_monthly": "Facturación Mensual",
+    "plan_starter_name": "Starter",
+    "plan_starter_price": "29€",
+    "plan_starter_desc": "Ideal para nutricionistas que están empezando su consulta.",
+    "plan_starter_f1": "Hasta 25 clientes activos",
+    "plan_starter_f2": "Planificaciones ilimitadas",
+    "plan_starter_f3": "Acceso a app móvil para clientes",
+    "plan_pro_name": "Profesional",
+    "plan_pro_price": "59€",
+    "plan_pro_popular": "Recomendado",
+    "plan_pro_desc": "Perfecto para consultas consolidadas con volumen de pacientes.",
+    "plan_pro_f1": "Hasta 80 clientes activos",
+    "plan_pro_f2": "Todas las características de Starter",
+    "plan_pro_f3": "Analítica de cumplimiento de menú",
+    "plan_pro_f4": "Soporte prioritario 24/7",
+    "plan_pro_f5": "Exportación PDF con tu marca",
+    "stripe_btn": "Suscribirse con Stripe",
+    "stripe_security": "Pago 100% seguro procesado por Stripe"
+  },
+  "footer": {
+    "desc": "EzFood impulsa el trabajo de los nutricionistas permitiendo enviar dietas al teléfono de sus pacientes en tiempo récord.",
+    "quick_links": "Enlaces Rápidos",
+    "social": "Redes Sociales",
+    "rights": "© 2026 EzFood. Todos los derechos reservados."
+  }
+}

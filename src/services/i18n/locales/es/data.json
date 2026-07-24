@@ -37,7 +37,8 @@
             "training": "Entrenamiento",
             "planing": "Planificacion",
             "event": "Evento",
-            "selectedWeek": "Semana seleccionada"
+            "selectedWeek": "Semana seleccionada",
+            "info": "Ver informacion de la app"
         },
         "navigation": {
             "header": "Ir a",

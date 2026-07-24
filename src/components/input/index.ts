@@ -9,7 +9,7 @@ const InputComponent = {
     Numeric,
     Date,
     Select: {
-        One,
+      One,
     },
 }
 

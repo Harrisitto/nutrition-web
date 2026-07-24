@@ -1,4 +1,5 @@
 import { saveDate } from "@src/helpers/dates";
+import { use } from "i18next";
 
 export const queryKeys = ({
     userId = '',
@@ -34,5 +35,9 @@ export const queryKeys = ({
         videos: ["data", "videos"],
         singleRecipe: (id: number) => ["data", "recipe", id, language],
         recipes: ["data", "recipes", language, searchStr],
-    }
+  },
+  auth: {
+    profile: ["auth", "profile", userId],
+    session: ["auth", "session"],
+  }
 });

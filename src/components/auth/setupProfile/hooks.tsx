@@ -1,15 +1,15 @@
 import useAppNavigation from "@src/hooks/navigation"
 import { APP_ROUTES } from "@src/hooks/navigation/routes"
 import { useEffect } from "react"
-import { useAppSelector } from "@src/store/store"
+import { useGetAuthInfo } from "@src/services/tanstack/auth/get"
 
 export const useRedirect = () => {
     const { navigateTo } = useAppNavigation()
-    const { profile } = useAppSelector((state) => state.auth)
+    const info = useGetAuthInfo()
 
     useEffect(() => {
-        if (profile) {
-            navigateTo(APP_ROUTES.DASHBOARD)
+        if (info.data?.name) {
+          navigateTo(APP_ROUTES.DASHBOARD)
         }
-    }, [profile, navigateTo])
+    }, [info.data, navigateTo])
 }

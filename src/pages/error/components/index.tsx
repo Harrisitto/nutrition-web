@@ -45,7 +45,7 @@ const ClearButton = ({ onClear }: { onClear: () => void }) => {
   );
 }
 
-export const ErrorComponents = {
+export {
   Title,
   ClearButton,
 }

@@ -4,7 +4,7 @@ import { useMutation, useQuery } from "@tanstack/react-query"
 import { useEffect, useState } from "react"
 import { queryKeys } from "../keys"
 import { queryClient } from "../queryClient"
-import { useAppSelector } from "@src/store/store"
+import { useGetAuthSession } from "../auth/get"
 
 //type AvailableClient = NonNullable<ReturnType<typeof useFetchAvailableClients>["data"]>[number]
 
@@ -17,7 +17,8 @@ export const useFetchAvailableClients = ({
     pageSize?: number;
 }) => {
 
-    const nutriId = useAppSelector((state) => state.auth.user?.id);
+    const { data: session } = useGetAuthSession()
+    const userId = session?.userId
     const [debouncedInvitationCode, setDebouncedInvitationCode] = useState(invitationCode ?? "");
 
     useEffect(() => {
@@ -31,9 +32,9 @@ export const useFetchAvailableClients = ({
     }, [invitationCode]);
 
     return useQuery({
-        queryKey: queryKeys({ userId: nutriId }).user.invitations(debouncedInvitationCode),
+        queryKey: queryKeys({ userId }).user.invitations(debouncedInvitationCode),
         queryFn: async () => {
-            if (!nutriId) throw new Error("No authenticated user found");
+            if (!userId) throw new Error("No authenticated user found");
             const { data, error } = await supabase
                 .from(TABLE_ALL_USERS.NAME)
                 .select()
@@ -48,16 +49,17 @@ export const useFetchAvailableClients = ({
 }
 
 export const useFetchInvitedClients = () => {
-    const nutriId = useAppSelector((state) => state.auth.user?.id);
+    const { data: session } = useGetAuthSession()
+    const userId = session?.userId
 
     return useQuery({
-        queryKey: queryKeys({ userId: nutriId }).user.invitations("all"),
+        queryKey: queryKeys({ userId }).user.invitations("all"),
         queryFn: async () => {
-            if (!nutriId) throw new Error("No authenticated user found");
+            if (!userId) throw new Error("No authenticated user found");
             const { data, error } = await supabase
                 .from(TABLE_USER_INVITATIONS.NAME)
                 .select()
-                .eq(TABLE_USER_INVITATIONS.COLS.NUTRI_ID, nutriId)
+                .eq(TABLE_USER_INVITATIONS.COLS.NUTRI_ID, userId)
                 .order(TABLE_USER_INVITATIONS.COLS.CREATED_AT, { ascending: false })
 
             if (error) throw error
@@ -67,19 +69,20 @@ export const useFetchInvitedClients = () => {
 }
 
 export const useMutateUserInvitations = () => {
-    const nutriId = useAppSelector((state) => state.auth.user?.id);
+    const { data } = useGetAuthSession()
+    const userId = data?.userId;
 
     return useMutation({
-        mutationKey: queryKeys({ userId: nutriId }).user.invitationsBase,
+        mutationKey: queryKeys({ userId }).user.invitationsBase,
         mutationFn: async ({ clientId, message }: {
             clientId: string;
             message: string;
         }) => {
-            if (!nutriId) throw new Error("No authenticated user found");
+            if (!userId) throw new Error("No authenticated user found");
             const { data, error } = await supabase
                 .from(TABLE_USER_INVITATIONS.NAME)
                 .insert({
-                    nutri_id: nutriId,
+                    nutri_id: userId,
                     client_id: clientId,
                     message,
                 })
@@ -91,30 +94,31 @@ export const useMutateUserInvitations = () => {
         },
         onSuccess: async () => {
             await queryClient.invalidateQueries({
-                queryKey: queryKeys({ userId: nutriId }).user.invitationsBase,
+                queryKey: queryKeys({ userId }).user.invitationsBase,
             });
         }
     })
 }
 
 export const useDeleteUserInvitation = () => {
-    const nutriId = useAppSelector((state) => state.auth.user?.id);
+    const { data } = useGetAuthSession()
+    const userId = data?.userId;
 
     return useMutation({
-        mutationKey: queryKeys({ userId: nutriId }).user.invitationsBase,
+        mutationKey: queryKeys({ userId }).user.invitationsBase,
         mutationFn: async (clientId: string) => {
-            if (!nutriId) throw new Error("No authenticated user found");
+            if (!userId) throw new Error("No authenticated user found");
             const { error } = await supabase
                 .from(TABLE_USER_INVITATIONS.NAME)
                 .delete()
-                .eq(TABLE_USER_INVITATIONS.COLS.NUTRI_ID, nutriId)
+                .eq(TABLE_USER_INVITATIONS.COLS.NUTRI_ID, userId)
                 .eq(TABLE_USER_INVITATIONS.COLS.CLIENT_ID, clientId)
 
             if (error) throw error
         },
         onSuccess: async () => {
             await queryClient.invalidateQueries({
-                queryKey: queryKeys({ userId: nutriId }).user.invitationsBase,
+                queryKey: queryKeys({ userId }).user.invitationsBase,
             });
         }
     })

@@ -1,19 +1,20 @@
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { fieldIds, useFormSetupContext } from "./form";
-import { useInsertUserInfo } from "@src/services/tanstack/user/info";
 import useAppNavigation from "@src/hooks/navigation";
 import { APP_ROUTES } from "@src/hooks/navigation/routes";
-import { useAppSelector } from "../../../store/store";
+import { useGetAuthSession } from "@src/services/tanstack/auth/get";
+import { useInsertAuthInfo } from "@src/services/tanstack/auth/mutate";
 
 export const ConfirmSetup = () => {
   const { t } = useTranslation();
-  const userId = useAppSelector((state) => state.auth.user?.id ?? "");
+  const { data } = useGetAuthSession();
+  const userId = data?.userId;
   const { setupForm } = useFormSetupContext();
   const {
     mutateAsync: insertInfo,
     isPending: isPendindInfo,
-  } = useInsertUserInfo();
+  } = useInsertAuthInfo();
   const { navigateTo } = useAppNavigation();
 
   const handleConfirm = useCallback(() => {
@@ -21,6 +22,10 @@ export const ConfirmSetup = () => {
     if (!form.validateForm()) return;
     const state = form.getState();
     if (!state[fieldIds.name]) return;
+    if (!userId) {
+      console.error('nutri id not provided')
+      return
+    };
     insertInfo(
       {
         nutri_id: userId,

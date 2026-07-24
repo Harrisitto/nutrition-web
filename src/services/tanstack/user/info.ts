@@ -1,39 +1,8 @@
 import { supabase } from "@src/services/supabase/client"
-import { TABLE_ALL_NUTRITIONISTS } from "@src/services/supabase/definitions"
-import { useNotification } from "@src/store/slices/notification/hook"
-import type { TablesInsert } from "@src/services/supabase/types"
-import { useMutation, useQuery } from "@tanstack/react-query"
-import { useConfigSelectedUserId } from "@src/store/slices/config/hook"
+import { useQuery } from "@tanstack/react-query"
 import { queryKeys } from "../keys"
 import { dateToSupabaseFormat } from "@src/helpers/dates"
-import { useAppDispatch, useAppSelector } from "@src/store/store"
-import { setProfile } from "@src/store/slices/auth/store"
-
-export const useInsertUserInfo = () => {
-  const { addMutationError } = useNotification();
-  const userId = useAppSelector((state) => state.auth.user?.id ?? "");
-  const dispatch = useAppDispatch();
-
-  const mutation = useMutation({
-    mutationFn: async (insertData: TablesInsert<typeof TABLE_ALL_NUTRITIONISTS.NAME>) => {
-      if (!userId) throw new Error('No authenticated user found')
-      const { data, error } = await supabase
-        .from(TABLE_ALL_NUTRITIONISTS.NAME)
-        .upsert(insertData)
-        .select()
-        .single()
-        if (error) throw error
-        return data
-    },
-    onError: () => {
-      addMutationError();
-    },
-    onSuccess: (data) => {
-      dispatch(setProfile(data));
-    },
-  })
-  return mutation
-}
+import { useAppSelector } from "@src/store/store"
 
 export const useFetchBmr = ({
   startDate,
@@ -42,7 +11,7 @@ export const useFetchBmr = ({
   startDate: Date;
   endDate: Date;
 }) => {
-  const userId = useConfigSelectedUserId();
+  const userId = useAppSelector((state) => state.config.selectedUserId);
   const start = dateToSupabaseFormat(startDate);
   const end = dateToSupabaseFormat(endDate);
 
@@ -72,7 +41,7 @@ export const useFetchUserWeightForDateRange = ({
   startDate: Date;
   endDate: Date;
 }) => {
-  const userId = useConfigSelectedUserId();
+  const userId = useAppSelector((state) => state.config.selectedUserId);
   const start = dateToSupabaseFormat(startDate);
   const end = dateToSupabaseFormat(endDate);
 
@@ -94,4 +63,3 @@ export const useFetchUserWeightForDateRange = ({
   });
   return query;
 }
-

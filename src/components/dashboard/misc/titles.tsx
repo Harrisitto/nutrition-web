@@ -1,10 +1,10 @@
 import { useFetchNutritionistUsers } from "@src/services/tanstack/user/profile";
-import { useConfigSelectedUserId } from "@src/store/slices/config/hook";
 import { ForkKnife } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useAppSelector } from "@src/store/store";
 
 export const UserName = () => {
-    const selectedUserId = useConfigSelectedUserId();
+    const selectedUserId = useAppSelector((state) => state.config.selectedUserId);
     const users = useFetchNutritionistUsers();
     const selectedUser = users.data?.find(user => user.user_id === selectedUserId);
 

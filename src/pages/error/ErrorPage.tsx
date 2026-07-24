@@ -1,6 +1,6 @@
 import { useAppSelector } from "@src/store/store";
 import { useError } from "@src/store/slices/error/hook";
-import { ErrorComponents } from "./components";
+import * as ErrorComponents from "./components";
 
 export default function ErrorBoundary({
     children,
@@ -17,6 +17,6 @@ export default function ErrorBoundary({
                 err.clear();
             }} />
         </div>
-            
+
     )
 }

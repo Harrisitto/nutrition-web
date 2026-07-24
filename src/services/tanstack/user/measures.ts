@@ -2,11 +2,12 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryKeys } from "../keys";
 import { supabase } from "@src/services/supabase/client";
 import { TABLE_ALL_MEASURES, TABLE_USER_MEASURES } from "@src/services/supabase/definitions";
-import { useConfigSelectedUserId } from "@src/store/slices/config/hook";
 import { useLanguageCode } from "@src/hooks/helpers/language";
 import type { Tables, TablesInsert } from "@src/services/supabase/types";
 import { queryClient } from "../queryClient";
 import { saveDate } from "@src/helpers/dates";
+import { useGetAuthSession } from "../auth/get";
+
 
 type UserMeasure = Tables<"user_measures">;
 type UserMeasuresData = UserMeasure[];
@@ -89,7 +90,8 @@ export const useFetchUserMeasuresForDateRange = ({
     startDate: Date;
     endDate: Date;
 }) => {
-    const userId = useConfigSelectedUserId();
+    const { data } = useGetAuthSession();
+    const userId = data?.userId;
     const start = saveDate(startDate);
     const end = saveDate(endDate);
 
@@ -116,7 +118,8 @@ export const useFetchUserMeasuresForDateRange = ({
 }
 
 export const useInsertUserMeasure = () => {
-    const userId = useConfigSelectedUserId();
+    const { data } = useGetAuthSession();
+    const userId = data?.userId;
     return useMutation({
         mutationKey: queryKeys({
             userId,
@@ -141,7 +144,8 @@ export const useInsertUserMeasure = () => {
 }
 
 export const useDeleteMeasures = () => {
-    const userId = useConfigSelectedUserId();
+    const { data } = useGetAuthSession();
+    const userId = data?.userId;
     return useMutation({
         mutationKey: queryKeys({
             userId,
@@ -161,6 +165,7 @@ export const useDeleteMeasures = () => {
             if (error) throw error;
         },
         onSuccess: (_, measureIds) => {
+            if(!userId) return
             updateMeasuresQueries(userId, (oldData) => {
                 if (!oldData) return oldData;
                 return oldData.filter((measure) => measureIds.measureId !== measure.measure_id || measure.date !== measureIds.date);

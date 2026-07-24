@@ -1,8 +1,7 @@
 import { fromDate, loadDate, saveDate } from "@src/helpers/dates";
 import { useFetchPlanning } from "@src/services/tanstack/user/planing";
-import { useConfigSelectedDay, useConfigSelectedUserId } from "@src/store/slices/config/hook";
 import { setSelectedDay } from "@src/store/slices/config/store";
-import { useAppDispatch } from "@src/store/store";
+import { useAppDispatch, useAppSelector } from "@src/store/store";
 import {
   DayButton,
   DayPicker,
@@ -64,9 +63,10 @@ const CalendarDayButton = (props: DayButtonProps) => {
 };
 
 export const SelectDateHeader = () => {
-  const currentDate = useConfigSelectedDay() ?? fromDate().nextMonday();
+  const d = useAppSelector((state) => state.config.selectedDay);
+  const currentDate = d ? new Date(d) : fromDate().nextMonday();
   const currentYear = new Date().getFullYear();
-  const userId = useConfigSelectedUserId();
+  const userId = useAppSelector((state) => state.config.selectedUserId);
   const dispatch = useAppDispatch();
   const planningQuery = useFetchPlanning();
   const { t } = useTranslation();

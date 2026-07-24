@@ -6,11 +6,13 @@ import enSystem from "./locales/en/system.json";
 import enAuth from "./locales/en/auth.json";
 import enApp from "./locales/en/data.json";
 import enForms from "./locales/en/forms.json";
+import enHome from "./locales/en/home.json";
 
 import esSystem from "./locales/es/system.json";
 import esAuth from "./locales/es/auth.json";
 import esApp from "./locales/es/data.json";
 import esForms from "./locales/es/forms.json";
+import esHome from "./locales/es/home.json";
 
 const resources = {
     en: {
@@ -18,12 +20,14 @@ const resources = {
         auth: enAuth,
         data: enApp,
         forms: enForms,
+        home: enHome,
     }, // English translations
     es: {
         system: esSystem,
         auth: esAuth,
         data: esApp,
         forms: esForms,
+        home: esHome,
     }, // Spanish translations
 };
 
@@ -45,7 +49,7 @@ i18next
         },
 
         interpolation: {
-            escapeValue: false // react already safes from xss 
+            escapeValue: false // react already safes from xss
         }
     });
 
