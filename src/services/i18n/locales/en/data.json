@@ -169,7 +169,10 @@
             "authManagement": {
                 "title": "Auth Management",
                 "description": "Manage authentication actions for your account.",
-                "comingSoon": "This section is under development. Please check back later."
+                "userSettings": "User Settings",
+                "signOutWarning": "Sign out safely from your account in this device",
+                "regionSettings": "Region Settings",
+                "chooseLanguage": "Choose Language"
             }
         }
     },

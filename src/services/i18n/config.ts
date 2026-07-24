@@ -31,6 +31,7 @@ const resources = {
     }, // Spanish translations
 };
 
+export const savedLngKey = "lng"
 export const supportedLngs = ["en", 'es'] as const;
 export type SupportedLanguage = typeof supportedLngs[number];
 
@@ -44,8 +45,12 @@ i18next
         load: "languageOnly",
         // detection options: prefer navigator languages, then querystring/localStorage/cookie
         detection: {
-            order: ["navigator", "querystring", "localStorage", "cookie", "htmlTag", "path", "subdomain"],
-            caches: ["localStorage", "cookie"],
+            // 1. Pon 'localStorage' al principio del orden
+            order: ["localStorage", "navigator", "querystring", "cookie", "htmlTag"],
+            // 2. Dile a i18next qué clave buscar en localStorage
+            lookupLocalStorage: savedLngKey,
+            // 3. Guarda automáticamente la selección del usuario en localStorage
+            caches: ["localStorage"],
         },
 
         interpolation: {

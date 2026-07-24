@@ -14,7 +14,7 @@ export const ConfigurationPages = ({
         <p className="mt-1 text-sm text-text-muted">{description}</p>
       </header>
 
-      <div>{children}</div>
+      <div className="flex flex-col items-center w-full">{children}</div>
     </div>
   );
 };
