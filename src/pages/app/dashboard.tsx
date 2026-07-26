@@ -1,21 +1,65 @@
 import IdxConfiguration from "@src/components/configuration";
 import { AppDashboard, IdxDashboard } from "@src/components/dashboard";
-import { AnimationLoading } from "@src/components/global/Animations";
+import { AnimationLoading, InitialAnimation } from "@src/components/global/Animations";
 import { fromDate, loadDate } from "@src/helpers/dates";
+import { useGetAuthInfo } from "@src/services/tanstack/auth/get";
 import { useFetchNutritionistUsers } from "@src/services/tanstack/user/profile";
 import { useAppSelector } from "@src/store/store";
+import { IdxSetUpProfile } from "@src/components/auth/setUpProfileIndex";
+import { useEffect, useState } from "react";
+import { debounce } from "lodash";
+
 
 export default function PageDashboard() {
+  const [isLoading, setIsLoading] = useState(true);
   const d = useAppSelector((state) => state.config.selectedDay);
   const date = loadDate(d ?? '')
 
   const thisDateMonday = date
     ? fromDate(date).thisMonday()
     : fromDate().nextMonday();
-  const allClients = useFetchNutritionistUsers();
 
-  if (allClients.isLoading) {
-    return <AnimationLoading />;
+  const allClients = useFetchNutritionistUsers();
+  const nutriInfoQuery = useGetAuthInfo();
+
+  const DEBOUNCE_DURATION = 500;
+
+  useEffect(() => {
+    // 1. Definimos la función debouncenda
+    const handleLoadingDebounced = debounce(() => {
+      // Ambas consultas deben haber terminado de cargar (&&)
+      const isStillLoading = allClients.isLoading || nutriInfoQuery.isLoading;
+      setIsLoading(isStillLoading);
+    }, DEBOUNCE_DURATION);
+
+    // 2. IMPORTANTE: ¡Ejecutamos la función!
+    handleLoadingDebounced();
+
+    // 3. Cancelamos la ejecución pendiente si las dependencias cambian o el componente se desmonta
+    return () => {
+      handleLoadingDebounced.cancel();
+    };
+  }, [allClients.isLoading, nutriInfoQuery.isLoading]);
+
+  if (isLoading) {
+    return <div className="w-full min-h-screen flex justify-center items-center">
+      <AnimationLoading size={240} />
+    </div>;
+  }
+
+  if (!nutriInfoQuery.data) {
+    return (
+      <IdxSetUpProfile.Provider>
+        <div className="min-h-screen flex items-center justify-center bg-gray-100">
+          <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-lg ">
+            <IdxSetUpProfile.Text.Title />
+            <IdxSetUpProfile.Text.Message />
+            <IdxSetUpProfile.Fields />
+            <IdxSetUpProfile.Actions.ConfirmSetup />
+          </div>
+        </div>
+      </IdxSetUpProfile.Provider>
+    )
   }
 
   if (allClients.data?.length === 0 && allClients.isLoading === false) {

@@ -94,7 +94,7 @@ const PageInfo = () => {
                 } else if (profile) {
                   navigateTo(APP_ROUTES.DASHBOARD);
                 } else {
-                  navigateTo(APP_ROUTES.COMPLETE_PROFILE);
+                  console.error("Invalid route redirect");
                 }
           }}>
             {t("home:nav.login")}

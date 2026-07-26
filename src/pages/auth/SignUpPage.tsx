@@ -66,15 +66,11 @@ const SignUpPage = () => {
       onSuccess: async () => {
         setIsSubmitting(false);
         const { data, error } = await infoQuery.refetch();
-        if (error) {
+        if (error || !data?.name) {
           notify.addFormSubmitError();
           return;
         }
-        if (data) {
-          navigateTo(APP_ROUTES.DASHBOARD, { replace: true });
-        } else {
-          navigateTo(APP_ROUTES.COMPLETE_PROFILE, { replace: true });
-        }
+        navigateTo(APP_ROUTES.DASHBOARD, { replace: true });
       }
     })
   }, [verification, tokenDigits, email, notify, navigateTo])

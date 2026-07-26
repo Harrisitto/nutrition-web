@@ -2,6 +2,8 @@ import { useQuery } from "@tanstack/react-query"
 import { queryKeys } from "../keys"
 import { supabase } from "@src/services/supabase/client"
 import { TABLE_ALL_NUTRITIONISTS } from "@src/services/supabase/definitions"
+import { queryClient } from "../queryClient"
+import { useEffect } from "react"
 
 export const useGetAuthInfo = () => {
 
@@ -37,6 +39,12 @@ export const useGetAuthSession = () => {
       }
     },
   })
+
+  useEffect(() => {
+    queryClient.refetchQueries({
+      queryKey: queryKeys().auth.profile
+    })
+  }, [queryClient, query.data])
 
   return query
 }
