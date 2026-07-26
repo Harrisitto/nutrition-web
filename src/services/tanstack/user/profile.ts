@@ -2,11 +2,11 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { useNotification, useNotificationErrorQuery } from '@src/store/slices/notification/hook'
 import { supabase } from '@src/services/supabase/client'
 import type { Database } from '@src/services/supabase/types'
-import { TABLE_ALL_NUTRITIONISTS, TABLE_ALL_USERS, TABLE_USER_PLANING, TABLE_USER_PLANING_MEAL } from '@src/services/supabase/definitions'
-import { useAppDispatch, useAppSelector } from '@src/store/store'
+import { TABLE_ALL_USERS, TABLE_USER_PLANING, TABLE_USER_PLANING_MEAL } from '@src/services/supabase/definitions'
 import { queryKeys } from '../keys'
 import { queryClient } from '../queryClient'
 import { useGetAuthSession } from '../auth/get'
+import { useAppSelector } from '@src/store/store'
 
 type UserWithInfo = Database['public']['Tables']['all_users']['Row']
 

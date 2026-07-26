@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./components/global/ProtectedRoute";
 import { APP_ROUTES } from "./hooks/navigation/routes";
 import { usePrefetchPlaning } from "./services/tanstack/user/planing";
-import { AnimationLoading, InitialAnimation } from "./components/global/Animations";
+import { InitialAnimation } from "./components/global/Animations";
 
 const SignInPage = lazy(() => import("./pages/auth/SignUpPage"));
 const PageAppDashboard = lazy(() => import("./pages/app/dashboard"));

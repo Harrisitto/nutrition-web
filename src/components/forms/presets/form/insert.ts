@@ -1,12 +1,13 @@
-import { useConfigSelectedUserId } from "@src/store/slices/config/hook";
 import { fieldIds, useContextFormPreset } from "./hook";
 import { useInsertPreset } from "@src/services/tanstack/user/preset";
 import { useCallback } from "react";
 import type { InputState } from "@src/hooks/form/types";
 import { t } from "i18next";
+import { useGetAuthSession } from "@src/services/tanstack/auth/get";
 
 export const useInsert = () => {
-    const userId = useConfigSelectedUserId();
+  const { data } = useGetAuthSession();
+  const userId = data?.userId;
     const formPreset = useContextFormPreset();
     const insertPreset = useInsertPreset();
 
@@ -69,7 +70,7 @@ export const useInsert = () => {
             console.error("Error inserting preset:", error);
             alert(t("forms:preset.insertError"));
         }
-        
+
     }, [formPreset, insertPreset, userId]);
 
     return {

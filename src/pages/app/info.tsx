@@ -17,13 +17,13 @@ const PageInfo = () => {
   const { navigateTo } = useAppNavigation();
 
   // Fallback de posts desde home.json
-  const fallbackPosts = t("home:instagram.posts", { returnObjects: true }) || [];
+  //const fallbackPosts = t("home:instagram.posts", { returnObjects: true }) || [];
 
   // Token de Instagram desde variable de entorno
   const instagramToken = import.meta.env?.VITE_INSTAGRAM_TOKEN || "";
 
   // Hook dinámico de Instagram
-  const { posts, loading: loadingPosts } = useInstagramPosts(instagramToken, fallbackPosts);
+  const { posts, loading: loadingPosts } = useInstagramPosts(instagramToken);
 
   // --- OPTIMIZACIÓN HASH ROUTER: Scroll suave entre secciones ---
   const scrollToSection = (sectionId: string) => {

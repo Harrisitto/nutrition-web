@@ -25,7 +25,7 @@ export const SignOut = () => {
 }
 
 export const DeleteAccount = () => {
-  const { t } = useTranslation();
+ // const { t } = useTranslation();
   //const { mutate } = useDeleteAccount();
   //
   return null;

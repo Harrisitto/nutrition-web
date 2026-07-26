@@ -1,6 +1,6 @@
 import IdxConfiguration from "@src/components/configuration";
 import { AppDashboard, IdxDashboard } from "@src/components/dashboard";
-import { AnimationLoading, InitialAnimation } from "@src/components/global/Animations";
+import { AnimationLoading } from "@src/components/global/Animations";
 import { fromDate, loadDate } from "@src/helpers/dates";
 import { useGetAuthInfo } from "@src/services/tanstack/auth/get";
 import { useFetchNutritionistUsers } from "@src/services/tanstack/user/profile";

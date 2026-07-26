@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 import { debounce } from "lodash";
 import { supabase } from "@src/services/supabase/client";
 import type { SupportedLanguage } from "@src/services/i18n/config";
-import { useAppSelector } from "@src/store/store";
 import { queryClient } from "../queryClient";
+import { useGetAuthSession } from "../auth/get";
 
 type RecipeInfo = NonNullable<ReturnType<typeof useFetchRecipeInfo>["data"]>;
 
@@ -80,7 +80,7 @@ export const useFetchRecipes = ({
             if (error) {
                 throw error;
             }
-            
+
             return data || [];
         },
         placeholderData: [],
@@ -108,7 +108,7 @@ export const useFetchRecipeInfo = ({
             if (error) {
                 throw error;
             }
-            
+
             return data || null;
         },
     });
@@ -120,7 +120,8 @@ export const useMutateNutriRecipe = ({
     recipeId: number;
 }) => {
     const langCode = useLanguageCode();
-    const nutriId = useAppSelector((state) => state.auth.session?.user?.id) || '';
+    const { data: sessionData } = useGetAuthSession();
+    const nutriId = sessionData?.userId ?? '';
 
     return useMutation({
         mutationKey: queryKeys({
