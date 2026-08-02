@@ -172,7 +172,8 @@
                 "userSettings": "User Settings",
                 "signOutWarning": "Sign out safely from your account in this device",
                 "regionSettings": "Region Settings",
-                "chooseLanguage": "Choose Language"
+                "chooseLanguage": "Choose Language",
+                "manageSubscription": "Manage Subscription"
             }
         }
     },

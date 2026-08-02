@@ -8,23 +8,23 @@ import * as Info from "./metrics/userInfo";
 import { CloneLastWeek } from "./misc/cloneWeek";
 
 export const IdxDashboard = {
-    Users: {
-        List: UserList,
-        Info
-    },
-    Metrics: {
-        Meals,
-    },
-    Text: {
-        Titles,
-    },
-    Dates: {
-        SelectDateHeader,
-    },
-    Buttons: {
-        ...Navigation,
-        CloneLastWeek
-    },
-}
+  Users: {
+    List: UserList,
+    Info,
+  },
+  Metrics: {
+    Meals,
+  },
+  Text: {
+    Titles,
+  },
+  Dates: {
+    SelectDateHeader,
+  },
+  Buttons: {
+    ...Navigation,
+    CloneLastWeek,
+  },
+};
 
-export { AppDashboard }
+export { AppDashboard };

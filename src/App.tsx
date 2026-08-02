@@ -6,22 +6,29 @@ import { usePrefetchPlaning } from "./services/tanstack/user/planing";
 import { InitialAnimation } from "./components/global/Animations";
 
 const SignInPage = lazy(() => import("./pages/auth/SignUpPage"));
-const PageAppDashboard = lazy(() => import("./pages/app/dashboard"));
+const PageAppDashboard = lazy(() => import("./pages/dashboard"));
 const PageUserPreset = lazy(() => import("./pages/forms/preset"));
 const PagePrivacyPolicy = lazy(() => import("./pages/privacyPolicy/page"));
 const PageReferences = lazy(() => import("./pages/references/page"));
 const NotFoundPage = lazy(() => import("./pages/error/NotFoundPage"));
 const PageMeasures = lazy(() => import("./pages/forms/measures"));
-const PageNutritionistConfiguration = lazy(() => import("./pages/app/configuration"));
+const PageNutritionistConfiguration = lazy(
+  () => import("./pages/dashboard/configuration"),
+);
 const PageInfo = lazy(() => import("./pages/app/info"));
 
 function App() {
   usePrefetchPlaning();
 
-
   return (
     <main className="w-full min-h-screen bg-white-green text-black-green">
-      <Suspense fallback={<div className="w-full flex min-h-screen justify-center items-center border-red-500"><InitialAnimation duration={2500} /></div>}>
+      <Suspense
+        fallback={
+          <div className="w-full flex min-h-screen justify-center items-center border-red-500">
+            <InitialAnimation duration={2500} />
+          </div>
+        }
+      >
         <Routes>
           {/* Public routes */}
           <Route path={APP_ROUTES.HOME} element={<PageInfo />} />

@@ -76,7 +76,7 @@ const SideElement = ({
 
   return (
     <SideSelectOptions
-      initialId={planingData?.type_id?.id?.toString()}
+      initialId={planingData?.recipe_type?.id?.toString()}
       options={options}
       onSelect={handleDBMeal}
       render={(id: string) => {
@@ -130,9 +130,11 @@ const PlaningCell = ({
   const planingKey = generateMealKey(mealId, date);
   const planingData = planing.mealsMap.get(planingKey);
 
+  console.log("planingData", planingData);
+
   const kcalStyle = useMemo(() => {
     if (!planingData) return "";
-    const type = planingData.type_id;
+    const type = planingData.recipe_type;
     if (type.kcal < 200) {
       return "border-green-500 bg-green-100/30 hover:bg-green-100/50";
     } else if (type.kcal < 500) {
@@ -156,7 +158,7 @@ const PlaningCell = ({
     <div
       className={`border p-3 text-center transition-colors h-full flex items-center justify-center text-fade-dark-green font-bold cursor-pointer ${isSelected ? "border-dark-green bg-light-green" : `${kcalStyle}`}`}
     >
-      {planingData.type_id.name}
+      {planingData.recipe_type.name}
     </div>
   );
 };

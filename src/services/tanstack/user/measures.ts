@@ -124,8 +124,7 @@ export const useFetchUserMeasuresForDateRange = ({
 };
 
 export const useInsertUserMeasure = () => {
-  const { data } = useGetAuthSession();
-  const userId = data?.userId;
+  const userId = useAppSelector((state) => state.config.selectedUserId);
   return useMutation({
     mutationKey: queryKeys({
       userId,

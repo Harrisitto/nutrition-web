@@ -1,5 +1,8 @@
-import { useQuery } from "@tanstack/react-query"
-import { TABLE_ALL_MEALS, TABLE_RECIPE_TYPES } from "@src/services/supabase/definitions";
+import { useQuery } from "@tanstack/react-query";
+import {
+  TABLE_ALL_MEALS,
+  TABLE_RECIPE_TYPES,
+} from "@src/services/supabase/definitions";
 import { queryKeys } from "../keys";
 import { supabase } from "@src/services/supabase/client";
 import { useLanguageCode } from "@src/hooks/helpers/language";
@@ -7,10 +10,12 @@ import { useFetchPlanning } from "../user/planing";
 import { fromDate } from "@src/helpers/dates";
 import { useMemo } from "react";
 
-const fetchTypesForMeal = async (langCode: ReturnType<typeof useLanguageCode>) => {
+const fetchTypesForMeal = async (
+  langCode: ReturnType<typeof useLanguageCode>,
+) => {
   const { data, error } = await supabase
     .from(TABLE_RECIPE_TYPES.NAME)
-    .select(`fat, hc, id, kcal, prot, name: name->>${langCode}`)
+    .select(`fat, hc, id, kcal, prot, name: name->>${langCode}`);
   if (error) throw error;
   return data;
 };
@@ -24,17 +29,19 @@ export const useFetchMeals = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from(TABLE_ALL_MEALS.NAME)
-        .select(`
+        .select(
+          `
           id,
           order,
           name: name->>${langCode}
-        `)
+        `,
+        )
         .order(TABLE_ALL_MEALS.COLS.ORDER);
       if (error) throw error;
       return data;
-    }
-  })
-}
+    },
+  });
+};
 
 export const useFetchAllMealTypes = () => {
   const langCode = useLanguageCode();
@@ -44,9 +51,9 @@ export const useFetchAllMealTypes = () => {
     }).data.allTypes,
     queryFn: async () => {
       return await fetchTypesForMeal(langCode);
-    }
-  })
-}
+    },
+  });
+};
 
 export const useFetchOrderedMealsForId = ({
   mealId,
@@ -55,7 +62,6 @@ export const useFetchOrderedMealsForId = ({
   mealId: number;
   date?: Date;
 }) => {
-
   const planningInfo = useFetchPlanning({
     forDate: fromDate(date).incrementDay(-28),
     rangeInWeeks: 4,
@@ -66,13 +72,13 @@ export const useFetchOrderedMealsForId = ({
   const orderedMeals = useMemo(() => {
     if (!types || !planningInfo?.data) return [];
     // 1. Cargamos en memoria el historico de comidas.
-    const info = planningInfo.data.flatMap(el => el.user_planing_meal)
+    const info = planningInfo.data.flatMap((el) => el.user_planing_meal);
     // 2. Acumulamos los conteos históricos
     const countMap = new Map<number, number>();
     for (const item of info) {
       if (item.meal_id !== mealId) continue;
-      const key = item.type_id.id;
-      const currentCount = countMap.get(key)
+      const key = item.recipe_type.id;
+      const currentCount = countMap.get(key);
       if (!currentCount) {
         countMap.set(key, 1);
         continue;
@@ -85,7 +91,7 @@ export const useFetchOrderedMealsForId = ({
       const countB = countMap.get(b.id) ?? 0;
       const countDiff = countB - countA;
       if (countDiff !== 0) return countDiff;
-      return Number(a.name) - Number(b.name)
+      return Number(a.name) - Number(b.name);
     });
   }, [types, planningInfo?.data, mealId]);
 

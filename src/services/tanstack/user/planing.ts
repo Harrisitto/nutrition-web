@@ -12,12 +12,8 @@ import { useNotification } from "@src/store/slices/notification/hook";
 import { useAppSelector } from "@src/store/store";
 import { useEffect } from "react";
 
-
 const selectFromMeal = (languageCode: ReturnType<typeof useLanguageCode>) => {
-  return `*,
-        ${TABLE_USER_PLANING_MEAL.COLS.TYPE_ID}(
-        *,
-  name: name->>${languageCode})` as const;
+  return `*, recipe_type(*, name: name->>${languageCode})` as const;
 };
 
 const selectFromPlaning = (
@@ -126,7 +122,9 @@ export const useFetchPlanning = ({
   const paramStartDate = forDate || loadDate(savedDate);
   const effectiveStartDate = saveDate(fromDate(paramStartDate).thisMonday());
   const effectiveEndDate = saveDate(
-    fromDate(fromDate(paramStartDate).incrementDay(rangeInWeeks * 7)).thisSunday(),
+    fromDate(
+      fromDate(paramStartDate).incrementDay(rangeInWeeks * 7),
+    ).thisSunday(),
   );
 
   return useQuery({
@@ -202,7 +200,7 @@ export const useInsertPlaningWithMeals = () => {
       training_hc,
       training_kcal,
       comment,
-      event
+      event,
     }: {
       date: Date;
       meals: {
@@ -219,18 +217,20 @@ export const useInsertPlaningWithMeals = () => {
 
       const normalizedDate = saveDate(date);
 
+      const insertData = {
+        [TABLE_USER_PLANING.COLS.USER_ID]: userId,
+        [TABLE_USER_PLANING.COLS.DATE]: normalizedDate,
+        ...(training_hc != null
+          ? { [TABLE_USER_PLANING.COLS.TRAINING_HC]: training_hc }
+          : {}),
+        ...(training_kcal != null ? { training_kcal } : {}),
+        ...(comment != null ? { comment } : {}),
+        ...(event != null ? { event } : {}),
+      };
+
       const { data: planingData, error: planingError } = await supabase
         .from(TABLE_USER_PLANING.NAME)
-        .upsert({
-          [TABLE_USER_PLANING.COLS.USER_ID]: userId,
-          [TABLE_USER_PLANING.COLS.DATE]: normalizedDate,
-          ...(training_hc != null
-            ? { [TABLE_USER_PLANING.COLS.TRAINING_HC]: training_hc }
-            : {}),
-          ...(training_kcal != null ? { training_kcal } : {}),
-          ...(comment != null ? { comment } : {}),
-          ...(event != null ? { event } : {}),
-        })
+        .upsert(insertData)
         .select(TABLE_USER_PLANING.COLS.ID)
         .single();
 
@@ -252,6 +252,8 @@ export const useInsertPlaningWithMeals = () => {
         [TABLE_USER_PLANING_MEAL.COLS.MEAL_ID]: meal.meal_id,
         [TABLE_USER_PLANING_MEAL.COLS.TYPE_ID]: meal.type_id,
       }));
+
+      console.log(mealRows);
 
       if (mealRows.length > 0) {
         const { error: mealError } = await supabase
@@ -321,6 +323,8 @@ export const useInsertMeal = () => {
 
         if (existingPlaningError) throw existingPlaningError;
 
+        console.log("existing", existingPlaning);
+
         if (existingPlaning?.id != null) {
           id = existingPlaning.id;
         } else {
@@ -333,10 +337,11 @@ export const useInsertMeal = () => {
                 training_hc: [],
               })
               .select(TABLE_USER_PLANING.COLS.ID)
-              .single();
+              .maybeSingle();
 
           if (createdPlaningError) throw createdPlaningError;
           id = createdPlaning?.id;
+          console.log("created", createdPlaning);
         }
       }
 
@@ -352,7 +357,9 @@ export const useInsertMeal = () => {
         })
         .select(selectFromMeal(languageCode))
         .single();
+      console.log(error?.message);
       if (error) throw error;
+      console.log("upsertData", data);
       return data;
     },
     onSuccess: async (data) => {
@@ -480,7 +487,6 @@ export const useDeletePlaning = () => {
 };
 
 export const usePrefetchPlaning = () => {
-
   const selectedUserId = useAppSelector((state) => state.config.selectedUserId);
   const languageCode = useLanguageCode();
 
@@ -494,7 +500,10 @@ export const usePrefetchPlaning = () => {
       { start: thisMonday.incrementDay(0), end: thisSunday.incrementDay(0) }, // Current week
       { start: thisMonday.incrementDay(-7), end: thisSunday.incrementDay(-7) }, // Previous week
       { start: thisMonday.incrementDay(7), end: thisSunday.incrementDay(7) }, // Next week
-      { start: thisMonday.incrementDay(-14), end: thisSunday.incrementDay(-14) }, // Two weeks ago
+      {
+        start: thisMonday.incrementDay(-14),
+        end: thisSunday.incrementDay(-14),
+      }, // Two weeks ago
       { start: thisMonday.incrementDay(14), end: thisSunday.incrementDay(14) }, // Two weeks ahead
       // { start: thisMonday.incrementDay(21), end: thisSunday.incrementDay(21) }, // Three weeks ahead
       // { start: thisMonday.incrementDay(28), end: thisSunday.incrementDay(28) }, // Four weeks ahead

@@ -172,7 +172,8 @@
                 "userSettings": "Configuracion de usuario",
                 "signOutWarning": "Cierra tu sesión actual de forma segura en este dispositivo.",
                 "regionSettings": "Configuracion de region",
-                "chooseLanguage": "Elegir idioma"
+                "chooseLanguage": "Elegir idioma",
+                "manageSubscription": "Gestionar suscripcion"
             }
         }
     },

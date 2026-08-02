@@ -122,7 +122,6 @@ export type Database = {
         Row: {
           description: Json | null
           id: number
-          image_url: string
           name: Json | null
           type_id: number
           url: string
@@ -130,7 +129,6 @@ export type Database = {
         Insert: {
           description?: Json | null
           id?: number
-          image_url?: string
           name?: Json | null
           type_id: number
           url?: string
@@ -138,7 +136,6 @@ export type Database = {
         Update: {
           description?: Json | null
           id?: number
-          image_url?: string
           name?: Json | null
           type_id?: number
           url?: string
@@ -287,6 +284,83 @@ export type Database = {
           kcal?: number
           name?: Json | null
           prot?: number
+        }
+        Relationships: []
+      }
+      recipe_type_custom: {
+        Row: {
+          amount: number
+          relation: number
+          type_id: number
+        }
+        Insert: {
+          amount?: number
+          relation: number
+          type_id: number
+        }
+        Update: {
+          amount?: number
+          relation?: number
+          type_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipe_type_custom_relation_fkey"
+            columns: ["relation"]
+            isOneToOne: false
+            referencedRelation: "recipe_type_custom_relation"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recipe_type_custom_type_id_fkey"
+            columns: ["type_id"]
+            isOneToOne: false
+            referencedRelation: "recipe_type"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recipe_type_custom_ingredients: {
+        Row: {
+          id: number
+          name: Json | null
+          relation: number | null
+        }
+        Insert: {
+          id: number
+          name?: Json | null
+          relation?: number | null
+        }
+        Update: {
+          id?: number
+          name?: Json | null
+          relation?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipe_type_custom_ingredients_relation_fkey"
+            columns: ["relation"]
+            isOneToOne: false
+            referencedRelation: "recipe_type_custom_relation"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recipe_type_custom_relation: {
+        Row: {
+          id: number
+          macro_type: string | null
+          meal_type: string | null
+        }
+        Insert: {
+          id?: number
+          macro_type?: string | null
+          meal_type?: string | null
+        }
+        Update: {
+          id?: number
+          macro_type?: string | null
+          meal_type?: string | null
         }
         Relationships: []
       }
@@ -570,10 +644,30 @@ export type Database = {
         Args: { end_date: string; start_date: string; user_uuid: string }
         Returns: number
       }
+      get_top_recipes_for_type: {
+        Args: {
+          p_lang: string
+          p_search?: string
+          p_type_id: number
+          p_user_id: string
+        }
+        Returns: {
+          id: number
+          name: string
+          nutri_rating: number
+          score: number
+          times_interacted: number
+          times_used: number
+          type_id: number
+          user_rating: number
+        }[]
+      }
       get_weight: {
         Args: { end_date: string; start_date: string; user_uuid: string }
         Returns: number
       }
+      has_active_subscription: { Args: never; Returns: boolean }
+      unaccent: { Args: { "": string }; Returns: string }
     }
     Enums: {
       [_ in never]: never

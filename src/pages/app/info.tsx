@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
 import { useInstagramPosts } from "../../components/info/instagramHook";
@@ -6,7 +6,10 @@ import { Button, CarouselNavButton } from "../../components/info/buttons";
 import { PhoneMockup } from "@src/components/info/phoneMockup";
 import { APP_ROUTES } from "@src/hooks/navigation/routes";
 import useAppNavigation from "@src/hooks/navigation";
-import { useGetAuthInfo, useGetAuthSession } from "@src/services/tanstack/auth/get";
+import {
+  useGetAuthInfo,
+  useGetAuthSession,
+} from "@src/services/tanstack/auth/get";
 
 const PageInfo = () => {
   const { t } = useTranslation();
@@ -16,8 +19,15 @@ const PageInfo = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const { navigateTo } = useAppNavigation();
 
-  // Fallback de posts desde home.json
-  //const fallbackPosts = t("home:instagram.posts", { returnObjects: true }) || [];
+  const handleClick = useCallback(() => {
+    if (!session?.session) {
+      navigateTo(APP_ROUTES.SIGN_UP);
+    } else if (profile) {
+      navigateTo(APP_ROUTES.DASHBOARD);
+    } else {
+      console.error("Invalid route redirect");
+    }
+  }, [navigateTo, session, profile]);
 
   // Token de Instagram desde variable de entorno
   const instagramToken = import.meta.env?.VITE_INSTAGRAM_TOKEN || "";
@@ -68,10 +78,7 @@ const PageInfo = () => {
 
           {/* Navegación compatible con HashRouter */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button
-              variant="ghost"
-              onClick={() => scrollToSection("features")}
-            >
+            <Button variant="ghost" onClick={() => scrollToSection("features")}>
               {t("home:nav.features")}
             </Button>
             <Button
@@ -80,23 +87,12 @@ const PageInfo = () => {
             >
               {t("home:nav.instagram")}
             </Button>
-            <Button
-              variant="ghost"
-              onClick={() => scrollToSection("pricing")}
-            >
+            <Button variant="ghost" onClick={() => scrollToSection("pricing")}>
               {t("home:nav.pricing")}
             </Button>
           </div>
 
-          <Button variant="dark" size="md" onClick={() => {
-            if (!session?.session) {
-                  navigateTo(APP_ROUTES.SIGN_UP);
-                } else if (profile) {
-                  navigateTo(APP_ROUTES.DASHBOARD);
-                } else {
-                  console.error("Invalid route redirect");
-                }
-          }}>
+          <Button variant="dark" size="md" onClick={handleClick}>
             {t("home:nav.login")}
           </Button>
         </div>
@@ -125,7 +121,10 @@ const PageInfo = () => {
       </section>
 
       {/* --- FEATURES SECTION --- */}
-      <section id="features" className="py-20 bg-white border-y border-gray-blue-200">
+      <section
+        id="features"
+        className="py-20 bg-white border-y border-gray-blue-200"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <span className="text-xs font-bold tracking-wider uppercase text-text-subtitle bg-gray-blue-100 px-3 py-1 rounded-full">
@@ -197,7 +196,13 @@ const PageInfo = () => {
               variant="instagram"
               size="md"
               className="mt-6 md:mt-0"
-              onClick={() => window.open("https://instagram.com", "_blank", "noopener,noreferrer")}
+              onClick={() =>
+                window.open(
+                  "https://instagram.com",
+                  "_blank",
+                  "noopener,noreferrer",
+                )
+              }
             >
               {t("home:instagram.follow_btn")}
             </Button>
@@ -209,7 +214,10 @@ const PageInfo = () => {
               /* Skeleton Loader */
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="bg-white rounded-2xl h-80 animate-pulse p-4">
+                  <div
+                    key={i}
+                    className="bg-white rounded-2xl h-80 animate-pulse p-4"
+                  >
                     <div className="bg-gray-blue-200 h-48 rounded-xl mb-4"></div>
                     <div className="bg-gray-blue-200 h-4 rounded w-3/4 mb-2"></div>
                     <div className="bg-gray-blue-200 h-4 rounded w-1/2"></div>
@@ -223,7 +231,10 @@ const PageInfo = () => {
                   style={{ transform: `translateX(-${currentSlide * 100}%)` }}
                 >
                   {posts.map((post) => (
-                    <div key={post.id} className="w-full sm:w-1/2 lg:w-1/3 flex-shrink-0 p-3">
+                    <div
+                      key={post.id}
+                      className="w-full sm:w-1/2 lg:w-1/3 flex-shrink-0 p-3"
+                    >
                       <a
                         href={post.postUrl}
                         target="_blank"
@@ -269,7 +280,10 @@ const PageInfo = () => {
       </section>
 
       {/* --- PRICING SECTION --- */}
-      <section id="pricing" className="py-20 bg-white border-t border-gray-blue-200">
+      <section
+        id="pricing"
+        className="py-20 bg-white border-t border-gray-blue-200"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <span className="text-xs font-bold uppercase tracking-wider text-nutrition-green bg-gray-blue-100 px-3 py-1 rounded-full">
@@ -311,7 +325,12 @@ const PageInfo = () => {
                 </ul>
               </div>
 
-              <Button variant="stripe-starter" fullWidth size="lg">
+              <Button
+                variant="stripe-starter"
+                fullWidth
+                size="lg"
+                onClick={handleClick}
+              >
                 {t("home:pricing.stripe_btn")}
               </Button>
             </div>
@@ -350,7 +369,12 @@ const PageInfo = () => {
                 </ul>
               </div>
 
-              <Button variant="stripe-pro" fullWidth size="lg">
+              <Button
+                variant="stripe-pro"
+                fullWidth
+                size="lg"
+                onClick={handleClick}
+              >
                 {t("home:pricing.stripe_btn")}
               </Button>
             </div>

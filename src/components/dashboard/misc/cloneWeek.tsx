@@ -34,7 +34,7 @@ export const CloneLastWeek = ({ startMonday }: { startMonday: Date }) => {
             ...day,
             meals: day.user_planing_meal.map((meal) => ({
               meal_id: meal.meal_id,
-              type_id: meal.type_id.id,
+              type_id: meal.recipe_type.id,
             })),
             comment: "",
             event: "",

@@ -1,185 +1,209 @@
 import { useFetchPlanning } from "@src/services/tanstack/user/planing";
-import { generateMealKey, generatePlaningKey, getDayIndexForDate } from "../helperFunctions";
+import {
+  generateMealKey,
+  generatePlaningKey,
+  getDayIndexForDate,
+} from "../helperFunctions";
 import { useMemo } from "react";
 import { fromDate, loadDate, saveDate } from "@src/helpers/dates";
-import { useFetchBmr, useFetchUserWeightForDateRange } from "@src/services/tanstack/user/info";
+import {
+  useFetchBmr,
+  useFetchUserWeightForDateRange,
+} from "@src/services/tanstack/user/info";
 import { calculateKcalFromMacros } from "@src/hooks/helpers/constants";
 
 const daysInWeek = 7;
 
-
 export const usePlaning = ({
-    forDate,
+  forDate,
 }: {
-    forDate?: Date;
+  forDate?: Date;
 } = {}) => {
-    /**
-     * Fetches the meal planning data for the specified date range using the useFetchPlanning hook
-     */
-    const planing = useFetchPlanning({
-        forDate,
-    });
+  /**
+   * Fetches the meal planning data for the specified date range using the useFetchPlanning hook
+   */
+  const planing = useFetchPlanning({
+    forDate,
+  });
 
-    const fallbackStartDate = useMemo(() => {
-        const baseDate = forDate || new Date();
-        return fromDate(baseDate).thisMonday();
-    }, [forDate]);
+  const fallbackStartDate = useMemo(() => {
+    const baseDate = forDate || new Date();
+    return fromDate(baseDate).thisMonday();
+  }, [forDate]);
 
-    const currentWeek = useMemo(() => {
-        const firstDate = planing.data?.[0]?.date;
-        if (!firstDate) return fallbackStartDate;
-        return loadDate(firstDate);
-    }, [fallbackStartDate, planing.data]);
+  const currentWeek = useMemo(() => {
+    const firstDate = planing.data?.[0]?.date;
+    if (!firstDate) return fallbackStartDate;
+    return loadDate(firstDate);
+  }, [fallbackStartDate, planing.data]);
 
-    const bmrQuery = useFetchBmr({
-        startDate: fromDate(currentWeek).thisMonday(),
-        endDate: fromDate(currentWeek).thisSunday(),
-    });
+  const bmrQuery = useFetchBmr({
+    startDate: fromDate(currentWeek).thisMonday(),
+    endDate: fromDate(currentWeek).thisSunday(),
+  });
 
-    const userWeight = useFetchUserWeightForDateRange({
-        startDate: fromDate(currentWeek).thisMonday(),
-        endDate: fromDate(currentWeek).thisSunday(),
-    });
+  const userWeight = useFetchUserWeightForDateRange({
+    startDate: fromDate(currentWeek).thisMonday(),
+    endDate: fromDate(currentWeek).thisSunday(),
+  });
 
-    /**
-     * Maps meal planning data to a structure that allows quick access to meal plans for each meal and date.
-     * Key ~ Date
-     * Value ~ All planing info for that day.
-     */
-    const planningMap = useMemo(() => {
-        const data = planing.data ?? [];
-        const map = new Map(
-            data.map((plan) => {
-                return [
-                    generatePlaningKey(plan.date),
-                    plan,
-                ] as const;
-            }),
-        );
-        return map;
-    }, [planing.data]);
+  /**
+   * Maps meal planning data to a structure that allows quick access to meal plans for each meal and date.
+   * Key ~ Date
+   * Value ~ All planing info for that day.
+   */
+  const planningMap = useMemo(() => {
+    const data = planing.data ?? [];
+    const map = new Map(
+      data.map((plan) => {
+        return [generatePlaningKey(plan.date), plan] as const;
+      }),
+    );
+    return map;
+  }, [planing.data]);
 
-    /**
-     * Maps meal planning data to a structure that allows quick access to meal plans for each meal and date.
-     * Key ~ Meal ID + Date
-     * Value ~ Meal plan data for that meal and date.
-     */
-    const mealsMap = useMemo(() => {
-        const data = planing.data ?? [];
-        const map = new Map(
-            data.flatMap((plan) => {
-                return plan.user_planing_meal.map((meal) => {
-                    return [
-                        generateMealKey(meal.meal_id, plan.date),
-                        meal,
-                    ] as const;
-                });
-            }),
-        );
-        return map;
-    }, [planing.data]);
-
-    /**
-     * Calculates the total kcal for each day of the week based on the meal planning data.
-     * This is used to display the total kcal for each day in the meals table.
-     */
-    const kcalState = useMemo(() => {
-        const kcalPerDay: {
-            meals: number;
-            training: number;
-            total: number;
-            balance: number;
-            macros: {
-                carbs: number;
-                carbsPerKg: number;
-                protein: number;
-                proteinPerKg: number;
-                fat: number;
-                fatPerKg: number;
-            }
-        }[] = Array.from({ length: daysInWeek }, () => ({
-            meals: 0,
-            training: 0,
-            total: 0,
-            balance: 0,
-            macros: {
-                carbs: 0,
-                carbsPerKg: 0,
-                protein: 0,
-                proteinPerKg: 0,
-                fat: 0,
-                fatPerKg: 0,
-            },
-        }));
-        const data = planing.data ?? [];
-        if (data.length === 0) return kcalPerDay;
-
-        if (!userWeight.data) {
-            return kcalPerDay;
-        }
-
-        if(!bmrQuery.data) {
-            return kcalPerDay;
-        }
-
-        data.forEach((plan) => {
-            if (!plan.date) {
-                console.warn("Planing entry is missing date:", plan);
-                return; // Skip entries without a date
-            }
-            const date = loadDate(plan.date);
-            const dayIndex = getDayIndexForDate(fallbackStartDate, date);
-            if (dayIndex < 0 || dayIndex >= daysInWeek) {
-                console.warn(`Planing date ${saveDate(date)} is out of range for the current week starting on ${saveDate(fallbackStartDate)}`);
-                return; // Skip meals that are outside the current week
-            }
-            kcalPerDay[dayIndex].meals = plan.user_planing_meal.reduce((total, meal) => {
-                return total + meal.type_id.kcal;
-            }, 0);
-            kcalPerDay[dayIndex].training = plan.training_hc.reduce((total, hc) => {
-                return total + calculateKcalFromMacros({ carbs: hc, protein: 0, fat: 0 });
-            }, 0);
-            kcalPerDay[dayIndex].macros = plan.user_planing_meal.reduce((totals, meal) => {
-                totals.carbs += meal.type_id.hc;
-                totals.protein += meal.type_id.prot;
-                totals.fat += meal.type_id.fat;
-                return totals;
-            }, { carbs: 0, protein: 0, fat: 0, carbsPerKg: 0, proteinPerKg: 0, fatPerKg: 0 });
-            kcalPerDay[dayIndex].macros.carbsPerKg = kcalPerDay[dayIndex].macros.carbs / userWeight.data;
-            kcalPerDay[dayIndex].macros.proteinPerKg = kcalPerDay[dayIndex].macros.protein / userWeight.data;
-            kcalPerDay[dayIndex].macros.fatPerKg = kcalPerDay[dayIndex].macros.fat / userWeight.data;
-            kcalPerDay[dayIndex].total = kcalPerDay[dayIndex].meals + kcalPerDay[dayIndex].training;
-            kcalPerDay[dayIndex].balance = kcalPerDay[dayIndex].total - (bmrQuery.data ?? 0) - (plan.training_kcal ?? 0);
+  /**
+   * Maps meal planning data to a structure that allows quick access to meal plans for each meal and date.
+   * Key ~ Meal ID + Date
+   * Value ~ Meal plan data for that meal and date.
+   */
+  const mealsMap = useMemo(() => {
+    const data = planing.data ?? [];
+    const map = new Map(
+      data.flatMap((plan) => {
+        return plan.user_planing_meal.map((meal) => {
+          return [generateMealKey(meal.meal_id, plan.date), meal] as const;
         });
+      }),
+    );
+    return map;
+  }, [planing.data]);
 
-        return kcalPerDay;
-    }, [bmrQuery.data, fallbackStartDate, planing.data, userWeight.data]);
+  /**
+   * Calculates the total kcal for each day of the week based on the meal planning data.
+   * This is used to display the total kcal for each day in the meals table.
+   */
+  const kcalState = useMemo(() => {
+    const kcalPerDay: {
+      meals: number;
+      training: number;
+      total: number;
+      balance: number;
+      macros: {
+        carbs: number;
+        carbsPerKg: number;
+        protein: number;
+        proteinPerKg: number;
+        fat: number;
+        fatPerKg: number;
+      };
+    }[] = Array.from({ length: daysInWeek }, () => ({
+      meals: 0,
+      training: 0,
+      total: 0,
+      balance: 0,
+      macros: {
+        carbs: 0,
+        carbsPerKg: 0,
+        protein: 0,
+        proteinPerKg: 0,
+        fat: 0,
+        fatPerKg: 0,
+      },
+    }));
+    const data = planing.data ?? [];
+    if (data.length === 0) return kcalPerDay;
 
-    const maxTrainingHours = useMemo(() => {
-        const data = planing.data ?? [];
-        if (data.length === 0) return 3; // Default to 3 training hours if no data is available
+    if (!userWeight.data) {
+      return kcalPerDay;
+    }
 
-        const maxFilledHours = Math.max(
-            3, // Minimum of 3 hours
-            ...data.map((plan) => {
-                const trainingHours = plan.training_hc ?? [];
-                for (let index = trainingHours.length - 1; index >= 0; index--) {
-                    if ((trainingHours[index] ?? 0) > 0) {
-                        return index + 1;
-                    }
-                }
-                return 0;
-            }),
+    if (!bmrQuery.data) {
+      return kcalPerDay;
+    }
+
+    data.forEach((plan) => {
+      if (!plan.date) {
+        console.warn("Planing entry is missing date:", plan);
+        return; // Skip entries without a date
+      }
+      const date = loadDate(plan.date);
+      const dayIndex = getDayIndexForDate(fallbackStartDate, date);
+      if (dayIndex < 0 || dayIndex >= daysInWeek) {
+        console.warn(
+          `Planing date ${saveDate(date)} is out of range for the current week starting on ${saveDate(fallbackStartDate)}`,
         );
+        return; // Skip meals that are outside the current week
+      }
+      kcalPerDay[dayIndex].meals = plan.user_planing_meal.reduce(
+        (total, meal) => {
+          return total + meal.recipe_type.kcal;
+        },
+        0,
+      );
+      kcalPerDay[dayIndex].training = plan.training_hc.reduce((total, hc) => {
+        return (
+          total + calculateKcalFromMacros({ carbs: hc, protein: 0, fat: 0 })
+        );
+      }, 0);
+      kcalPerDay[dayIndex].macros = plan.user_planing_meal.reduce(
+        (totals, meal) => {
+          totals.carbs += meal.recipe_type.hc;
+          totals.protein += meal.recipe_type.prot;
+          totals.fat += meal.recipe_type.fat;
+          return totals;
+        },
+        {
+          carbs: 0,
+          protein: 0,
+          fat: 0,
+          carbsPerKg: 0,
+          proteinPerKg: 0,
+          fatPerKg: 0,
+        },
+      );
+      kcalPerDay[dayIndex].macros.carbsPerKg =
+        kcalPerDay[dayIndex].macros.carbs / userWeight.data;
+      kcalPerDay[dayIndex].macros.proteinPerKg =
+        kcalPerDay[dayIndex].macros.protein / userWeight.data;
+      kcalPerDay[dayIndex].macros.fatPerKg =
+        kcalPerDay[dayIndex].macros.fat / userWeight.data;
+      kcalPerDay[dayIndex].total =
+        kcalPerDay[dayIndex].meals + kcalPerDay[dayIndex].training;
+      kcalPerDay[dayIndex].balance =
+        kcalPerDay[dayIndex].total -
+        (bmrQuery.data ?? 0) -
+        (plan.training_kcal ?? 0);
+    });
 
-        return Math.max(3, maxFilledHours + 1); // +1 for the next editable empty row
-    }, [planing.data]);
+    return kcalPerDay;
+  }, [bmrQuery.data, fallbackStartDate, planing.data, userWeight.data]);
 
-    return {
-        planningMap,
-        mealsMap,
-        maxTrainingHours,
-        kcalState,
-        bmr: bmrQuery.data,
-    };
+  const maxTrainingHours = useMemo(() => {
+    const data = planing.data ?? [];
+    if (data.length === 0) return 3; // Default to 3 training hours if no data is available
+
+    const maxFilledHours = Math.max(
+      3, // Minimum of 3 hours
+      ...data.map((plan) => {
+        const trainingHours = plan.training_hc ?? [];
+        for (let index = trainingHours.length - 1; index >= 0; index--) {
+          if ((trainingHours[index] ?? 0) > 0) {
+            return index + 1;
+          }
+        }
+        return 0;
+      }),
+    );
+
+    return Math.max(3, maxFilledHours + 1); // +1 for the next editable empty row
+  }, [planing.data]);
+
+  return {
+    planningMap,
+    mealsMap,
+    maxTrainingHours,
+    kcalState,
+    bmr: bmrQuery.data,
+  };
 };

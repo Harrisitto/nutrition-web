@@ -6,14 +6,12 @@ import { useGetAuthInfo } from "@src/services/tanstack/auth/get";
 import { useFetchNutritionistUsers } from "@src/services/tanstack/user/profile";
 import { useAppSelector } from "@src/store/store";
 import { IdxSetUpProfile } from "@src/components/auth/setUpProfileIndex";
-import { useEffect, useState } from "react";
-import { debounce } from "lodash";
-
+import { useFetchHasSuscription } from "./@queries/hasSuscription";
+import { PaymentRequiredPage } from "./paymentCheckout";
 
 export default function PageDashboard() {
-  const [isLoading, setIsLoading] = useState(true);
   const d = useAppSelector((state) => state.config.selectedDay);
-  const date = loadDate(d ?? '')
+  const date = loadDate(d ?? "");
 
   const thisDateMonday = date
     ? fromDate(date).thisMonday()
@@ -21,30 +19,19 @@ export default function PageDashboard() {
 
   const allClients = useFetchNutritionistUsers();
   const nutriInfoQuery = useGetAuthInfo();
+  const hasSuscriptionQuery = useFetchHasSuscription();
 
-  const DEBOUNCE_DURATION = 500;
-
-  useEffect(() => {
-    // 1. Definimos la función debouncenda
-    const handleLoadingDebounced = debounce(() => {
-      // Ambas consultas deben haber terminado de cargar (&&)
-      const isStillLoading = allClients.isLoading || nutriInfoQuery.isLoading;
-      setIsLoading(isStillLoading);
-    }, DEBOUNCE_DURATION);
-
-    // 2. IMPORTANTE: ¡Ejecutamos la función!
-    handleLoadingDebounced();
-
-    // 3. Cancelamos la ejecución pendiente si las dependencias cambian o el componente se desmonta
-    return () => {
-      handleLoadingDebounced.cancel();
-    };
-  }, [allClients.isLoading, nutriInfoQuery.isLoading]);
+  const isLoading =
+    nutriInfoQuery.isLoading ||
+    allClients.isLoading ||
+    hasSuscriptionQuery.isLoading;
 
   if (isLoading) {
-    return <div className="w-full min-h-screen flex justify-center items-center">
-      <AnimationLoading size={240} />
-    </div>;
+    return (
+      <div className="w-full min-h-screen flex justify-center items-center">
+        <AnimationLoading size={240} />
+      </div>
+    );
   }
 
   if (!nutriInfoQuery.data) {
@@ -59,7 +46,7 @@ export default function PageDashboard() {
           </div>
         </div>
       </IdxSetUpProfile.Provider>
-    )
+    );
   }
 
   if (allClients.data?.length === 0 && allClients.isLoading === false) {
@@ -70,6 +57,10 @@ export default function PageDashboard() {
         <IdxConfiguration.Invitations.InvitedClients />
       </div>
     );
+  }
+
+  if (!hasSuscriptionQuery.data) {
+    return <PaymentRequiredPage />;
   }
 
   return (
