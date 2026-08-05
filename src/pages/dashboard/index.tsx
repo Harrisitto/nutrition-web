@@ -1,5 +1,4 @@
-import IdxConfiguration from "@src/components/configuration";
-import { AppDashboard, IdxDashboard } from "@src/components/dashboard";
+import AppDashboard from "./@components/sideBar";
 import { AnimationLoading } from "@src/components/global/Animations";
 import { fromDate, loadDate } from "@src/helpers/dates";
 import { useGetAuthInfo } from "@src/services/tanstack/auth/get";
@@ -7,7 +6,17 @@ import { useFetchNutritionistUsers } from "@src/services/tanstack/user/profile";
 import { useAppSelector } from "@src/store/store";
 import { IdxSetUpProfile } from "@src/components/auth/setUpProfileIndex";
 import { useFetchHasSuscription } from "./@queries/hasSuscription";
-import { PaymentRequiredPage } from "./paymentCheckout";
+import { ManageAuthState } from "./configuration/authManagement";
+import PageInviteClient from "./configuration/inviteClient";
+import { Route, Routes } from "react-router-dom";
+import { APP_ROUTES, getTrailingRoute } from "@src/hooks/navigation/routes";
+import { lazy, useMemo } from "react";
+
+const PageFormPreset = lazy(() => import("./presetForm/index"));
+const PageFormMeasure = lazy(() => import("./measuresForm/index"));
+const PageConfiguration = lazy(() => import("./configuration/index"));
+const PaymentRequiredPage = lazy(() => import("./paymentCheckout/index"));
+const PagePlaningForm = lazy(() => import("./planingForm/index"));
 
 export default function PageDashboard() {
   const d = useAppSelector((state) => state.config.selectedDay);
@@ -21,10 +30,17 @@ export default function PageDashboard() {
   const nutriInfoQuery = useGetAuthInfo();
   const hasSuscriptionQuery = useFetchHasSuscription();
 
-  const isLoading =
-    nutriInfoQuery.isLoading ||
-    allClients.isLoading ||
-    hasSuscriptionQuery.isLoading;
+  const isLoading = useMemo(
+    () =>
+      nutriInfoQuery.isLoading ||
+      allClients.isLoading ||
+      hasSuscriptionQuery.isLoading,
+    [
+      nutriInfoQuery.isLoading,
+      allClients.isLoading,
+      hasSuscriptionQuery.isLoading,
+    ],
+  );
 
   if (isLoading) {
     return (
@@ -49,12 +65,11 @@ export default function PageDashboard() {
     );
   }
 
-  if (allClients.data?.length === 0 && allClients.isLoading === false) {
+  if (allClients.data?.length === 0) {
     return (
       <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2">
-        <IdxConfiguration.AuthManagement.ManageAuthState />
-        <IdxConfiguration.Invitations.InviteClient />
-        <IdxConfiguration.Invitations.InvitedClients />
+        <ManageAuthState />
+        <PageInviteClient />
       </div>
     );
   }
@@ -66,30 +81,24 @@ export default function PageDashboard() {
   return (
     <AppDashboard>
       <div className="p-4">
-        <IdxDashboard.Text.Titles.UserName />
-        <div className="my-2 h-px w-full bg-nutrition-green/20" />
-        <div className="flex flex-row items-center gap-2 m-4 justify-between">
-          <IdxDashboard.Dates.SelectDateHeader />
-          <div className="flex flex-col gap-2">
-            <IdxDashboard.Text.Titles.Navigation />
-            <IdxDashboard.Buttons.NavigateInfo />
-            <IdxDashboard.Buttons.NavigateUserPreset />
-            <IdxDashboard.Buttons.NavigateMeasures />
-            <IdxDashboard.Buttons.NavigateConfig />
-          </div>
-          <div>
-            <IdxDashboard.Buttons.CloneLastWeek startMonday={thisDateMonday} />
-          </div>
-          <div className="flex flex-1 flex-row flex-wrap justify-evenly gap-2">
-            <IdxDashboard.Users.Info.LastSeen />
-            <IdxDashboard.Users.Info.Email />
-            <IdxDashboard.Users.Info.Phone />
-            <IdxDashboard.Users.Info.Weight />
-            <IdxDashboard.Users.Info.Goal />
-          </div>
-        </div>
-        <div className="my-4" />
-        <IdxDashboard.Metrics.Meals.WeeklyMeals startMonday={thisDateMonday} />
+        <Routes>
+          <Route
+            path={"/"}
+            element={<PagePlaningForm thisDateMonday={thisDateMonday} />}
+          />
+          <Route
+            path={getTrailingRoute(APP_ROUTES.FORM_PRESET)}
+            element={<PageFormPreset />}
+          />
+          <Route
+            path={getTrailingRoute(APP_ROUTES.FORM_MEASURE)}
+            element={<PageFormMeasure />}
+          />
+          <Route
+            path={getTrailingRoute(APP_ROUTES.CONFIG_WILD)}
+            element={<PageConfiguration />}
+          />
+        </Routes>
       </div>
     </AppDashboard>
   );

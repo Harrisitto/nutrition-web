@@ -23,6 +23,20 @@
             "5": "Sabado",
             "6": "Domingo"
         },
+        "monthsOfYear": {
+            "0": "Enero",
+            "1": "Febrero",
+            "2": "Marzo",
+            "3": "Abril",
+            "4": "Mayo",
+            "5": "Junio",
+            "6": "Julio",
+            "7": "Agosto",
+            "8": "Septiembre",
+            "9": "Octubre",
+            "10": "Noviembre",
+            "11": "Diciembre"
+        },
         "commentsRows": {
             "header": "Comentarios",
             "pressEsc": "Pulsa ESC para cerrar",
@@ -44,7 +58,9 @@
             "header": "Ir a",
             "presets": "Preajustes",
             "measures": "Medidas",
-            "config": "Configuracion del nutricionista"
+            "config": "Configuracion del nutricionista",
+            "info": "Ver informacion de la app",
+            "dashboard": "Tablero"
         },
         "actions": {
             "cloneWeek": "Clonar semana anterior",

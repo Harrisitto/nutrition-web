@@ -1,6 +1,6 @@
 import { useRedirectToCheckout } from "./@queries/redirectCheckout";
 
-export function PaymentRequiredPage() {
+const PaymentRequiredPage = () => {
   const { loading, handleCheckout } = useRedirectToCheckout();
 
   return (
@@ -23,4 +23,6 @@ export function PaymentRequiredPage() {
       </div>
     </div>
   );
-}
+};
+
+export default PaymentRequiredPage;

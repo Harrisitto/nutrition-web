@@ -2,24 +2,17 @@ import { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./components/global/ProtectedRoute";
 import { APP_ROUTES } from "./hooks/navigation/routes";
-import { usePrefetchPlaning } from "./services/tanstack/user/planing";
 import { InitialAnimation } from "./components/global/Animations";
 
 const SignInPage = lazy(() => import("./pages/auth/SignUpPage"));
 const PageAppDashboard = lazy(() => import("./pages/dashboard"));
-const PageUserPreset = lazy(() => import("./pages/forms/preset"));
-const PagePrivacyPolicy = lazy(() => import("./pages/privacyPolicy/page"));
-const PageReferences = lazy(() => import("./pages/references/page"));
+const PagePrivacyPolicy = lazy(() => import("./pages/app/privacyPolicy/page"));
+const PageReferences = lazy(() => import("./pages/app/references/page"));
 const NotFoundPage = lazy(() => import("./pages/error/NotFoundPage"));
-const PageMeasures = lazy(() => import("./pages/forms/measures"));
-const PageNutritionistConfiguration = lazy(
-  () => import("./pages/dashboard/configuration"),
-);
+
 const PageInfo = lazy(() => import("./pages/app/info"));
 
 function App() {
-  usePrefetchPlaning();
-
   return (
     <main className="w-full min-h-screen bg-white-green text-black-green">
       <Suspense
@@ -41,44 +34,13 @@ function App() {
           />
           {/* Protected routes */}
           <Route
-            path={APP_ROUTES.DASHBOARD}
+            path={APP_ROUTES.DASHBOARD_WILD}
             element={
-              <ProtectedRoute>
+              <ProtectedRoute selectedUserRequired={true}>
                 <PageAppDashboard />
               </ProtectedRoute>
             }
           />
-          <Route
-            path={APP_ROUTES.FORM_PRESET}
-            element={
-              <ProtectedRoute
-                selectedUserRequired={true} // This page requires a user to be selected in the config
-              >
-                <PageUserPreset />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path={APP_ROUTES.FORM_MEASURE}
-            element={
-              <ProtectedRoute
-                selectedUserRequired={true} // This page requires a user to be selected in the config
-              >
-                <PageMeasures />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path={APP_ROUTES.CONFIG}
-            element={
-              <ProtectedRoute>
-                <PageNutritionistConfiguration />
-              </ProtectedRoute>
-            }
-          />
-
           {/* 404 - Catch all unmatched routes */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

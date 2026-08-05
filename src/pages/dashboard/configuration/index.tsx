@@ -1,59 +1,67 @@
-import IdxConfiguration from "@src/components/configuration";
 import { useTranslation } from "react-i18next";
+import { Header } from "./@components/header";
+import { Routes, Route } from "react-router-dom";
+import { APP_ROUTES, getTrailingRoute } from "@src/hooks/navigation/routes";
+import { Recipes } from "./recipes";
+import { TableCommands } from "./keyboard";
+import { ManageAuthState } from "./authManagement";
+import useAppNavigation from "@src/hooks/navigation";
+import { lazy } from "react";
 
-const ConfigurationContent = () => {
+const PageInviteClient = lazy(() => import("./inviteClient/index"));
+
+const PageNutritionistConfiguration = () => {
   const { t } = useTranslation();
-  const { selectedSection } = IdxConfiguration.Default.useContext();
+  const { navigateTo } = useAppNavigation();
 
   return (
-    <>
-      <IdxConfiguration.Default.Header
+    <div className="p-6">
+      <Header
         sections={[
           {
-            key: "inviteClient",
+            route: APP_ROUTES.INVITE_CLIENT,
             label: t("data:configuration.sections.invitations.title"),
+            onClick: () => navigateTo(APP_ROUTES.INVITE_CLIENT),
           },
           {
-            key: "recipesConfig",
+            route: APP_ROUTES.RECIPES_CONFIG,
             label: t("data:configuration.sections.recipes.title"),
+            onClick: () => navigateTo(APP_ROUTES.RECIPES_CONFIG),
           },
           {
-            key: "keyboard",
+            route: APP_ROUTES.KEYBOARD,
             label: t("data:configuration.sections.keyboard.tableCommands"),
+            onClick: () => navigateTo(APP_ROUTES.KEYBOARD),
           },
           {
-            key: "authManagement",
+            route: APP_ROUTES.AUTH_MANAGEMENT,
             label: t("data:configuration.sections.authManagement.title"),
+            onClick: () => navigateTo(APP_ROUTES.AUTH_MANAGEMENT),
           },
         ]}
       />
-
-      {selectedSection === "inviteClient" ? (
-        <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2">
-          <IdxConfiguration.Invitations.InviteClient />
-          <IdxConfiguration.Invitations.InvitedClients />
-          <IdxConfiguration.Invitations.ManageClients />
-        </div>
-      ) : null}
-      {selectedSection === "recipesConfig" ? (
-        <IdxConfiguration.Recipes />
-      ) : null}
-      {selectedSection === "keyboard" ? (
-        <IdxConfiguration.Keyboard.TableCommands />
-      ) : null}
-      {selectedSection === "authManagement" ? (
-        <IdxConfiguration.AuthManagement.ManageAuthState />
-      ) : null}
-    </>
-  );
-};
-
-const PageNutritionistConfiguration = () => {
-  return (
-    <div className="p-6">
-      <IdxConfiguration.Default.Provider>
-        <ConfigurationContent />
-      </IdxConfiguration.Default.Provider>
+      <Routes>
+        <Route
+          path={getTrailingRoute(APP_ROUTES.CONFIG)}
+          element={<PageInviteClient />}
+        />
+        <Route
+          path={getTrailingRoute(APP_ROUTES.INVITE_CLIENT)}
+          element={<PageInviteClient />}
+        />
+        <Route
+          path={getTrailingRoute(APP_ROUTES.RECIPES_CONFIG)}
+          element={<Recipes />}
+        />
+        <Route
+          path={getTrailingRoute(APP_ROUTES.KEYBOARD)}
+          element={<TableCommands />}
+        />
+        <Route
+          path={getTrailingRoute(APP_ROUTES.AUTH_MANAGEMENT)}
+          element={<ManageAuthState />}
+        />
+      </Routes>
     </div>
   );
 };
