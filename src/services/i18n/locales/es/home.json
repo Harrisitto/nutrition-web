@@ -4,17 +4,12 @@
     "features": "Ventajas",
     "instagram": "Comunidad",
     "pricing": "Precios",
-    "login": "Entrar",
-    "register": "Empieza Gratis"
+    "login": "Entrar"
   },
   "hero": {
     "badge": "⚡ Una herramienta esencial para nutricionistas",
     "title": "Simplifica la gestión de dietas y conecta con tus clientes",
-    "subtitle": "EzFood agiliza la creación y envío de planificaciones nutricionales para que ahorres tiempo y te concentres en lo que importa. Tus clientes tendrán su menú accesible en cualquier momento desde su teléfono.",
-    "cta_primary": "Probar Gratis 14 Días",
-    "cta_secondary": "Ver Demostración",
-    "nutritionist_benefit": "Planifica en minutos",
-    "client_benefit": "App móvil para tus pacientes"
+    "subtitle": "EzFood agiliza la creación y envío de planificaciones nutricionales para que ahorres tiempo y te concentres en lo que importa. Tus clientes tendrán su menú accesible en cualquier momento desde su teléfono."
   },
   "features": {
     "badge": "Diseñado para ganar tiempo",
@@ -31,45 +26,17 @@
     "badge": "Comunidad EzFood",
     "title": "Síguenos en Instagram",
     "subtitle": "Descubre consejos de nutrición, actualizaciones de la plataforma y casos de éxito de otros nutricionistas.",
-    "follow_btn": "Seguir a @ezfood.app",
-    "posts": [
-      {
-        "id": 1,
-        "title": "5 Consejos para aumentar la adherencia al menú semanal 🥗",
-        "date": "Hace 2 días",
-        "likes": "342 me gusta"
-      },
-      {
-        "id": 2,
-        "title": "Nueva funcionalidad: Ajustes rápidos en dietas personalizadas 🚀",
-        "date": "Hace 4 días",
-        "likes": "512 me gusta"
-      },
-      {
-        "id": 3,
-        "title": "¿Cómo ahorrar hasta 6 horas a la semana administrando pacientes? ⏱️",
-        "date": "Hace 1 semana",
-        "likes": "289 me gusta"
-      },
-      {
-        "id": 4,
-        "title": "Nutrición clínica vs. Nutrición deportiva en la app EzFood 📊",
-        "date": "Hace 2 semanas",
-        "likes": "415 me gusta"
-      }
-    ]
+    "follow_btn": "Seguir a @ezfood.app"
   },
   "pricing": {
     "badge": "Integración con Stripe",
     "title": "Planes transparentes para nutricionistas",
     "subtitle": "Comienza desde 5€ al mes. Y paga solo por los usuarios que necesites.",
-    "billing_monthly": "Facturación Mensual",
     "plan_starter_name": "Starter",
     "plan_starter_price": "5€",
     "plan_starter_desc": "Ideal para nutricionistas que están empezando su consulta.",
     "plan_starter_f1": "Hasta 5 clientes.",
     "plan_starter_f2": "Planificaciones ilimitadas",
-    "plan_starter_f3": "Acceso a app móvil para clientes",
     "plan_pro_name": "Profesional",
     "plan_pro_price": "25€ + 2€ por cliente",
     "plan_pro_popular": "Recomendado",
@@ -77,12 +44,17 @@
     "plan_pro_f1": "Todos los clientes que necesites.",
     "plan_pro_f2": "Planificaciones ilimitadas",
     "plan_pro_f3": "Soporte prioritario",
-    "stripe_security": "Pago 100% seguro procesado por Stripe"
+    "stripe_btn": "Comenzar"
   },
   "footer": {
     "desc": "EzFood impulsa el trabajo de los nutricionistas permitiendo enviar dietas al teléfono de sus pacientes en tiempo récord.",
     "quick_links": "Enlaces Rápidos",
-    "social": "Redes Sociales",
-    "rights": "© 2026 EzFood. Todos los derechos reservados."
+    "important_links": "Enlaces Importantes",
+    "privacy_policy": "Política de Privacidad",
+    "references": "Referencias"
+  },
+  "phone": {
+    "badgeSyncronized": "Sincronizado",
+    "badgeDailyPlan": "Plan diario"
   }
 }

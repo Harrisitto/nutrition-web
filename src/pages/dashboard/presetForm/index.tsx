@@ -1,39 +1,41 @@
-import IdxUserPreset from "@src/components/forms/presets";
+import { FieldMeal, FieldText, FieldTrainingHc, InsertData, Provider } from "./components/form/logicComponents";
+import { List } from "./components/manage";
+import { Description, FormResume, Meals, NewPreset, Title, TrainingHc } from "./components/text";
 
 const PageUserPreset = () => {
   return (
-    <IdxUserPreset.Form.Provider>
+    <Provider>
       <div className="p-24 justify-center items-center w-full">
-        <IdxUserPreset.Text.Title />
-        <IdxUserPreset.Text.Description />
+        <Title />
+        <Description />
         <div className="my-6" />
         <div className="grid grid-cols-1 md:grid-cols-[720px_minmax(0,1fr)] gap-4 items-start">
           <div className="rounded-lg border border-nutrition-green/20 p-6">
-            <IdxUserPreset.Text.NewPreset />
-            <IdxUserPreset.Form.FieldText />
+            <NewPreset />
+            <FieldText />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <IdxUserPreset.Text.Meals />
+                <Meals />
                 <div className="my-2" />
-                <IdxUserPreset.Form.FieldMeal />
+                <FieldMeal />
               </div>
               <div>
-                <IdxUserPreset.Text.TrainingHc />
+                <TrainingHc />
                 <div className="my-2" />
-                <IdxUserPreset.Form.FieldTrainingHc />
+                <FieldTrainingHc />
               </div>
               <div>
-                <IdxUserPreset.Text.FormResume />
+                <FormResume />
                 <div className="my-2" />
-                <IdxUserPreset.Form.Resume />
+                <FormResume />
                 </div>
             </div>
-            <IdxUserPreset.Form.InsertData />
+            <InsertData />
           </div>
-          <IdxUserPreset.Manage.List />
+          <List />
         </div>
       </div>
-    </IdxUserPreset.Form.Provider>
+    </Provider>
   );
 };
 

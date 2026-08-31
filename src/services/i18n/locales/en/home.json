@@ -4,88 +4,57 @@
     "features": "Features",
     "instagram": "Community",
     "pricing": "Pricing",
-    "login": "Enter",
-    "register": "Get Started Free"
+    "login": "Log in"
   },
   "hero": {
-    "badge": "⚡ A tool essential for nutritionists",
-    "title": "Simplify meal planning and connect with your clients",
-    "subtitle": "EzFood streamlines creating and sending meal plans so you save time and focus on what matters most. Your clients will always have their menu accessible on their phone.",
-    "cta_primary": "Start 14-Day Free Trial",
-    "cta_secondary": "Watch Demo",
-    "nutritionist_benefit": "Plan in minutes",
-    "client_benefit": "Mobile app for your patients"
+    "badge": "⚡ An essential tool for nutritionists",
+    "title": "Simplify diet management and connect with your clients",
+    "subtitle": "EzFood streamlines the creation and delivery of meal plans so you save time and focus on what matters. Your clients will have their menu accessible anytime right from their phone."
   },
   "features": {
     "badge": "Designed to save time",
     "title": "Everything you need to scale your nutrition practice",
-    "subtitle": "Eliminate chaotic spreadsheets and scattered messages. A smooth workflow for you and effortless experience for your users.",
+    "subtitle": "Eliminate the chaos of spreadsheets and scattered messages. A smooth workflow for you and effortless for your users.",
     "item1_title": "Ultra-fast Planning",
-    "item1_desc": "Assign and adjust meal plans in minutes thanks to our smart templates.",
+    "item1_desc": "Assign and modify meal plans in minutes thanks to our smart templates.",
     "item2_title": "Always handy on mobile",
-    "item2_desc": "Clients instantly view their daily meal plan from their smartphone—clear, clean, and well-organized.",
+    "item2_desc": "Clients instantly view their daily diet from their smartphone—clear, clean, and well-organized.",
     "item3_title": "More time for your clients",
-    "item3_desc": "Automate menu delivery and reduce administrative tasks to offer higher quality care."
+    "item3_desc": "Automate menu delivery and reduce admin tasks to provide higher-quality patient care."
   },
   "instagram": {
     "badge": "EzFood Community",
     "title": "Follow us on Instagram",
     "subtitle": "Discover nutrition tips, platform updates, and success stories from other nutritionists.",
-    "follow_btn": "Follow @ezfood.app",
-    "posts": [
-      {
-        "id": 1,
-        "title": "5 Tips to increase weekly meal plan adherence 🥗",
-        "date": "2 days ago",
-        "likes": "342 likes"
-      },
-      {
-        "id": 2,
-        "title": "New feature: Quick adjustments in custom meal plans 🚀",
-        "date": "4 days ago",
-        "likes": "512 likes"
-      },
-      {
-        "id": 3,
-        "title": "How to save up to 6 hours a week managing patients ⏱️",
-        "date": "1 week ago",
-        "likes": "289 likes"
-      },
-      {
-        "id": 4,
-        "title": "Clinical vs. Sports Nutrition in the EzFood app 📊",
-        "date": "2 weeks ago",
-        "likes": "415 likes"
-      }
-    ]
+    "follow_btn": "Follow @ezfood.app"
   },
   "pricing": {
     "badge": "Stripe Integration",
-    "title": "Transparent pricing for nutritionists",
-    "subtitle": "Start with a 14-day free trial. No commitment, cancel anytime.",
-    "billing_monthly": "Monthly Billing",
+    "title": "Transparent plans for nutritionists",
+    "subtitle": "Start from €5 a month. Pay only for the users you need.",
     "plan_starter_name": "Starter",
-    "plan_starter_price": "€29",
+    "plan_starter_price": "€5",
     "plan_starter_desc": "Ideal for nutritionists starting their practice.",
-    "plan_starter_f1": "Up to 25 active clients",
+    "plan_starter_f1": "Up to 5 clients.",
     "plan_starter_f2": "Unlimited meal plans",
-    "plan_starter_f3": "Client mobile app access",
     "plan_pro_name": "Professional",
-    "plan_pro_price": "€59",
+    "plan_pro_price": "€25 + €2/client",
     "plan_pro_popular": "Recommended",
-    "plan_pro_desc": "Perfect for established practices with a growing client volume.",
-    "plan_pro_f1": "Up to 80 active clients",
-    "plan_pro_f2": "All Starter features",
-    "plan_pro_f3": "Menu compliance analytics",
-    "plan_pro_f4": "24/7 priority support",
-    "plan_pro_f5": "Branded PDF export",
-    "stripe_btn": "Subscribe with Stripe",
-    "stripe_security": "100% secure payment processed by Stripe"
+    "plan_pro_desc": "Perfect for established practices with a solid volume of patients.",
+    "plan_pro_f1": "As many clients as you need.",
+    "plan_pro_f2": "Unlimited meal plans",
+    "plan_pro_f3": "Priority support",
+    "stripe_btn": "Get Started"
   },
   "footer": {
-    "desc": "EzFood empowers nutritionists to deliver meal plans directly to their patients' phones in record time.",
+    "desc": "EzFood empowers nutritionists by delivering meal plans directly to their patients' phones in record time.",
     "quick_links": "Quick Links",
-    "social": "Social Media",
-    "rights": "© 2026 EzFood. All rights reserved."
+    "important_links": "Important Links",
+    "privacy_policy": "Privacy Policy",
+    "references": "References"
+  },
+  "phone": {
+    "badgeSyncronized": "Syncronized",
+    "badgeDailyPlan": "Daily plan"
   }
 }

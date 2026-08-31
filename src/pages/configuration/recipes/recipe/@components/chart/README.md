@@ -1,0 +1,1 @@
+Gráfico circular (pie chart) que representa la proporción de carbohidratos, proteínas y grasas de una receta, con el total de kcal en el centro. `macroLabel.tsx` calcula la posición y el texto de las etiquetas que rodean el gráfico.

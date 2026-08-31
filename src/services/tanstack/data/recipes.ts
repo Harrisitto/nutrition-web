@@ -75,13 +75,23 @@ export const useFetchRecipes = ({
                 .from("all_recipes")
                 .select(selectRecipes(langCode))
                 .ilike("name->>" + langCode, `%${search}%`)
-                .limit(100)
+                .limit(20)
 
             if (error) {
                 throw error;
             }
 
-            return data || [];
+            const recipeIds = data?.map(recipe => recipe.id) || [];
+
+            const signedUrls = await supabase.storage.from('recipe_images').createSignedUrls(
+                recipeIds.map(id => `receta_${id}.jpg`),
+                60 * 60 // 1 hour
+            );
+
+            return data?.map((recipe, index) => ({
+                ...recipe,
+                url: signedUrls.data ? signedUrls.data[index]?.signedUrl : recipe.url,
+            })) || [];
         },
         placeholderData: [],
     });
@@ -109,8 +119,18 @@ export const useFetchRecipeInfo = ({
                 throw error;
             }
 
-            return data || null;
+            const signedUrl = await supabase.storage.from('recipe_images').createSignedUrl(`receta_${recipeId}.jpg`, 60 * 60);
+
+            if (signedUrl.error) {
+                console.error("Error fetching signed URL:", signedUrl.error);
+            }
+
+            return {
+                ...data,
+                url: signedUrl.data ? signedUrl.data?.signedUrl : null,
+            };
         },
+        enabled: !!recipeId,
     });
 }
 

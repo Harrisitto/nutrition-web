@@ -5,12 +5,15 @@ import {
   TABLE_USER_PLANING,
   TABLE_USER_PLANING_MEAL,
 } from "@src/services/supabase/definitions";
-import { fromDate, loadDate, saveDate } from "@src/helpers/dates";
+import FromDate from "@src/helpers/dates";
 import { useLanguageCode } from "@src/hooks/helpers/language";
 import { queryClient } from "../queryClient";
 import { useNotification } from "@src/store/slices/notification/hook";
 import { useAppSelector } from "@src/store/store";
-import { useEffect } from "react";
+
+type Planing = ReturnType<typeof useFetchPlanning>["data"];
+type PlanningData = NonNullable<Planing>;
+type PlanningDay = PlanningData[number];
 
 const selectFromMeal = (languageCode: ReturnType<typeof useLanguageCode>) => {
   return `*, recipe_type(*, name: name->>${languageCode})` as const;
@@ -23,30 +26,18 @@ const selectFromPlaning = (
         ${TABLE_USER_PLANING_MEAL.NAME}(${selectFromMeal(languageCode)})` as const;
 };
 
-type Planing = ReturnType<typeof useFetchPlanning>["data"];
-type PlanningData = NonNullable<Planing>;
-type PlanningDay = PlanningData[number];
-
-const getPlaningWeekRange = (date: Date | string) => {
-  const opts = fromDate(new Date(date));
-  return {
-    start: saveDate(opts.thisMonday()),
-    end: saveDate(opts.thisSunday()),
-  };
-};
-
 const updatePlanningWeekQuery = (
   userId: string | null,
   languageCode: ReturnType<typeof useLanguageCode>,
-  date: Date | string,
+  date: FromDate | string,
   updater: (oldData: PlanningData) => PlanningData,
 ) => {
-  const { start, end } = getPlaningWeekRange(date);
+  const { monday: start, sunday: end } = new FromDate(date).thisWeek();
   queryClient.setQueryData<PlanningData>(
     queryKeys({
       userId,
       language: languageCode,
-    }).user.planing(start, end),
+    }).user.planing(start.save(), end.save()),
     (oldData) => {
       if (!oldData) return oldData;
       return updater(oldData);
@@ -110,33 +101,30 @@ export const fetchPlanningWeek = async ({
 
 export const useFetchPlanning = ({
   forDate,
-  rangeInWeeks = 0,
 }: {
-  forDate?: Date;
-  rangeInWeeks?: number;
+  forDate?: FromDate;
 } = {}) => {
   const savedDate = useAppSelector((state) => state.config.selectedDay);
   const user = useAppSelector((state) => state.config.selectedUserId);
   const languageCode = useLanguageCode();
 
-  const paramStartDate = forDate || loadDate(savedDate);
-  const effectiveStartDate = saveDate(fromDate(paramStartDate).thisMonday());
-  const effectiveEndDate = saveDate(
-    fromDate(
-      fromDate(paramStartDate).incrementDay(rangeInWeeks * 7),
-    ).thisSunday(),
-  );
+  // Garantiza que paramStartDate sea siempre una instancia de FromDate
+  const paramStartDate = new FromDate(forDate || savedDate);
+
+  // Usa los métodos que existen en tu clase FromDate
+  const monday = paramStartDate.thisMonday();
+  const sunday = paramStartDate.thisSunday();
 
   return useQuery({
     queryKey: queryKeys({
       userId: user,
       language: languageCode,
-    }).user.planing(effectiveStartDate, effectiveEndDate),
+    }).user.planing(monday.save(), sunday.save()),
     queryFn: async () =>
       fetchPlanningWeek({
         userId: user || "",
         languageCode,
-        dateRange: { start: effectiveStartDate, end: effectiveEndDate },
+        dateRange: { start: monday.save(), end: sunday.save() },
       }),
     enabled: !!user,
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -153,7 +141,7 @@ export const useInsertPlaning = () => {
       language: languageCode,
     }).user.planingBase,
     mutationFn: async (upsertData: {
-      date: Date;
+      date: FromDate;
       training_hc?: number[];
       training_kcal?: number;
       comment?: string;
@@ -166,7 +154,7 @@ export const useInsertPlaning = () => {
         .upsert({
           user_id: userId,
           ...upsertData,
-          date: saveDate(upsertData.date),
+          date: upsertData.date.save(),
         })
         .select(selectFromPlaning(languageCode))
         .single();
@@ -202,7 +190,7 @@ export const useInsertPlaningWithMeals = () => {
       comment,
       event,
     }: {
-      date: Date;
+      date: FromDate;
       meals: {
         meal_id: number;
         type_id: number;
@@ -215,7 +203,7 @@ export const useInsertPlaningWithMeals = () => {
       if (!userId)
         throw new Error("User ID is required to insert planing data");
 
-      const normalizedDate = saveDate(date);
+      const normalizedDate = date.save();
 
       const insertData = {
         [TABLE_USER_PLANING.COLS.USER_ID]: userId,
@@ -252,8 +240,6 @@ export const useInsertPlaningWithMeals = () => {
         [TABLE_USER_PLANING_MEAL.COLS.MEAL_ID]: meal.meal_id,
         [TABLE_USER_PLANING_MEAL.COLS.TYPE_ID]: meal.type_id,
       }));
-
-      console.log(mealRows);
 
       if (mealRows.length > 0) {
         const { error: mealError } = await supabase
@@ -306,12 +292,12 @@ export const useInsertMeal = () => {
       planingId?: number;
       mealId: number;
       typeId: number;
-      date: Date;
+      date: FromDate;
     }) => {
       if (!userId) throw new Error("User ID is required to insert a meal");
       let id = planingId;
       if (id == null) {
-        const targetDate = saveDate(date);
+        const targetDate = date.save();
 
         const { data: existingPlaning, error: existingPlaningError } =
           await supabase
@@ -408,20 +394,43 @@ export const useDeleteMeal = () => {
     mutationFn: async ({
       planingId,
       mealId,
+      date,
     }: {
-      planingId: number;
+      planingId?: number;
       mealId: number;
+      date?: FromDate;
     }) => {
       if (!userId) throw new Error("User ID is required to delete a meal");
+
+      let id = planingId;
+      if (id == null) {
+        if (!date)
+          throw new Error("Either planingId or date is required to delete a meal");
+
+        const { data: existingPlaning, error: existingPlaningError } =
+          await supabase
+            .from(TABLE_USER_PLANING.NAME)
+            .select(TABLE_USER_PLANING.COLS.ID)
+            .eq(TABLE_USER_PLANING.COLS.USER_ID, userId)
+            .eq(TABLE_USER_PLANING.COLS.DATE, date.save())
+            .maybeSingle();
+
+        if (existingPlaningError) throw existingPlaningError;
+        id = existingPlaning?.id;
+      }
+
+      if (id == null) return { planingId: null, mealId };
+
       const { error } = await supabase
         .from(TABLE_USER_PLANING_MEAL.NAME)
         .delete()
-        .eq(TABLE_USER_PLANING_MEAL.COLS.PLANING_ID, planingId)
+        .eq(TABLE_USER_PLANING_MEAL.COLS.PLANING_ID, id)
         .eq(TABLE_USER_PLANING_MEAL.COLS.MEAL_ID, mealId);
       if (error) throw error;
-      return { planingId, mealId };
+      return { planingId: id, mealId };
     },
     onSuccess: ({ planingId, mealId }) => {
+      if (planingId == null) return;
       updatePlanningQueries(userId, languageCode, (oldData) => {
         return oldData.map((day) => {
           if (day.id !== planingId) return day;
@@ -451,14 +460,10 @@ export const useDeletePlaning = () => {
   const { addErrorIcon } = useNotification();
 
   const mutation = useMutation({
-    mutationKey: queryKeys({
-      userId,
-      language: languageCode,
-    }).user.planingBase,
-    mutationFn: async (date: Date) => {
+    mutationFn: async (date: FromDate) => {
       console.log("Deleting planing for date:", date);
       if (!userId) throw new Error("User ID is required to delete a planing");
-      const targetDate = saveDate(date);
+      const targetDate = date.save();
 
       const { data: existingPlaning, error: existingPlaningError } =
         await supabase

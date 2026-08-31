@@ -16,6 +16,7 @@ import {
   useInsertPlaningWithMeals,
   type useFetchPlanning,
 } from "@src/services/tanstack/user/planing";
+import FromDate from "@src/helpers/dates";
 
 type PlaningType = NonNullable<
   ReturnType<typeof useFetchPlanning>["data"]
@@ -34,7 +35,7 @@ export const CalendarView = ({ weeksGrid }: CalendarViewProps) => {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 5,
+        distance: 2,
       },
     }),
   );
@@ -59,7 +60,7 @@ export const CalendarView = ({ weeksGrid }: CalendarViewProps) => {
           try {
             await Promise.all(
               sourceData.map((day, index) => {
-                const newDate = new Date(targetWeekStart);
+                const newDate = new FromDate(targetWeekStart);
                 newDate.setDate(newDate.getDate() + index);
 
                 return insertPlaning.mutateAsync({

@@ -2,10 +2,8 @@ import { useCallback, useMemo } from "react";
 import { useFetchPlanning } from "@src/services/tanstack/user/planing";
 import { setSelectedDay } from "@src/store/slices/config/store";
 import { useAppDispatch, useAppSelector } from "@src/store/store";
-import { fromDate, saveDate } from "@src/helpers/dates";
 import DayCell from "./day";
-
-type DayData = NonNullable<ReturnType<typeof useFetchPlanning>["data"]>[number];
+import FromDate from "@src/helpers/dates";
 
 interface WeekRowVisualProps {
   days: Date[];
@@ -22,7 +20,7 @@ export const WeekRowVisual = ({
   const selectedDayStr = useAppSelector((state) => state.config.selectedDay);
 
   const planningQuery = useFetchPlanning({
-    forDate: days[0],
+    forDate: new FromDate(days[0]),
   });
 
   // Mapa de datos de planificación O(1) incluyendo flags y el título del evento
@@ -45,10 +43,7 @@ export const WeekRowVisual = ({
               !!dayData.training_hc?.length || !!dayData.training_kcal,
           },
           // Si event es un string o un objeto con propiedad title/name, adáptalo según tu API (ej: dayData.event?.title || dayData.event)
-          eventTitle:
-            typeof dayData.event === "string"
-              ? dayData.event
-              : dayData.event?.title,
+          eventTitle: dayData.event,
         });
       });
     }
@@ -60,14 +55,12 @@ export const WeekRowVisual = ({
   const selectedWeekSet = useMemo(() => {
     const set = new Set<string>();
     const baseDate = selectedDayStr
-      ? new Date(selectedDayStr)
-      : fromDate().nextMonday();
-    const monday = fromDate(baseDate).thisMonday();
+      ? new FromDate(selectedDayStr)
+      : new FromDate().incrementDay(7).thisMonday();
+    const monday = new FromDate(baseDate).thisMonday();
 
     for (let i = 0; i < 7; i++) {
-      const d = new Date(monday);
-      d.setDate(d.getDate() + i);
-      set.add(saveDate(d));
+      set.add(monday.incrementDay(i).save());
     }
 
     return set;
@@ -75,12 +68,12 @@ export const WeekRowVisual = ({
 
   const handleSelectDay = useCallback(
     (day: Date) => {
-      dispatch(setSelectedDay(saveDate(fromDate(day).thisMonday())));
+      dispatch(setSelectedDay(new FromDate(day).save()));
     },
     [dispatch],
   );
 
-  const todayStr = useMemo(() => saveDate(new Date()), []);
+  const todayStr = useMemo(() => new FromDate().save(), []);
 
   return (
     <div
@@ -95,7 +88,7 @@ export const WeekRowVisual = ({
       }`}
     >
       {days.map((day, index) => {
-        const dateKey = saveDate(day);
+        const dateKey = new FromDate(day).save();
         const isToday = dateKey === todayStr;
         const isSelectedWeek = selectedWeekSet.has(dateKey);
         const dayPlanning = planningMap.get(dateKey);

@@ -1,1 +1,0 @@
-../../../components/privacy

@@ -1,4 +1,4 @@
-import { saveDate } from "@src/helpers/dates";
+import type FromDate from "@src/helpers/dates";
 
 export const queryKeys = ({
   userId = "",
@@ -23,38 +23,39 @@ export const queryKeys = ({
       start,
       end,
     ],
-    trainingBase: ["user", "training", userId],
-    training: (start: string, end: string) => [
+    mealsBase: ["user", "meals", userId],
+    meals: (start: string, end: string) => [
       "user",
-      "training",
+      "meals",
       userId,
+      language,
       start,
       end,
     ],
     presets: ["user", "presets", userId],
     measuresBase: ["user", "measuresBase", userId],
-    basalMetabolicRate: (startDate: Date, endDate: Date) => [
+    basalMetabolicRate: (startDate: FromDate, endDate: FromDate) => [
       "user",
       "measuresBase",
       userId,
       "bmr",
-      saveDate(startDate),
-      saveDate(endDate),
+      startDate.save(),
+      endDate.save(),
     ],
-    weightForDateRange: (startDate: Date, endDate: Date) => [
+    weightForDateRange: (startDate: FromDate, endDate: FromDate) => [
       "user",
       "measuresBase",
       userId,
       "weight",
-      saveDate(startDate),
-      saveDate(endDate),
+      startDate.save(),
+      endDate.save(),
     ],
-    measuresForDateRange: (startDate: Date, endDate: Date) => [
+    measuresForDateRange: (startDate: FromDate, endDate: FromDate) => [
       "user",
       "measuresBase",
       userId,
-      saveDate(startDate),
-      saveDate(endDate),
+      startDate.save(),
+      endDate.save(),
     ],
   },
   data: {

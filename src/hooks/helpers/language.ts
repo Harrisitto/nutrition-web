@@ -22,7 +22,7 @@ export const useDaysOfWeek = (): string[] => {
     t("dashboardTable.daysOfWeek.4"),
     t("dashboardTable.daysOfWeek.5"),
     t("dashboardTable.daysOfWeek.6"),
-  ];
+  ] as const;
 };
 
 export const useMonthsOfYear = (): string[] => {

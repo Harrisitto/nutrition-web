@@ -1,12 +1,12 @@
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
-import * as ComponentsSignIn from "@src/components/auth/signIn/text";
 import { useNotification } from "@src/store/slices/notification/hook";
 import { supabase } from "@src/services/supabase/client";
 import { useVerifyAuth } from "@src/services/tanstack/auth/mutate";
 import useAppNavigation from "@src/hooks/navigation";
 import { APP_ROUTES } from "@src/hooks/navigation/routes";
 import { useGetAuthInfo } from "@src/services/tanstack/auth/get";
+import { Disclaimer, Title as TitleSignIn } from "@src/pages/auth/components/text";
 
 
 const SignUpPage = () => {
@@ -102,7 +102,7 @@ const SignUpPage = () => {
       <div className="min-h-screen bg-gradient-to-br from-white-green via-gray-blue-50 to-white-green/50 flex items-center justify-center p-4 sm:p-6">
         <div className="w-full max-w-md bg-white/90 backdrop-blur-md rounded-2xl shadow-xl border border-gray-blue-200/80 p-8 space-y-6 animate-fade-in">
           <div className="text-center text-text-title">
-            <ComponentsSignIn.Title />
+            <TitleSignIn />
           </div>
 
           <div className="space-y-4 pt-2">
@@ -139,7 +139,7 @@ const SignUpPage = () => {
         <div className="w-full max-w-md bg-white/90 backdrop-blur-md rounded-2xl shadow-xl border border-gray-blue-200/80 p-8 space-y-6 animate-fade-in">
 
           <div className="text-center text-text-title">
-            <ComponentsSignIn.Title />
+            <TitleSignIn />
           </div>
 
           {!isPendingOtp ? (
@@ -238,7 +238,7 @@ const SignUpPage = () => {
           )}
 
           <div className="pt-2 border-t border-gray-blue-100 text-center text-xs text-text-muted">
-            <ComponentsSignIn.Disclaimer />
+            <Disclaimer />
           </div>
 
         </div>

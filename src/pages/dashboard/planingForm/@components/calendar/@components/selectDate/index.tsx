@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { fromDate } from "@src/helpers/dates";
 import { useAppSelector } from "@src/store/store";
 import { useMonthsOfYear } from "@src/hooks/helpers/language";
 import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import FromDate from "@src/helpers/dates";
 
 interface SelectDateHeaderProps {
   viewMonth: (num: number) => void;
@@ -17,7 +17,7 @@ export const SelectDateHeader = ({
 
   // Obtenemos el mes y año de la fecha seleccionada inicial para el primer render
   const initialDate = useMemo(() => {
-    return d ? new Date(d) : fromDate().nextMonday();
+    return new FromDate(d);
   }, []);
 
   const currentYear = new Date().getFullYear();

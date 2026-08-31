@@ -6,11 +6,10 @@ import { InitialAnimation } from "./components/global/Animations";
 
 const SignInPage = lazy(() => import("./pages/auth/SignUpPage"));
 const PageAppDashboard = lazy(() => import("./pages/dashboard"));
-const PagePrivacyPolicy = lazy(() => import("./pages/app/privacyPolicy/page"));
-const PageReferences = lazy(() => import("./pages/app/references/page"));
+const PagePrivacyPolicy = lazy(() => import("./pages/privacyPolicy"));
+const PageReferences = lazy(() => import("./pages/references"));
 const NotFoundPage = lazy(() => import("./pages/error/NotFoundPage"));
-
-const PageInfo = lazy(() => import("./pages/app/info"));
+const PageInfo = lazy(() => import("./pages/info/info"));
 
 function App() {
   return (

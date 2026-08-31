@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo } from "react";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { GripVertical } from "lucide-react";
-import { saveDate } from "@src/helpers/dates";
 import { WeekRowVisual } from "./visualWeek";
 import { useFetchPlanning } from "@src/services/tanstack/user/planing";
+import FromDate from "@src/helpers/dates";
 
 interface DraggableWeekRowProps {
   days: Date[];
@@ -11,9 +11,10 @@ interface DraggableWeekRowProps {
 
 export const DraggableWeekRow = ({ days }: DraggableWeekRowProps) => {
   // Generamos una ID única e inmutable para esta fila (la fecha del lunes)
-  const weekId = useMemo(() => saveDate(days[0]), [days]);
+  const initialDate = new FromDate(days[0]);
+  const weekId = useMemo(() => initialDate.save(), [days]);
   const planningQuery = useFetchPlanning({
-    forDate: days[0],
+    forDate: initialDate,
   });
 
   // Hook para hacer la fila ARRASTRABLE

@@ -8,9 +8,9 @@ import {
 import { useLanguageCode } from "@src/hooks/helpers/language";
 import type { Tables, TablesInsert } from "@src/services/supabase/types";
 import { queryClient } from "../queryClient";
-import { saveDate } from "@src/helpers/dates";
 import { useGetAuthSession } from "../auth/get";
 import { useAppSelector } from "@src/store/store";
+import type FromDate from "@src/helpers/dates";
 
 type UserMeasure = Tables<"user_measures">;
 type UserMeasuresData = UserMeasure[];
@@ -94,12 +94,12 @@ export const useFetchUserMeasuresForDateRange = ({
   startDate,
   endDate,
 }: {
-  startDate: Date;
-  endDate: Date;
+  startDate: FromDate;
+  endDate: FromDate;
 }) => {
   const userId = useAppSelector((state) => state.config.selectedUserId);
-  const start = saveDate(startDate);
-  const end = saveDate(endDate);
+  const start = startDate.save();
+  const end = endDate.save();
 
   return useQuery({
     queryKey: queryKeys({

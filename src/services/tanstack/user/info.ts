@@ -1,65 +1,75 @@
-import { supabase } from "@src/services/supabase/client"
-import { useQuery } from "@tanstack/react-query"
-import { queryKeys } from "../keys"
-import { dateToSupabaseFormat } from "@src/helpers/dates"
-import { useAppSelector } from "@src/store/store"
+import { supabase } from "@src/services/supabase/client";
+import { useQuery } from "@tanstack/react-query";
+import { queryKeys } from "../keys";
+import { useAppSelector } from "@src/store/store";
+import FromDate from "@src/helpers/dates";
 
 export const useFetchBmr = ({
   startDate,
   endDate,
 }: {
-  startDate: Date;
-  endDate: Date;
-}) => {
+  startDate?: FromDate;
+  endDate?: FromDate;
+} = {}) => {
+  const selectedDate = useAppSelector((state) => state.config.selectedDay);
   const userId = useAppSelector((state) => state.config.selectedUserId);
-  const start = dateToSupabaseFormat(startDate);
-  const end = dateToSupabaseFormat(endDate);
+  const start = startDate
+    ? startDate.save()
+    : new FromDate(selectedDate).thisMonday().save();
+  const end = endDate
+    ? endDate.save()
+    : new FromDate(selectedDate).thisSunday().save();
 
   const query = useQuery({
     queryKey: queryKeys({
       userId,
-    }).user.basalMetabolicRate(startDate, endDate),
+    }).user.basalMetabolicRate(new FromDate(start), new FromDate(end)),
     queryFn: async () => {
-      if (!userId) throw new Error('No authenticated user found')
-      const { data, error } = await supabase.rpc('get_bmr', {
+      if (!userId) throw new Error("No authenticated user found");
+      const { data, error } = await supabase.rpc("get_bmr", {
         user_uuid: userId,
         start_date: start,
         end_date: end,
       });
-      if (error) throw error
-      return data
+      if (error) throw error;
+      return data;
     },
     enabled: !!userId,
   });
   return query;
-}
+};
 
 export const useFetchUserWeightForDateRange = ({
   startDate,
   endDate,
 }: {
-  startDate: Date;
-  endDate: Date;
-}) => {
+  startDate?: FromDate;
+  endDate?: FromDate;
+} = {}) => {
+  const savedDate = useAppSelector((state) => state.config.selectedDay);
   const userId = useAppSelector((state) => state.config.selectedUserId);
-  const start = dateToSupabaseFormat(startDate);
-  const end = dateToSupabaseFormat(endDate);
+  const start = startDate
+    ? startDate.save()
+    : new FromDate(savedDate).thisMonday().save();
+  const end = endDate
+    ? endDate.save()
+    : new FromDate(savedDate).thisSunday().save();
 
   const query = useQuery({
     queryKey: queryKeys({
       userId,
-    }).user.weightForDateRange(startDate, endDate),
+    }).user.weightForDateRange(new FromDate(start), new FromDate(end)),
     queryFn: async () => {
-      if (!userId) throw new Error('No authenticated user found')
-      const { data, error } = await supabase.rpc('get_weight', {
+      if (!userId) throw new Error("No authenticated user found");
+      const { data, error } = await supabase.rpc("get_weight", {
         user_uuid: userId,
         start_date: start,
         end_date: end,
       });
-      if (error) throw error
-      return data
+      if (error) throw error;
+      return data;
     },
     enabled: !!userId,
   });
   return query;
-}
+};

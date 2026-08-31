@@ -5,6 +5,7 @@
         "hcHeader": "Carbs Per Hour of Training",
         "trainingKcalHeader": "Training Kcal",
         "energyBalanceHeader": "Energy Balance",
+        "energyBalanceResume": "Week sum",
         "weekBalance": "Week Balance",
         "search": "Search",
         "dailyMacros": {
@@ -78,7 +79,8 @@
             "age": "Age",
             "weight": "Weight",
             "goal": "Goal",
-            "lastSeen": "Last seen {{days}} days ago",
+            "lastSeenLabel": "Last seen",
+            "lastSeen": "{{days}} days ago",
             "neverSeen": "Last seen never"
         }
     },

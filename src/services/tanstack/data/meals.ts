@@ -7,15 +7,17 @@ import { queryKeys } from "../keys";
 import { supabase } from "@src/services/supabase/client";
 import { useLanguageCode } from "@src/hooks/helpers/language";
 import { useFetchPlanning } from "../user/planing";
-import { fromDate } from "@src/helpers/dates";
 import { useMemo } from "react";
+import FromDate from "@src/helpers/dates";
 
 const fetchTypesForMeal = async (
   langCode: ReturnType<typeof useLanguageCode>,
 ) => {
   const { data, error } = await supabase
     .from(TABLE_RECIPE_TYPES.NAME)
-    .select(`fat, hc, id, kcal, prot, name: name->>${langCode}`);
+    .select(
+      `fat, hc, id, kcal, prot, name: name->>${langCode}, comment: comment->>${langCode}`,
+    );
   if (error) throw error;
   return data;
 };
@@ -57,13 +59,13 @@ export const useFetchAllMealTypes = () => {
 
 export const useFetchOrderedMealsForId = ({
   mealId,
-  date = new Date(),
+  date = new FromDate(),
 }: {
   mealId: number;
-  date?: Date;
+  date?: FromDate;
 }) => {
   const planningInfo = useFetchPlanning({
-    forDate: fromDate(date).incrementDay(-28),
+    forDate: date.incrementDay(-28),
     rangeInWeeks: 4,
   });
 

@@ -1,28 +1,43 @@
-import { IdxDashboard } from "./@components";
 import { SelectDateCalendar } from "./@components/calendar";
+import {
+  NavigateMeasures,
+  NavigateUserPreset,
+} from "./@components/header/navigate";
+import { Navigation, UserName } from "./@components/header/titles";
+import {
+  Email,
+  LastSeen,
+  Phone,
+  Weight,
+  Goal,
+} from "./@components/header/fields";
+import { WeeklyMeals } from "./@components/table";
 
-const PagePlaningForm = ({ thisDateMonday }: { thisDateMonday: Date }) => {
+const PagePlaningForm = () => {
   return (
     <div>
-      <IdxDashboard.Text.Titles.UserName />
-      <div className="my-2 h-px w-full bg-nutrition-green/20" />
       <div className="flex flex-row items-center gap-2 m-4 justify-between">
+        <div className="flex flex-1 flex-col gap-2 justify-start">
+          <UserName />
+          <div className="my-2 h-px w-full bg-nutrition-green/20" />
+          <div className="flex flex-row gap-2">
+            <Navigation />
+            <NavigateUserPreset />
+            <NavigateMeasures />
+          </div>
+          <div className="flex flex-row flex-wrap justify-between gap-2">
+            <LastSeen />
+            <Email />
+            <Phone />
+            <Weight />
+            <Goal />
+          </div>
+        </div>
         <SelectDateCalendar />
-        <div className="flex flex-col gap-2">
-          <IdxDashboard.Text.Titles.Navigation />
-          <IdxDashboard.Buttons.NavigateUserPreset />
-          <IdxDashboard.Buttons.NavigateMeasures />
-        </div>
-        <div className="flex flex-1 flex-row flex-wrap justify-evenly gap-2">
-          <IdxDashboard.Users.Info.LastSeen />
-          <IdxDashboard.Users.Info.Email />
-          <IdxDashboard.Users.Info.Phone />
-          <IdxDashboard.Users.Info.Weight />
-          <IdxDashboard.Users.Info.Goal />
-        </div>
       </div>
+
       <div className="my-4" />
-      <IdxDashboard.Metrics.Meals.WeeklyMeals startMonday={thisDateMonday} />
+      <WeeklyMeals />
     </div>
   );
 };

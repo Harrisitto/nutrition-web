@@ -1,63 +1,47 @@
+class FromDate extends Date {
+  constructor(date?: string | number | Date | null) {
+    if (date) {
+      super(date);
+    } else {
+      super();
+    }
+  }
 
-export const dateToSupabaseFormat = (date: Date) => {
-    // YEAR-MONTH-DAY
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
+  save(): string {
+    const year = this.getFullYear();
+    const month = String(this.getMonth() + 1).padStart(2, "0");
+    const day = String(this.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
+  }
+
+  incrementDay(days: number): FromDate {
+    const newDate = new FromDate(this);
+    newDate.setDate(newDate.getDate() + days);
+    return newDate;
+  }
+
+  thisMonday(): FromDate {
+    const newDate = new FromDate(this);
+    const day = newDate.getDay();
+    const diff = (day === 0 ? -6 : 1) - day;
+    newDate.setDate(newDate.getDate() + diff);
+    return newDate;
+  }
+
+  thisSunday(): FromDate {
+    const newDate = new FromDate(this);
+    const day = newDate.getDay();
+    const diff = (day === 0 ? 0 : 7) - day;
+    newDate.setDate(newDate.getDate() + diff);
+    return newDate;
+  }
+
+  thisWeek() {
+    return {
+      monday: this.thisMonday(),
+      sunday: this.thisSunday(),
+    };
+  }
 }
 
-export const saveDate = (date: Date) => {
-    return date.toLocaleDateString('en-CA'); // Format: YYYY-MM-DD
-}
-
-export const loadDate = (dateString: string | null) => {
-    if (!dateString) return new Date();
-    const [year, month, day] = dateString.split('-').map(Number);
-    return new Date(year, month - 1, day);
-};
-
-export const nextDayDate = (date: Date | string) => {
-    const nextDate = new Date(date);
-    nextDate.setDate(nextDate.getDate() + 1);
-    return nextDate;
-}
-
-
-export const fromDate = (fromDate = new Date()) => ({
-    incrementDay: (days: number) => {
-        const newDate = new Date(fromDate);
-        newDate.setDate(newDate.getDate() + days);
-        return newDate;
-    },
-    nextMonday: () => {
-        const day = fromDate.getDay();
-        const diff = (day === 0 ? 1 : 8) - day;
-        return new Date(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate() + diff);
-    },
-    nextSunday: () => {
-        const day = fromDate.getDay();
-        const diff = (day === 0 ? 0 : 7) - day;
-        return new Date(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate() + diff);
-    },
-    thisMonday: () => {
-        const day = fromDate.getDay();
-        const diff = (day === 0 ? -6 : 1) - day;
-        return new Date(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate() + diff);
-    },
-    thisSunday: () => {
-        const day = fromDate.getDay();
-        const diff = (day === 0 ? 0 : 7) - day;
-        return new Date(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate() + diff);
-    },
-    pastMonday: () => {
-        const day = fromDate.getDay();
-        const diff = (day === 0 ? -6 : 1) - day;
-        return new Date(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate() + diff - 7);
-    },
-    pastSunday: () => {
-        const day = fromDate.getDay();
-        const diff = (day === 0 ? 0 : 7) - day;
-        return new Date(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate() + diff - 7);
-    },
-})
+export default FromDate;

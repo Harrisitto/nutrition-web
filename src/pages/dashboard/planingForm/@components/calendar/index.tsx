@@ -1,10 +1,10 @@
 import { useState, useMemo } from "react";
-import { fromDate } from "@src/helpers/dates";
 import { useAppSelector } from "@src/store/store";
 import { useTranslation } from "react-i18next";
 import { useDaysOfWeek } from "@src/hooks/helpers/language";
 import { SelectDateHeader } from "./@components/selectDate";
 import { CalendarView } from "./@components/weekRow";
+import FromDate from "@src/helpers/dates";
 
 const RANGE_WEEKS = 6; // Número de semanas a mostrar en el calendario
 
@@ -14,7 +14,7 @@ export const SelectDateCalendar = () => {
   const weekdays = useDaysOfWeek();
 
   const selectedDate = useMemo(
-    () => (selectedDayStr ? new Date(selectedDayStr) : fromDate().nextMonday()),
+    () => new FromDate(selectedDayStr),
     [selectedDayStr],
   );
 

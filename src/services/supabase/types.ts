@@ -476,22 +476,28 @@ export type Database = {
       }
       user_planing_meal: {
         Row: {
+          date: string | null
           meal_id: number
           planing_id: number
           recipe_id: number | null
           type_id: number
+          user_id: string | null
         }
         Insert: {
+          date?: string | null
           meal_id: number
           planing_id: number
           recipe_id?: number | null
           type_id: number
+          user_id?: string | null
         }
         Update: {
+          date?: string | null
           meal_id?: number
           planing_id?: number
           recipe_id?: number | null
           type_id?: number
+          user_id?: string | null
         }
         Relationships: [
           {
