@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../keys";
 import { supabase } from "@src/services/supabase/client";
 import type { TablesInsert } from "@src/services/supabase/types";
+import { useCallback } from "react";
 
 const TABLE_NAME = "user_planing_meal" as const;
 
@@ -51,7 +52,24 @@ export const useFetchPlaningMealsForDate = ({
     },
   });
 
-  return query;
+  const createMap = useCallback(() => {
+    const map = new Map<string, NonNullable<typeof query.data>>();
+    if (query.data?.length) {
+      query.data.forEach((meal) => {
+        const date = meal.date;
+        if (!map.has(date)) {
+          map.set(date, []);
+        }
+        map.get(date)?.push(meal);
+      });
+    }
+    return map;
+  }, [query.data]);
+
+  return {
+    ...query,
+    createMap
+  };
 };
 
 export const useMutatePlaningMeals = ({
@@ -96,7 +114,7 @@ export const useMutatePlaningMeals = ({
         queryKeys({
           userId,
           language,
-        }).user.meals(safeDate.save(),  safeDate.save()),
+        }).user.meals(safeDate.thisMonday().save(),  safeDate.thisSunday().save()),
        (oldData: MealType[] | undefined) => {
           if (!data) return oldData;
           if(!oldData) return data;

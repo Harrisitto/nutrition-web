@@ -4,6 +4,7 @@ import { setSelectedDay } from "@src/store/slices/config/store";
 import { useAppDispatch, useAppSelector } from "@src/store/store";
 import DayCell from "./day";
 import FromDate from "@src/helpers/dates";
+import { useFetchPlaningMealsForDate } from "../../../../../../../services/tanstack/user/meals";
 
 interface WeekRowVisualProps {
   days: Date[];
@@ -23,6 +24,10 @@ export const WeekRowVisual = ({
     forDate: new FromDate(days[0]),
   });
 
+  const mealsQuery = useFetchPlaningMealsForDate({
+    date: new FromDate(days[0]),
+  });
+
   // Mapa de datos de planificación O(1) incluyendo flags y el título del evento
   const planningMap = useMemo(() => {
     const map = new Map<
@@ -33,12 +38,14 @@ export const WeekRowVisual = ({
       }
     >();
 
+    const mealsMap = mealsQuery.createMap();
+
     if (planningQuery.data?.length) {
       planningQuery.data.forEach((dayData) => {
         map.set(dayData.date, {
           flags: {
             hasEvent: !!dayData.event,
-            hasPlaning: !!dayData.user_planing_meal?.length,
+            hasPlaning: !!mealsMap.get(dayData.date)?.length,
             hasTraining:
               !!dayData.training_hc?.length || !!dayData.training_kcal,
           },

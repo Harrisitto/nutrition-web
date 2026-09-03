@@ -640,6 +640,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      clone_week_planing: {
+        Args: { p_from_monday: string; p_to_monday: string; p_user_id: string }
+        Returns: undefined
+      }
       get_bmr: {
         Args: { end_date: string; start_date: string; user_uuid: string }
         Returns: number

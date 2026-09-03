@@ -1,6 +1,7 @@
 import { Range } from "react-range";
 import { useTranslation } from "react-i18next";
 import { usePlotContext } from "../plotContext";
+import FromDate from "../../../../../../helpers/dates";
 
 export const SelectDateRange = () => {
     const { t } = useTranslation();
@@ -22,7 +23,7 @@ export const SelectDateRange = () => {
                         onChange={(e) =>
                             setDateRange({
                                 ...dateRange,
-                                startDate: new Date(e.target.value),
+                                startDate: new FromDate(e.target.value),
                             })
                         }
                     />
@@ -41,7 +42,7 @@ export const SelectDateRange = () => {
                         onChange={(e) =>
                             setDateRange({
                                 ...dateRange,
-                                endDate: new Date(e.target.value),
+                                endDate: new FromDate(e.target.value),
                             })
                         }
                     />
@@ -99,8 +100,8 @@ export const SelectFocusedDateRange = () => {
                     const endDayValue = Math.max(startValue, endValue);
 
                     setFocusedDateRange({
-                        startDate: new Date(minTimestamp + startDayValue * DAY_IN_MS),
-                        endDate: new Date(minTimestamp + endDayValue * DAY_IN_MS),
+                        startDate: new FromDate(minTimestamp + startDayValue * DAY_IN_MS),
+                        endDate: new FromDate(minTimestamp + endDayValue * DAY_IN_MS),
                     });
                 }}
                 renderTrack={({ props, children }) => (

@@ -11,11 +11,18 @@ import { useAppSelector } from '@src/store/store'
 type UserWithInfo = Database['public']['Tables']['all_users']['Row']
 
 const selectUser = () => {
-  // Si tu clave foránea se llama, por ejemplo, "user_planing_user_id_fkey"
+  // user_planing_meal no longer has a FK to user_planing (it matches by
+  // user_id + date), so it's embedded as a sibling of user_planing rather
+  // than nested inside it.
   return `*,
     user_planing(
+      date
+    ),
+    user_planing_meal(
       date,
-      user_planing_meal(planing_id)
+      meal_id,
+      recipe_id,
+      type_id
     )
   ` as const;
 }
@@ -62,7 +69,8 @@ export const useFetchNutritionistUsers = () => {
                     .eq(TABLE_ALL_USERS.COLS.NUTRI_ID, userId)
                     .order(TABLE_USER_PLANING.COLS.DATE, { referencedTable: TABLE_USER_PLANING.NAME, ascending: false })
                     .limit(1, { referencedTable: TABLE_USER_PLANING.NAME })
-                    .limit(1, { referencedTable: `${TABLE_USER_PLANING.NAME}.${TABLE_USER_PLANING_MEAL.NAME}` })
+                    .order(TABLE_USER_PLANING_MEAL.COLS.DATE, { referencedTable: TABLE_USER_PLANING_MEAL.NAME, ascending: false })
+                    .limit(1, { referencedTable: TABLE_USER_PLANING_MEAL.NAME })
               //.eq(TABLE_ALL_USERS.COLS.IS_NUTRI, false)
                 if (error) throw error
                 return data

@@ -1,8 +1,10 @@
 export const TABLE_USER_PLANING_MEAL = {
     NAME: 'user_planing_meal',
     COLS: {
+        USER_ID: 'user_id',
+        DATE: 'date',
         MEAL_ID: 'meal_id',
-        PLANING_ID: 'planing_id',
+        RECIPE_ID: 'recipe_id',
         TYPE_ID: 'type_id',
     }
 } as const

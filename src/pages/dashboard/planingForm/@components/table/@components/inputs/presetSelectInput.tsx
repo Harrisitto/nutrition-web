@@ -34,9 +34,7 @@ const PresetDayEditor = ({ onClose, date }: PresetDayEditorProps) => {
   const upsertMeals = useMutatePlaningMeals({
     forDate: date,
   });
-  const upsertPlaning = useInsertPlaning({
-    forDate: date,
-  });
+  const upsertPlaning = useInsertPlaning();
 
   // Memoización para mantener la estabilidad de referencia de initialValue/clearOption
   const clearOption = useMemo(
@@ -56,7 +54,7 @@ const PresetDayEditor = ({ onClose, date }: PresetDayEditorProps) => {
   const handleSave = (selected: PresetOption) => {
     if (selected.id === CLEAR_PRESET_OPTION) {
       Promise.all([
-        deleteMeals.mutateAsync(),
+        deleteMeals.mutateAsync(undefined),
         deletePlaning.mutateAsync(),
       ]).finally(onClose);
       return;
@@ -71,16 +69,15 @@ const PresetDayEditor = ({ onClose, date }: PresetDayEditorProps) => {
 
     Promise.all([
       upsertMeals.mutateAsync(selectedPreset.user_preset_meal.map((meal) => ({
-        meal_id: meal.meal_id,
-        type_id: meal.type_id,
+        meal_id: meal.meal_id.id,
+        type_id: meal.type_id.id,
       }))),
       upsertPlaning.mutateAsync({
+        date,
         comment: selectedPreset.comment,
         training_hc: selectedPreset.training_hc,
-        training_kcal: selectedPreset.training_kcal,
       }),
     ]).finally(onClose);
-  };
   };
 
   return (

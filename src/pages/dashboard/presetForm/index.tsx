@@ -1,4 +1,4 @@
-import { FieldMeal, FieldText, FieldTrainingHc, InsertData, Provider } from "./components/form/logicComponents";
+import { FieldMeal, FieldText, FieldTrainingHc, InsertData, Provider, Resume } from "./components/form/logicComponents";
 import { List } from "./components/manage";
 import { Description, FormResume, Meals, NewPreset, Title, TrainingHc } from "./components/text";
 
@@ -27,8 +27,8 @@ const PageUserPreset = () => {
               <div>
                 <FormResume />
                 <div className="my-2" />
-                <FormResume />
-                </div>
+                <Resume />
+              </div>
             </div>
             <InsertData />
           </div>

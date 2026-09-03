@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useFetchPlanning } from "@src/services/tanstack/user/planing";
 import { useFetchMeals } from "@src/services/tanstack/data/meals";
 import { MealRowInfo, RowInfo, TrainingHcRowInfo } from "../types";
-import { useFetchMealsForDate } from "@src/services/tanstack/user/meals";
+import { useFetchPlaningMealsForDate } from "@src/services/tanstack/user/meals";
 import { useTranslation } from "react-i18next";
 import {
   useFetchBmr,
@@ -15,7 +15,7 @@ const useTableRows = () => {
   const { t } = useTranslation();
   const planingQuery = useFetchPlanning();
   const mealsQuery = useFetchMeals();
-  const userMeals = useFetchMealsForDate();
+  const userMeals = useFetchPlaningMealsForDate();
   const bmr = useFetchBmr();
   const savedDate = useAppSelector((state) => state.config.selectedDay);
   const monday = useMemo(

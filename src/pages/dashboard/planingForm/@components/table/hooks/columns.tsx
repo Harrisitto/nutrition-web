@@ -50,6 +50,7 @@ const useTableColumns = ({
               case ALL_IDS.INPUT_PRESET:
                 return (
                   <CellPresetDay
+                    date={date}
                     dayName={daysOfWeek[dayIndex]}
                     isEditing={isEditing}
                     isHighlighted={isHighlighted}

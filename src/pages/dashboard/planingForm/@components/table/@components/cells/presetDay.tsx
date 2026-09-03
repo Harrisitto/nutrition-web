@@ -1,8 +1,10 @@
 import PresetDayEditor from "../inputs/presetSelectInput";
 import { highlightRingOnDarkStyle, sectionHeaderBoxStyle } from "../../styles";
+import type FromDate from "../../../../../../../helpers/dates";
 
 interface CellPresetDayProps {
   dayName: string;
+  date: FromDate;
   isEditing: boolean;
   isHighlighted: boolean;
   openEditor: () => void;
@@ -10,6 +12,7 @@ interface CellPresetDayProps {
 }
 
 const CellPresetDay = ({
+  date,
   dayName,
   isEditing,
   isHighlighted,
@@ -28,7 +31,7 @@ const CellPresetDay = ({
         {dayName}
       </button>
 
-      {isEditing && <PresetDayEditor onClose={closeEditor} />}
+      {isEditing && <PresetDayEditor onClose={closeEditor} date={date} />}
     </>
   );
 };

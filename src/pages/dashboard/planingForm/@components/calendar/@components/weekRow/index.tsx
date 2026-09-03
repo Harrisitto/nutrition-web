@@ -13,10 +13,10 @@ import { DraggableWeekRow } from "./draggableWeek";
 import { WeekRowVisual } from "./visualWeek";
 import { useTranslation } from "react-i18next";
 import {
-  useInsertPlaningWithMeals,
   type useFetchPlanning,
 } from "@src/services/tanstack/user/planing";
 import FromDate from "@src/helpers/dates";
+import { useCloneWeek } from "@src/services/tanstack/user/clone";
 
 type PlaningType = NonNullable<
   ReturnType<typeof useFetchPlanning>["data"]
@@ -29,7 +29,7 @@ interface CalendarViewProps {
 export const CalendarView = ({ weeksGrid }: CalendarViewProps) => {
   const { t } = useTranslation();
   const [activeDays, setActiveDays] = useState<Date[] | null>(null);
-  const insertPlaning = useInsertPlaningWithMeals();
+  const cloneMutation = useCloneWeek();
 
   // Umbral de 5px para evitar activaciones por clics accidentales
   const sensors = useSensors(
@@ -56,30 +56,10 @@ export const CalendarView = ({ weeksGrid }: CalendarViewProps) => {
       const targetWeekStart = over.data.current?.days[0] as Date;
 
       if (sourceData && targetWeekStart) {
-        (async () => {
-          try {
-            await Promise.all(
-              sourceData.map((day, index) => {
-                const newDate = new FromDate(targetWeekStart);
-                newDate.setDate(newDate.getDate() + index);
-
-                return insertPlaning.mutateAsync({
-                  ...day,
-                  date: newDate, // Guardamos solo la fecha en formato YYYY-MM-DD
-                  meals:
-                    day.user_planing_meal?.map((meal) => ({
-                      meal_id: meal.meal_id,
-                      type_id: meal.recipe_type?.id,
-                    })) || [],
-                  comment: "",
-                  event: "",
-                });
-              }),
-            );
-          } catch (error) {
-            console.error("Error al clonar la semana:", error);
-          }
-        })();
+       cloneMutation.mutateAsync({
+          from: new FromDate(sourceData[0].date),
+          to: new FromDate(targetWeekStart),
+        });
       }
     }
   };
