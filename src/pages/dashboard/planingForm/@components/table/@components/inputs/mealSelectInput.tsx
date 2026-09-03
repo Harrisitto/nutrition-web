@@ -2,10 +2,7 @@ import { useTranslation } from "react-i18next";
 import FromDate from "@src/helpers/dates";
 import { useFetchOrderedMealsForId } from "@src/services/tanstack/data/meals";
 import { useMemo } from "react";
-import {
-  useInsertMeal,
-  useDeleteMeal,
-} from "@src/services/tanstack/user/planing";
+import { useDeletePlaningMeal, useMutatePlaningMeals } from "@src/services/tanstack/user/meals";
 import SelectEditor from "./selectInput";
 
 const CLEAR_MEAL_ID = -1;
@@ -41,8 +38,13 @@ const MealTypeEditor = ({
     mealId,
   });
 
-  const insertMeal = useInsertMeal();
-  const deleteMeal = useDeleteMeal();
+  const insertMeal = useMutatePlaningMeals({
+    forDate: date,
+  });
+
+  const deleteMeal = useDeletePlaningMeal({
+    forDate: date
+  });
 
   const rawOptions = mealTypes.data ?? [];
 
@@ -63,16 +65,15 @@ const MealTypeEditor = ({
 
   const handleSave = (selected: MealTypeOption) => {
     if (selected.isClear || selected.id === CLEAR_MEAL_ID) {
-      deleteMeal.mutateAsync({ date, mealId }).finally(onClose);
+      deleteMeal.mutateAsync(mealId).finally(onClose);
       return;
     }
 
     insertMeal
-      .mutateAsync({
-        mealId,
-        typeId: selected.id,
-        date,
-      })
+      .mutateAsync([{
+        meal_id: mealId,
+        type_id: selected.id,
+      }])
       .finally(onClose);
   };
 

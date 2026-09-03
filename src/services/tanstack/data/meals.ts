@@ -6,9 +6,8 @@ import {
 import { queryKeys } from "../keys";
 import { supabase } from "@src/services/supabase/client";
 import { useLanguageCode } from "@src/hooks/helpers/language";
-import { useFetchPlanning } from "../user/planing";
 import { useMemo } from "react";
-import FromDate from "@src/helpers/dates";
+import { useFetchPlaningMealsForDate } from "../user/meals";
 
 const fetchTypesForMeal = async (
   langCode: ReturnType<typeof useLanguageCode>,
@@ -59,25 +58,20 @@ export const useFetchAllMealTypes = () => {
 
 export const useFetchOrderedMealsForId = ({
   mealId,
-  date = new FromDate(),
 }: {
   mealId: number;
-  date?: FromDate;
 }) => {
-  const planningInfo = useFetchPlanning({
-    forDate: date.incrementDay(-28),
-    rangeInWeeks: 4,
+  const mealsInfo = useFetchPlaningMealsForDate({
+    prevRange: 28,
   });
 
   const { data: types } = useFetchAllMealTypes();
 
   const orderedMeals = useMemo(() => {
-    if (!types || !planningInfo?.data) return [];
-    // 1. Cargamos en memoria el historico de comidas.
-    const info = planningInfo.data.flatMap((el) => el.user_planing_meal);
+    if (!types || !mealsInfo?.data) return [];
     // 2. Acumulamos los conteos históricos
     const countMap = new Map<number, number>();
-    for (const item of info) {
+    for (const item of mealsInfo.data) {
       if (item.meal_id !== mealId) continue;
       const key = item.recipe_type.id;
       const currentCount = countMap.get(key);
@@ -95,12 +89,12 @@ export const useFetchOrderedMealsForId = ({
       if (countDiff !== 0) return countDiff;
       return Number(a.name) - Number(b.name);
     });
-  }, [types, planningInfo?.data, mealId]);
+  }, [types, mealsInfo?.data, mealId]);
 
   // 3. Return a consistent shape matching standard TanStack Query hooks
   return {
     data: orderedMeals,
-    isLoading: planningInfo.isLoading || !types, // easily track joint loading state
-    isError: planningInfo.isError,
+    isLoading: mealsInfo.isLoading || !types, // easily track joint loading state
+    isError: mealsInfo.isError,
   };
 };

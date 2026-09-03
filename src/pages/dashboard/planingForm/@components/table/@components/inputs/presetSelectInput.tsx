@@ -2,6 +2,9 @@ import { useTranslation } from "react-i18next";
 import { useMemo } from "react";
 import SelectEditor from "./selectInput";
 import { useFetchPresets } from "@src/services/tanstack/user/preset";
+import { useDeletePlaningMeal, useMutatePlaningMeals } from "../../../../../../../services/tanstack/user/meals";
+import { useDeletePlaning, useInsertPlaning } from "../../../../../../../services/tanstack/user/planing";
+import type FromDate from "../../../../../../../helpers/dates";
 
 const CLEAR_PRESET_OPTION = "__clear_preset__";
 
@@ -14,12 +17,26 @@ type PresetOption =
   | NonNullable<ReturnType<typeof useFetchPresets>["data"]>[number];
 
 export interface PresetDayEditorProps {
+  date: FromDate;
   onClose: () => void;
 }
 
-const PresetDayEditor = ({ onClose }: PresetDayEditorProps) => {
+const PresetDayEditor = ({ onClose, date }: PresetDayEditorProps) => {
   const { t } = useTranslation();
   const presetQuery = useFetchPresets();
+  
+  const deleteMeals = useDeletePlaningMeal({
+    forDate: date,
+  });
+  const deletePlaning = useDeletePlaning({
+    forDate: date,
+  });
+  const upsertMeals = useMutatePlaningMeals({
+    forDate: date,
+  });
+  const upsertPlaning = useInsertPlaning({
+    forDate: date,
+  });
 
   // Memoización para mantener la estabilidad de referencia de initialValue/clearOption
   const clearOption = useMemo(
@@ -37,14 +54,33 @@ const PresetDayEditor = ({ onClose }: PresetDayEditorProps) => {
   }, [presetQuery.data, clearOption]);
 
   const handleSave = (selected: PresetOption) => {
-    /*
-      SAVE PRESET ON PLANING
-    */
-    console.warn(
-      "NO HAY LOGICA DE IMPLANTACIÓN DE PLANIFICACIONES AÚN. ESPERANDO MIGRACIÓN DE BBDD",
-      selected,
-    );
-    onClose();
+    if (selected.id === CLEAR_PRESET_OPTION) {
+      Promise.all([
+        deleteMeals.mutateAsync(),
+        deletePlaning.mutateAsync(),
+      ]).finally(onClose);
+      return;
+    }
+
+    const selectedPreset = presetQuery.data?.find((preset) => preset.id === selected.id);
+    if(!selectedPreset) {
+      console.error("Selected preset not found in the fetched presets.");
+      onClose();
+      return;
+    }
+
+    Promise.all([
+      upsertMeals.mutateAsync(selectedPreset.user_preset_meal.map((meal) => ({
+        meal_id: meal.meal_id,
+        type_id: meal.type_id,
+      }))),
+      upsertPlaning.mutateAsync({
+        comment: selectedPreset.comment,
+        training_hc: selectedPreset.training_hc,
+        training_kcal: selectedPreset.training_kcal,
+      }),
+    ]).finally(onClose);
+  };
   };
 
   return (

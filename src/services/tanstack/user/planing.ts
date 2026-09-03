@@ -3,7 +3,6 @@ import { queryKeys } from "../keys";
 import { supabase } from "@src/services/supabase/client";
 import {
   TABLE_USER_PLANING,
-  TABLE_USER_PLANING_MEAL,
 } from "@src/services/supabase/definitions";
 import FromDate from "@src/helpers/dates";
 import { useLanguageCode } from "@src/hooks/helpers/language";
@@ -15,20 +14,12 @@ type Planing = ReturnType<typeof useFetchPlanning>["data"];
 type PlanningData = NonNullable<Planing>;
 type PlanningDay = PlanningData[number];
 
-const selectFromMeal = (languageCode: ReturnType<typeof useLanguageCode>) => {
-  return `*, recipe_type(*, name: name->>${languageCode})` as const;
-};
-
-const selectFromPlaning = (
-  languageCode: ReturnType<typeof useLanguageCode>,
-) => {
-  return `*,
-        ${TABLE_USER_PLANING_MEAL.NAME}(${selectFromMeal(languageCode)})` as const;
+const selectFromPlaning = () => {
+  return `*` as const;
 };
 
 const updatePlanningWeekQuery = (
   userId: string | null,
-  languageCode: ReturnType<typeof useLanguageCode>,
   date: FromDate | string,
   updater: (oldData: PlanningData) => PlanningData,
 ) => {
@@ -36,27 +27,7 @@ const updatePlanningWeekQuery = (
   queryClient.setQueryData<PlanningData>(
     queryKeys({
       userId,
-      language: languageCode,
     }).user.planing(start.save(), end.save()),
-    (oldData) => {
-      if (!oldData) return oldData;
-      return updater(oldData);
-    },
-  );
-};
-
-const updatePlanningQueries = (
-  userId: string | null,
-  languageCode: ReturnType<typeof useLanguageCode>,
-  updater: (oldData: PlanningData) => PlanningData,
-) => {
-  queryClient.setQueriesData<PlanningData>(
-    {
-      queryKey: queryKeys({
-        userId,
-        language: languageCode,
-      }).user.planingBase,
-    },
     (oldData) => {
       if (!oldData) return oldData;
       return updater(oldData);
@@ -68,29 +39,27 @@ const upsertPlanningDayInWeek = (
   oldData: PlanningData,
   dayData: PlanningDay,
 ) => {
-  const existingIndex = oldData.findIndex((day) => day.id === dayData.id);
-  if (existingIndex !== -1) {
-    const updated = [...oldData];
-    updated[existingIndex] = dayData;
-    return updated;
+  const index = oldData.findIndex((day) => day.date === dayData.date);
+  if (index !== -1) {
+    const updatedData = [...oldData];
+    updatedData[index] = dayData;
+    return updatedData;
+  } else {
+    return [...oldData, dayData];
   }
-
-  return [...oldData, dayData].sort((a, b) => a.date.localeCompare(b.date));
 };
 
 export const fetchPlanningWeek = async ({
   userId,
-  languageCode,
   dateRange,
 }: {
   userId: string;
-  languageCode: ReturnType<typeof useLanguageCode>;
   dateRange: { start: string; end: string };
 }) => {
   if (!userId) return [];
   const { data, error } = await supabase
     .from(TABLE_USER_PLANING.NAME)
-    .select(selectFromPlaning(languageCode))
+    .select(selectFromPlaning())
     .eq(TABLE_USER_PLANING.COLS.USER_ID, userId)
     .gte(TABLE_USER_PLANING.COLS.DATE, dateRange.start)
     .lte(TABLE_USER_PLANING.COLS.DATE, dateRange.end)
@@ -123,7 +92,6 @@ export const useFetchPlanning = ({
     queryFn: async () =>
       fetchPlanningWeek({
         userId: user || "",
-        languageCode,
         dateRange: { start: monday.save(), end: sunday.save() },
       }),
     enabled: !!user,
@@ -156,14 +124,14 @@ export const useInsertPlaning = () => {
           ...upsertData,
           date: upsertData.date.save(),
         })
-        .select(selectFromPlaning(languageCode))
+        .select(selectFromPlaning())
         .single();
       if (error) throw error;
       return data;
     },
     onSuccess: async (data) => {
       if (!data) return;
-      updatePlanningWeekQuery(userId, languageCode, data.date, (oldData) => {
+      updatePlanningWeekQuery(userId, data.date, (oldData: PlanningData) => {
         return upsertPlanningDayInWeek(oldData, data);
       });
     },
@@ -172,300 +140,19 @@ export const useInsertPlaning = () => {
   return mutation;
 };
 
-export const useInsertPlaningWithMeals = () => {
+export const useDeletePlaning = ({ forDate }: { forDate?: FromDate } = {}) => {
+  const d = useAppSelector((state) => state.config.selectedDay);
+  const safeDate = forDate ?? new FromDate(d);
   const userId = useAppSelector((state) => state.config.selectedUserId);
-  const languageCode = useLanguageCode();
-  const { addErrorIcon } = useNotification();
-
-  return useMutation({
-    mutationKey: queryKeys({
-      userId,
-      language: languageCode,
-    }).user.planingBase,
-    mutationFn: async ({
-      date,
-      meals,
-      training_hc,
-      training_kcal,
-      comment,
-      event,
-    }: {
-      date: FromDate;
-      meals: {
-        meal_id: number;
-        type_id: number;
-      }[];
-      training_hc?: number[];
-      training_kcal?: number;
-      comment?: string;
-      event?: string;
-    }) => {
-      if (!userId)
-        throw new Error("User ID is required to insert planing data");
-
-      const normalizedDate = date.save();
-
-      const insertData = {
-        [TABLE_USER_PLANING.COLS.USER_ID]: userId,
-        [TABLE_USER_PLANING.COLS.DATE]: normalizedDate,
-        ...(training_hc != null
-          ? { [TABLE_USER_PLANING.COLS.TRAINING_HC]: training_hc }
-          : {}),
-        ...(training_kcal != null ? { training_kcal } : {}),
-        ...(comment != null ? { comment } : {}),
-        ...(event != null ? { event } : {}),
-      };
-
-      const { data: planingData, error: planingError } = await supabase
-        .from(TABLE_USER_PLANING.NAME)
-        .upsert(insertData)
-        .select(TABLE_USER_PLANING.COLS.ID)
-        .single();
-
-      if (planingError) throw planingError;
-
-      const planingId = planingData?.id;
-      if (planingId == null) throw new Error("Failed to retrieve planing ID");
-
-      const uniqueMealsByMealId = new Map<
-        number,
-        { meal_id: number; type_id: number }
-      >();
-      for (const meal of meals) {
-        uniqueMealsByMealId.set(meal.meal_id, meal);
-      }
-
-      const mealRows = Array.from(uniqueMealsByMealId.values()).map((meal) => ({
-        [TABLE_USER_PLANING_MEAL.COLS.PLANING_ID]: planingId,
-        [TABLE_USER_PLANING_MEAL.COLS.MEAL_ID]: meal.meal_id,
-        [TABLE_USER_PLANING_MEAL.COLS.TYPE_ID]: meal.type_id,
-      }));
-
-      if (mealRows.length > 0) {
-        const { error: mealError } = await supabase
-          .from(TABLE_USER_PLANING_MEAL.NAME)
-          .upsert(mealRows, {
-            onConflict: `${TABLE_USER_PLANING_MEAL.COLS.PLANING_ID},${TABLE_USER_PLANING_MEAL.COLS.MEAL_ID}`,
-          });
-
-        if (mealError) throw mealError;
-      }
-
-      const { data: fullPlaningData, error: fullPlaningError } = await supabase
-        .from(TABLE_USER_PLANING.NAME)
-        .select(selectFromPlaning(languageCode))
-        .eq(TABLE_USER_PLANING.COLS.ID, planingId)
-        .single();
-
-      if (fullPlaningError) throw fullPlaningError;
-      return fullPlaningData;
-    },
-    onSuccess: (data) => {
-      if (!data) return;
-      updatePlanningWeekQuery(userId, languageCode, data.date, (oldData) => {
-        return upsertPlanningDayInWeek(oldData, data);
-      });
-    },
-    onError: (error) => {
-      console.error("Error inserting planing with meals:", error);
-      addErrorIcon();
-    },
-  });
-};
-
-export const useInsertMeal = () => {
-  const userId = useAppSelector((state) => state.config.selectedUserId);
-  const { addErrorIcon } = useNotification();
-  const languageCode = useLanguageCode();
-
-  const mutation = useMutation({
-    mutationKey: queryKeys({
-      userId,
-      language: languageCode,
-    }).user.planingBase,
-    mutationFn: async ({
-      planingId,
-      mealId,
-      typeId,
-      date,
-    }: {
-      planingId?: number;
-      mealId: number;
-      typeId: number;
-      date: FromDate;
-    }) => {
-      if (!userId) throw new Error("User ID is required to insert a meal");
-      let id = planingId;
-      if (id == null) {
-        const targetDate = date.save();
-
-        const { data: existingPlaning, error: existingPlaningError } =
-          await supabase
-            .from(TABLE_USER_PLANING.NAME)
-            .select(TABLE_USER_PLANING.COLS.ID)
-            .eq(TABLE_USER_PLANING.COLS.USER_ID, userId)
-            .eq(TABLE_USER_PLANING.COLS.DATE, targetDate)
-            .maybeSingle();
-
-        if (existingPlaningError) throw existingPlaningError;
-
-        console.log("existing", existingPlaning);
-
-        if (existingPlaning?.id != null) {
-          id = existingPlaning.id;
-        } else {
-          const { data: createdPlaning, error: createdPlaningError } =
-            await supabase
-              .from(TABLE_USER_PLANING.NAME)
-              .upsert({
-                user_id: userId,
-                date: targetDate,
-                training_hc: [],
-              })
-              .select(TABLE_USER_PLANING.COLS.ID)
-              .maybeSingle();
-
-          if (createdPlaningError) throw createdPlaningError;
-          id = createdPlaning?.id;
-          console.log("created", createdPlaning);
-        }
-      }
-
-      if (id == null)
-        throw new Error("Failed to retrieve or create planing ID");
-
-      const { data, error } = await supabase
-        .from(TABLE_USER_PLANING_MEAL.NAME)
-        .upsert({
-          planing_id: id,
-          meal_id: mealId,
-          type_id: typeId,
-        })
-        .select(selectFromMeal(languageCode))
-        .single();
-      console.log(error?.message);
-      if (error) throw error;
-      console.log("upsertData", data);
-      return data;
-    },
-    onSuccess: async (data) => {
-      if (!data) return;
-      const planingId = data.planing_id;
-
-      const { data: planingData, error: planingError } = await supabase
-        .from(TABLE_USER_PLANING.NAME)
-        .select(selectFromPlaning(languageCode))
-        .eq(TABLE_USER_PLANING.COLS.ID, planingId)
-        .single();
-
-      if (planingError || !planingData) {
-        if (planingError) throw planingError;
-        return;
-      }
-
-      updatePlanningWeekQuery(
-        userId,
-        languageCode,
-        planingData.date,
-        (oldData) => {
-          return upsertPlanningDayInWeek(oldData, planingData);
-        },
-      );
-    },
-    onError: (error) => {
-      console.error("Error inserting meal:", error);
-      addErrorIcon();
-    },
-  });
-
-  return mutation;
-};
-
-export const useDeleteMeal = () => {
-  const userId = useAppSelector((state) => state.config.selectedUserId);
-  const languageCode = useLanguageCode();
   const { addErrorIcon } = useNotification();
 
   const mutation = useMutation({
-    mutationKey: queryKeys({
-      userId,
-      language: languageCode,
-    }).user.planingBase,
-    mutationFn: async ({
-      planingId,
-      mealId,
-      date,
-    }: {
-      planingId?: number;
-      mealId: number;
-      date?: FromDate;
-    }) => {
-      if (!userId) throw new Error("User ID is required to delete a meal");
-
-      let id = planingId;
-      if (id == null) {
-        if (!date)
-          throw new Error("Either planingId or date is required to delete a meal");
-
-        const { data: existingPlaning, error: existingPlaningError } =
-          await supabase
-            .from(TABLE_USER_PLANING.NAME)
-            .select(TABLE_USER_PLANING.COLS.ID)
-            .eq(TABLE_USER_PLANING.COLS.USER_ID, userId)
-            .eq(TABLE_USER_PLANING.COLS.DATE, date.save())
-            .maybeSingle();
-
-        if (existingPlaningError) throw existingPlaningError;
-        id = existingPlaning?.id;
-      }
-
-      if (id == null) return { planingId: null, mealId };
-
-      const { error } = await supabase
-        .from(TABLE_USER_PLANING_MEAL.NAME)
-        .delete()
-        .eq(TABLE_USER_PLANING_MEAL.COLS.PLANING_ID, id)
-        .eq(TABLE_USER_PLANING_MEAL.COLS.MEAL_ID, mealId);
-      if (error) throw error;
-      return { planingId: id, mealId };
-    },
-    onSuccess: ({ planingId, mealId }) => {
-      if (planingId == null) return;
-      updatePlanningQueries(userId, languageCode, (oldData) => {
-        return oldData.map((day) => {
-          if (day.id !== planingId) return day;
-          const existingMeals = day.user_planing_meal || [];
-          const updatedMeals = existingMeals.filter(
-            (meal) => meal.meal_id !== mealId,
-          );
-          return {
-            ...day,
-            user_planing_meal: updatedMeals,
-          };
-        });
-      });
-    },
-    onError: (error) => {
-      console.error("Error deleting meal:", error);
-      addErrorIcon();
-    },
-  });
-
-  return mutation;
-};
-
-export const useDeletePlaning = () => {
-  const userId = useAppSelector((state) => state.config.selectedUserId);
-  const languageCode = useLanguageCode();
-  const { addErrorIcon } = useNotification();
-
-  const mutation = useMutation({
-    mutationFn: async (date: FromDate) => {
-      console.log("Deleting planing for date:", date);
+    mutationFn: async () => {
+      console.log("Deleting planing for date:", safeDate);
       if (!userId) throw new Error("User ID is required to delete a planing");
-      const targetDate = date.save();
+      const targetDate = safeDate.save();
 
-      const { data: existingPlaning, error: existingPlaningError } =
+      const { error: existingPlaningError } =
         await supabase
           .from(TABLE_USER_PLANING.NAME)
           .delete()
@@ -475,11 +162,11 @@ export const useDeletePlaning = () => {
           .single();
 
       if (existingPlaningError) throw existingPlaningError;
-      return { planingId: existingPlaning.id, date: targetDate };
+      return { date: targetDate };
     },
-    onSuccess: ({ planingId, date }) => {
-      updatePlanningWeekQuery(userId, languageCode, date, (oldData) => {
-        return oldData.filter((day) => day.id !== planingId);
+    onSuccess: ({ date }) => {
+      updatePlanningWeekQuery(userId, date, (oldData) => {
+        return oldData.filter((day) => day.date !== date);
       });
     },
     onError: (error) => {
