@@ -5,27 +5,24 @@ import { Button } from "./@components/buttons";
 import { PhoneMockup } from "@src/pages/info/@components/phoneMockup";
 import { APP_ROUTES } from "@src/hooks/navigation/routes";
 import useAppNavigation from "@src/hooks/navigation";
-import {
-  useGetAuthInfo,
-  useGetAuthSession,
-} from "@src/services/tanstack/auth/get";
+import { useGetAuthSession } from "@src/services/tanstack/auth/get";
 
 const PageInfo = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const { data: session } = useGetAuthSession();
-  const { data: profile } = useGetAuthInfo();
   const { navigateTo } = useAppNavigation();
 
   const handleClick = useCallback(() => {
-    if (!session?.session) {
+    if (!session?.userId) {
       navigateTo(APP_ROUTES.SIGN_UP);
-    } else if (profile) {
-      navigateTo(APP_ROUTES.DASHBOARD);
-    } else {
-      console.error("Invalid route redirect");
+      return;
     }
-  }, [navigateTo, session, profile]);
+    // Signed in but no profile row yet is a normal state, not an error: the
+    // dashboard answers it with the profile setup screen. Treating it as
+    // unreachable left the call-to-action doing nothing at all.
+    navigateTo(APP_ROUTES.DASHBOARD);
+  }, [navigateTo, session]);
 
   // --- OPTIMIZACIÓN HASH ROUTER: Scroll suave entre secciones ---
   const scrollToSection = (sectionId: string) => {
@@ -211,77 +208,57 @@ const PageInfo = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {/* Starter */}
-            <div className="bg-white-green p-8 rounded-3xl border border-gray-blue-200 flex flex-col justify-between">
-              <div>
-                <h3 className="text-2xl font-bold text-text-title">
-                  {t("home:pricing.plan_starter_name")}
-                </h3>
-                <p className="text-text-muted text-sm mt-1">
-                  {t("home:pricing.plan_starter_desc")}
-                </p>
-                <div className="my-6">
-                  <span className="text-4xl font-black text-text-title">
-                    {t("home:pricing.plan_starter_price")}
-                  </span>
-                  <span className="text-text-muted text-sm"> / mes</span>
-                </div>
-                <ul className="space-y-3 text-sm text-text-body mb-8">
-                  <li className="flex items-center space-x-2">
-                    <span className="text-nutrition-green font-bold">✓</span>
-                    <span>{t("home:pricing.plan_starter_f1")}</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <span className="text-nutrition-green font-bold">✓</span>
-                    <span>{t("home:pricing.plan_starter_f2")}</span>
-                  </li>
-                </ul>
+          {/* A single subscription whose amount Stripe derives from the seat
+              count, so there is nothing for the visitor to choose here: the
+              tiers below are information, not options. */}
+          <div className="max-w-lg mx-auto">
+            <div className="bg-dark-green p-8 rounded-3xl text-text-light shadow-xl">
+              <h3 className="text-2xl font-bold">
+                {t("home:pricing.plan_name")}
+              </h3>
+              <p className="text-gray-blue-300 text-sm mt-1">
+                {t("home:pricing.plan_desc")}
+              </p>
+
+              <div className="my-6 flex items-baseline flex-wrap gap-x-2">
+                <span className="text-gray-blue-300 text-sm">
+                  {t("home:pricing.price_from")}
+                </span>
+                <span className="text-5xl font-black">
+                  {t("home:pricing.price_amount")}
+                </span>
+                <span className="text-gray-blue-300 text-sm">
+                  {t("home:pricing.price_period")}
+                </span>
               </div>
 
-              <Button
-                variant="stripe-starter"
-                fullWidth
-                size="lg"
-                onClick={handleClick}
-              >
-                {t("home:pricing.stripe_btn")}
-              </Button>
-            </div>
-
-            {/* Pro */}
-            <div className="bg-dark-green p-8 rounded-3xl text-text-light flex flex-col justify-between relative shadow-xl transform md:-translate-y-2">
-              <div className="absolute -top-3 right-8 bg-nutrition-green text-white-green text-xs font-bold px-3 py-1 rounded-full uppercase">
-                {t("home:pricing.plan_pro_popular")}
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold">
-                  {t("home:pricing.plan_pro_name")}
-                </h3>
-                <p className="text-gray-blue-300 text-sm mt-1">
-                  {t("home:pricing.plan_pro_desc")}
+              <div className="bg-black-green/40 rounded-2xl p-5 mb-8 space-y-3">
+                <p className="text-xs font-bold uppercase tracking-wider text-nutrition-green">
+                  {t("home:pricing.tiers_title")}
                 </p>
-                <div className="my-6">
-                  <span className="text-4xl font-black">
-                    {t("home:pricing.plan_pro_price")}
-                  </span>
-                  <span className="text-gray-blue-300 text-sm"> / mes</span>
+                <div className="flex items-start space-x-2 text-sm">
+                  <span className="text-nutrition-green font-bold shrink-0">1</span>
+                  <span>{t("home:pricing.tier_1")}</span>
                 </div>
-                <ul className="space-y-3 text-sm mb-8">
-                  <li className="flex items-center space-x-2">
-                    <span className="text-nutrition-green font-bold">✓</span>
-                    <span>{t("home:pricing.plan_pro_f1")}</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <span className="text-nutrition-green font-bold">✓</span>
-                    <span>{t("home:pricing.plan_pro_f2")}</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <span className="text-nutrition-green font-bold">✓</span>
-                    <span>{t("home:pricing.plan_pro_f3")}</span>
-                  </li>
-                </ul>
+                <div className="flex items-start space-x-2 text-sm">
+                  <span className="text-nutrition-green font-bold shrink-0">2</span>
+                  <span>{t("home:pricing.tier_2")}</span>
+                </div>
+                <p className="text-gray-blue-300 text-xs pt-1 leading-relaxed">
+                  {t("home:pricing.auto_adjust")}
+                </p>
               </div>
+
+              <ul className="space-y-3 text-sm mb-8">
+                {["f1", "f2", "f3", "f4"].map((key) => (
+                  <li key={key} className="flex items-start space-x-2">
+                    <span className="text-nutrition-green font-bold shrink-0">
+                      ✓
+                    </span>
+                    <span>{t(`home:pricing.${key}`)}</span>
+                  </li>
+                ))}
+              </ul>
 
               <Button
                 variant="stripe-pro"

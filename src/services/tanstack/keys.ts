@@ -69,8 +69,10 @@ export const queryKeys = ({
     recipes: ["data", "recipes", language, searchStr],
   },
   auth: {
+    profileBase: ["auth", "profile"],
     profile: ["auth", "profile", userId],
     session: ["auth", "session"],
+    subscriptionBase: ["auth", "subscription"],
     subscription: ["auth", "subscription", userId],
   },
 });

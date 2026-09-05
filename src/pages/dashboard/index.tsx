@@ -22,6 +22,8 @@ const ScreenPaymentRequired = lazy(
   () => import("./@components/paymentScreen/index"),
 );
 
+const ScreenCancelPayment = lazy(() => import("./cancelPayment/index"));
+
 export default function PageDashboard() {
   const allClients = useFetchNutritionistUsers();
   const nutriInfoQuery = useGetAuthInfo();
@@ -29,13 +31,22 @@ export default function PageDashboard() {
 
   const isLoading = useMemo(
     () =>
-      nutriInfoQuery.isLoading ||
-      allClients.isLoading ||
-      hasSuscriptionQuery.isLoading,
+      nutriInfoQuery.isPending ||
+      // `useFetchNutritionistUsers` declares `placeholderData: []`, which makes
+      // the query report success with an empty list while the first fetch is
+      // still in flight -- `isLoading` is false there, so gating on it showed
+      // the "no clients" screen to every nutritionist on every load.
+      allClients.isPending ||
+      allClients.isPlaceholderData ||
+      // Disabled queries are pending-but-idle, so `isLoading` is false and
+      // `data` undefined: gating on it flashed the paywall before the session
+      // resolved.
+      hasSuscriptionQuery.isPending,
     [
-      nutriInfoQuery.isLoading,
-      allClients.isLoading,
-      hasSuscriptionQuery.isLoading,
+      nutriInfoQuery.isPending,
+      allClients.isPending,
+      allClients.isPlaceholderData,
+      hasSuscriptionQuery.isPending,
     ],
   );
 
@@ -51,6 +62,23 @@ export default function PageDashboard() {
     return <ScreenNoClients />;
   }
 
+  // The paywall comes before the "no clients yet" screen: gating on the client
+  // count first let anyone with zero clients use the invite flow for free.
+  if (!hasSuscriptionQuery.data) {
+    // Stripe's cancel_url points inside the dashboard, so it has to resolve
+    // while the paywall is up -- otherwise cancelling checkout lands on a
+    // blank page.
+    return (
+      <Routes>
+        <Route
+          path={getTrailingRoute(APP_ROUTES.CANCEL_PAYMENT)}
+          element={<ScreenCancelPayment />}
+        />
+        <Route path="*" element={<ScreenPaymentRequired />} />
+      </Routes>
+    );
+  }
+
   if (allClients.data?.length === 0) {
     return (
       <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2">
@@ -58,10 +86,6 @@ export default function PageDashboard() {
         <PageInviteClient />
       </div>
     );
-  }
-
-  if (!hasSuscriptionQuery.data) {
-    return <ScreenPaymentRequired />;
   }
 
   return (

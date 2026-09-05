@@ -1,4 +1,5 @@
 import { useRedirectToCheckout } from "./@queries/redirectCheckout";
+import { SignOut } from "@src/pages/configuration/authManagement/components/buttons";
 
 const PaymentRequiredPage = () => {
   const { loading, handleCheckout } = useRedirectToCheckout();
@@ -20,6 +21,13 @@ const PaymentRequiredPage = () => {
         >
           {loading ? "Cargando pasarela..." : "Activar suscripción"}
         </button>
+
+        {/* This screen now gates the whole dashboard, so it has to carry the
+            only way out: otherwise signing in with the wrong account leaves
+            the user stuck here with no sign out. */}
+        <div className="mt-6 pt-6 border-t border-gray-100 flex justify-center">
+          <SignOut />
+        </div>
       </div>
     </div>
   );

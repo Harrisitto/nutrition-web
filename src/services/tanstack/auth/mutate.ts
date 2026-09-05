@@ -50,6 +50,18 @@ export const useVerifyAuth = ({
       if (error) throw error
       return data
     },
+    onSuccess: (data) => {
+      // The auth listener also publishes this, but seeding it synchronously
+      // means anything reading the session right after `mutate` resolves (the
+      // sign-up page refetches the profile there) already sees the new user.
+      queryClient.setQueryData(queryKeys().auth.session, {
+        session: data.session,
+        user: data.user,
+        userId: data.session?.user?.id,
+      })
+      queryClient.invalidateQueries({ queryKey: queryKeys().auth.profileBase })
+      queryClient.invalidateQueries({ queryKey: queryKeys().auth.subscriptionBase })
+    },
     onError: () => {
       addMutationError();
     },
@@ -70,8 +82,15 @@ export const useSignOut = () => {
       addMutationError();
     },
     onSuccess: () => {
-      queryClient.setQueryData(queryKeys().auth.session, null)
+      queryClient.setQueryData(queryKeys().auth.session, {
+        session: null,
+        user: null,
+        userId: undefined,
+      })
       queryClient.setQueryData(queryKeys().auth.profile, null)
+      // Subscription state is keyed by user id, so it survives a sign out and
+      // would be handed to whoever signs in next on this browser.
+      queryClient.removeQueries({ queryKey: queryKeys().auth.subscriptionBase })
     },
   })
   return mutation

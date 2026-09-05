@@ -10,6 +10,13 @@ interface ProtectedRouteProps {
   selectedUserRequired?: boolean // If true, also checks if a user is selected in the config
 }
 
+// Routes that live under the dashboard but are not about a single client:
+// bouncing them back to the dashboard root would break their deep links,
+// which is what happens on every reload since the selection is not persisted.
+const routeNeedsSelectedClient = (pathname: string) =>
+  !pathname.startsWith(APP_ROUTES.CONFIG) &&
+  pathname !== APP_ROUTES.CANCEL_PAYMENT
+
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
   authenticatedUserRequired = true,
@@ -18,19 +25,30 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   const selectedUser = useAppSelector((state) => state.config.selectedUserId)
   const { data: session, isLoading } = useGetAuthSession();
-  const { navigateTo } = useAppNavigation();
+  const { navigateTo, currentRoute } = useAppNavigation();
+
+  const isAuthenticated = !!session?.userId
 
   useEffect(() => {
     if (isLoading) return;
-    if (!session?.userId && authenticatedUserRequired) {
+    if (!isAuthenticated && authenticatedUserRequired) {
       navigateTo(APP_ROUTES.INFO); // Redirect to dashboard if no user selected
+      return;
     }
-    if (selectedUserRequired && !selectedUser) {
+    if (
+      selectedUserRequired &&
+      !selectedUser &&
+      currentRoute !== APP_ROUTES.DASHBOARD &&
+      routeNeedsSelectedClient(currentRoute)
+    ) {
       navigateTo(APP_ROUTES.DASHBOARD); // Redirect to dashboard if no user selected
     }
-    }, [isLoading, session, selectedUserRequired])
+    }, [isLoading, isAuthenticated, authenticatedUserRequired, selectedUserRequired, selectedUser, currentRoute, navigateTo])
 
-  if (isLoading || !session) {
+  // `data` is an object even when signed out, so this has to test the user id:
+  // testing the object itself let the protected tree mount and fire its
+  // queries unauthenticated for a render before the redirect landed.
+  if (isLoading || (authenticatedUserRequired && !isAuthenticated)) {
     // While loading or if not authenticated or profile incomplete or not a nutritionist, render nothing (or a loader)
     return null;
   }
