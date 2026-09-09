@@ -15,6 +15,18 @@ const selectFromMeal = (languageCode: ReturnType<typeof useLanguageCode>) => {
 
 type MealType = NonNullable<ReturnType<typeof useFetchPlaningMealsForDate>["data"]>[number];
 
+/**
+ * Rango semanal de la query de comidas. La query y las mutaciones tienen que
+ * calcularlo igual: si no, `setQueryData` escribe en una clave que nadie lee.
+ */
+const mealsWeekRange = (date: FromDate, prevRange = 0, postRange = 0) => ({
+  monday: date.incrementDay(prevRange).thisMonday(),
+  sunday: date.incrementDay(postRange).thisSunday(),
+});
+
+/** Una fila por (fecha, comida): el tipo es el valor, no parte de la identidad. */
+const mealSlotId = (meal: MealType) => `${meal.date}-${meal.meal_id}`;
+
 export const useFetchPlaningMealsForDate = ({ 
   date,
   prevRange,
@@ -29,10 +41,13 @@ export const useFetchPlaningMealsForDate = ({
   const userId = useAppSelector((state) => state.config.selectedUserId);
 
   const safeDate = date ?? new FromDate(d);
-  const safePrevRange = Math.floor(prevRange ?? 1);
-  const safePostRange = Math.floor(postRange ?? 1);
-  const monday = safeDate.incrementDay(safePrevRange).thisMonday();
-  const sunday = safeDate.incrementDay(safePostRange).thisSunday();
+  // Por defecto 0: con el antiguo 1, un domingo seleccionado saltaba a la
+  // semana siguiente (`thisMonday()` de un domingo ya devuelve su propio lunes).
+  const { monday, sunday } = mealsWeekRange(
+    safeDate,
+    Math.floor(prevRange ?? 0),
+    Math.floor(postRange ?? 0),
+  );
 
   const query = useQuery({
     queryKey: queryKeys({
@@ -43,6 +58,7 @@ export const useFetchPlaningMealsForDate = ({
       const { data, error } = await supabase
         .from(TABLE_NAME)
         .select(selectFromMeal(language))
+        .eq("user_id", userId!)
         .gte("date", monday.save())
         .lte("date", sunday.save());
 
@@ -50,6 +66,7 @@ export const useFetchPlaningMealsForDate = ({
 
       return data;
     },
+    enabled: !!userId,
   });
 
   const createMap = useCallback(() => {
@@ -110,20 +127,24 @@ export const useMutatePlaningMeals = ({
       return data;
     },
     onSuccess: (data) => {
+      if (!data?.length) return;
+      const { monday, sunday } = mealsWeekRange(safeDate);
       queryClient.setQueryData(
         queryKeys({
           userId,
           language,
-        }).user.meals(safeDate.thisMonday().save(),  safeDate.thisSunday().save()),
+        }).user.meals(monday.save(), sunday.save()),
        (oldData: MealType[] | undefined) => {
-          if (!data) return oldData;
-          if(!oldData) return data;
-          const createId = (m: MealType) => {
-            return `${m.date}-${m.meal_id}-${m.type_id}`;
-          }
-          const dataSet = new Set(oldData?.map(createId));
-          const newData = data.filter((d) => !dataSet.has(createId(d)));
-          return [...(oldData ?? []), ...newData];
+          if (!oldData) return oldData;
+          // El upsert reemplaza el `type_id` de la comida. Comparando por
+          // (fecha, comida, tipo) el tipo nuevo parecía otra fila y se añadía
+          // junto a la vieja, duplicando kcal en la tabla.
+          const incoming = new Map(data.map((m) => [mealSlotId(m), m]));
+          const known = new Set(oldData.map(mealSlotId));
+          return [
+            ...oldData.map((m) => incoming.get(mealSlotId(m)) ?? m),
+            ...data.filter((m) => !known.has(mealSlotId(m))),
+          ];
         },
       );
     }
@@ -172,19 +193,19 @@ export const useDeletePlaningMeal = ({
       return data;
     },
     onSuccess: (data) => {
+      if (!data) return;
+      // La clave era (día, día) y la query guarda por (lunes, domingo): el
+      // borrado nunca llegaba a tocar la caché que lee la tabla.
+      const { monday, sunday } = mealsWeekRange(safeDate);
       queryClient.setQueryData(
         queryKeys({
           userId,
           language,
-        }).user.meals(safeDate.save(),  safeDate.save()),
+        }).user.meals(monday.save(), sunday.save()),
        (oldData: MealType[] | undefined) => {
-          if (!data) return oldData;
-          if(!oldData) return oldData;
-          const deleteId = (m: MealType) => {
-            return `${m.date}-${m.meal_id}-${m.type_id}`;
-          }
-          const dataSet = new Set(data.map(deleteId));
-          return oldData.filter((d) => !dataSet.has(deleteId(d)));
+          if (!oldData) return oldData;
+          const deleted = new Set(data.map(mealSlotId));
+          return oldData.filter((m) => !deleted.has(mealSlotId(m)));
         },
       );
     }

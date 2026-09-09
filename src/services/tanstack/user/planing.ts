@@ -152,10 +152,13 @@ export const useMutatePlaning = () => {
       if (!context?.previous) return;
       queryClient.setQueryData<PlanningData>(context.queryKey, context.previous);
     },
-    onSuccess: (data) => {
+    // `variables.date` ya es la fecha local que se editó; reconstruirla desde
+    // `data.date` ("YYYY-MM-DD") la parsearía como UTC y en husos por detrás de
+    // UTC caería en la semana anterior, escribiendo en la clave equivocada.
+    onSuccess: (data, variables) => {
       if (!data) return;
       queryClient.setQueryData<PlanningData>(
-        weekQueryKey(new FromDate(data.date)),
+        weekQueryKey(variables.date),
         (oldData) => (oldData ? upsertDayInWeek(oldData, data) : oldData),
       );
     },
@@ -174,18 +177,17 @@ export const useDeletePlaning = ({ forDate }: { forDate?: FromDate } = {}) => {
   
   const mutation = useMutation({
     mutationFn: async () => {
-      console.log("Deleting planing for date:", safeDate);
       if (!userId) throw new Error("User ID is required to delete a planing");
       const targetDate = safeDate.save();
 
-      const { error: existingPlaningError } =
-        await supabase
-          .from(TABLE_USER_PLANING.NAME)
-          .delete()
-          .eq(TABLE_USER_PLANING.COLS.DATE, targetDate)
-          .eq(TABLE_USER_PLANING.COLS.USER_ID, userId)
-          .select(TABLE_USER_PLANING.COLS.ID)
-          .single();
+      // `user_planing` se identifica por (user_id, date): no tiene columna `id`,
+      // así que pedirla hacía fallar el borrado entero. Tampoco se usa `.single()`
+      // porque limpiar un día sin fila guardada debe ser un no-op, no un error.
+      const { error: existingPlaningError } = await supabase
+        .from(TABLE_USER_PLANING.NAME)
+        .delete()
+        .eq(TABLE_USER_PLANING.COLS.DATE, targetDate)
+        .eq(TABLE_USER_PLANING.COLS.USER_ID, userId);
 
       if (existingPlaningError) throw existingPlaningError;
       return { date: targetDate };

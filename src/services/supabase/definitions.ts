@@ -11,11 +11,14 @@ export const TABLE_USER_PLANING_MEAL = {
 
 export const TABLE_USER_PLANING = {
     NAME: 'user_planing',
+    // Clave primaria compuesta (user_id, date): la tabla no tiene columna `id`.
     COLS: {
-        ID: 'id',
         USER_ID: 'user_id',
         DATE: 'date',
         TRAINING_HC: 'training_hc',
+        TRAINING_KCAL: 'training_kcal',
+        COMMENT: 'comment',
+        EVENT: 'event',
     }
 } as const
 

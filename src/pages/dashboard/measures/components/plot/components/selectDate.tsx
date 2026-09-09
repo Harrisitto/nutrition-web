@@ -17,9 +17,9 @@ export const SelectDateRange = () => {
                     <input
                         type="date"
                         className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-200"
-                        value={dateRange.startDate.toISOString().split("T")[0]}
-                        min={minDate.toISOString().split("T")[0]}
-                        max={maxDate.toISOString().split("T")[0]}
+                        value={dateRange.startDate.save()}
+                        min={minDate.save()}
+                        max={maxDate.save()}
                         onChange={(e) =>
                             setDateRange({
                                 ...dateRange,
@@ -36,9 +36,9 @@ export const SelectDateRange = () => {
                     <input
                         type="date"
                         className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-200"
-                        value={dateRange.endDate.toISOString().split("T")[0]}
-                        min={minDate.toISOString().split("T")[0]}
-                        max={maxDate.toISOString().split("T")[0]}
+                        value={dateRange.endDate.save()}
+                        min={minDate.save()}
+                        max={maxDate.save()}
                         onChange={(e) =>
                             setDateRange({
                                 ...dateRange,

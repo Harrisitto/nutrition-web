@@ -17,8 +17,8 @@ export type MesureInfo = {
 };
 
 export type PlotContextType = {
-  minDate: Date;
-  maxDate: Date;
+  minDate: FromDate;
+  maxDate: FromDate;
   dateRange: DateRange;
   focusedDateRange: DateRange;
   measureInfo: Record<number, MesureInfo>;
