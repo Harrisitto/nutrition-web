@@ -74,8 +74,6 @@ npx --yes supabase secrets set SEAT_SYNC_SECRET="$SEAT_SECRET" \
   --project-ref iivsjutltecehnnhmjok
 ```
 
-c8ed6ffc7c9aaefca6f47dc649c0e1ea08c937cfac0f6b490b0e53b809a900b9
-
 > Guarda el valor de `SEAT_SYNC_SECRET`: hace falta en el paso 2.2. Si lo
 > pierdes no hay forma de consultarlo (`secrets list` y el dashboard solo
 > muestran el digest); genera uno nuevo y actualiza también Vault.
@@ -122,10 +120,7 @@ La copia en `stripe.customers` es solo un espejo: hay que escribir la metadata
 **en Stripe**, y el sync engine la replicará. Para cada fila del resultado:
 
 ```bash
-# metadata es un parametro anidado: va con -d, no como flag.
-# El CLI opera en modo test por defecto; si el proyecto usa sk_live_, anade --live.
-stripe customers update cus_XXXX \
-  -d "metadata[supabase_user_id]=<uuid>"
+stripe customers update cus_XXXX --metadata[supabase_user_id]=<uuid>
 ```
 
 Si son pocos, a mano. Si son muchos, un script. La nueva

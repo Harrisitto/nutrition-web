@@ -1,5 +1,5 @@
 import { useState } from "react";
-import ModalShell from "./@portal";
+import ModalShell from "./portal";
 import { useAppSelector } from "@src/store/store";
 
 const getRoundedNumber = (value: number) => {

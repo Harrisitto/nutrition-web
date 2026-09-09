@@ -48,6 +48,12 @@ const useKeyboardNavigation = ({
     if (editableRows.length === 0 || dayDatesLength === 0) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      // El editor abierto ya ha consumido la tecla. Sin esto, un mismo Enter
+      // guarda y cierra el portal desde el input y, al llegar aquí, lo vuelve a
+      // abrir (`saveData` y `selectCell` son la misma tecla). Lo mismo pasa con
+      // las flechas dentro del selector, que moverían la selección de la tabla.
+      if (e.defaultPrevented) return;
+
       if (e.key === tableNavigation.exitCell) {
         if (!tableSelection.isEditorOpen) return;
         e.preventDefault();

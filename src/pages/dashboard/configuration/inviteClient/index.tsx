@@ -6,7 +6,7 @@ import {
 } from "@src/services/tanstack/user/invitations";
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ConfigurationPages } from "@src/pages/configuration/@components/title";
+import { ConfigurationPages } from "@src/pages/dashboard/configuration/@components/title";
 import {
   useFetchNutritionistUsers,
   useRemoveClient,

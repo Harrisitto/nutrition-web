@@ -1,6 +1,7 @@
+import type { ReactNode } from "react";
 import type FromDate from "@src/helpers/dates";
 import type { RowInfo } from "../../types";
-import NumericEditor from "../inputs/numericInput";
+import NumericEditor from "../inputs/default/numericInput";
 import { cellChipStyle, highlightRingStyle } from "../../styles";
 
 interface CellNumericProps {
@@ -11,6 +12,9 @@ interface CellNumericProps {
   isHighlighted: boolean;
   openEditor: () => void;
   closeEditor: () => void;
+  onSave: (value: number) => void;
+  /** Editor propio de la fila; si no se pasa, sólo se edita el valor en memoria */
+  editor?: ReactNode;
 }
 
 const CellNumeric = ({
@@ -21,6 +25,8 @@ const CellNumeric = ({
   isHighlighted,
   openEditor,
   closeEditor,
+  onSave,
+  editor,
 }: CellNumericProps) => {
   const numericValue =
     typeof cellValue === "number" ? cellValue : Number(cellValue) || 0;
@@ -37,17 +43,19 @@ const CellNumeric = ({
         {cellValue !== "" && cellValue !== undefined ? cellValue : "-"}
       </button>
 
-      {isEditing && (
-        <NumericEditor
-          title={`${rowInfo.label} (${date.save()})`}
-          initialValue={numericValue}
-          onSave={(val) => {
-            rowInfo.map.set(date.save(), val);
-            closeEditor();
-          }}
-          onClose={closeEditor}
-        />
-      )}
+      {isEditing &&
+        (editor ?? (
+          <NumericEditor
+            title={`${rowInfo.label} (${date.save()})`}
+            initialValue={numericValue}
+            onSave={(val) => {
+              rowInfo.map.set(date.save(), val);
+              onSave(val);
+              closeEditor();
+            }}
+            onClose={closeEditor}
+          />
+        ))}
     </>
   );
 };

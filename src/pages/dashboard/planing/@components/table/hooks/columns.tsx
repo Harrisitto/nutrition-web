@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import type { ColumnDef } from "@tanstack/react-table";
-import { ALL_IDS, MealRowInfo, RowInfo } from "../types";
+import { ALL_IDS, MealRowInfo, RowInfo, TrainingHcRowInfo } from "../types";
 import { useDaysOfWeek } from "@src/hooks/helpers/language";
 import CellRowLabel from "../@components/cells/rowLabel";
 import CellPresetDay from "../@components/cells/presetDay";
@@ -11,6 +11,7 @@ import CellText from "../@components/cells/textCell";
 import CellDisplay from "../@components/cells/displayCell";
 import type FromDate from "@src/helpers/dates";
 import { features } from "../features";
+import { useMutatePlaning } from "@src/services/tanstack/user/planing";
 
 const useTableColumns = ({
   editingCell,
@@ -27,6 +28,7 @@ const useTableColumns = ({
 }) => {
   const { t } = useTranslation();
   const daysOfWeek = useDaysOfWeek();
+  const planingMutation = useMutatePlaning();
 
   const columns = useMemo<Array<ColumnDef<typeof features, RowInfo>>>(() => {
     const rowLabelCol: ColumnDef<typeof features, RowInfo> = {
@@ -74,6 +76,25 @@ const useTableColumns = ({
                 );
 
               case ALL_IDS.INPUT_TRAINING_HC:
+                if (!(rowInfo instanceof TrainingHcRowInfo)) return null;
+                return (
+                  <CellNumeric
+                    rowInfo={rowInfo}
+                    date={date}
+                    cellValue={cellValue}
+                    isEditing={isEditing}
+                    isHighlighted={isHighlighted}
+                    openEditor={openEditor}
+                    closeEditor={closeEditor}
+                    onSave={(num) => {
+                      planingMutation.mutateAsync({
+                        date,
+                        training_hc: rowInfo.getUpdatedArray(date.save(), num),
+                      });
+                    }}
+                  />
+                );
+
               case ALL_IDS.INPUT_TRAINING_KCAL:
                 return (
                   <CellNumeric
@@ -84,10 +105,36 @@ const useTableColumns = ({
                     isHighlighted={isHighlighted}
                     openEditor={openEditor}
                     closeEditor={closeEditor}
+                    onSave={(num) => {
+                      planingMutation.mutateAsync({
+                        date,
+                        training_kcal: num,
+                      });
+                    }}
                   />
                 );
 
               case ALL_IDS.INPUT_COMMENTS:
+                return (
+                  <CellText
+                    rowInfo={rowInfo}
+                    date={date}
+                    cellValue={cellValue}
+                    isEditing={isEditing}
+                    isHighlighted={isHighlighted}
+                    placeholder={t(
+                      "data:dashboardTable.commentsRows.writeComment",
+                    )}
+                    openEditor={openEditor}
+                    closeEditor={closeEditor}
+                    onSave={(val) => {
+                      planingMutation.mutateAsync({
+                        date,
+                        comment: val,
+                      });
+                    }}
+                  />
+                );
               case ALL_IDS.INPUT_EVENTS:
                 return (
                   <CellText
@@ -101,6 +148,12 @@ const useTableColumns = ({
                     )}
                     openEditor={openEditor}
                     closeEditor={closeEditor}
+                    onSave={(val) => {
+                      planingMutation.mutateAsync({
+                        date,
+                        event: val,
+                      });
+                    }}
                   />
                 );
 
@@ -123,6 +176,7 @@ const useTableColumns = ({
     selectCell,
     closeEditor,
     daysOfWeek,
+    planingMutation,
     t,
   ]);
 

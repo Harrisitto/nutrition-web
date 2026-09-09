@@ -11,6 +11,8 @@ import {
 import { useAppSelector } from "@src/store/store";
 import FromDate from "@src/helpers/dates";
 
+const MIN_TRAINING_HC_ROWS = 2;
+
 const useTableRows = () => {
   const { t } = useTranslation();
   const planingQuery = useFetchPlanning();
@@ -65,10 +67,19 @@ const useTableRows = () => {
   const createTrainingHcRows = useMemo(() => {
     const lengths =
       planingQuery.data?.map((el) => el.training_hc?.length ?? 0) ?? [];
-    const maxHcLength = lengths.length > 0 ? Math.max(...lengths) : 2; // Garantiza mínimo 2 filas o la longitud real
+    // Siempre una fila vacía extra para seguir añadiendo horas, con un mínimo de 2 filas
+    const maxHcLength = Math.max(
+      MIN_TRAINING_HC_ROWS,
+      Math.max(0, ...lengths) + 1,
+    );
+
+    // Array completo de cada día, para que al editar una hora se conserven las demás
+    const hcByDate = new Map(
+      planingQuery.data?.map((day) => [day.date, day.training_hc ?? []]) ?? [],
+    );
 
     return Array.from({ length: maxHcLength }, (_, index) =>
-      new TrainingHcRowInfo(index)
+      new TrainingHcRowInfo(index, hcByDate)
         .addLabel(`${index + 1} H`)
         .addMap(
           planingQuery.data?.map((hc) => [
@@ -265,7 +276,7 @@ const useTableRows = () => {
       .addMap(
         planingQuery.data?.map((planing) => [
           planing.date,
-          planing.event ?? "", // Cambia 'event' por el nombre exacto de la propiedad en tu backend
+          planing.event ?? "",
         ]) ?? [],
       );
   }, [planingQuery.data, t]);

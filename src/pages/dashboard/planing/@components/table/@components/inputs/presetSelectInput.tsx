@@ -1,9 +1,9 @@
 import { useTranslation } from "react-i18next";
 import { useMemo } from "react";
-import SelectEditor from "./selectInput";
+import SelectEditor from "./default/selectInput";
 import { useFetchPresets } from "@src/services/tanstack/user/preset";
 import { useDeletePlaningMeal, useMutatePlaningMeals } from "../../../../../../../services/tanstack/user/meals";
-import { useDeletePlaning, useInsertPlaning } from "../../../../../../../services/tanstack/user/planing";
+import { useDeletePlaning, useMutatePlaning } from "../../../../../../../services/tanstack/user/planing";
 import type FromDate from "../../../../../../../helpers/dates";
 
 const CLEAR_PRESET_OPTION = "__clear_preset__";
@@ -34,7 +34,7 @@ const PresetDayEditor = ({ onClose, date }: PresetDayEditorProps) => {
   const upsertMeals = useMutatePlaningMeals({
     forDate: date,
   });
-  const upsertPlaning = useInsertPlaning();
+  const upsertPlaning = useMutatePlaning();
 
   // Memoización para mantener la estabilidad de referencia de initialValue/clearOption
   const clearOption = useMemo(

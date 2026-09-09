@@ -7,7 +7,7 @@ import {
   type ReactNode,
   type KeyboardEvent,
 } from "react";
-import ModalShell from "./@portal";
+import ModalShell from "./portal";
 import { useAppSelector } from "@src/store/store";
 
 export interface SelectEditorProps<T> {

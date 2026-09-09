@@ -94,17 +94,38 @@ export class MealRowInfo extends RowInfo {
  */
 export class TrainingHcRowInfo extends RowInfo {
   trainingHour: number;
+  // La fila representa UNA hora de entrenamiento a lo largo de las 7 fechas de
+  // la semana, mientras que `training_hc` es un array por fecha. Por eso hace
+  // falta el array completo de cada día y no un único `number[]`: sin la fecha
+  // no se puede saber sobre qué array hay que escribir.
+  private trainingByDate: Map<string, number[]>;
 
-  constructor(trainingHour: number) {
+  constructor(
+    trainingHour: number,
+    trainingByDate: Map<string, number[]> = new Map(),
+  ) {
     super({
       id: "INPUT_TRAINING_HC",
       isEditable: "numeric",
       isFullWidth: false,
     });
     this.trainingHour = trainingHour;
+    this.trainingByDate = trainingByDate;
   }
 
   override getCellId(date: string) {
     return `${this.getRowId()}.${date}.${this.trainingHour}`;
+  }
+
+  getUpdatedArray(date: string, newValue: number) {
+    const updatedArray = [...(this.trainingByDate.get(date) ?? [])];
+    // Rellena los huecos intermedios para no generar un array disperso
+    while (updatedArray.length <= this.trainingHour) updatedArray.push(0);
+    updatedArray[this.trainingHour] = newValue;
+    // Recorta los ceros finales para que la tabla no acumule filas vacías
+    while (updatedArray.length > 0 && !updatedArray[updatedArray.length - 1]) {
+      updatedArray.pop();
+    }
+    return updatedArray.map((val) => (isNaN(val) ? 0 : val));
   }
 }

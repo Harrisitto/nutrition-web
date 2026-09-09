@@ -1,4 +1,4 @@
-import { useRedirectToCheckout } from "../@components/paymentScreen/@queries/redirectCheckout";
+import { useRedirectToCheckout } from "../paymentScreen/@queries/redirectCheckout";
 import useAppNavigation from "@src/hooks/navigation";
 import { APP_ROUTES } from "@src/hooks/navigation/routes";
 

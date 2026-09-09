@@ -3,7 +3,7 @@ import FromDate from "@src/helpers/dates";
 import { useFetchOrderedMealsForId } from "@src/services/tanstack/data/meals";
 import { useMemo } from "react";
 import { useDeletePlaningMeal, useMutatePlaningMeals } from "@src/services/tanstack/user/meals";
-import SelectEditor from "./selectInput";
+import SelectEditor from "./default/selectInput";
 
 const CLEAR_MEAL_ID = -1;
 

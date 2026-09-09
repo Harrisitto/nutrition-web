@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../keys";
 import { supabase } from "@src/services/supabase/client";
 import {
@@ -6,47 +6,14 @@ import {
 } from "@src/services/supabase/definitions";
 import FromDate from "@src/helpers/dates";
 import { useLanguageCode } from "@src/hooks/helpers/language";
-import { queryClient } from "../queryClient";
 import { useNotification } from "@src/store/slices/notification/hook";
 import { useAppSelector } from "@src/store/store";
 
 type Planing = ReturnType<typeof useFetchPlanning>["data"];
 type PlanningData = NonNullable<Planing>;
-type PlanningDay = PlanningData[number];
 
 const selectFromPlaning = () => {
   return `*` as const;
-};
-
-const updatePlanningWeekQuery = (
-  userId: string | null,
-  date: FromDate | string,
-  updater: (oldData: PlanningData) => PlanningData,
-) => {
-  const { monday: start, sunday: end } = new FromDate(date).thisWeek();
-  queryClient.setQueryData<PlanningData>(
-    queryKeys({
-      userId,
-    }).user.planing(start.save(), end.save()),
-    (oldData) => {
-      if (!oldData) return oldData;
-      return updater(oldData);
-    },
-  );
-};
-
-const upsertPlanningDayInWeek = (
-  oldData: PlanningData,
-  dayData: PlanningDay,
-) => {
-  const index = oldData.findIndex((day) => day.date === dayData.date);
-  if (index !== -1) {
-    const updatedData = [...oldData];
-    updatedData[index] = dayData;
-    return updatedData;
-  } else {
-    return [...oldData, dayData];
-  }
 };
 
 export const fetchPlanningWeek = async ({
@@ -99,9 +66,34 @@ export const useFetchPlanning = ({
   });
 };
 
-export const useInsertPlaning = () => {
+/**
+ * Inserta o reemplaza el día dentro de la lista semanal cacheada.
+ * `oldData.map()` por sí solo descarta los días que aún no existían en la
+ * caché (los que se acaban de crear en la BBDD), y eso dejaba a
+ * `TrainingHcRowInfo` leyendo siempre un array vacío.
+ */
+const upsertDayInWeek = (week: PlanningData, day: PlanningData[number]) => {
+  const index = week.findIndex((el) => el.date === day.date);
+  if (index === -1) {
+    return [...week, day].sort((a, b) => a.date.localeCompare(b.date));
+  }
+  const next = [...week];
+  next[index] = day;
+  return next;
+};
+
+export const useMutatePlaning = () => {
   const userId = useAppSelector((state) => state.config.selectedUserId);
   const languageCode = useLanguageCode();
+  const queryClient = useQueryClient();
+
+  const weekQueryKey = (date: FromDate) => {
+    const { monday, sunday } = date.thisWeek();
+    return queryKeys({
+      userId,
+      language: languageCode,
+    }).user.planing(monday.save(), sunday.save());
+  };
 
   const mutation = useMutation({
     mutationKey: queryKeys({
@@ -129,11 +121,43 @@ export const useInsertPlaning = () => {
       if (error) throw error;
       return data;
     },
-    onSuccess: async (data) => {
+    // Actualiza la caché antes de que responda el servidor: así las filas se
+    // reconstruyen de inmediato y una segunda edición ya parte del array
+    // actualizado en lugar del que había al renderizar.
+    onMutate: async (upsertData) => {
+      const queryKey = weekQueryKey(upsertData.date);
+      await queryClient.cancelQueries({ queryKey });
+      const previous = queryClient.getQueryData<PlanningData>(queryKey);
+      if (!previous) return { queryKey, previous };
+
+      const date = upsertData.date.save();
+      const current = previous.find((day) => day.date === date);
+      const optimistic = {
+        user_id: userId ?? "",
+        comment: "",
+        event: "",
+        training_hc: [],
+        training_kcal: 0,
+        ...current,
+        ...upsertData,
+        date,
+      } satisfies PlanningData[number];
+
+      queryClient.setQueryData<PlanningData>(queryKey, (oldData) =>
+        oldData ? upsertDayInWeek(oldData, optimistic) : oldData,
+      );
+      return { queryKey, previous };
+    },
+    onError: (_error, _variables, context) => {
+      if (!context?.previous) return;
+      queryClient.setQueryData<PlanningData>(context.queryKey, context.previous);
+    },
+    onSuccess: (data) => {
       if (!data) return;
-      updatePlanningWeekQuery(userId, data.date, (oldData: PlanningData) => {
-        return upsertPlanningDayInWeek(oldData, data);
-      });
+      queryClient.setQueryData<PlanningData>(
+        weekQueryKey(new FromDate(data.date)),
+        (oldData) => (oldData ? upsertDayInWeek(oldData, data) : oldData),
+      );
     },
   });
 
@@ -145,7 +169,9 @@ export const useDeletePlaning = ({ forDate }: { forDate?: FromDate } = {}) => {
   const safeDate = forDate ?? new FromDate(d);
   const userId = useAppSelector((state) => state.config.selectedUserId);
   const { addErrorIcon } = useNotification();
-
+  const queryClient = useQueryClient();
+  const languageCode = useLanguageCode();
+  
   const mutation = useMutation({
     mutationFn: async () => {
       console.log("Deleting planing for date:", safeDate);
@@ -165,9 +191,17 @@ export const useDeletePlaning = ({ forDate }: { forDate?: FromDate } = {}) => {
       return { date: targetDate };
     },
     onSuccess: ({ date }) => {
-      updatePlanningWeekQuery(userId, date, (oldData) => {
-        return oldData.filter((day) => day.date !== date);
-      });
+      const { monday, sunday } = safeDate.thisWeek();
+      queryClient.setQueryData<PlanningData>(
+        queryKeys({
+          userId,
+          language: languageCode,
+        }).user.planing(monday.save(), sunday.save()),
+        (oldData) => {
+          if (!oldData) return oldData;
+          return oldData.filter((day) => day.date !== date);
+        },
+      );
     },
     onError: (error) => {
       console.error("Error deleting planing:", error);
