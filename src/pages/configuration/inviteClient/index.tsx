@@ -72,9 +72,11 @@ const Invitation = ({ id, code }: { id: string; code: string }) => {
 const Invited = ({
   message,
   clientId,
+  code,
 }: {
   message?: string;
   clientId: string;
+  code: string;
 }) => {
   const { t } = useTranslation();
   const deleteMutation = useDeleteUserInvitation();
@@ -85,7 +87,7 @@ const Invited = ({
           {t("data:configuration.sections.invitations.client")}
         </p>
         <span className="rounded-full border border-nutrition-green/25 bg-white px-3 py-1 text-xs font-semibold text-dark-green">
-          {clientId}
+          {code}
         </span>
       </div>
       {message ? (
@@ -187,7 +189,9 @@ const InvitedClients = () => {
             {query.data.map((invitation) => (
               <Invited
                 key={invitation.client_id}
-                clientId={invitation.all_users.invitation_code}
+                clientId={invitation.client_id}
+                code={invitation.all_users.invitation_code}
+                message={invitation.message}
               />
             ))}
           </ul>
