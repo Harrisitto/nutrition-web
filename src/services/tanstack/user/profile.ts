@@ -6,7 +6,8 @@ import { TABLE_ALL_USERS, TABLE_USER_PLANING, TABLE_USER_PLANING_MEAL } from '@s
 import { queryKeys } from '../keys'
 import { queryClient } from '../queryClient'
 import { useGetAuthSession } from '../auth/get'
-import { useAppSelector } from '@src/store/store'
+import { useAppDispatch, useAppSelector } from '@src/store/store'
+import { setSelectedUserId } from '@src/store/slices/config/store'
 
 type UserWithInfo = Database['public']['Tables']['all_users']['Row']
 
@@ -132,7 +133,8 @@ export const useUpdateClientGoal = () => {
 }
 
 export const useRemoveClient = () => {
-  const clientId = useAppSelector((state) => state.config.selectedUserId);
+  const selectedUserId = useAppSelector((state) => state.config.selectedUserId);
+  const dispatch = useAppDispatch()
   const { data: authData } = useGetAuthSession()
   const nutritionistId = authData?.userId
   const { addMutationError } = useNotification();
@@ -141,20 +143,24 @@ export const useRemoveClient = () => {
     mutationKey: queryKeys({
         userId: nutritionistId ?? '',
     }).user.fromNutritionist,
-    mutationFn: async () => {
-      if (!clientId) throw new Error('No authenticated user found')
+    mutationFn: async (clientId: string) => {
+      if (!nutritionistId) throw new Error('No authenticated user found')
       const { data, error } = await supabase
         .from(TABLE_ALL_USERS.NAME)
         .update({
             nutri_id: null,
          })
         .eq(TABLE_ALL_USERS.COLS.USER_ID, clientId)
+        .eq(TABLE_ALL_USERS.COLS.NUTRI_ID, nutritionistId)
         .select()
         .single()
       if (error) throw error
       return data
     },
-    onSuccess: async () => {
+    onSuccess: async (_data, clientId) => {
+        // The removed client can no longer be the active one in the dashboard
+        if (selectedUserId === clientId) dispatch(setSelectedUserId(null))
+
         await queryClient.invalidateQueries({
             queryKey: queryKeys({
                 userId: clientId,

@@ -228,9 +228,8 @@ const ManageClients = () => {
           </div>
           <button
             className="mt-3 inline-flex items-center justify-center rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
-            onClick={() => {
-              remove.mutate();
-            }}
+            onClick={() => remove.mutate(client.user_id)}
+            disabled={remove.isPending}
           >
             {t("data:configuration.sections.invitations.removeClient")}
           </button>
