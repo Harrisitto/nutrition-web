@@ -105,6 +105,8 @@ export const useMutateUserInvitations = () => {
                 .select()
                 .single()
 
+            // 23505 = unique_violation: this client was already invited, nothing to do
+            if (error?.code === "23505") return null
             if (error) throw error
             return data
         },
