@@ -3,7 +3,7 @@ import { List } from "./@components/list";
 import { ViewRecipe } from "./recipe";
 import { useFetchAllMealTypes } from "@src/services/tanstack/data/meals";
 import { useTranslation } from "react-i18next";
-import { ConfigurationPages } from "@src/pages/dashboard/configuration/@components/title";
+import { ConfigurationPages } from "@src/pages/configuration/@components/title";
 
 export const Recipes = () => {
   const [searchStr, setSearchStr] = useState("");

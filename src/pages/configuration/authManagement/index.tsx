@@ -1,4 +1,4 @@
-import { ConfigurationPages } from "@src/pages/dashboard/configuration/@components/title";
+import { ConfigurationPages } from "@src/pages/configuration/@components/title";
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNotification } from "@src/store/slices/notification/hook";

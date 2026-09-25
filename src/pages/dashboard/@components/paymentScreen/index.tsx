@@ -1,5 +1,5 @@
 import { useRedirectToCheckout } from "./@queries/redirectCheckout";
-import { SignOut } from "@src/pages/dashboard/configuration/authManagement/components/buttons";
+import { SignOut } from "@src/pages/configuration/authManagement/components/buttons";
 
 const PaymentRequiredPage = () => {
   const { loading, handleCheckout } = useRedirectToCheckout();

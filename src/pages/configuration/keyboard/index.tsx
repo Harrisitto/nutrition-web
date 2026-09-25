@@ -1,7 +1,7 @@
 import { useAppSelector } from "@src/store/store";
 import { useTranslation } from "react-i18next";
 import { RenderCommandGroup } from "./@components/renderCommandGroup";
-import { ConfigurationPages } from "@src/pages/dashboard/configuration/@components/title";
+import { ConfigurationPages } from "@src/pages/configuration/@components/title";
 
 export const TableCommands = () => {
   const { t } = useTranslation("data");

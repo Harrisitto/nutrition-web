@@ -3,15 +3,15 @@ import { AnimationLoading } from "@src/components/global/Animations";
 import { useGetAuthInfo } from "@src/services/tanstack/auth/get";
 import { useFetchNutritionistUsers } from "@src/services/tanstack/user/profile";
 import { useFetchHasSuscription } from "./@queries/hasSuscription";
-import { ManageAuthState } from "./configuration/authManagement";
-import PageInviteClient from "./configuration/inviteClient";
+import { ManageAuthState } from "../configuration/authManagement";
+import PageInviteClient from "../configuration/inviteClient";
 import { Route, Routes } from "react-router-dom";
 import { APP_ROUTES, getTrailingRoute } from "@src/hooks/navigation/routes";
 import { lazy, useMemo } from "react";
 
 const PageFormPreset = lazy(() => import("./preset/index"));
 const PageFormMeasure = lazy(() => import("./measures/index"));
-const PageConfiguration = lazy(() => import("./configuration/index"));
+const PageConfiguration = lazy(() => import("../configuration/index"));
 const PagePlaningForm = lazy(() => import("./planing/index"));
 
 const ScreenNoClients = lazy(

@@ -35,12 +35,28 @@ export const useFetchAvailableClients = ({
         queryKey: queryKeys({ userId }).user.invitations(debouncedInvitationCode),
         queryFn: async () => {
             if (!userId) throw new Error("No authenticated user found");
-            const { data, error } = await supabase
+
+            // Clients already invited by this nutritionist must not be listed again
+            const { data: invited, error: invitedError } = await supabase
+                .from(TABLE_USER_INVITATIONS.NAME)
+                .select(TABLE_USER_INVITATIONS.COLS.CLIENT_ID)
+                .eq(TABLE_USER_INVITATIONS.COLS.NUTRI_ID, userId)
+
+            if (invitedError) throw invitedError
+            const invitedIds = invited.map((invitation) => invitation.client_id)
+
+            let query = supabase
                 .from(TABLE_ALL_USERS.NAME)
                 .select()
                 .is(TABLE_ALL_USERS.COLS.NUTRI_ID, null)
                 .ilike(TABLE_ALL_USERS.COLS.INVITATION_CODE, `%${debouncedInvitationCode}%`)
                 .limit(pageSize)
+
+            if (invitedIds.length > 0) {
+                query = query.not(TABLE_ALL_USERS.COLS.USER_ID, "in", `(${invitedIds.join(",")})`)
+            }
+
+            const { data, error } = await query
 
             if (error) throw error
             return data
@@ -58,7 +74,7 @@ export const useFetchInvitedClients = () => {
             if (!userId) throw new Error("No authenticated user found");
             const { data, error } = await supabase
                 .from(TABLE_USER_INVITATIONS.NAME)
-                .select()
+                .select(`*, all_users!inner(invitation_code)`)
                 .eq(TABLE_USER_INVITATIONS.COLS.NUTRI_ID, userId)
                 .order(TABLE_USER_INVITATIONS.COLS.CREATED_AT, { ascending: false })
 
@@ -92,7 +108,14 @@ export const useMutateUserInvitations = () => {
             if (error) throw error
             return data
         },
-        onSuccess: async () => {
+        onSuccess: async (_data, { clientId }) => {
+            // Remove the invited client from the available lists right away
+            queryClient.setQueriesData<{ user_id: string }[]>(
+                { queryKey: queryKeys({ userId }).user.invitationsBase },
+                (old) => Array.isArray(old) && old.every((client) => "user_id" in client)
+                    ? old.filter((client) => client.user_id !== clientId)
+                    : old,
+            );
             await queryClient.invalidateQueries({
                 queryKey: queryKeys({ userId }).user.invitationsBase,
             });
