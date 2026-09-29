@@ -30,34 +30,35 @@ export const RenderCommandGroup = <C extends KeyboardCategory>({
   const dispatch = useAppDispatch();
 
   return (
-    <section className="rounded-xl border border-nutrition-green/20 bg-white-green/60 p-4 shadow-sm">
-      <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.08em] text-dark-green/85">
-        {title}
-      </h3>
-      <div className="grid gap-3 sm:grid-cols-2">
+    <section className="min-w-64 flex-1 overflow-hidden rounded-lg border border-nutrition-green/25 shadow-sm">
+      <header className="bg-dark-green px-4 py-2.5">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-white-green">
+          {title}
+        </h3>
+      </header>
+      <ul className="divide-y divide-nutrition-green/10 bg-fade-white-green">
         {entries.map(([command, key]) => (
-          <label
-            key={String(command)}
-            className="rounded-lg border border-nutrition-green/15 bg-white px-3 py-2 transition-colors hover:border-nutrition-green/35"
-          >
-            <span className="mb-2 block text-xs font-medium uppercase tracking-wide text-text-muted">
-              {t(`configuration.sections.keyboard.commands.${String(command)}`)}
-            </span>
-            <KeyboardInput
-              value={key}
-              onChange={(newKey) =>
-                dispatch(
-                  setKeyboardCommand({
-                    category,
-                    command: command as AnyKeyboardCommand,
-                    key: newKey,
-                  }),
-                )
-              }
-            />
-          </label>
+          <li key={String(command)}>
+            <label className="flex items-center justify-between gap-3 px-4 py-2 transition-colors hover:bg-white-green">
+              <span className="text-sm font-medium text-dark-green">
+                {t(`configuration.sections.keyboard.commands.${String(command)}`)}
+              </span>
+              <KeyboardInput
+                value={key}
+                onChange={(newKey) =>
+                  dispatch(
+                    setKeyboardCommand({
+                      category,
+                      command: command as AnyKeyboardCommand,
+                      key: newKey,
+                    }),
+                  )
+                }
+              />
+            </label>
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   );
 };

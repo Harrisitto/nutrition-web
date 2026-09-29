@@ -2,6 +2,7 @@ import { useAppSelector } from "@src/store/store";
 import { useTranslation } from "react-i18next";
 import { RenderCommandGroup } from "./@components/renderCommandGroup";
 import { ConfigurationPages } from "@src/pages/configuration/@components/title";
+import DisplayMealsForm from "./@components/displaymealsForm";
 
 export const TableCommands = () => {
   const { t } = useTranslation("data");
@@ -22,8 +23,8 @@ export const TableCommands = () => {
       title={t("configuration.sections.keyboard.tableCommands")}
       description={t("configuration.sections.keyboard.description")}
     >
-      <div className="rounded-2xl border border-nutrition-green/20 bg-gradient-to-br from-white to-white-green/70 p-5 shadow-md">
-        <div className="space-y-4">
+      <div>
+        <div className="space-y-4 flex flex-row flex-wrap gap-4 justify-between">
           <RenderCommandGroup
             title={t("configuration.sections.keyboard.groups.table")}
             entries={tableNavigationEntries}
@@ -40,6 +41,8 @@ export const TableCommands = () => {
             category="commentsEditor"
           />
         </div>
+        <div className="my-4 h-px w-full bg-nutrition-green/20" />
+        <DisplayMealsForm />
       </div>
     </ConfigurationPages>
   );

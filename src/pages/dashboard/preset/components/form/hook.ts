@@ -180,7 +180,8 @@ const calculateDerivedState = (
 };
 
 const useCreateConfig = () => {
-  const mealsQuery = useFetchMeals();
+  // Presets store data for every meal, regardless of the table display config
+  const mealsQuery = useFetchMeals({ onlyVisible: false });
 
   const mealOptions = useFetchAllMealTypes();
 

@@ -6,7 +6,8 @@ import {
 import { queryKeys } from "../keys";
 import { supabase } from "@src/services/supabase/client";
 import { useLanguageCode } from "@src/hooks/helpers/language";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
+import { useAppSelector } from "@src/store/store";
 import { useFetchPlaningMealsForDate } from "../user/meals";
 
 const fetchTypesForMeal = async (
@@ -21,26 +22,51 @@ const fetchTypesForMeal = async (
   return data;
 };
 
-export const useFetchMeals = () => {
+const fetchMeals = async (langCode: ReturnType<typeof useLanguageCode>) => {
+  const { data, error } = await supabase
+    .from(TABLE_ALL_MEALS.NAME)
+    .select(
+      `
+      id,
+      order,
+      name: name->>${langCode}
+    `,
+    )
+    .order(TABLE_ALL_MEALS.COLS.ORDER);
+  if (error) throw error;
+  return data;
+};
+
+/**
+ * Meals ordered by the user's display config (falls back to the DB order).
+ * By default hidden meals are filtered out; pass `onlyVisible: false` to get
+ * all of them (e.g. in the settings form where they can be re-enabled).
+ */
+export const useFetchMeals = ({ onlyVisible = true } = {}) => {
   const langCode = useLanguageCode();
+  const displayMeals = useAppSelector((state) => state.config.showMealsInTable);
+
+  const applyDisplay = useCallback(
+    (meals: Awaited<ReturnType<typeof fetchMeals>>) => {
+      const displayMap = new Map(displayMeals);
+      const getOrder = (meal: (typeof meals)[number]) =>
+        displayMap.get(meal.id)?.order ?? meal.order ?? 0;
+
+      return meals
+        .filter(
+          (meal) => !onlyVisible || (displayMap.get(meal.id)?.isVisible ?? true),
+        )
+        .sort((a, b) => getOrder(a) - getOrder(b));
+    },
+    [displayMeals, onlyVisible],
+  );
+
   return useQuery({
     queryKey: queryKeys({
       language: langCode,
     }).data.meals,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from(TABLE_ALL_MEALS.NAME)
-        .select(
-          `
-          id,
-          order,
-          name: name->>${langCode}
-        `,
-        )
-        .order(TABLE_ALL_MEALS.COLS.ORDER);
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => fetchMeals(langCode),
+    select: applyDisplay,
   });
 };
 

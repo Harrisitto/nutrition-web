@@ -55,5 +55,13 @@
             "noDataInFocusRange": "No hay datos en el rango de enfoque seleccionado.",
             "measureFallback": "Medida {{id}}"
         }
+    },
+    "dashboardOptions": {
+        "title": "Opciones del panel de control",
+        "description": "Gestiona las opciones de tu panel de control.",
+        "fields": {
+            "order": "Orden",
+            "isVisible": "Visible"
+        }
     }
 }

@@ -56,5 +56,13 @@
             "noDataInFocusRange": "No data in the selected focus range.",
             "measureFallback": "Measure {{id}}"
         }
+    },
+    "dashboardOptions": {
+        "title": "Dashboard options",
+        "description": "Manage your dashboard options.",
+        "fields": {
+            "order": "Order",
+            "isVisible": "Visible"
+        }
     }
 }

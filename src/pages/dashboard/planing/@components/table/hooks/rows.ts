@@ -25,6 +25,7 @@ const useTableRows = () => {
     [savedDate],
   );
   const userWeight = useFetchUserWeightForDateRange();
+  
 
   const createMealRows = useMemo(() => {
     if (!mealsQuery.data) return [];
@@ -37,6 +38,7 @@ const useTableRows = () => {
     >();
 
     userMeals.data?.forEach((scheduledMeal) => {
+
       const date = scheduledMeal.date ?? "";
       const name = String(scheduledMeal.recipe_type?.name ?? "");
       const kcal = Number(scheduledMeal.recipe_type?.kcal ?? 0);
@@ -295,8 +297,8 @@ const useTableRows = () => {
         id: "HEADER_TRAINING",
         isFullWidth: true,
       }).addLabel(t("data:dashboardTable.hcHeader")),
-      ...createTrainingHcRows,
       createTrainingKcal,
+      ...createTrainingHcRows,
       new RowInfo({
         id: "HEADER_ENERGY_BALANCE",
         isFullWidth: true,

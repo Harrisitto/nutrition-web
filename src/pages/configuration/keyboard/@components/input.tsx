@@ -44,7 +44,7 @@ export const KeyboardInput = ({
             onFocus={handleFocus}
             onBlur={handleBlur}
             placeholder={t("configuration.sections.keyboard.pressKey")}
-            className="w-full rounded-md border border-nutrition-green/20 bg-white px-3 py-2 text-sm font-semibold text-dark-green shadow-inner outline-none transition-all placeholder:text-text-muted/80 focus:border-nutrition-green/50 focus:ring-2 focus:ring-light-green/40"
+            className="w-28 shrink-0 cursor-pointer rounded border border-b-2 border-nutrition-green/25 bg-white-green px-2 py-1 text-center font-mono text-xs font-bold text-nutrition-green outline-none transition-colors placeholder:font-sans placeholder:font-medium placeholder:text-text-muted focus:placeholder:text-white-green/80 hover:border-nutrition-green/50 focus:border-dark-green focus:bg-nutrition-green focus:placeholder:animate-pulse"
         />
     );
 };
