@@ -47,6 +47,24 @@
             "header": "Eventos",
             "rowHeader": "Para"
         },
+        "autoGenerate": {
+            "header": "Generar",
+            "button": "Generar automáticamente",
+            "title": "Generar automáticamente",
+            "description": "Se elegirán los tipos de las comidas seleccionadas según el historial del último mes, buscando un balance energético cercano a 0. Las comidas que no existen se crearán y las recetas se elegirán de nuevo.",
+            "confirm": "Generar",
+            "cancel": "Cancelar",
+            "generating": "Generando...",
+            "noChanges": "No se ha encontrado ninguna combinación. Puede que no haya historial suficiente para estas comidas.",
+            "error": "Ocurrió un error al generar el día. Inténtalo de nuevo.",
+            "loading": "Cargando datos del día...",
+            "selectMeals": "Comidas a generar",
+            "selectAll": "Todas",
+            "selectNone": "Ninguna",
+            "target": "Objetivo",
+            "current": "Actual",
+            "noHistory": "Sin historial en el último mes para: {{meals}}. Esas comidas no se han generado."
+        },
         "calendar": {
             "training": "Entrenamiento",
             "planing": "Planificacion",

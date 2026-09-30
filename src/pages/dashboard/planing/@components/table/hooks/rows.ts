@@ -292,6 +292,11 @@ const useTableRows = () => {
         isEditable: "presets",
         isFullWidth: false,
       }).addLabel(t("data:dashboardTable.navigation.presets")),
+      new RowInfo({
+        id: "INPUT_AUTO_GENERATE",
+        isEditable: "action",
+        isFullWidth: false,
+      }).addLabel(t("data:dashboardTable.autoGenerate.header")),
       ...createMealRows,
       new RowInfo({
         id: "HEADER_TRAINING",

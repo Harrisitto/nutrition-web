@@ -1,5 +1,6 @@
 export const ALL_IDS = {
   INPUT_PRESET: "preset",
+  INPUT_AUTO_GENERATE: "autoGenerate",
   INPUT_MEAL: "meal",
   HEADER_TRAINING: "headerTraining",
   INPUT_TRAINING_HC: "trainingHc",
@@ -22,7 +23,7 @@ export type AllIdsValues = (typeof ALL_IDS)[keyof typeof ALL_IDS];
  */
 export class RowInfo {
   private id: AllIdsValues;
-  isEditable?: "numeric" | "text" | "meals" | "presets";
+  isEditable?: "numeric" | "text" | "meals" | "presets" | "action";
   isFullWidth: boolean = false;
   label: string = "";
   resume?: string;
@@ -30,7 +31,7 @@ export class RowInfo {
 
   constructor(props: {
     id: keyof typeof ALL_IDS;
-    isEditable?: "numeric" | "text" | "meals" | "presets";
+    isEditable?: "numeric" | "text" | "meals" | "presets" | "action";
     isFullWidth?: boolean;
     resume?: string;
     map?: Map<string, string | number>;

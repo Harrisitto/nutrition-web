@@ -644,6 +644,29 @@ export type Database = {
         Args: { p_from_monday: string; p_to_monday: string; p_user_id: string }
         Returns: undefined
       }
+      generate_meal_types_for_day: {
+        Args: {
+          p_changable_meal_ids: number[]
+          p_date: string
+          p_seed: number
+          p_target_kcal?: number
+          p_training_kcal: number
+          p_user_id: string
+        }
+        Returns: {
+          date: string
+          meal_id: number
+          recipe_id: number | null
+          type_id: number
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "user_planing_meal"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       get_bmr: {
         Args: { end_date: string; start_date: string; user_uuid: string }
         Returns: number

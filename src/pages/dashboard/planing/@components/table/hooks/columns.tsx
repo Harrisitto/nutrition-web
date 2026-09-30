@@ -9,6 +9,7 @@ import CellMeal from "../@components/cells/mealCell";
 import CellNumeric from "../@components/cells/numericCell";
 import CellText from "../@components/cells/textCell";
 import CellDisplay from "../@components/cells/displayCell";
+import CellAutoGenerate from "../@components/cells/autoGenerateCell";
 import type FromDate from "@src/helpers/dates";
 import { features } from "../features";
 import { useMutatePlaning } from "@src/services/tanstack/user/planing";
@@ -54,6 +55,17 @@ const useTableColumns = ({
                   <CellPresetDay
                     date={date}
                     dayName={daysOfWeek[dayIndex]}
+                    isEditing={isEditing}
+                    isHighlighted={isHighlighted}
+                    openEditor={openEditor}
+                    closeEditor={closeEditor}
+                  />
+                );
+
+              case ALL_IDS.INPUT_AUTO_GENERATE:
+                return (
+                  <CellAutoGenerate
+                    date={date}
                     isEditing={isEditing}
                     isHighlighted={isHighlighted}
                     openEditor={openEditor}
