@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FunctionsHttpError } from "@supabase/supabase-js";
 import { queryKeys } from "../keys";
-import { supabase } from "@src/services/supabase/client";
+import { supabase, supabaseAnonKey, supabaseUrl } from "@src/services/supabase/client";
 import FromDate from "@src/helpers/dates";
 import { hcToKcal, raceHc } from "@src/helpers/nutrition";
 import { useAppSelector } from "@src/store/store";
@@ -308,33 +308,34 @@ export const useSaveRacePlan = () => {
 };
 
 /**
- * Descarga el svg final de una carrera: lo genera la edge function display-gpx
- * con los datos guardados, la misma imagen que ve el corredor.
+ * Descarga la imagen final (png) de una carrera: la genera la edge function
+ * display-gpx con los datos guardados, la misma imagen que ve el corredor.
  */
 export const useDownloadRaceImage = () => {
   const lang = useLanguageCode();
 
   return useMutation({
     mutationFn: async (race: { id: number; name: string; date: string }) => {
-      // display-gpx responde image/svg+xml: invoke lo devuelve como texto
-      const { data, error } = await supabase.functions.invoke<string>(
-        "display-gpx",
-        { body: { race_id: race.id, lang } },
-      );
+      // invoke lee image/png como texto y corrompe el binario: se usa fetch
+      const { data: sessionData } = await supabase.auth.getSession();
+      const response = await fetch(`${supabaseUrl}/functions/v1/display-gpx`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: supabaseAnonKey,
+          Authorization: `Bearer ${sessionData.session?.access_token ?? supabaseAnonKey}`,
+        },
+        body: JSON.stringify({ race_id: race.id, lang, format: "png" }),
+      });
 
-      if (error) {
-        throw error;
-      }
-      if (!data) {
-        throw new Error("display-gpx returned no data");
+      if (!response.ok) {
+        throw new Error(`display-gpx failed: ${response.status} ${await response.text()}`);
       }
 
-      const url = URL.createObjectURL(
-        new Blob([data], { type: "image/svg+xml" }),
-      );
+      const url = URL.createObjectURL(await response.blob());
       const link = document.createElement("a");
       link.href = url;
-      link.download = `${race.date}-${race.name.replace(/[^\p{L}\p{N}._-]+/gu, "_")}.svg`;
+      link.download = `${race.date}-${race.name.replace(/[^\p{L}\p{N}._-]+/gu, "_")}.png`;
       link.click();
       // Se revoca después: algunos navegadores leen el blob tras el click
       setTimeout(() => URL.revokeObjectURL(url), 1000);
