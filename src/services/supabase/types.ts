@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "13.0.5"
   }
   public: {
     Tables: {
@@ -118,6 +118,24 @@ export type Database = {
         }
         Relationships: []
       }
+      all_race_landmarks: {
+        Row: {
+          id: number
+          name: Json
+          url: string
+        }
+        Insert: {
+          id?: number
+          name: Json
+          url?: string
+        }
+        Update: {
+          id?: number
+          name?: Json
+          url?: string
+        }
+        Relationships: []
+      }
       all_recipes: {
         Row: {
           description: Json | null
@@ -157,6 +175,7 @@ export type Database = {
           email: string
           gender: string
           goal: string
+          health_consent_at: string | null
           invitation_code: string
           last_seen: string | null
           name: string
@@ -170,6 +189,7 @@ export type Database = {
           email?: string
           gender?: string
           goal?: string
+          health_consent_at?: string | null
           invitation_code?: string
           last_seen?: string | null
           name?: string
@@ -183,6 +203,7 @@ export type Database = {
           email?: string
           gender?: string
           goal?: string
+          health_consent_at?: string | null
           invitation_code?: string
           last_seen?: string | null
           name?: string
@@ -224,6 +245,98 @@ export type Database = {
         }
         Relationships: []
       }
+      nutri_race_ingredients: {
+        Row: {
+          caffeine_amount: number | null
+          created_at: string
+          hc_amount: number | null
+          id: number
+          is_deleted: boolean
+          liquid_amount: number | null
+          name: string
+          nutri_id: string
+          sodium_amount: number | null
+        }
+        Insert: {
+          caffeine_amount?: number | null
+          created_at?: string
+          hc_amount?: number | null
+          id?: number
+          is_deleted?: boolean
+          liquid_amount?: number | null
+          name: string
+          nutri_id?: string
+          sodium_amount?: number | null
+        }
+        Update: {
+          caffeine_amount?: number | null
+          created_at?: string
+          hc_amount?: number | null
+          id?: number
+          is_deleted?: boolean
+          liquid_amount?: number | null
+          name?: string
+          nutri_id?: string
+          sodium_amount?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nutri_race_ingredients_nutri_id_fkey"
+            columns: ["nutri_id"]
+            isOneToOne: false
+            referencedRelation: "all_nutritionist"
+            referencedColumns: ["nutri_id"]
+          },
+        ]
+      }
+      nutri_races: {
+        Row: {
+          created_at: string
+          distance_km: number
+          gpx_path: string | null
+          id: number
+          name: string
+          nutri_id: string
+          race_date: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          distance_km: number
+          gpx_path?: string | null
+          id?: number
+          name: string
+          nutri_id?: string
+          race_date: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          distance_km?: number
+          gpx_path?: string | null
+          id?: number
+          name?: string
+          nutri_id?: string
+          race_date?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nutri_races_nutri_id_fkey"
+            columns: ["nutri_id"]
+            isOneToOne: false
+            referencedRelation: "all_nutritionist"
+            referencedColumns: ["nutri_id"]
+          },
+          {
+            foreignKeyName: "nutri_races_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "all_users"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       nutri_recipe: {
         Row: {
           nutri_id: string
@@ -253,6 +366,131 @@ export type Database = {
             columns: ["recipe_id"]
             isOneToOne: false
             referencedRelation: "all_recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      race_ingredients: {
+        Row: {
+          amount: number
+          id: number
+          ingredient_id: number
+          km: number
+          km_span: number | null
+          race_id: number
+        }
+        Insert: {
+          amount?: number
+          id?: number
+          ingredient_id: number
+          km: number
+          km_span?: number | null
+          race_id: number
+        }
+        Update: {
+          amount?: number
+          id?: number
+          ingredient_id?: number
+          km?: number
+          km_span?: number | null
+          race_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "race_ingredients_ingredient_id_fkey"
+            columns: ["ingredient_id"]
+            isOneToOne: false
+            referencedRelation: "nutri_race_ingredients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "race_ingredients_race_id_fkey"
+            columns: ["race_id"]
+            isOneToOne: false
+            referencedRelation: "nutri_races"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      race_landmarks: {
+        Row: {
+          id: number
+          km: number
+          landmark_id: number
+          name: string
+          race_id: number
+        }
+        Insert: {
+          id?: number
+          km: number
+          landmark_id: number
+          name?: string
+          race_id: number
+        }
+        Update: {
+          id?: number
+          km?: number
+          landmark_id?: number
+          name?: string
+          race_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "race_landmarks_landmark_id_fkey"
+            columns: ["landmark_id"]
+            isOneToOne: false
+            referencedRelation: "all_race_landmarks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "race_landmarks_race_id_fkey"
+            columns: ["race_id"]
+            isOneToOne: false
+            referencedRelation: "nutri_races"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      race_steps: {
+        Row: {
+          aprox_time_start: string | null
+          elevation_gain: number | null
+          elevation_loss: number | null
+          km_start: number
+          max_altitude: number | null
+          max_altitude_at: number | null
+          min_altitude: number | null
+          min_altitude_at: number | null
+          race_id: number
+        }
+        Insert: {
+          aprox_time_start?: string | null
+          elevation_gain?: number | null
+          elevation_loss?: number | null
+          km_start: number
+          max_altitude?: number | null
+          max_altitude_at?: number | null
+          min_altitude?: number | null
+          min_altitude_at?: number | null
+          race_id: number
+        }
+        Update: {
+          aprox_time_start?: string | null
+          elevation_gain?: number | null
+          elevation_loss?: number | null
+          km_start?: number
+          max_altitude?: number | null
+          max_altitude_at?: number | null
+          min_altitude?: number | null
+          min_altitude_at?: number | null
+          race_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "race_steps_race_id_fkey"
+            columns: ["race_id"]
+            isOneToOne: false
+            referencedRelation: "nutri_races"
             referencedColumns: ["id"]
           },
         ]
@@ -694,13 +932,53 @@ export type Database = {
         Returns: number
       }
       has_active_subscription: { Args: never; Returns: boolean }
+      has_nutri_race_assigned: {
+        Args: { p_nutri_id: string }
+        Returns: boolean
+      }
+      has_race_access: { Args: { p_race_id: number }; Returns: boolean }
+      is_race_owner: { Args: { p_race_id: number }; Returns: boolean }
+      save_race_plan: {
+        Args: {
+          p_distance_km: number
+          p_gpx_path?: string
+          p_id?: number
+          p_ingredients?: Database["public"]["CompositeTypes"]["race_ingredient_input"][]
+          p_landmarks?: Database["public"]["CompositeTypes"]["race_landmark_input"][]
+          p_name: string
+          p_race_date: string
+          p_steps?: Database["public"]["CompositeTypes"]["race_step_input"][]
+          p_user_id: string
+        }
+        Returns: number
+      }
       unaccent: { Args: { "": string }; Returns: string }
     }
     Enums: {
       [_ in never]: never
     }
     CompositeTypes: {
-      [_ in never]: never
+      race_ingredient_input: {
+        ingredient_id: number | null
+        km: number | null
+        amount: number | null
+        km_span: number | null
+      }
+      race_landmark_input: {
+        landmark_id: number | null
+        km: number | null
+        name: string | null
+      }
+      race_step_input: {
+        km_start: number | null
+        min_altitude: number | null
+        min_altitude_at: number | null
+        max_altitude: number | null
+        max_altitude_at: number | null
+        elevation_gain: number | null
+        elevation_loss: number | null
+        aprox_time_start: string | null
+      }
     }
   }
 }

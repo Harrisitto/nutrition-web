@@ -3,6 +3,9 @@
         "Kcal": "kcal",
         "resumeHeader": "Daily Summary",
         "hcHeader": "Carbs Per Hour of Training",
+        "racesRow": "Races",
+        "racesCell": "Races on {{day}}: {{kcal}} kcal",
+        "racesCellEmpty": "Races on {{day}}: none",
         "trainingKcalHeader": "Training Kcal",
         "energyBalanceHeader": "Energy Balance",
         "energyBalanceResume": "Week sum",
@@ -209,6 +212,31 @@
                 "regionSettings": "Region Settings",
                 "chooseLanguage": "Choose Language",
                 "manageSubscription": "Manage Subscription"
+            },
+            "raceIngredients": {
+                "title": "My race ingredients",
+                "description": "Manage the ingredients you use in race plans.",
+                "listTitle": "Ingredients",
+                "addTitle": "Add ingredient",
+                "empty": "You don't have any race ingredients yet.",
+                "add": "Add",
+                "delete": "Delete",
+                "confirmDelete": "Remove “{{name}}” from the catalog? Races that already use it keep it.",
+                "search": "Search ingredient...",
+                "noResults": "No ingredients match your search.",
+                "loadError": "The ingredients could not be loaded.",
+                "saveError": "The ingredient could not be saved.",
+                "imageTypeError": "Format not allowed. Use PNG, JPEG, WebP or SVG.",
+                "imageSizeError": "The image cannot be larger than 5 MB.",
+                "imageUploadError": "Error uploading the image. The ingredient was created without it.",
+                "fields": {
+                    "name": "Name",
+                    "hc_amount": "Carbs",
+                    "sodium_amount": "Sodium",
+                    "caffeine_amount": "Caffeine",
+                    "liquid_amount": "Liquid",
+                    "image": "Image"
+                }
             }
         }
     },
@@ -223,6 +251,112 @@
         "carbsPerKg": "Carbs per kg",
         "proteinPerKg": "Protein per kg",
         "fatsPerKg": "Fats per kg"
+    },
+    "races": {
+        "title": "Race planning",
+        "back": "Back to dashboard",
+        "steps": {
+            "profile": {
+                "title": "Generate the profile",
+                "description": "Upload a GPX file to generate the profile automatically or add the segments one by one."
+            },
+            "landmarks": {
+                "title": "Points of interest",
+                "description": "Mark aid stations, summits and other points of interest along the course."
+            },
+            "ingredients": {
+                "title": "Ingredients",
+                "description": "Set the km where each ingredient is taken."
+            }
+        },
+        "previous": "Previous",
+        "next": "Next",
+        "save": "Save race",
+        "saveError": "The race could not be saved",
+        "loadError": "The race could not be loaded.",
+        "retry": "Retry",
+        "stepNeedsAttention": "needs attention",
+        "pendingForm": "{{step}}: some data has not been added. Click “Add” or clear the form.",
+        "profile": {
+            "name": "Name",
+            "date": "Race date",
+            "distance": "Distance (km)",
+            "gpxTitle": "Generate from a GPX",
+            "gpxDescription": "Upload the course GPX file to calculate the segments and their elevation automatically. You can also add the segments by hand in the table.",
+            "gpxGenerate": "Generate profile",
+            "gpxReplaceWarning": "Generating the profile replaces the current segments. Ingredients and points of interest are kept.",
+            "gpxError": "The GPX could not be processed",
+            "stepsTitle": "Segments",
+            "addStep": "Add segment",
+            "removeStep": "Remove segment",
+            "noSteps": "There are no segments yet. Generate the profile from a GPX or add them by hand.",
+            "columns": {
+                "km_start": "Start km",
+                "min_altitude": "Min alt. (m)",
+                "max_altitude": "Max alt. (m)",
+                "elevation_gain": "Elev. gain (m)",
+                "elevation_loss": "Elev. loss (m)",
+                "aprox_time_start": "Approx. time"
+            }
+        },
+        "chart": {
+            "empty": "The profile will appear here once the race has segments with altitude.",
+            "altitude": "Altitude",
+            "landmarks": "Points of interest",
+            "ingredients": "Ingredients"
+        },
+        "landmarks": {
+            "type": "Type",
+            "selectType": "Choose a type",
+            "km": "Km",
+            "name": "Name (optional)",
+            "namePlaceholder": "e.g. Aid station 1",
+            "add": "Add",
+            "remove": "Remove point of interest",
+            "empty": "There are no points of interest yet."
+        },
+        "ingredients": {
+            "total": "Race total",
+            "ingredient": "Ingredient",
+            "selectIngredient": "Choose an ingredient",
+            "amount": "Units",
+            "kmSpan": "Over (km)",
+            "add": "Add",
+            "remove": "Remove ingredient",
+            "during": "over {{km}} km",
+            "deleted": "(removed from catalog)",
+            "km": "Km",
+            "empty": "There are no ingredients in the race yet."
+        },
+        "backToList": "Back to races",
+        "manage": {
+            "title": "Races on {{date}}",
+            "description": "Create, edit or delete the client's races on this day.",
+            "new": "New race",
+            "empty": "The client has no races on this day.",
+            "loadError": "The races could not be loaded.",
+            "edit": "Edit race",
+            "delete": "Delete race",
+            "download": "Download race image",
+            "confirmDelete": "Delete the race “{{name}}”? Its segments, ingredients and points of interest will be removed."
+        },
+        "errors": {
+            "missingName": "The race name is missing.",
+            "missingDate": "The race date is missing.",
+            "missingDistance": "The distance must be greater than 0.",
+            "stepOutOfRange": "Each segment must start after the previous one and before the end of the race.",
+            "stepAltitudeOutOfRange": "The km of the minimum or maximum altitude is outside the segment.",
+            "stepAltitudeOrder": "The minimum altitude is higher than the maximum.",
+            "stepNegativeElevation": "Elevation gain and loss cannot be negative.",
+            "stepInvalidTime": "The approximate time must use the hh:mm format.",
+            "landmarkOutOfRange": "The km is outside the race.",
+            "landmarkDuplicated": "There is already a point of interest of this type at the same km.",
+            "ingredientOutOfRange": "The intake, or the km over which it is taken, goes beyond the race.",
+            "ingredientInvalidAmount": "Units and km span must be greater than 0.",
+            "deletedIngredient": "An ingredient that is no longer in the catalog was added.",
+            "duplicated": "The race has duplicated items.",
+            "invalidValue": "Some value in the race is not valid.",
+            "raceNotFound": "The race no longer exists or you are not allowed to edit it."
+        }
     }
-
 }

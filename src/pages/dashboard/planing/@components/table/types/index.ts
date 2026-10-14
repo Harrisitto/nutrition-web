@@ -1,3 +1,5 @@
+import type FromDate from "@src/helpers/dates";
+
 export const ALL_IDS = {
   INPUT_PRESET: "preset",
   INPUT_AUTO_GENERATE: "autoGenerate",
@@ -5,6 +7,7 @@ export const ALL_IDS = {
   HEADER_TRAINING: "headerTraining",
   INPUT_TRAINING_HC: "trainingHc",
   INPUT_TRAINING_KCAL: "trainingKcal",
+  INPUT_RACES: "races",
   HEADER_ENERGY_BALANCE: "headerEnergyBalance",
   DISPLAY_ENERGY_BALANCE: "displayEnergyBalance",
   HEADER_DAILY_MACROS: "headerDailyMacros",
@@ -28,6 +31,8 @@ export class RowInfo {
   label: string = "";
   resume?: string;
   map: Map<string, string | number> = new Map();
+  // Filas "action" que no abren editor: al abrir la celda se ejecuta esto (p. ej. navegar)
+  onAction?: (date: FromDate) => void;
 
   constructor(props: {
     id: keyof typeof ALL_IDS;
@@ -56,6 +61,11 @@ export class RowInfo {
 
   addMap(data: Map<string, string | number> | [string, string | number][]) {
     this.map = data instanceof Map ? data : new Map(data);
+    return this;
+  }
+
+  addAction(onAction: (date: FromDate) => void) {
+    this.onAction = onAction;
     return this;
   }
 

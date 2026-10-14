@@ -10,6 +10,7 @@ import CellNumeric from "../@components/cells/numericCell";
 import CellText from "../@components/cells/textCell";
 import CellDisplay from "../@components/cells/displayCell";
 import CellAutoGenerate from "../@components/cells/autoGenerateCell";
+import CellRace from "../@components/cells/raceCell";
 import type FromDate from "@src/helpers/dates";
 import { features } from "../features";
 import { useMutatePlaning } from "@src/services/tanstack/user/planing";
@@ -123,6 +124,16 @@ const useTableColumns = ({
                         training_kcal: num,
                       });
                     }}
+                  />
+                );
+
+              case ALL_IDS.INPUT_RACES:
+                return (
+                  <CellRace
+                    dayName={daysOfWeek[dayIndex]}
+                    cellValue={cellValue}
+                    isHighlighted={isHighlighted}
+                    openEditor={openEditor}
                   />
                 );
 

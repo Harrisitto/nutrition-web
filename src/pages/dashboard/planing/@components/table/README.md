@@ -2,7 +2,7 @@
 
 Tabla semanal (7 columnas de día + 1 columna de etiqueta) que muestra y edita
 la planificación nutricional del usuario: presets del día, comidas, horas de
-entrenamiento, kcal de entrenamiento, balance energético, macros por kg y
+entrenamiento, kcal de entrenamiento, carreras, balance energético, macros por kg y
 comentarios/eventos. Se monta desde [index.tsx](index.tsx) como
 `WeeklyMeals`.
 
@@ -13,7 +13,7 @@ comentarios/eventos. Se monta desde [index.tsx](index.tsx) como
   y renderiza el `<table>`.
 - **[hooks/rows.ts](hooks/rows.ts)** — construye el array de `RowInfo` (una
   entrada por fila) a partir de varias queries de TanStack Query (planning,
-  meals, meals del usuario, BMR, peso). Cada bloque de datos (comidas,
+  meals, meals del usuario, BMR, peso, carreras de la semana). Cada bloque de datos (comidas,
   entrenamiento, balance energético, macros, comentarios/eventos) se calcula
   en su propio `useMemo` y luego se concatenan, intercalando filas de
   cabecera (`isFullWidth: true`) entre secciones.
@@ -40,8 +40,12 @@ comentarios/eventos. Se monta desde [index.tsx](index.tsx) como
 Cada fila de la tabla es una instancia de `RowInfo` con:
 
 - `id` — uno de los valores de `ALL_IDS`, identifica el *tipo* de fila.
-- `isEditable` — `"numeric" | "text" | "meals" | "presets"` si la fila se
-  puede editar, o `undefined` si es de solo lectura.
+- `isEditable` — `"numeric" | "text" | "meals" | "presets" | "action"` si la
+  fila se puede editar o abrir, o `undefined` si es de solo lectura.
+- `onAction` (opcional, `addAction()`) — en filas `"action"` que no abren
+  editor: abrir la celda (click o Enter) ejecuta `onAction(date)` en vez de
+  marcarla como `editingCell`. La fila de carreras lo usa para fijar el día y
+  navegar a `APP_ROUTES.RACES`.
 - `isFullWidth` — `true` para filas de cabecera de sección (ocupan todo el
   ancho, sin columnas de día).
 - `map: Map<string, string | number>` — valor de la fila por fecha (clave
@@ -102,6 +106,7 @@ refetch no dispara el scroll — solo un cambio real de fila lo hace.
 | `INPUT_PRESET` | `CellPresetDay` | `PresetSelectInput` |
 | `INPUT_MEAL` | `CellMeal` | `MealSelectInput` |
 | `INPUT_TRAINING_HC`, `INPUT_TRAINING_KCAL` | `CellNumeric` | `NumericInput` |
+| `INPUT_RACES` | `CellRace` | — (`onAction`: navega a `APP_ROUTES.RACES`) |
 | `INPUT_COMMENTS`, `INPUT_EVENTS` | `CellText` | `TextInput` |
 | resto (`DISPLAY_*`) | `CellDisplay` | — (solo lectura) |
 

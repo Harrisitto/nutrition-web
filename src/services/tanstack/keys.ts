@@ -32,6 +32,15 @@ export const queryKeys = ({
       start,
       end,
     ],
+    racesBase: ["user", "races", userId],
+    racePlan: (raceId: number) => ["user", "races", userId, "plan", raceId],
+    races: (start: string, end: string) => [
+      "user",
+      "races",
+      userId,
+      start,
+      end,
+    ],
     presets: ["user", "presets", userId],
     measuresBase: ["user", "measuresBase", userId],
     basalMetabolicRate: (startDate: FromDate, endDate: FromDate) => [
@@ -67,6 +76,8 @@ export const queryKeys = ({
     videos: ["data", "videos"],
     singleRecipe: (id: number) => ["data", "recipe", id, language],
     recipes: ["data", "recipes", language, searchStr],
+    raceIngredients: ["data", "raceIngredients", userId],
+    raceLandmarks: ["data", "raceLandmarks", language],
   },
   auth: {
     profileBase: ["auth", "profile"],

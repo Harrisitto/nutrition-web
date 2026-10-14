@@ -8,8 +8,13 @@ import {
   useFetchBmr,
   useFetchUserWeightForDateRange,
 } from "@src/services/tanstack/user/info";
-import { useAppSelector } from "@src/store/store";
+import { useAppDispatch, useAppSelector } from "@src/store/store";
 import FromDate from "@src/helpers/dates";
+import { dayBalanceWithoutMeals } from "@src/helpers/nutrition";
+import { useRaceTotalsByDate } from "@src/services/tanstack/user/races";
+import { setSelectedDay } from "@src/store/slices/config/store";
+import useAppNavigation from "@src/hooks/navigation";
+import { APP_ROUTES } from "@src/hooks/navigation/routes";
 
 const MIN_TRAINING_HC_ROWS = 2;
 
@@ -25,7 +30,10 @@ const useTableRows = () => {
     [savedDate],
   );
   const userWeight = useFetchUserWeightForDateRange();
-  
+  // HC y kcal tomados en carreras por fecha
+  const { totalsByDate: raceTotalsByDate } = useRaceTotalsByDate();
+  const dispatch = useAppDispatch();
+  const { navigateTo } = useAppNavigation();
 
   const createMealRows = useMemo(() => {
     if (!mealsQuery.data) return [];
@@ -107,40 +115,68 @@ const useTableRows = () => {
       );
   }, [planingQuery.data, t]);
 
-  const createEnergyBalance = useMemo(() => {
-    const kcalMap = new Map<string, number>();
+  const createRacesRow = useMemo(() => {
+    return new RowInfo({
+      id: "INPUT_RACES",
+      isEditable: "action",
+      isFullWidth: false,
+    })
+      .addLabel(t("data:dashboardTable.racesRow"))
+      .addMap(
+        Array.from(raceTotalsByDate, ([date, { kcal }]) => [
+          date,
+          Math.round(kcal),
+        ]),
+      )
+      // La página races muestra las carreras de selectedDay: se fija el día pulsado
+      .addAction((date) => {
+        dispatch(setSelectedDay(date.save()));
+        navigateTo(APP_ROUTES.RACES);
+      });
+  }, [raceTotalsByDate, t, dispatch, navigateTo]);
 
+  const createEnergyBalance = useMemo(() => {
     // Suma de Kcal provenientes de las comidas
+    const mealKcalByDate = new Map<string, number>();
     userMeals.data?.forEach((scheduledMeal) => {
       const date = scheduledMeal.date;
       if (!date) return;
       const mealKcal = scheduledMeal.recipe_type?.kcal ?? 0;
-      const currentKcal = kcalMap.get(date) ?? 0;
-      kcalMap.set(date, currentKcal + mealKcal);
+      mealKcalByDate.set(date, (mealKcalByDate.get(date) ?? 0) + mealKcal);
     });
 
-    // Ajuste por carbohidratos consumidos y gasto calórico durante entrenamientos
-    planingQuery.data?.forEach((scheduledPlan) => {
-      const date = scheduledPlan.date;
-      if (!date) return;
-      const currentKcal = kcalMap.get(date) ?? 0;
-      const trainingCarbsKcal = (scheduledPlan.training_hc ?? []).reduce(
-        (acc, hc) => acc + (hc || 0) * 4,
-        0,
-      );
-      const netTrainingKcal =
-        trainingCarbsKcal - (scheduledPlan.training_kcal || 0);
-      kcalMap.set(date, currentKcal + netTrainingKcal);
-    });
+    const planningByDate = new Map(
+      planingQuery.data?.map((scheduledPlan) => [
+        scheduledPlan.date,
+        scheduledPlan,
+      ]),
+    );
+    const bmrKcal = typeof bmr.data === "number" ? bmr.data : null;
 
-    // Resta del metabolismo basal (BMR) para cada día de la semana
-    if (typeof bmr.data === "number") {
-      Array.from({ length: 7 }).forEach((_, index) => {
-        const key = monday.incrementDay(index).save();
-        const currentKcal = kcalMap.get(key) ?? 0;
-        kcalMap.set(key, currentKcal - bmr.data);
-      });
-    }
+    // Días con algún dato y, si hay metabolismo basal (BMR), todos los de la semana
+    const dates = new Set([
+      ...mealKcalByDate.keys(),
+      ...planningByDate.keys(),
+      ...raceTotalsByDate.keys(),
+      ...(bmrKcal === null
+        ? []
+        : Array.from({ length: 7 }, (_, index) =>
+            monday.incrementDay(index).save(),
+          )),
+    ]);
+
+    // Comidas + entrenamiento neto + carreras − BMR (misma cuenta que el autogenerado)
+    const kcalMap = new Map(
+      Array.from(dates, (date) => [
+        date,
+        (mealKcalByDate.get(date) ?? 0) +
+          dayBalanceWithoutMeals({
+            planning: planningByDate.get(date),
+            raceKcal: raceTotalsByDate.get(date)?.kcal ?? 0,
+            bmr: bmrKcal ?? 0,
+          }),
+      ]),
+    );
 
     const totalBalance = Array.from(kcalMap.values()).reduce(
       (acc, kcal) => acc + kcal,
@@ -161,7 +197,7 @@ const useTableRows = () => {
       .addLabel(t("data:dashboardTable.energyBalanceResume"))
       .addMap(stringifiedMap)
       .addResume(totalBalance.toFixed(0) + " Kcal");
-  }, [userMeals.data, planingQuery.data, bmr.data, monday, t]);
+  }, [userMeals.data, planingQuery.data, raceTotalsByDate, bmr.data, monday, t]);
 
   const createUserMacros = useMemo(() => {
     const macrosMap = new Map<
@@ -194,6 +230,12 @@ const useTableRows = () => {
         prot: saved.prot,
         fat: saved.fat,
       });
+    });
+
+    // HC tomados durante las carreras
+    raceTotalsByDate.forEach(({ hc }, date) => {
+      const saved = macrosMap.get(date) ?? { hc: 0, prot: 0, fat: 0 };
+      macrosMap.set(date, { ...saved, hc: saved.hc + hc });
     });
 
     const safeWeight = userWeight.data || 1;
@@ -251,7 +293,7 @@ const useTableRows = () => {
       .addResume(`${avgFat} g/kg`);
 
     return { carbsRow, proteinRow, fatRow };
-  }, [userMeals.data, planingQuery.data, userWeight.data, t]);
+  }, [userMeals.data, planingQuery.data, raceTotalsByDate, userWeight.data, t]);
 
   const createCommentsRow = useMemo(() => {
     return new RowInfo({
@@ -304,6 +346,7 @@ const useTableRows = () => {
       }).addLabel(t("data:dashboardTable.hcHeader")),
       createTrainingKcal,
       ...createTrainingHcRows,
+      createRacesRow,
       new RowInfo({
         id: "HEADER_ENERGY_BALANCE",
         isFullWidth: true,
@@ -327,6 +370,7 @@ const useTableRows = () => {
     createMealRows,
     createTrainingHcRows,
     createTrainingKcal,
+    createRacesRow,
     createEnergyBalance,
     createUserMacros,
     createCommentsRow,

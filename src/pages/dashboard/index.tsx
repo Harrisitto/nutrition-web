@@ -13,6 +13,7 @@ const PageFormPreset = lazy(() => import("./preset/index"));
 const PageFormMeasure = lazy(() => import("./measures/index"));
 const PageConfiguration = lazy(() => import("../configuration/index"));
 const PagePlaningForm = lazy(() => import("./planing/index"));
+const PageNutriRaces = lazy(() => import("./races/index"));
 
 const ScreenNoClients = lazy(
   () => import("./@components/noClientsScreen/index"),
@@ -100,6 +101,10 @@ export default function PageDashboard() {
           <Route
             path={getTrailingRoute(APP_ROUTES.FORM_MEASURE)}
             element={<PageFormMeasure />}
+          />
+          <Route
+            path={getTrailingRoute(APP_ROUTES.RACES)}
+            element={<PageNutriRaces />}
           />
           <Route
             path={getTrailingRoute(APP_ROUTES.CONFIG_WILD)}

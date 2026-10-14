@@ -32,6 +32,12 @@ export const WeeklyMeals = () => {
     [rows],
   );
 
+  // Abre el editor de la celda o, en las filas con acción, la ejecuta
+  const openCell = useCallback((row: RowInfo, date: FromDate) => {
+    if (row.onAction) row.onAction(date);
+    else setEditingCell(row.getCellId(date.save()));
+  }, []);
+
   const selectCell = useCallback(
     (row: RowInfo, dayIndex: number) => {
       // Se compara por identidad de contenido (no por referencia): `rows` se
@@ -45,9 +51,9 @@ export const WeeklyMeals = () => {
         setSelection({ row: rowIndex, col: dayIndex });
       }
       const date = dayDates[dayIndex];
-      if (date) setEditingCell(row.getCellId(date.save()));
+      if (date) openCell(row, date);
     },
-    [editableRows, dayDates],
+    [editableRows, dayDates, openCell],
   );
 
   const closeEditor = useCallback(() => setEditingCell(null), []);
@@ -90,12 +96,12 @@ export const WeeklyMeals = () => {
       if (patch.isEditorOpen === true) {
         const row = editableRows[patch.row ?? selection.row];
         const date = dayDates[patch.col ?? selection.col];
-        if (row && date) setEditingCell(row.getCellId(date.save()));
+        if (row && date) openCell(row, date);
       } else if (patch.isEditorOpen === false) {
         setEditingCell(null);
       }
     },
-    [editableRows, dayDates, selection],
+    [editableRows, dayDates, selection, openCell],
   );
 
   useKeyboardNavigation({

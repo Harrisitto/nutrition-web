@@ -32,6 +32,15 @@ export const AnimationLoading = ({ size = 40, color = 'gray', className = "" }: 
 	);
 };
 
+// Carga de una sección: centrada y con el verde de la marca
+export const SectionLoading = () => {
+	return (
+		<div className="flex items-center justify-center p-8 text-nutrition-green">
+			<AnimationLoading color="currentColor" />
+		</div>
+	);
+};
+
 interface InitialAnimationProps {
   /** Duración de la animación en milisegundos */
   duration?: number;

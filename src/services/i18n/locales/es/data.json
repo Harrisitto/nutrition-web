@@ -3,8 +3,12 @@
         "Kcal": "kcal",
         "resumeHeader": "Resumen diario",
         "hcHeader": "Carbohidratos por hora de entrenamiento",
+        "racesRow": "Carreras",
+        "racesCell": "Carreras del {{day}}: {{kcal}} kcal",
+        "racesCellEmpty": "Carreras del {{day}}: ninguna",
         "trainingKcalHeader": "Kcal de entrenamiento",
         "energyBalanceHeader": "Balance energetico",
+        "energyBalanceResume": "Suma semanal",
         "weekBalance": "Balance semanal",
         "search": "Buscar",
         "dailyMacros": {
@@ -208,6 +212,31 @@
                 "regionSettings": "Configuracion de region",
                 "chooseLanguage": "Elegir idioma",
                 "manageSubscription": "Gestionar suscripcion"
+            },
+            "raceIngredients": {
+                "title": "Mis ingredientes de carrera",
+                "description": "Gestiona los ingredientes que usas en los planes de carrera.",
+                "listTitle": "Ingredientes",
+                "addTitle": "Añadir ingrediente",
+                "empty": "Todavía no tienes ingredientes de carrera.",
+                "add": "Añadir",
+                "delete": "Eliminar",
+                "confirmDelete": "¿Eliminar «{{name}}» del catálogo? Las carreras que ya lo usan lo conservan.",
+                "search": "Buscar ingrediente...",
+                "noResults": "Ningún ingrediente coincide con la búsqueda.",
+                "loadError": "No se han podido cargar los ingredientes.",
+                "saveError": "No se ha podido guardar el ingrediente.",
+                "imageTypeError": "Formato no permitido. Usa PNG, JPEG, WebP o SVG.",
+                "imageSizeError": "La imagen no puede superar los 5 MB.",
+                "imageUploadError": "Error al subir la imagen. El ingrediente se ha creado sin imagen.",
+                "fields": {
+                    "name": "Nombre",
+                    "hc_amount": "Carbohidratos",
+                    "sodium_amount": "Sodio",
+                    "caffeine_amount": "Cafeína",
+                    "liquid_amount": "Líquido",
+                    "image": "Imagen"
+                }
             }
         }
     },
@@ -222,5 +251,112 @@
         "carbsPerKg": "Carbohidratos por kg",
         "proteinPerKg": "Proteina por kg",
         "fatsPerKg": "Grasas por kg"
+    },
+    "races": {
+        "title": "Planificación de carrera",
+        "back": "Volver al dashboard",
+        "steps": {
+            "profile": {
+                "title": "Generar el perfil",
+                "description": "Sube un archivo GPX para generar el perfil automáticamente o añade los tramos uno a uno."
+            },
+            "landmarks": {
+                "title": "Puntos de interés",
+                "description": "Marca avituallamientos, cimas y otros puntos de interés a lo largo del recorrido."
+            },
+            "ingredients": {
+                "title": "Ingredientes",
+                "description": "Indica en qué km se toma cada ingrediente."
+            }
+        },
+        "previous": "Anterior",
+        "next": "Siguiente",
+        "save": "Guardar carrera",
+        "saveError": "No se ha podido guardar la carrera",
+        "loadError": "No se ha podido cargar la carrera.",
+        "retry": "Reintentar",
+        "stepNeedsAttention": "tiene avisos",
+        "pendingForm": "{{step}}: hay datos escritos sin añadir. Pulsa «Añadir» o vacía el formulario.",
+        "profile": {
+            "name": "Nombre",
+            "date": "Fecha de la carrera",
+            "distance": "Distancia (km)",
+            "gpxTitle": "Generar desde un GPX",
+            "gpxDescription": "Sube el archivo GPX del recorrido para calcular los tramos y su desnivel automáticamente. También puedes añadir los tramos a mano en la tabla.",
+            "gpxGenerate": "Generar perfil",
+            "gpxReplaceWarning": "Generar el perfil sustituye los tramos actuales. Los ingredientes y puntos de interés se mantienen.",
+            "gpxError": "No se ha podido procesar el GPX",
+            "stepsTitle": "Tramos",
+            "addStep": "Añadir tramo",
+            "removeStep": "Eliminar tramo",
+            "noSteps": "Todavía no hay tramos. Genera el perfil desde un GPX o añádelos a mano.",
+            "columns": {
+                "km_start": "Km inicio",
+                "min_altitude": "Alt. mín (m)",
+                "max_altitude": "Alt. máx (m)",
+                "elevation_gain": "Desnivel + (m)",
+                "elevation_loss": "Desnivel − (m)",
+                "aprox_time_start": "Hora aprox."
+            }
+        },
+        "chart": {
+            "empty": "El perfil aparecerá aquí cuando la carrera tenga tramos con altitud.",
+            "altitude": "Altitud",
+            "landmarks": "Puntos de interés",
+            "ingredients": "Ingredientes"
+        },
+        "landmarks": {
+            "type": "Tipo",
+            "selectType": "Elige un tipo",
+            "km": "Km",
+            "name": "Nombre (opcional)",
+            "namePlaceholder": "p. ej. Avituallamiento 1",
+            "add": "Añadir",
+            "remove": "Eliminar punto de interés",
+            "empty": "Todavía no hay puntos de interés."
+        },
+        "ingredients": {
+            "total": "Total de la carrera",
+            "ingredient": "Ingrediente",
+            "selectIngredient": "Elige un ingrediente",
+            "amount": "Unidades",
+            "kmSpan": "Durante (km)",
+            "add": "Añadir",
+            "remove": "Eliminar ingrediente",
+            "during": "durante {{km}} km",
+            "deleted": "(eliminado del catálogo)",
+            "km": "Km",
+            "empty": "Todavía no hay ingredientes en la carrera."
+        },
+        "backToList": "Volver a las carreras",
+        "manage": {
+            "title": "Carreras del {{date}}",
+            "description": "Crea, edita o elimina las carreras del cliente en este día.",
+            "new": "Nueva carrera",
+            "empty": "El cliente no tiene carreras este día.",
+            "loadError": "No se han podido cargar las carreras.",
+            "edit": "Editar carrera",
+            "delete": "Eliminar carrera",
+            "download": "Descargar imagen de la carrera",
+            "confirmDelete": "¿Eliminar la carrera «{{name}}»? Se borrarán sus tramos, ingredientes y puntos de interés."
+        },
+        "errors": {
+            "missingName": "Falta el nombre de la carrera.",
+            "missingDate": "Falta la fecha de la carrera.",
+            "missingDistance": "La distancia tiene que ser mayor que 0.",
+            "stepOutOfRange": "Cada tramo tiene que empezar después del anterior y antes del final de la carrera.",
+            "stepAltitudeOutOfRange": "El km de la altitud mínima o máxima queda fuera del tramo.",
+            "stepAltitudeOrder": "La altitud mínima es mayor que la máxima.",
+            "stepNegativeElevation": "El desnivel no puede ser negativo.",
+            "stepInvalidTime": "La hora aproximada tiene que tener el formato hh:mm.",
+            "landmarkOutOfRange": "El km queda fuera de la carrera.",
+            "landmarkDuplicated": "Ya hay un punto de interés de este tipo en el mismo km.",
+            "ingredientOutOfRange": "La toma, o los km durante los que se toma, se sale de la carrera.",
+            "ingredientInvalidAmount": "Las unidades y los km de duración tienen que ser mayores que 0.",
+            "deletedIngredient": "Se ha añadido un ingrediente que ya no está en el catálogo.",
+            "duplicated": "Hay elementos repetidos en la carrera.",
+            "invalidValue": "Algún valor de la carrera no es válido.",
+            "raceNotFound": "La carrera ya no existe o no tienes permiso para editarla."
+        }
     }
 }

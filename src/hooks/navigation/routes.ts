@@ -20,6 +20,9 @@ export const APP_ROUTES = {
 
   FORM_PRESET: "/dashboard/form-preset",
   FORM_MEASURE: "/dashboard/form-measure",
+  RACES: "/dashboard/races",
+
+  RACE_INGREDIENTS: "/dashboard/config/race-ingredients",
 
   // Error routes
   NOT_FOUND: "/404",

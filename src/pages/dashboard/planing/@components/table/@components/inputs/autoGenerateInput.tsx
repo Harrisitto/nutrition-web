@@ -7,6 +7,8 @@ import { useFetchPlanning } from "@src/services/tanstack/user/planing";
 import { useFetchPlaningMealsForDate } from "@src/services/tanstack/user/meals";
 import { useFetchBmr } from "@src/services/tanstack/user/info";
 import { useGeneratePlaningDay } from "@src/services/tanstack/user/generate";
+import { useRaceTotalsByDate } from "@src/services/tanstack/user/races";
+import { dayBalanceWithoutMeals } from "@src/helpers/nutrition";
 
 interface AutoGenerateEditorProps {
   date: FromDate;
@@ -19,6 +21,7 @@ const AutoGenerateEditor = ({ date, onClose }: AutoGenerateEditorProps) => {
   const planingQuery = useFetchPlanning();
   const userMeals = useFetchPlaningMealsForDate();
   const bmr = useFetchBmr();
+  const races = useRaceTotalsByDate();
   const generate = useGeneratePlaningDay();
   const [message, setMessage] = useState<string | null>(null);
   // `null` hasta que el usuario toque algo: por defecto todas las comidas
@@ -48,16 +51,17 @@ const AutoGenerateEditor = ({ date, onClose }: AutoGenerateEditorProps) => {
 
   const targetKcal = useMemo(() => {
     if (typeof bmr.data !== "number") return null;
-    const trainingCarbsKcal = (day?.training_hc ?? []).reduce(
-      (acc, hc) => acc + (hc || 0) * 4,
-      0,
-    );
     // Mismo cálculo que la fila de balance energético, despejado para que el
     // balance del día quede en 0.
-    return bmr.data + (day?.training_kcal ?? 0) - trainingCarbsKcal;
-  }, [bmr.data, day]);
+    return -dayBalanceWithoutMeals({
+      planning: day,
+      raceKcal: races.totalsByDate.get(date.save())?.kcal ?? 0,
+      bmr: bmr.data,
+    });
+  }, [bmr.data, day, races.totalsByDate, date]);
 
-  const isReady = !!mealsQuery.data && targetKcal !== null;
+  // Sin las carreras cargadas el objetivo no las tendría en cuenta
+  const isReady = !!mealsQuery.data && targetKcal !== null && !races.isLoading;
 
   const toggleMeal = (mealId: number) => {
     const next = new Set(selectedIds);

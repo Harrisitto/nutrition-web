@@ -7,6 +7,7 @@ import { TableCommands } from "./keyboard";
 import { ManageAuthState } from "./authManagement";
 import useAppNavigation from "@src/hooks/navigation";
 import { lazy } from "react";
+import ConfigRaceIngredients from "./raceIngredients";
 
 const PageInviteClient = lazy(() => import("./inviteClient/index"));
 
@@ -38,6 +39,11 @@ const PageNutritionistConfiguration = () => {
             label: t("data:configuration.sections.authManagement.title"),
             onClick: () => navigateTo(APP_ROUTES.AUTH_MANAGEMENT),
           },
+          {
+            route: APP_ROUTES.RACE_INGREDIENTS,
+            label: t("data:configuration.sections.raceIngredients.title"),
+            onClick: () => navigateTo(APP_ROUTES.RACE_INGREDIENTS),
+          }
         ]}
       />
       <Routes>
@@ -60,6 +66,10 @@ const PageNutritionistConfiguration = () => {
         <Route
           path={getTrailingRoute(APP_ROUTES.AUTH_MANAGEMENT)}
           element={<ManageAuthState />}
+        />
+        <Route
+          path={getTrailingRoute(APP_ROUTES.RACE_INGREDIENTS)}
+          element={<ConfigRaceIngredients />}
         />
       </Routes>
     </div>
