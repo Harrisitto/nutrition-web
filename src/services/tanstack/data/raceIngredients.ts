@@ -5,6 +5,7 @@ import { supabase } from "@src/services/supabase/client";
 import { queryClient } from "../queryClient";
 import { useGetAuthSession } from "../auth/get";
 import type { Database } from "@src/services/supabase/types";
+import { resizeImage } from "@src/helpers/images";
 
 type RaceIngredientRow = Database["public"]["Tables"]["nutri_race_ingredients"]["Row"];
 export type RaceIngredient = RaceIngredientRow & { image_url: string | null };
@@ -18,6 +19,7 @@ export class RaceIngredientImageError extends Error {}
 
 const IMAGES_BUCKET = "race_ingredients";
 const SIGNED_URL_TTL = 60 * 60; // 1 hora
+const MAX_IMAGE_WIDTH = 300; // px
 
 // Las imágenes van por convención en <nutri_id>/<ingredient_id>: no hace falta columna
 const imagePath = (nutriId: string, ingredientId: number) => `${nutriId}/${ingredientId}`;
@@ -106,6 +108,9 @@ export const useAddRaceIngredient = () => {
             ingredient: NewRaceIngredient;
             image?: File | null;
         }) => {
+            // Antes del insert: si la imagen no se puede leer no se crea el ingrediente
+            const resizedImage = image ? await resizeImage(image, MAX_IMAGE_WIDTH) : null;
+
             const { data, error } = await supabase
                 .from("nutri_race_ingredients")
                 .insert({ ...ingredient, nutri_id: nutriId })
@@ -116,11 +121,11 @@ export const useAddRaceIngredient = () => {
                 throw error;
             }
 
-            if (image) {
+            if (resizedImage) {
                 const { error: uploadError } = await supabase.storage
                     .from(IMAGES_BUCKET)
-                    .upload(imagePath(nutriId, data.id), image, {
-                        contentType: image.type,
+                    .upload(imagePath(nutriId, data.id), resizedImage, {
+                        contentType: resizedImage.type,
                     });
 
                 if (uploadError) {
