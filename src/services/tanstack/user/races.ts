@@ -1,20 +1,26 @@
 import { useMemo } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { FunctionsHttpError } from "@supabase/supabase-js";
+import { StorageApiError } from "@supabase/supabase-js";
 import { queryKeys } from "../keys";
-import { supabase, supabaseAnonKey, supabaseUrl } from "@src/services/supabase/client";
+import { supabase } from "@src/services/supabase/client";
 import FromDate from "@src/helpers/dates";
 import { hcToKcal, raceHc } from "@src/helpers/nutrition";
+import { downloadBlob } from "@src/helpers/images";
 import { useAppSelector } from "@src/store/store";
-import { useLanguageCode } from "@src/hooks/helpers/language";
 import type { Database } from "@src/services/supabase/types";
 import { useGetAuthSession } from "../auth/get";
 
 const GPX_BUCKET = "race_gpx";
+const RACE_IMAGES_BUCKET = "race_images";
+
+// PNG del grafico de la carrera que descarga el corredor: race_images/{nutri_id}/{race_id}.png,
+// en la carpeta del nutricionista dueño de la carrera (lo exigen las policies del bucket)
+const raceImagePath = (nutriId: string, raceId: number) => `${nutriId}/${raceId}.png`;
 
 const selectRacesWithHc = () => {
   return `
     id,
+    nutri_id,
     name,
     race_date,
     distance_km,
@@ -64,6 +70,7 @@ export const useFetchRacesForWeek = () => {
 
         return {
           id: race.id,
+          nutriId: race.nutri_id,
           name: race.name,
           date: race.race_date,
           distanceKm: race.distance_km,
@@ -100,7 +107,6 @@ export const useRaceTotalsByDate = () => {
 };
 
 type Tables = Database["public"]["Tables"];
-type SaveRacePlanArgs = Database["public"]["Functions"]["save_race_plan"]["Args"];
 
 // Tramo, toma y punto de interés tal y como se editan en el borrador y se envían a save_race_plan
 export type RaceStepDraft = Omit<Tables["race_steps"]["Row"], "race_id">;
@@ -220,16 +226,11 @@ export const removeUnusedGpx = async (paths: string[]) => {
   }
 };
 
-type ParsedGpx = Pick<SaveRacePlanArgs, "p_name" | "p_distance_km"> & {
-  p_gpx_path: string;
-  p_steps: RaceStepDraft[];
-};
-
 /**
- * Sube el gpx a race_gpx/<nutri_id>/ y lo procesa con la edge function parse-gpx.
- * No guarda la carrera: devuelve el perfil para revisarlo en el borrador.
+ * Sube el gpx de la carrera a race_gpx/<nutri_id>/ y devuelve su ruta. El gpx se procesa
+ * antes, en el navegador (helpers/races/gpx.ts): aquí solo se guarda el fichero original.
  */
-export const useParseGpx = () => {
+export const useUploadGpx = () => {
   const { data: sessionData } = useGetAuthSession();
   const nutriId = sessionData?.userId ?? "";
 
@@ -239,49 +240,67 @@ export const useParseGpx = () => {
       const safeName = file.name.replace(/[^\w.-]+/g, "_");
       const gpxPath = `${nutriId}/${Date.now()}-${safeName}`;
 
-      const { error: uploadError } = await supabase.storage
+      const { error } = await supabase.storage
         .from(GPX_BUCKET)
         .upload(gpxPath, file, {
           contentType: file.type || "application/gpx+xml",
         });
 
-      if (uploadError) {
-        throw uploadError;
-      }
-
-      const { data, error } = await supabase.functions.invoke<ParsedGpx>(
-        "parse-gpx",
-        { body: { gpx_path: gpxPath } },
-      );
-
-      if (error || !data) {
-        // Ninguna carrera lo usa todavía: no se deja huérfano
-        await removeUnusedGpx([gpxPath]);
-      }
       if (error) {
-        // parse-gpx explica en { error } por qué el gpx no es válido (422)
-        if (error instanceof FunctionsHttpError) {
-          const body = await error.context.json().catch(() => null);
-          throw new Error(body?.error ?? error.message);
-        }
         throw error;
       }
-      if (!data) {
-        throw new Error("parse-gpx returned no data");
-      }
-      return data;
+      return gpxPath;
     },
   });
 };
 
+/**
+ * Sube (sobrescribe) el png de la carrera a race_images/{nutri_id}/{race_id}.png, de donde lo
+ * descarga el corredor. Solo puede subirlo el dueño de la carrera, en su carpeta.
+ */
+const uploadRaceImage = async (nutriId: string, raceId: number, image: Blob) => {
+  const { error } = await supabase.storage
+    .from(RACE_IMAGES_BUCKET)
+    .upload(raceImagePath(nutriId, raceId), image, {
+      contentType: "image/png",
+      upsert: true,
+      // Se sobrescribe en cada guardado: que el corredor no vea una versión cacheada
+      cacheControl: "0",
+    });
+
+  if (error) {
+    throw error;
+  }
+};
+
+/**
+ * Guarda la carrera con save_race_plan y sube su imagen, que `renderImage` genera a partir
+ * del borrador. Devuelve el id de la carrera y si se ha subido la imagen.
+ */
 export const useSaveRacePlan = () => {
   const queryClient = useQueryClient();
+  // Quien guarda es el dueño de la carrera: la imagen va a su carpeta
+  const { data: sessionData } = useGetAuthSession();
+  const nutriId = sessionData?.userId ?? "";
 
   return useMutation({
-    mutationFn: async (draft: RacePlanDraft) => {
+    mutationFn: async ({
+      draft,
+      renderImage,
+    }: {
+      draft: RacePlanDraft;
+      renderImage: () => Promise<Blob>;
+    }) => {
       if (draft.distanceKm === null) throw new Error("Race distance is required");
 
-      const { data, error } = await supabase.rpc("save_race_plan", {
+      // La imagen no depende de la carrera guardada: se genera mientras se guarda. Si falla,
+      // null (se avisa con imageUploaded)
+      const image = renderImage().catch((renderError: unknown) => {
+        console.error("Error rendering race image:", renderError);
+        return null;
+      });
+
+      const { data: raceId, error } = await supabase.rpc("save_race_plan", {
         p_id: draft.id ?? undefined,
         p_user_id: draft.userId,
         p_race_date: draft.raceDate,
@@ -296,9 +315,20 @@ export const useSaveRacePlan = () => {
       if (error) {
         throw error;
       }
-      return data;
+
+      // La carrera ya está guardada: si la imagen falla no se propaga (reintentar el guardado
+      // de una carrera nueva la duplicaría), pero se avisa. Se vuelve a subir al guardar de nuevo.
+      const png = await image;
+      if (!png) return { raceId, imageUploaded: false };
+      try {
+        await uploadRaceImage(nutriId, raceId, png);
+        return { raceId, imageUploaded: true };
+      } catch (imageError) {
+        console.error("Error uploading race image:", imageError);
+        return { raceId, imageUploaded: false };
+      }
     },
-    onSuccess: (_raceId, draft) => {
+    onSuccess: (_saved, { draft }) => {
       // Recalcula la fila de carreras y el balance energético de la tabla
       queryClient.invalidateQueries({
         queryKey: queryKeys({ userId: draft.userId }).user.racesBase,
@@ -307,60 +337,74 @@ export const useSaveRacePlan = () => {
   });
 };
 
+/** Nombre del png al descargarlo: fecha y nombre de la carrera. */
+export const raceImageFileName = (race: { name: string; date: string }) =>
+  `${race.date}-${race.name.replace(/[^\p{L}\p{N}._-]+/gu, "_")}.png`;
+
 /**
- * Descarga la imagen final (png) de una carrera: la genera la edge function
- * display-gpx con los datos guardados, la misma imagen que ve el corredor.
+ * La carrera no tiene imagen en race_images: se guardó antes de que existiera o falló la
+ * subida. Storage suele responder 400 con statusCode "404" (Object not found), pero según el
+ * backend puede llegar como HTTP 404 o con otro código.
+ */
+export const isMissingRaceImage = (error: unknown) =>
+  error instanceof StorageApiError &&
+  (error.status === 404 || ["404", "not_found", "NoSuchKey"].includes(error.statusCode));
+
+/**
+ * Descarga la imagen (png) de una carrera tal y como se subió al guardarla: la misma que ve
+ * el corredor. Si no la tiene, falla con un error que reconoce isMissingRaceImage.
  */
 export const useDownloadRaceImage = () => {
-  const lang = useLanguageCode();
-
   return useMutation({
-    mutationFn: async (race: { id: number; name: string; date: string }) => {
-      // invoke lee image/png como texto y corrompe el binario: se usa fetch
-      const { data: sessionData } = await supabase.auth.getSession();
-      const response = await fetch(`${supabaseUrl}/functions/v1/display-gpx`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          apikey: supabaseAnonKey,
-          Authorization: `Bearer ${sessionData.session?.access_token ?? supabaseAnonKey}`,
-        },
-        body: JSON.stringify({ race_id: race.id, lang, format: "png" }),
-      });
+    mutationFn: async (race: { id: number; nutriId: string; name: string; date: string }) => {
+      const { data, error } = await supabase.storage
+        .from(RACE_IMAGES_BUCKET)
+        .download(raceImagePath(race.nutriId, race.id));
 
-      if (!response.ok) {
-        throw new Error(`display-gpx failed: ${response.status} ${await response.text()}`);
+      if (error) {
+        throw error;
       }
-
-      const url = URL.createObjectURL(await response.blob());
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `${race.date}-${race.name.replace(/[^\p{L}\p{N}._-]+/gu, "_")}.png`;
-      link.click();
-      // Se revoca después: algunos navegadores leen el blob tras el click
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      downloadBlob(data, raceImageFileName(race));
     },
   });
 };
 
 /**
- * Borra una carrera (tramos, ingredientes y landmarks caen en cascada) y su gpx.
+ * Borra una carrera (tramos, ingredientes y landmarks caen en cascada), su imagen y su gpx.
  */
 export const useDeleteRace = () => {
   const user = useAppSelector((state) => state.config.selectedUserId);
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, gpxPath }: { id: number; gpxPath: string | null }) => {
+    mutationFn: async ({
+      id,
+      nutriId,
+      gpxPath,
+    }: {
+      id: number;
+      nutriId: string;
+      gpxPath: string | null;
+    }) => {
       const { error } = await supabase.from("nutri_races").delete().eq("id", id);
 
       if (error) {
         throw error;
       }
 
-      if (gpxPath) {
-        await removeUnusedGpx([gpxPath]);
-      }
+      // Después de la carrera, para no quedarse sin imagen si su borrado falla: la policy de
+      // borrado de race_images solo mira la carpeta (la del dueño), así que sigue valiendo. Si
+      // falla solo queda un fichero huérfano: el error no se propaga
+      const removeImage = async () => {
+        const { error: imageError } = await supabase.storage
+          .from(RACE_IMAGES_BUCKET)
+          .remove([raceImagePath(nutriId, id)]);
+        if (imageError) {
+          console.error("Error removing race image:", imageError);
+        }
+      };
+
+      await Promise.all([removeImage(), gpxPath ? removeUnusedGpx([gpxPath]) : undefined]);
       return id;
     },
     onSuccess: () => {

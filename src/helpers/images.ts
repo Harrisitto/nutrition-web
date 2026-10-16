@@ -40,3 +40,14 @@ export const resizeImage = async (
     )
   );
 };
+
+/** Descarga un blob en el navegador con el nombre `fileName`. */
+export const downloadBlob = (blob: Blob, fileName: string) => {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  link.click();
+  // Se revoca después: algunos navegadores leen el blob tras el click
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+};

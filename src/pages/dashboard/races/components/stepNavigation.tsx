@@ -7,6 +7,8 @@ import { useRaceDraft } from "../context/raceDraftContext";
 import { RACE_STEPS, type RaceStep } from "../constants";
 import { saveErrorKey } from "../validation";
 import { secondaryButtonStyle } from "./formStyles";
+import { useRacePosterData } from "./poster/posterData";
+import { renderPosterPng } from "./poster/posterImage";
 
 export const StepNavigation = ({
   currentStep,
@@ -19,8 +21,10 @@ export const StepNavigation = ({
 }) => {
   const { t } = useTranslation();
   const { draft, issues, pendingSteps, onDraftSaved } = useRaceDraft();
-  const { addFormSubmitSucess } = useNotification();
+  const { add: addNotification, addFormSubmitSucess } = useNotification();
   const { mutate: saveRacePlan, isPending, error } = useSaveRacePlan();
+  // La imagen va en el idioma del corredor: no se guarda hasta tenerlo
+  const { data: posterData, isReady: posterReady } = useRacePosterData();
 
   const index = RACE_STEPS.indexOf(currentStep);
   const previousStep = RACE_STEPS[index - 1];
@@ -42,11 +46,22 @@ export const StepNavigation = ({
 
   const onSave = () =>
     saveRacePlan(
-      { ...draft, name: draft.name.trim() },
       {
-        onSuccess: (_raceId, saved) => {
+        draft: { ...draft, name: draft.name.trim() },
+        // La imagen que descarga el corredor se genera con los mismos datos que la vista previa
+        renderImage: () => renderPosterPng(posterData),
+      },
+      {
+        onSuccess: ({ imageUploaded }, { draft: saved }) => {
           onDraftSaved(saved);
           addFormSubmitSucess();
+          if (!imageUploaded) {
+            addNotification({
+              type: "error",
+              message: "data:races.imageUploadError",
+              duration: 8000,
+            });
+          }
           onSaved(saved.raceDate);
         },
       },
@@ -81,7 +96,7 @@ export const StepNavigation = ({
           <button
             type="button"
             className={primaryButtonStyle}
-            disabled={!canSave || isPending}
+            disabled={!canSave || !posterReady || isPending}
             onClick={onSave}
           >
             {isPending ? <Loader size={16} className="animate-spin" /> : <Save size={16} />}

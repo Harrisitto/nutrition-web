@@ -6,6 +6,12 @@ import type {
 } from "@src/services/tanstack/user/races";
 import { INGREDIENT_GAP, LANDMARK_LABEL_GAP, MAX_LANES } from "./constants";
 
+// Punto de interés listo para pintar: nombre ya resuelto (el escrito o el del tipo) e icono
+export type ChartLandmark = { km: number; name: string; iconUrl?: string };
+
+// Toma que dura varios km (p. ej. un bidón): se pinta como una franja de km a km + kmSpan
+export type ChartSpan = { km: number; kmSpan: number };
+
 export type ChartPoint = {
   km: number;
   altitude: number;
@@ -113,8 +119,35 @@ export const buildChartData = ({
   };
 };
 
-// Carril de la etiqueta de cada punto de interés, por su índice en el borrador
-export const landmarkLanes = (landmarks: RaceLandmarkDraft[], maxKm: number) => {
+export type ChartData = NonNullable<ReturnType<typeof buildChartData>>;
+
+// Tipo de punto de interés del catálogo, con el nombre ya en el idioma pedido
+type LandmarkOption = { id: number; name: string | null; url: string | null };
+
+/** Puntos de interés del borrador con su nombre (el escrito o el del tipo) e icono. */
+export const resolveLandmarks = (
+  landmarks: RaceLandmarkDraft[],
+  options: LandmarkOption[] | undefined,
+): ChartLandmark[] => {
+  const optionsById = new Map(options?.map((option) => [option.id, option]));
+  return landmarks.map((landmark) => {
+    const option = optionsById.get(landmark.landmark_id);
+    return {
+      km: landmark.km,
+      name: landmark.name || option?.name || "",
+      iconUrl: option?.url ?? undefined,
+    };
+  });
+};
+
+// Tomas con "durante" del borrador
+export const chartSpans = (ingredients: RaceIngredientDraft[]): ChartSpan[] =>
+  ingredients.flatMap((intake) =>
+    intake.km_span ? [{ km: intake.km, kmSpan: intake.km_span }] : [],
+  );
+
+// Carril de la etiqueta de cada punto de interés, por su índice en la lista
+export const landmarkLanes = (landmarks: { km: number }[], maxKm: number) => {
   const sorted = landmarks
     .map((landmark, index) => ({ km: landmark.km, index }))
     .sort((a, b) => a.km - b.km);

@@ -2,14 +2,17 @@ import { useTranslation } from "react-i18next";
 import { supportedLngs } from "@src/services/i18n/config";
 import type { SupportedLanguage } from "@src/services/i18n/config";
 
-export const useLanguageCode = (): SupportedLanguage => {
-  const { i18n } = useTranslation();
-  const langCode = i18n.language.split("-")[0];
-
-  // Ensure we return a valid supported language, fallback to first supported language
+// Ensure we return a valid supported language, fallback to first supported language
+export const toSupportedLanguage = (language: string): SupportedLanguage => {
+  const langCode = language.split("-")[0];
   return supportedLngs.includes(langCode as SupportedLanguage)
     ? (langCode as SupportedLanguage)
     : supportedLngs[0];
+};
+
+export const useLanguageCode = (): SupportedLanguage => {
+  const { i18n } = useTranslation();
+  return toSupportedLanguage(i18n.language);
 };
 
 export const useDaysOfWeek = (): string[] => {

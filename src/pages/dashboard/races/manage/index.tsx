@@ -5,6 +5,7 @@ import { SectionLoading } from "@src/components/global/Animations";
 import { deleteButtonStyle, primaryButtonStyle } from "@src/components/styles";
 import { useNotification } from "@src/store/slices/notification/hook";
 import {
+  isMissingRaceImage,
   useDeleteRace,
   useDownloadRaceImage,
   useFetchRacesForWeek,
@@ -27,7 +28,7 @@ export const RaceManager = ({
 }) => {
   const { t } = useTranslation();
   const selectedDay = useAppSelector((state) => state.config.selectedDay);
-  const { addFormSubmitError } = useNotification();
+  const { add: addNotification, addFormSubmitError } = useNotification();
   // La semana ya está cacheada por la fila de carreras de la tabla
   const { data: weekRaces, isLoading, isError, refetch } = useFetchRacesForWeek();
   const { mutate: deleteRace, isPending, variables } = useDeleteRace();
@@ -35,10 +36,22 @@ export const RaceManager = ({
 
   const races = weekRaces?.filter((race) => race.date === selectedDay) ?? [];
 
+  const onDownload = (race: (typeof races)[number]) =>
+    downloadImage.mutate(race, {
+      onError: (error) =>
+        isMissingRaceImage(error)
+          ? addNotification({
+              type: "error",
+              message: "data:races.manage.imageMissing",
+              duration: 6000,
+            })
+          : addFormSubmitError(),
+    });
+
   const onDelete = (race: (typeof races)[number]) => {
     if (!window.confirm(t("data:races.manage.confirmDelete", { name: race.name }))) return;
     deleteRace(
-      { id: race.id, gpxPath: race.gpxPath },
+      { id: race.id, nutriId: race.nutriId, gpxPath: race.gpxPath },
       { onError: () => addFormSubmitError() },
     );
   };
@@ -91,9 +104,7 @@ export const RaceManager = ({
               title={t("data:races.manage.download")}
               aria-label={t("data:races.manage.download")}
               disabled={downloadImage.isPending && downloadImage.variables?.id === race.id}
-              onClick={() =>
-                downloadImage.mutate(race, { onError: () => addFormSubmitError() })
-              }
+              onClick={() => onDownload(race)}
               className="shrink-0 rounded-md p-1.5 text-nutrition-green transition hover:bg-white-green/60 disabled:opacity-50"
             >
               <Download size={16} />

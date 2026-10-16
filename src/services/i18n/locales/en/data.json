@@ -273,6 +273,7 @@
         "next": "Next",
         "save": "Save race",
         "saveError": "The race could not be saved",
+        "imageUploadError": "The race was saved, but its image could not be uploaded. Save it again so the runner can see it.",
         "loadError": "The race could not be loaded.",
         "retry": "Retry",
         "stepNeedsAttention": "needs attention",
@@ -286,6 +287,12 @@
             "gpxGenerate": "Generate profile",
             "gpxReplaceWarning": "Generating the profile replaces the current segments. Ingredients and points of interest are kept.",
             "gpxError": "The GPX could not be processed",
+            "gpxErrors": {
+                "invalidFile": "the file is not a valid GPX",
+                "noPoints": "the GPX has no track points",
+                "tooShort": "the course is shorter than 100 m",
+                "tooLong": "the course is longer than 9999 km"
+            },
             "stepsTitle": "Segments",
             "addStep": "Add segment",
             "removeStep": "Remove segment",
@@ -303,7 +310,15 @@
             "empty": "The profile will appear here once the race has segments with altitude.",
             "altitude": "Altitude",
             "landmarks": "Points of interest",
-            "ingredients": "Ingredients"
+            "ingredients": "Ingredients",
+            "during": "During"
+        },
+        "poster": {
+            "preview": "Preview",
+            "title": "Race image",
+            "download": "Download PNG",
+            "close": "Close",
+            "eyebrow": "Race nutrition plan"
         },
         "landmarks": {
             "type": "Type",
@@ -338,6 +353,7 @@
             "edit": "Edit race",
             "delete": "Delete race",
             "download": "Download race image",
+            "imageMissing": "This race's image is not available: open the race and save it again.",
             "confirmDelete": "Delete the race “{{name}}”? Its segments, ingredients and points of interest will be removed."
         },
         "errors": {

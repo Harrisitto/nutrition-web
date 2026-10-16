@@ -273,6 +273,7 @@
         "next": "Siguiente",
         "save": "Guardar carrera",
         "saveError": "No se ha podido guardar la carrera",
+        "imageUploadError": "La carrera se ha guardado, pero no se ha podido subir su imagen. Vuelve a guardarla para que el corredor pueda verla.",
         "loadError": "No se ha podido cargar la carrera.",
         "retry": "Reintentar",
         "stepNeedsAttention": "tiene avisos",
@@ -286,6 +287,12 @@
             "gpxGenerate": "Generar perfil",
             "gpxReplaceWarning": "Generar el perfil sustituye los tramos actuales. Los ingredientes y puntos de interés se mantienen.",
             "gpxError": "No se ha podido procesar el GPX",
+            "gpxErrors": {
+                "invalidFile": "el archivo no es un GPX válido",
+                "noPoints": "el GPX no tiene puntos de recorrido",
+                "tooShort": "el recorrido mide menos de 100 m",
+                "tooLong": "el recorrido mide más de 9999 km"
+            },
             "stepsTitle": "Tramos",
             "addStep": "Añadir tramo",
             "removeStep": "Eliminar tramo",
@@ -303,7 +310,15 @@
             "empty": "El perfil aparecerá aquí cuando la carrera tenga tramos con altitud.",
             "altitude": "Altitud",
             "landmarks": "Puntos de interés",
-            "ingredients": "Ingredientes"
+            "ingredients": "Ingredientes",
+            "during": "Durante"
+        },
+        "poster": {
+            "preview": "Previsualizar",
+            "title": "Imagen de la carrera",
+            "download": "Descargar PNG",
+            "close": "Cerrar",
+            "eyebrow": "Plan de nutrición"
         },
         "landmarks": {
             "type": "Tipo",
@@ -338,6 +353,7 @@
             "edit": "Editar carrera",
             "delete": "Eliminar carrera",
             "download": "Descargar imagen de la carrera",
+            "imageMissing": "La imagen de esta carrera no está disponible: ábrela y vuelve a guardarla.",
             "confirmDelete": "¿Eliminar la carrera «{{name}}»? Se borrarán sus tramos, ingredientes y puntos de interés."
         },
         "errors": {

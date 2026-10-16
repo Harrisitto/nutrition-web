@@ -85,15 +85,16 @@ export const useFetchRaceIngredients = () => {
  * ingrediente esté borrado) y los ingredientes que se pueden añadir.
  */
 export const useRaceIngredientCatalog = () => {
-    const { data } = useFetchRaceIngredients();
+    const { data, isLoading } = useFetchRaceIngredients();
 
     return useMemo(() => {
         const ingredients = data ?? [];
         return {
             byId: new Map(ingredients.map((ingredient) => [ingredient.id, ingredient])),
             available: ingredients.filter((ingredient) => !ingredient.is_deleted),
+            isLoading,
         };
-    }, [data]);
+    }, [data, isLoading]);
 };
 
 export const useAddRaceIngredient = () => {

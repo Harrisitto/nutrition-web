@@ -181,6 +181,7 @@ export type Database = {
           name: string
           nutri_id: string | null
           phone: string
+          prefered_language: string
           user_id: string
         }
         Insert: {
@@ -195,6 +196,7 @@ export type Database = {
           name?: string
           nutri_id?: string | null
           phone?: string
+          prefered_language?: string
           user_id?: string
         }
         Update: {
@@ -209,6 +211,7 @@ export type Database = {
           name?: string
           nutri_id?: string | null
           phone?: string
+          prefered_language?: string
           user_id?: string
         }
         Relationships: [
@@ -938,6 +941,7 @@ export type Database = {
       }
       has_race_access: { Args: { p_race_id: number }; Returns: boolean }
       is_race_owner: { Args: { p_race_id: number }; Returns: boolean }
+      race_image_race_id: { Args: { p_name: string }; Returns: number }
       save_race_plan: {
         Args: {
           p_distance_km: number

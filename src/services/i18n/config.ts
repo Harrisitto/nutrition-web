@@ -14,7 +14,7 @@ import esApp from "./locales/es/data.json";
 import esForms from "./locales/es/forms.json";
 import esHome from "./locales/es/home.json";
 
-const resources = {
+export const resources = {
     en: {
         system: enSystem,
         auth: enAuth,
