@@ -9,7 +9,8 @@ export const amountFields = [
 
 export type AmountKey = (typeof amountFields)[number]["key"];
 
-// Igual que la configuración del bucket race_ingredients en Supabase
+// Los que puede elegir el nutricionista. El bucket race_ingredients acepta png, jpeg y webp: los svg
+// se convierten a png antes de subirlos (resizeImage)
 export const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp", "image/svg+xml"];
 export const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 

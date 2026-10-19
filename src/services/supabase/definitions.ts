@@ -49,6 +49,7 @@ export const TABLE_USER_INVITATIONS = {
         NUTRI_ID: 'nutri_id',
         CLIENT_ID: 'client_id',
         CREATED_AT: 'created_at',
+        EXPIRES_AT: 'expires_at',
     }
 } as const
 

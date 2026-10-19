@@ -6,6 +6,7 @@ import { queryKeys } from "../keys";
 import { supabase } from "@src/services/supabase/client";
 import type { TablesInsert } from "@src/services/supabase/types";
 import { useCallback } from "react";
+import { useRefreshClientOrder } from "./profile";
 
 const TABLE_NAME = "user_planing_meal" as const;
 
@@ -98,6 +99,7 @@ export const useMutatePlaningMeals = ({
   const d = useAppSelector((state) => state.config.selectedDay);
   const language = useLanguageCode();
   const queryClient = useQueryClient();
+  const refreshClientOrder = useRefreshClientOrder();
 
   const safeDate = forDate ?? new FromDate(d);
 
@@ -147,6 +149,7 @@ export const useMutatePlaningMeals = ({
           ];
         },
       );
+      refreshClientOrder();
     }
   });
 
@@ -162,6 +165,7 @@ export const useDeletePlaningMeal = ({
   const d = useAppSelector((state) => state.config.selectedDay);
   const language = useLanguageCode();
   const queryClient = useQueryClient();
+  const refreshClientOrder = useRefreshClientOrder();
 
   const safeDate = forDate ?? new FromDate(d);
 
@@ -208,6 +212,7 @@ export const useDeletePlaningMeal = ({
           return oldData.filter((m) => !deleted.has(mealSlotId(m)));
         },
       );
+      refreshClientOrder();
     }
   });
 

@@ -605,22 +605,52 @@ export type Database = {
         }
         Relationships: []
       }
+      stripe_seat_sync_queue: {
+        Row: {
+          attempts: number
+          dirty_at: string
+          next_attempt_at: string
+          nutri_id: string
+          request_id: number | null
+          taken_at: string | null
+        }
+        Insert: {
+          attempts?: number
+          dirty_at?: string
+          next_attempt_at?: string
+          nutri_id: string
+          request_id?: number | null
+          taken_at?: string | null
+        }
+        Update: {
+          attempts?: number
+          dirty_at?: string
+          next_attempt_at?: string
+          nutri_id?: string
+          request_id?: number | null
+          taken_at?: string | null
+        }
+        Relationships: []
+      }
       user_invitation: {
         Row: {
           client_id: string
           created_at: string
+          expires_at: string
           message: string
           nutri_id: string
         }
         Insert: {
           client_id: string
           created_at?: string
+          expires_at?: string
           message?: string
           nutri_id?: string
         }
         Update: {
           client_id?: string
           created_at?: string
+          expires_at?: string
           message?: string
           nutri_id?: string
         }
@@ -881,9 +911,58 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_invitation: {
+        Args: { p_nutri_id: string }
+        Returns: {
+          birth_date: string | null
+          created_at: string
+          email: string
+          gender: string
+          goal: string
+          health_consent_at: string | null
+          invitation_code: string
+          last_seen: string | null
+          name: string
+          nutri_id: string | null
+          phone: string
+          prefered_language: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "all_users"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       clone_week_planing: {
         Args: { p_from_monday: string; p_to_monday: string; p_user_id: string }
         Returns: undefined
+      }
+      delete_expired_invitations: { Args: never; Returns: number }
+      detach_client: {
+        Args: { p_nutri_id: string; p_user_id: string }
+        Returns: {
+          birth_date: string | null
+          created_at: string
+          email: string
+          gender: string
+          goal: string
+          health_consent_at: string | null
+          invitation_code: string
+          last_seen: string | null
+          name: string
+          nutri_id: string | null
+          phone: string
+          prefered_language: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "all_users"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       generate_meal_types_for_day: {
         Args: {
@@ -940,8 +1019,77 @@ export type Database = {
         Returns: boolean
       }
       has_race_access: { Args: { p_race_id: number }; Returns: boolean }
+      invite_client: {
+        Args: { p_code: string; p_message: string }
+        Returns: string
+      }
       is_race_owner: { Args: { p_race_id: number }; Returns: boolean }
+      leave_nutritionist: {
+        Args: never
+        Returns: {
+          birth_date: string | null
+          created_at: string
+          email: string
+          gender: string
+          goal: string
+          health_consent_at: string | null
+          invitation_code: string
+          last_seen: string | null
+          name: string
+          nutri_id: string | null
+          phone: string
+          prefered_language: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "all_users"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      nutri_active_subscriptions: {
+        Args: { p_nutri_id: string }
+        Returns: {
+          created: number
+          customer_id: string
+          subscription_id: string
+        }[]
+      }
+      nutri_has_active_subscription: {
+        Args: { p_nutri_id: string }
+        Returns: boolean
+      }
+      nutri_stripe_customer_id: {
+        Args: { p_nutri_id: string }
+        Returns: string
+      }
+      process_stripe_seat_sync_queue: { Args: never; Returns: number }
       race_image_race_id: { Args: { p_name: string }; Returns: number }
+      remove_client: {
+        Args: { p_user_id: string }
+        Returns: {
+          birth_date: string | null
+          created_at: string
+          email: string
+          gender: string
+          goal: string
+          health_consent_at: string | null
+          invitation_code: string
+          last_seen: string | null
+          name: string
+          nutri_id: string | null
+          phone: string
+          prefered_language: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "all_users"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       save_race_plan: {
         Args: {
           p_distance_km: number

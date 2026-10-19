@@ -4,6 +4,7 @@ import { queryKeys } from "../keys";
 import { useAppSelector } from "@src/store/store";
 import { useLanguageCode } from "@src/hooks/helpers/language";
 import type FromDate from "@src/helpers/dates";
+import { useRefreshClientOrder } from "./profile";
 
 /**
  * Genera (o completa) las comidas de un día con `change_kcal_on_planing` en
@@ -16,6 +17,7 @@ export const useGeneratePlaningDay = () => {
   const userId = useAppSelector((state) => state.config.selectedUserId);
   const language = useLanguageCode();
   const queryClient = useQueryClient();
+  const refreshClientOrder = useRefreshClientOrder();
 
   const mutation = useMutation({
     mutationFn: async ({
@@ -58,6 +60,7 @@ export const useGeneratePlaningDay = () => {
           sunday.save(),
         ),
       });
+      refreshClientOrder();
     },
   });
 

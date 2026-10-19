@@ -183,18 +183,25 @@
                 "client": "Cliente",
                 "writeMessage": "Escribe un mensaje al usuario invitado",
                 "messagePlaceholder": "Escribe un mensaje...",
-                "searchPlaceholder": "Buscar por codigo de invitacion...",
                 "loading": "Cargando invitaciones...",
                 "error": "Ocurrio un error al cargar las invitaciones.",
-                "noResults": "No se encontraron clientes disponibles.",
                 "noInvitations": "Aun no se han enviado invitaciones.",
                 "manageClientsTitle": "Gestionar clientes",
                 "manageClientsDescription": "Gestiona a tus clientes.",
                 "removeClient": "Eliminar cliente",
                 "message": "Mensaje: {{message}}",
                 "sendInvitation": "Enviar invitacion",
-                "revoke": "Revocar",
-                "messageTooShort": "El mensaje debe tener al menos 10 caracteres."
+                "codePlaceholder": "Codigo que te ha dado el cliente",
+                "messageLength": "El mensaje debe tener entre {{min}} y {{max}} caracteres.",
+                "sentAt": "Enviada el {{date}}",
+                "expiresAt": "Caduca el {{date}}",
+                "errors": {
+                    "clientNotFound": "No hay ningun cliente con ese codigo o ya tiene nutricionista.",
+                    "invalidMessage": "El mensaje debe tener entre 10 y 1000 caracteres.",
+                    "tooManyInvitations": "Has enviado demasiadas invitaciones en los ultimos 7 dias. Intentalo mas tarde.",
+                    "noSubscription": "Necesitas una suscripcion activa para invitar clientes.",
+                    "notNutritionist": "Solo las cuentas de nutricionista pueden invitar clientes."
+                }
             },
             "recipes": {
                 "title": "Configuracion de recetas",

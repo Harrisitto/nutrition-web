@@ -8,6 +8,7 @@ import { queryClient } from '../queryClient'
 import { useGetAuthSession } from '../auth/get'
 import { useAppDispatch, useAppSelector } from '@src/store/store'
 import { setSelectedUserId } from '@src/store/slices/config/store'
+import { useCallback } from 'react'
 
 type UserWithInfo = Database['public']['Tables']['all_users']['Row']
 
@@ -74,7 +75,12 @@ export const useFetchNutritionistUsers = () => {
                     .limit(1, { referencedTable: TABLE_USER_PLANING_MEAL.NAME })
               //.eq(TABLE_ALL_USERS.COLS.IS_NUTRI, false)
                 if (error) throw error
-                return data
+                // Clients whose planning runs out first (or who have none) go on top.
+                // Dates are YYYY-MM-DD, so comparing them as strings sorts them by date.
+                const lastMealDate = (user: (typeof data)[number]) =>
+                    user.user_planing_meal[0]?.date ?? ""
+                return data.sort((a, b) =>
+                    lastMealDate(a).localeCompare(lastMealDate(b)) || a.name.localeCompare(b.name))
             } catch (error) {
                 err()
                 throw error
@@ -83,6 +89,20 @@ export const useFetchNutritionistUsers = () => {
         },
         placeholderData: [],
     })
+}
+
+// The client list is sorted by each client's last planned meal, so it has to be
+// refetched whenever meals are added or removed for the order to stay current
+export const useRefreshClientOrder = () => {
+  const { data: authData } = useGetAuthSession()
+  const nutritionistId = authData?.userId
+
+  return useCallback(() => {
+    if (!nutritionistId) return
+    return queryClient.invalidateQueries({
+      queryKey: queryKeys({ userId: nutritionistId }).user.fromNutritionist,
+    })
+  }, [nutritionistId])
 }
 
 export const useUpdateClientGoal = () => {
@@ -145,15 +165,8 @@ export const useRemoveClient = () => {
     }).user.fromNutritionist,
     mutationFn: async (clientId: string) => {
       if (!nutritionistId) throw new Error('No authenticated user found')
-      const { data, error } = await supabase
-        .from(TABLE_ALL_USERS.NAME)
-        .update({
-            nutri_id: null,
-         })
-        .eq(TABLE_ALL_USERS.COLS.USER_ID, clientId)
-        .eq(TABLE_ALL_USERS.COLS.NUTRI_ID, nutritionistId)
-        .select()
-        .single()
+      // P0002 'Client not found' when the client isn't linked to this nutritionist
+      const { data, error } = await supabase.rpc('remove_client', { p_user_id: clientId })
       if (error) throw error
       return data
     },

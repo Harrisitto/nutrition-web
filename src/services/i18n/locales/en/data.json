@@ -183,18 +183,25 @@
                 "client": "Client",
                 "writeMessage": "Write a message to the invited user",
                 "messagePlaceholder": "Write a message...",
-                "searchPlaceholder": "Search by invitation code...",
                 "loading": "Loading invitations...",
                 "error": "An error occurred while loading invitations.",
-                "noResults": "No available clients found.",
                 "noInvitations": "No invitations sent yet.",
                 "manageClientsTitle": "Manage Clients",
                 "manageClientsDescription": "Manage your clients.",
                 "removeClient": "Remove Client",
                 "message": "Message: {{message}}",
                 "sendInvitation": "Send Invitation",
-                "revoke": "Revoke",
-                "messageTooShort": "Message must be at least 10 characters long."
+                "codePlaceholder": "Code given to you by the client",
+                "messageLength": "The message must be between {{min}} and {{max}} characters long.",
+                "sentAt": "Sent on {{date}}",
+                "expiresAt": "Expires on {{date}}",
+                "errors": {
+                    "clientNotFound": "No client found with that code, or the client already has a nutritionist.",
+                    "invalidMessage": "The message must be between 10 and 1000 characters long.",
+                    "tooManyInvitations": "You have sent too many invitations in the last 7 days. Please try again later.",
+                    "noSubscription": "You need an active subscription to invite clients.",
+                    "notNutritionist": "Only nutritionist accounts can invite clients."
+                }
             },
             "recipes": {
                 "title": "Recipes Configuration",

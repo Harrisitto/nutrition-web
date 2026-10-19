@@ -4,11 +4,13 @@ import { queryKeys } from "../keys";
 import { useAppSelector } from "@src/store/store";
 import { useLanguageCode } from "@src/hooks/helpers/language";
 import type FromDate from "@src/helpers/dates";
+import { useRefreshClientOrder } from "./profile";
 
 export const useCloneWeek = () => {
   const userId = useAppSelector((state) => state.config.selectedUserId);
   const language = useLanguageCode();
   const queryClient = useQueryClient();
+  const refreshClientOrder = useRefreshClientOrder();
 
   const mutation = useMutation({
     mutationFn: async ({ from, to }: { from: FromDate; to: FromDate }) => {
@@ -39,6 +41,7 @@ export const useCloneWeek = () => {
           toSunday.save(),
         ),
       });
+      refreshClientOrder();
     },
   });
 

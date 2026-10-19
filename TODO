@@ -1,0 +1,55 @@
+Contexto: en Supabase (proyecto iivsjutltecehnnhmjok) ya están desplegadas unas funciones RPC
+para las invitaciones nutricionista -> cliente. Hay que pasar la web a usarlas en lugar de los
+SELECT/INSERT/UPDATE/DELETE directos sobre all_users y user_invitation. Más adelante se quitarán
+los permisos directos, y el código actual dejará de funcionar. No toques la base de datos: solo
+la web.
+
+0. Regenera los tipos: `npm run supabase-types` (src/services/supabase/types.ts). Comprueba que
+   aparecen las funciones invite_client y remove_client y la columna user_invitation.expires_at.
+
+1. src/services/tanstack/user/invitations.ts
+   - Elimina useFetchAvailableClients. Ahora mismo hace un `ilike '%código%'` sobre all_users y,
+     con el campo vacío, lista usuarios cualesquiera con todos sus datos. El nutricionista ya no
+     busca: escribe el código exacto que le da el cliente y le invita directamente.
+   - useMutateUserInvitations: pasa a `supabase.rpc('invite_client', { p_code, p_message })`.
+     Recibe el código, no el clientId. La comparación ignora mayúsculas y espacios. Devuelve el
+     user_id (uuid) del cliente. Si el cliente ya estaba invitado no hace nada y no da error, así
+     que quita el caso 23505. En onSuccess basta con invalidar invitationsBase: quita el
+     setQueriesData que filtraba la lista de disponibles.
+   - useFetchInvitedClients: quita el join `all_users!inner(invitation_code)`. Cuando se quiten
+     los permisos, los usuarios sin nutricionista dejarán de ser visibles y el !inner no
+     devolverá nada. Haz un SELECT solo de user_invitation (client_id, message, created_at,
+     expires_at) filtrando por nutri_id y por `expires_at > now()` (`.gt('expires_at', new
+     Date().toISOString())`). Las caducadas se borran una vez al día y hasta entonces siguen en la
+     tabla.
+   - Elimina useDeleteUserInvitation. Las invitaciones caducan solas a los 7 días. Si el
+     nutricionista pudiera revocarlas, invitando y revocando en bucle se saltaría el límite de
+     invitaciones.
+
+2. src/pages/configuration/inviteClient/index.tsx
+   - Cambia el buscador con lista de resultados por un formulario: campo de código + mensaje +
+     botón de invitar.
+   - Valida en el cliente que el mensaje tenga entre 10 y 1000 caracteres, igual que el servidor.
+   - En la lista de invitaciones pendientes, quita el código de invitación (ya no se lee) y el
+     botón de revocar. Muestra el mensaje, la fecha y cuándo caduca (expires_at).
+   - Errores de invite_client. Son PostgrestError: distingue por `error.code` y, para el 55000,
+     por `error.message`. Muéstralos con lo que ya use la web (useNotification / addMutationError)
+     y con el sistema de traducciones que haya:
+       P0002 'Client not found'                    -> el código no existe o ese usuario ya
+                                                      tiene nutricionista
+       22023 'Invalid message'                     -> mensaje de longitud no válida
+       54000 'Too many invitations'                -> más de 50 invitaciones en 7 días
+       55000 'Nutritionist without subscription'   -> hace falta una suscripción activa
+       42501 'Not a nutritionist'                  -> la cuenta no es de nutricionista
+
+3. src/services/tanstack/user/profile.ts, useRemoveClient
+   - Cambia el UPDATE de nutri_id a null por
+     `supabase.rpc('remove_client', { p_user_id: clientId })`. Devuelve la fila de all_users del
+     cliente (que ya no tiene nutricionista). Error P0002 'Client not found' si no es cliente
+     suyo. Mantén el onSuccess actual (deseleccionar al cliente e invalidar).
+
+4. Busca en el resto de src cualquier otro sitio que escriba all_users.nutri_id o que inserte o
+   borre en user_invitation, y pásalo a las RPC o dímelo.
+
+5. Comprueba que compila y pasa el lint (tsc / npm run lint / npm run build, lo que use el
+   proyecto). No hagas commit.
