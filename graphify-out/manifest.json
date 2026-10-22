@@ -78,10 +78,10 @@
     "semantic_hash": "280303b295501f9fd9ca3b22fdd24594"
   },
   "src/components/styles.ts": {
-    "mtime": 1791994943.7820914,
-    "seen": 1792403392.183676,
-    "ast_hash": "925c00f8ee9b6499f6781b81e5e311fa",
-    "semantic_hash": "925c00f8ee9b6499f6781b81e5e311fa"
+    "mtime": 1792668091.69916,
+    "seen": 1792668102.9838314,
+    "ast_hash": "a6e18bddcc118b6f24ef999376bdaccf",
+    "semantic_hash": ""
   },
   "src/helpers/dates.ts": {
     "mtime": 1788962130.5662909,
@@ -192,10 +192,10 @@
     "semantic_hash": "8f514d1b58ec9de07607187c7caa99ba"
   },
   "src/hooks/navigation/routes.ts": {
-    "mtime": 1791989527.9267917,
-    "seen": 1792403392.1836944,
-    "ast_hash": "b328bb56759131ee1caf75a11be311b2",
-    "semantic_hash": "b328bb56759131ee1caf75a11be311b2"
+    "mtime": 1792664352.9146469,
+    "seen": 1792665218.7196712,
+    "ast_hash": "26787e85dfbc78f4074b2783855087d8",
+    "semantic_hash": ""
   },
   "src/hooks/navigation/search_params.ts": {
     "mtime": 1776074654.2493768,
@@ -258,10 +258,10 @@
     "semantic_hash": "9290c26e97549a607a52a72e6ffd2201"
   },
   "src/pages/configuration/index.tsx": {
-    "mtime": 1791987012.0347123,
-    "seen": 1792403392.1837072,
-    "ast_hash": "74b8fcb833feb7f9b85d0cb48ca81a88",
-    "semantic_hash": "74b8fcb833feb7f9b85d0cb48ca81a88"
+    "mtime": 1792664384.450784,
+    "seen": 1792665218.719723,
+    "ast_hash": "f5f8af9c507945347005ff7af417b0f8",
+    "semantic_hash": ""
   },
   "src/pages/configuration/inviteClient/index.tsx": {
     "mtime": 1792355985.0744832,
@@ -1116,16 +1116,16 @@
     "semantic_hash": "a0c1e7dd54c7ce6a5963f37497768f29"
   },
   "src/services/i18n/locales/en/data.json": {
-    "mtime": 1792355985.0744832,
-    "seen": 1792403392.1838477,
-    "ast_hash": "441887386e17556b91476c7508aacbae",
-    "semantic_hash": "441887386e17556b91476c7508aacbae"
+    "mtime": 1792668416.8396049,
+    "seen": 1792668421.6466205,
+    "ast_hash": "4fc88c674c9a215e2a31c2aa63d2f495",
+    "semantic_hash": ""
   },
   "src/services/i18n/locales/en/forms.json": {
-    "mtime": 1790691918.326486,
-    "seen": 1792403392.1838484,
-    "ast_hash": "502b8a7b0bac4dc246b072265176dddd",
-    "semantic_hash": "502b8a7b0bac4dc246b072265176dddd"
+    "mtime": 1792665210.7274077,
+    "seen": 1792665218.7202618,
+    "ast_hash": "1e428bd119a57ea4fb551633c481e178",
+    "semantic_hash": ""
   },
   "src/services/i18n/locales/en/home.json": {
     "mtime": 1788554070.2528822,
@@ -1146,16 +1146,16 @@
     "semantic_hash": "8edc5a2e8af07df1b1ae8bd461ce4290"
   },
   "src/services/i18n/locales/es/data.json": {
-    "mtime": 1792355985.0744832,
-    "seen": 1792403392.1838522,
-    "ast_hash": "95083df89e79dc087d598846e2b404a6",
-    "semantic_hash": "95083df89e79dc087d598846e2b404a6"
+    "mtime": 1792668416.8436048,
+    "seen": 1792668421.6466267,
+    "ast_hash": "3fb73c622252e0aba97f360e4e4a8af8",
+    "semantic_hash": ""
   },
   "src/services/i18n/locales/es/forms.json": {
-    "mtime": 1790691887.1345348,
-    "seen": 1792403392.1838534,
-    "ast_hash": "413a99f3e3de5bb1ff90bfd3d06ec868",
-    "semantic_hash": "413a99f3e3de5bb1ff90bfd3d06ec868"
+    "mtime": 1792665210.7274077,
+    "seen": 1792665218.720279,
+    "ast_hash": "0750990a0b9ede9871b1261514ae8e3f",
+    "semantic_hash": ""
   },
   "src/services/i18n/locales/es/home.json": {
     "mtime": 1788554070.2528822,
@@ -1188,10 +1188,10 @@
     "semantic_hash": "64f20c556a81671766a4d1c5d5ea1822"
   },
   "src/services/supabase/types.ts": {
-    "mtime": 1792355985.0744832,
-    "seen": 1792403392.1838589,
-    "ast_hash": "e6f9dbd3af14af847bbc207bc66662b8",
-    "semantic_hash": "e6f9dbd3af14af847bbc207bc66662b8"
+    "mtime": 1792663534.7597024,
+    "seen": 1792665218.720301,
+    "ast_hash": "0620ae201b935558c36c778f5ca23544",
+    "semantic_hash": ""
   },
   "src/services/tanstack/auth/get.ts": {
     "mtime": 1788543102.5054147,
@@ -1230,10 +1230,10 @@
     "semantic_hash": "e48ab8dc38133cdafe82bc173918da92"
   },
   "src/services/tanstack/keys.ts": {
-    "mtime": 1791994535.9777873,
-    "seen": 1792403392.1838653,
-    "ast_hash": "7d60bc0f7660c33a7413512c863af543",
-    "semantic_hash": "7d60bc0f7660c33a7413512c863af543"
+    "mtime": 1792665718.5057874,
+    "seen": 1792666244.484339,
+    "ast_hash": "ee0f0ae1bee231e355ad8bd11577ea78",
+    "semantic_hash": ""
   },
   "src/services/tanstack/queryClient.ts": {
     "mtime": 1776074654.253377,
@@ -1626,10 +1626,10 @@
     "semantic_hash": "1d9d8918159a6468c7de040b8a356ed8"
   },
   "stats.html": {
-    "mtime": 1792355985.078483,
-    "seen": 1792403392.1839302,
-    "ast_hash": "2086b18df9bf71e0153d32a5d99c5618",
-    "semantic_hash": "2086b18df9bf71e0153d32a5d99c5618"
+    "mtime": 1792403620.1338067,
+    "seen": 1792665218.7205842,
+    "ast_hash": "a15d0f070feb81ab8892ddad1783b5cb",
+    "semantic_hash": ""
   },
   "supabase/solution/README.md": {
     "mtime": 1788600884.267045,
@@ -1666,5 +1666,71 @@
     "seen": 1792403392.183936,
     "ast_hash": "f4513f145399ae9040fccaf650ac2312",
     "semantic_hash": "f4513f145399ae9040fccaf650ac2312"
+  },
+  "src/pages/configuration/appointmentThemes/index.tsx": {
+    "mtime": 1792668668.6439736,
+    "seen": 1792668673.3969223,
+    "ast_hash": "a06a70cfd5382ca8a220969a4a8ccb76",
+    "semantic_hash": ""
+  },
+  "src/pages/configuration/appointmentThemes/newAppointment/form.ts": {
+    "mtime": 1792665491.3301847,
+    "seen": 1792666244.484129,
+    "ast_hash": "c99565b8590d45f5a7c4cc79c4ebbf25",
+    "semantic_hash": ""
+  },
+  "src/pages/configuration/appointmentThemes/newPoint/form.ts": {
+    "mtime": 1792665209.5754151,
+    "seen": 1792665218.719704,
+    "ast_hash": "d393b9202e7c3968800e7d0dcaa0f605",
+    "semantic_hash": ""
+  },
+  "src/services/tanstack/data/appointments.ts": {
+    "mtime": 1792668226.6713393,
+    "seen": 1792668332.908094,
+    "ast_hash": "c435540ed8ee56da1fc5aab66bf47889",
+    "semantic_hash": ""
+  },
+  "src/services/tanstack/user/appointments.ts": {
+    "mtime": 1792664015.9532568,
+    "seen": 1792665218.7203374,
+    "ast_hash": "f0be91fe8563898cf9cb471bebe35f4d",
+    "semantic_hash": ""
+  },
+  "src/pages/configuration/appointmentThemes/listAppointment/index.tsx": {
+    "mtime": 1792668668.6439736,
+    "seen": 1792668673.396926,
+    "ast_hash": "0223129856c2e3edd633e5ad00029d61",
+    "semantic_hash": ""
+  },
+  "src/pages/configuration/appointmentThemes/listPoints/index.tsx": {
+    "mtime": 1792668668.6439736,
+    "seen": 1792668673.3969293,
+    "ast_hash": "0a0931ecae843d5464f94345d4e3421c",
+    "semantic_hash": ""
+  },
+  "src/pages/configuration/appointmentThemes/newAppointment/insert.tsx": {
+    "mtime": 1792668091.7151601,
+    "seen": 1792668102.98395,
+    "ast_hash": "710c17631155f98d7c389ef0a71e1335",
+    "semantic_hash": ""
+  },
+  "src/pages/configuration/appointmentThemes/newPoint/insert.tsx": {
+    "mtime": 1792668091.7151601,
+    "seen": 1792668102.9839573,
+    "ast_hash": "4ee30e1073cb42bf4ead9cca3e5496da",
+    "semantic_hash": ""
+  },
+  "src/pages/configuration/appointmentThemes/listPoints/timeline.tsx": {
+    "mtime": 1792668668.6439736,
+    "seen": 1792668673.3969324,
+    "ast_hash": "0cb6fc2c64b35d1a97088c98e1807158",
+    "semantic_hash": ""
+  },
+  "src/pages/configuration/appointmentThemes/useFitToScrollParent.ts": {
+    "mtime": 1792668653.9799516,
+    "seen": 1792668673.3969514,
+    "ast_hash": "1695536a2f0fb263ea4b40e9c0f49f57",
+    "semantic_hash": ""
   }
 }

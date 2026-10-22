@@ -244,6 +244,42 @@
                     "liquid_amount": "Líquido",
                     "image": "Imagen"
                 }
+            },
+            "appointmentThemes": {
+                "title": "Temáticas de planificación",
+                "description": "Gestiona las temáticas que usas para planificar tus citas.",
+                "errorLoading": "No se han podido cargar las temáticas de planificación.",
+                "lists": {
+                    "appointments": {
+                        "title": "Tus temáticas",
+                        "delete": "Eliminar temática",
+                        "confirmDelete": "¿Eliminar la temática «{{name}}»? Dejará de aparecer en esta lista.",
+                        "edit": "Editar temática",
+                        "save": "Guardar cambios",
+                        "cancel": "Cancelar"
+                    },
+                    "points": {
+                        "title": "Puntos de la temática"
+                    }
+                },
+                "forms": {
+                    "appointment": {
+                        "title": "Nueva temática",
+                        "submit": "Crear temática"
+                    },
+                    "point": {
+                        "title": "Nuevo punto",
+                        "inDays": "En {{days}} días",
+                        "error": "No se han podido cargar los puntos.",
+                        "submit": "Añadir punto",
+                        "edit": "Editar punto",
+                        "save": "Guardar cambios",
+                        "cancel": "Cancelar",
+                        "delete": "Eliminar punto",
+                        "confirmDelete": "¿Eliminar el punto «{{name}}»? Esta acción no se puede deshacer."
+                    }
+                },
+                "selectTheme": "Selecciona una temática para gestionar sus puntos."
             }
         }
     },

@@ -244,6 +244,42 @@
                     "liquid_amount": "Liquid",
                     "image": "Image"
                 }
+            },
+            "appointmentThemes": {
+                "title": "Appointment themes",
+                "description": "Manage the themes you use to classify your appointments.",
+                "errorLoading": "The appointment themes could not be loaded.",
+                "lists": {
+                    "appointments": {
+                        "title": "Your appointment themes",
+                        "delete": "Delete theme",
+                        "confirmDelete": "Delete the theme “{{name}}”? You will no longer see it in this list.",
+                        "edit": "Edit theme",
+                        "save": "Save changes",
+                        "cancel": "Cancel"
+                    },
+                    "points": {
+                        "title": "Theme points"
+                    }
+                },
+                "forms": {
+                    "appointment": {
+                        "title": "New appointment theme",
+                        "submit": "Create theme"
+                    },
+                    "point": {
+                        "title": "New point",
+                        "inDays": "In {{days}} days",
+                        "error": "The points could not be loaded.",
+                        "submit": "Add point",
+                        "edit": "Edit point",
+                        "save": "Save changes",
+                        "cancel": "Cancel",
+                        "delete": "Delete point",
+                        "confirmDelete": "Delete the point “{{name}}”? This action cannot be undone."
+                    }
+                },
+                "selectTheme": "Select a theme to manage its points."
             }
         }
     },

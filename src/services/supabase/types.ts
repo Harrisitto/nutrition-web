@@ -248,6 +248,215 @@ export type Database = {
         }
         Relationships: []
       }
+      appointment_points: {
+        Row: {
+          appointment_id: number
+          client_theme_id: number | null
+          id: number
+          point: string
+          position: number
+          treated_at: string | null
+        }
+        Insert: {
+          appointment_id: number
+          client_theme_id?: number | null
+          id?: number
+          point: string
+          position?: number
+          treated_at?: string | null
+        }
+        Update: {
+          appointment_id?: number
+          client_theme_id?: number | null
+          id?: number
+          point?: string
+          position?: number
+          treated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointment_points_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "nutri_appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointment_points_client_theme_id_fkey"
+            columns: ["client_theme_id"]
+            isOneToOne: false
+            referencedRelation: "client_themes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      appointment_theme_points: {
+        Row: {
+          id: number
+          in_days: number
+          point: string
+          position: number
+          theme_id: number
+        }
+        Insert: {
+          id?: number
+          in_days: number
+          point: string
+          position?: number
+          theme_id: number
+        }
+        Update: {
+          id?: number
+          in_days?: number
+          point?: string
+          position?: number
+          theme_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointment_theme_points_theme_id_fkey"
+            columns: ["theme_id"]
+            isOneToOne: false
+            referencedRelation: "nutri_appointment_themes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_themes: {
+        Row: {
+          created_at: string
+          id: number
+          nutri_id: string
+          start_date: string
+          theme_id: number | null
+          theme_name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          nutri_id?: string
+          start_date: string
+          theme_id?: number | null
+          theme_name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          nutri_id?: string
+          start_date?: string
+          theme_id?: number | null
+          theme_name?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_themes_nutri_id_fkey"
+            columns: ["nutri_id"]
+            isOneToOne: false
+            referencedRelation: "all_nutritionist"
+            referencedColumns: ["nutri_id"]
+          },
+          {
+            foreignKeyName: "client_themes_theme_id_fkey"
+            columns: ["theme_id"]
+            isOneToOne: false
+            referencedRelation: "nutri_appointment_themes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_themes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "all_users"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      nutri_appointment_themes: {
+        Row: {
+          created_at: string
+          id: number
+          is_deleted: boolean
+          name: string
+          nutri_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          is_deleted?: boolean
+          name: string
+          nutri_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          is_deleted?: boolean
+          name?: string
+          nutri_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nutri_appointment_themes_nutri_id_fkey"
+            columns: ["nutri_id"]
+            isOneToOne: false
+            referencedRelation: "all_nutritionist"
+            referencedColumns: ["nutri_id"]
+          },
+        ]
+      }
+      nutri_appointments: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: number
+          nutri_id: string
+          scheduled_on: string | null
+          start_time: string | null
+          status: string
+          user_id: string
+          video_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: number
+          nutri_id?: string
+          scheduled_on?: string | null
+          start_time?: string | null
+          status?: string
+          user_id: string
+          video_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: number
+          nutri_id?: string
+          scheduled_on?: string | null
+          start_time?: string | null
+          status?: string
+          user_id?: string
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nutri_appointments_nutri_id_fkey"
+            columns: ["nutri_id"]
+            isOneToOne: false
+            referencedRelation: "all_nutritionist"
+            referencedColumns: ["nutri_id"]
+          },
+          {
+            foreignKeyName: "nutri_appointments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "all_users"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       nutri_race_ingredients: {
         Row: {
           caffeine_amount: number | null
@@ -632,6 +841,61 @@ export type Database = {
         }
         Relationships: []
       }
+      user_appointment_points: {
+        Row: {
+          appointment_id: number | null
+          created_at: string
+          id: number
+          nutri_id: string
+          point: string
+          position: number
+          treated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          appointment_id?: number | null
+          created_at?: string
+          id?: number
+          nutri_id: string
+          point: string
+          position?: number
+          treated_at?: string | null
+          user_id?: string
+        }
+        Update: {
+          appointment_id?: number | null
+          created_at?: string
+          id?: number
+          nutri_id?: string
+          point?: string
+          position?: number
+          treated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_appointment_points_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "nutri_appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_appointment_points_nutri_id_fkey"
+            columns: ["nutri_id"]
+            isOneToOne: false
+            referencedRelation: "all_nutritionist"
+            referencedColumns: ["nutri_id"]
+          },
+          {
+            foreignKeyName: "user_appointment_points_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "all_users"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       user_invitation: {
         Row: {
           client_id: string
@@ -935,6 +1199,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      assign_appointment_theme: {
+        Args: { p_start_date: string; p_theme_id: number; p_user_id: string }
+        Returns: number
+      }
       clone_week_planing: {
         Args: { p_from_monday: string; p_to_monday: string; p_user_id: string }
         Returns: undefined
@@ -1014,6 +1282,10 @@ export type Database = {
         Returns: number
       }
       has_active_subscription: { Args: never; Returns: boolean }
+      has_appointment_access: {
+        Args: { p_appointment_id: number }
+        Returns: boolean
+      }
       has_nutri_race_assigned: {
         Args: { p_nutri_id: string }
         Returns: boolean
@@ -1022,6 +1294,10 @@ export type Database = {
       invite_client: {
         Args: { p_code: string; p_message: string }
         Returns: string
+      }
+      is_appointment_editor: {
+        Args: { p_appointment_id: number }
+        Returns: boolean
       }
       is_race_owner: { Args: { p_race_id: number }; Returns: boolean }
       leave_nutritionist: {

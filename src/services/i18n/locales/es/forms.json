@@ -63,5 +63,12 @@
             "order": "Orden",
             "isVisible": "Visible"
         }
+    },
+    "appointmentThemes": {
+        "fields": {
+            "name": "Nombre de la temática",
+            "point": "Punto",
+            "inDays": "En días"
+        }
     }
 }

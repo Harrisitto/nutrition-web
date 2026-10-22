@@ -66,6 +66,13 @@ export const queryKeys = ({
       startDate.save(),
       endDate.save(),
     ],
+    appointments: {
+      pendingClientPoints: ["user", "appointments", userId, "pendingClientPoints"],
+      treatedClientPoints: ["user", "appointments", userId, "treatedClientPoints"],
+      pending: ["user", "appointments", userId, "pending"],
+      treated: ["user", "appointments", userId, "treated"],
+
+    },
   },
   data: {
     meals: ["data", "meals", language],
@@ -78,6 +85,8 @@ export const queryKeys = ({
     recipes: ["data", "recipes", language, searchStr],
     raceIngredients: ["data", "raceIngredients", userId],
     raceLandmarks: ["data", "raceLandmarks", language],
+    appointmentThemes: ["data", "appointmentThemes"],
+    appointmentPoints: (themeId: number) => ["data", "appointmentThemes", themeId, "points"],
   },
   auth: {
     profileBase: ["auth", "profile"],

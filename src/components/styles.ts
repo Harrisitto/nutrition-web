@@ -11,3 +11,11 @@ export const deleteButtonStyle =
 
 export const fileInputStyle =
   "w-full text-sm text-gray-blue-700 file:mr-3 file:rounded-md file:border-0 file:bg-white-green file:px-3 file:py-1 file:text-dark-green";
+
+// Botón de solo icono, en verde (acción principal: añadir, crear)
+export const primaryIconButtonStyle =
+  "inline-flex shrink-0 items-center justify-center rounded-lg bg-nutrition-green p-2 text-white transition hover:opacity-90 disabled:opacity-50";
+
+// Botón de solo icono, sin fondo (acciones secundarias: editar, guardar, cancelar)
+export const iconButtonStyle =
+  "shrink-0 rounded-md p-1.5 text-nutrition-green transition hover:bg-white-green/60 disabled:opacity-50";

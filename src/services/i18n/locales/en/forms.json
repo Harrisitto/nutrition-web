@@ -64,5 +64,12 @@
             "order": "Order",
             "isVisible": "Visible"
         }
+    },
+    "appointmentThemes": {
+        "fields": {
+            "name": "Theme name",
+            "point": "Point",
+            "inDays": "In days"
+        }
     }
 }

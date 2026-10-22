@@ -23,6 +23,7 @@ export const APP_ROUTES = {
   RACES: "/dashboard/races",
 
   RACE_INGREDIENTS: "/dashboard/config/race-ingredients",
+  APPOINTMENT_THEMES: "/dashboard/config/appointment-themes",
 
   // Error routes
   NOT_FOUND: "/404",
