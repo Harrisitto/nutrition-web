@@ -1,5 +1,6 @@
 import { SelectDateCalendar } from "./@components/calendar";
 import {
+  NavigateAppointments,
   NavigateMeasures,
   NavigateUserPreset,
 } from "./@components/header/navigate";
@@ -12,6 +13,7 @@ import {
   Goal,
 } from "./@components/header/fields";
 import { WeeklyMeals } from "./@components/table";
+import ChartsAppointmentProgress from "./@components/appointmentProgress";
 
 const PagePlaningForm = () => {
   return (
@@ -24,6 +26,7 @@ const PagePlaningForm = () => {
             <Navigation />
             <NavigateUserPreset />
             <NavigateMeasures />
+            <NavigateAppointments />
           </div>
           <div className="flex flex-row flex-wrap justify-between gap-2">
             <LastSeen />
@@ -31,6 +34,9 @@ const PagePlaningForm = () => {
             <Phone />
             <Weight />
             <Goal />
+          </div>
+          <div className="flex flex-row flex-wrap gap-2">
+            <ChartsAppointmentProgress />
           </div>
         </div>
         <SelectDateCalendar />

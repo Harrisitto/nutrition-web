@@ -80,6 +80,7 @@
             "header": "Ir a",
             "presets": "Preajustes",
             "measures": "Medidas",
+            "appointments": "Consultas",
             "config": "Configuracion del nutricionista",
             "info": "Ver informacion de la app",
             "dashboard": "Tablero"
@@ -294,6 +295,81 @@
         "carbsPerKg": "Carbohidratos por kg",
         "proteinPerKg": "Proteina por kg",
         "fatsPerKg": "Grasas por kg"
+    },
+    "appointments": {
+        "title": "Consultas",
+        "new": "Nueva consulta",
+        "assign": {
+            "title": "Asignar temática",
+            "theme": "Temática",
+            "selectTheme": "Elige una temática",
+            "startDate": "Fecha de inicio",
+            "submit": "Asignar temática",
+            "noThemes": "Crea temáticas en la configuración para poder asignarlas.",
+            "errors": {
+                "noPoints": "La temática no tiene puntos.",
+                "generic": "No se ha podido asignar la temática.",
+                "load": "No se han podido cargar las temáticas."
+            }
+        },
+        "form": {
+            "backToList": "Volver a consultas",
+            "previous": "Anterior",
+            "saveAndContinue": "Guardar y continuar",
+            "finish": "Terminar",
+            "pointsLocked": "Guarda primero los datos de la consulta",
+            "steps": {
+                "details": {
+                    "title": "Datos de la consulta",
+                    "description": "Nombre y fecha. Sin fecha, la consulta queda pendiente de decidir."
+                },
+                "points": {
+                    "title": "Puntos a tratar",
+                    "description": "Añade puntos de las temáticas asignadas al cliente o puntos personalizados. Se guardan al añadirlos."
+                }
+            },
+            "points": {
+                "theme": "Temática",
+                "selectTheme": "Elige una temática",
+                "themePoint": "Punto de la temática",
+                "next": "Próximo",
+                "selectThemePoint": "Elige un punto",
+                "allAdded": "Ya se han añadido todos sus puntos",
+                "addThemePoint": "Añadir punto",
+                "allThemesFinished": "Todas las temáticas asignadas al cliente están terminadas. Puedes añadir puntos personalizados.",
+                "noThemes": "El cliente no tiene temáticas asignadas. Puedes añadir puntos personalizados.",
+                "pending": "Punto pendiente",
+                "selectPending": "Elige un punto pendiente",
+                "bringPending": "Traer a esta consulta",
+                "noPending": "No hay puntos pendientes de programar.",
+                "customPoint": "Punto personalizado",
+                "customPlaceholder": "...",
+                "addCustomPoint": "Añadir personalizado",
+                "remove": "Quitar punto",
+                "markTreated": "Marcar como tratado",
+                "unmarkTreated": "Desmarcar como tratado"
+            },
+            "errors": {
+                "duplicateDay": "Ya hay una consulta con este cliente ese día. Elige otra fecha o edita la que ya existe.",
+                "duplicateUndated": "Este cliente ya tiene una consulta sin fecha. Ponle fecha a esta o añade los puntos a la que ya existe.",
+                "save": "No se ha podido guardar la consulta.",
+                "load": "No se ha podido cargar la consulta.",
+                "points": "No se ha podido guardar el cambio en los puntos."
+            }
+        },
+        "pending": {
+            "noDate": "Fecha por decidir",
+            "today": "Hoy",
+            "daysLeft_one": "día",
+            "daysLeft_other": "días",
+            "daysLate_one": "día de retraso",
+            "daysLate_other": "días de retraso",
+            "undatedTitle": "Puntos pendientes por programar",
+            "untitled": "Consulta",
+            "noPoints": "Todavía no hay puntos que tratar",
+            "edit": "Gestionar consulta",
+            "clientPoint": "Propuesto por el cliente"
+        }
     },
     "races": {
         "title": "Planificación de carrera",

@@ -1,70 +1,70 @@
-# Graph Report - nutrition-web  (2026-10-22)
+# Graph Report - nutrition-web  (2026-10-23)
 
 ## Corpus Check
-- 277 files · ~115,039 words
+- 294 files · ~121,575 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 5 file(s) not represented in the graph (top: (none) 4, .css 1)
 
 ## Summary
-- 1380 nodes · 3923 edges · 71 communities (55 shown, 16 thin omitted)
+- 1455 nodes · 4256 edges · 76 communities (60 shown, 16 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 79 edges (avg confidence: 0.84)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `7da80b40`
+- Built from commit: `e28330d8`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- layout.ts
-- dashboard/index.tsx
+- Calendar WeekRow Module README
+- RowInfo
 - gpx.ts
-- Form
+- App.tsx
 - preset/components/form/hook.ts
 - Planning Calendar & Shortcuts
 - Measures Page & Colors
+- table/styles.ts
 - react-i18next
-- RowInfo
+- columns.tsx
 - hasSubscription
-- ConfigurationPages
-- chartData.ts
+- posterData.ts
 - Stripe Edge Functions
 - Privacy & References Text
 - Package Manifest
-- error/hook.ts
+- measures.ts
 - App TS Config
-- weekRow/index.tsx
-- error/store.ts
+- dates.ts
+- ConfigurationPages
 - layout.ts
 - Runtime Dependencies
-- profile.ts
-- config/store.ts
+- types/index.ts
+- useAppNavigation
 - Billing, Privacy & Deploy Docs
 - Node TS Config
 - Dev Dependencies
-- config.ts
-- posterData.ts
-- sideBar/list.tsx
-- SignUpPage.tsx
+- i18n/config.ts
+- react
+- configuration/index.tsx
+- planing.ts
 - useAppSelector
-- columns.tsx
+- state.config.keyboardCommands.tableNavigation
+- useGetAuthSession
+- actions.tsx
+- date/index.tsx
 - planing/index.tsx
-- posterPreview.tsx
-- FromDate
-- notification/store.ts
-- mealSelectInput.tsx
+- user/meals.ts
 - Subscription SQL View
 - Measures Screenshot
 - NPM Scripts
 - Mobile Calendar Screenshot
 - Web Dashboard Screenshot
-- measures.ts
+- profile.ts
 - Invite Client Flow
-- supabase/types.ts
+- races/index.tsx
 - Recipe Recommendation SQL
 - Stripe Seats Trigger
 - Root TS Config
-- rows.ts
+- info.tsx
 - External Navigation Helpers
 - App Store Compliance Docs
 - Clone Week Migration
@@ -77,24 +77,29 @@
 - EZ FOOD Logo
 - Info Landing Page
 - Expo Folder
-- queryKeys
-- new.tsx
-- vite.config.ts
 - store/store.ts
-- renderCommandGroup.tsx
+- numericCell.tsx
+- recipes.ts
+- sideBar/index.tsx
+- config/store.ts
 - inviteClient/index.tsx
+- rows.ts
+- vite.config.ts
+- useAppDispatch
+- manage.tsx
+- error/hook.ts
 
 ## God Nodes (most connected - your core abstractions)
-1. `react` - 93 edges
-2. `react-i18next` - 86 edges
-3. `useAppSelector` - 83 edges
-4. `queryKeys()` - 78 edges
-5. `FromDate` - 74 edges
-6. `useGetAuthSession()` - 38 edges
-7. `lucide-react` - 36 edges
-8. `useNotification()` - 31 edges
-9. `useLanguageCode()` - 30 edges
-10. `WeeklyMeals Table README` - 30 edges
+1. `react` - 101 edges
+2. `react-i18next` - 98 edges
+3. `useAppSelector` - 96 edges
+4. `queryKeys()` - 84 edges
+5. `FromDate` - 81 edges
+6. `lucide-react` - 45 edges
+7. `useGetAuthSession()` - 38 edges
+8. `useLanguageCode()` - 34 edges
+9. `useAppNavigation()` - 33 edges
+10. `useNotification()` - 33 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Stripe-Supabase Integration Deployment Guide` --conceptually_related_to--> `Generate Supabase Types Workflow`  [INFERRED]
@@ -121,55 +126,55 @@
 - **Dashboard onboarding gate flow (name, subscription, payment)** — src_pages_dashboard_readme_onboarding_gate, src_pages_dashboard__components_noclientsscreen_readme_nutritionist_name_prompt, src_pages_dashboard__components_paymentscreen_readme_payment_component, src_pages_dashboard__queries_readme_hassubscription, src_pages_dashboard__components_noclientsscreen_readme_all_nutritionist_table [INFERRED 0.85]
 - **Measures page filter-visualize-edit flow** — src_assets_screenshots_screenshot_web_measures_date_range_filter, src_assets_screenshots_screenshot_web_measures_measure_time_series_chart, src_assets_screenshots_screenshot_web_measures_shown_measures_toggle_list, src_assets_screenshots_screenshot_web_measures_visible_measures_list, src_assets_screenshots_screenshot_web_measures_measure_entry_form [INFERRED 0.85]
 
-## Communities (71 total, 16 thin omitted)
+## Communities (76 total, 16 thin omitted)
 
-### Community 0 - "layout.ts"
-Cohesion: 0.11
-Nodes (31): altitudeAt(), BOX_HEADER_HEIGHT, BOX_LABEL_FONT_SIZE, BOX_PADDING, CARD_GAP, IntakeCard(), altitudeAxis(), boxHeight() (+23 more)
+### Community 0 - "Calendar WeekRow Module README"
+Cohesion: 0.23
+Nodes (13): Calendar WeekRow Module README, CalendarView.tsx, DayCell.tsx, @dnd-kit/core, DraggableWeekRow.tsx, saveDate(), useFetchPlanning, Week Cloning via Drag and Drop (+5 more)
 
-### Community 1 - "dashboard/index.tsx"
-Cohesion: 0.05
-Nodes (70): react, react-i18next, react-router-dom, App(), NotFoundPage, PageAppDashboard, PageInfo, PagePrivacyPolicy (+62 more)
+### Community 1 - "RowInfo"
+Cohesion: 0.14
+Nodes (4): CellRowLabelProps, CellTextProps, RowInfo, TrainingHcRowInfo
 
 ### Community 2 - "gpx.ts"
 Cohesion: 0.18
 Nodes (16): @we-gold/gpxjs, cleanName(), coursePoints(), fileBaseName(), formatElapsed(), GpxError, GpxErrorKey, GpxRacePlan (+8 more)
 
-### Community 3 - "Form"
-Cohesion: 0.06
-Nodes (48): MultiLineTextInputProps, TextInputProps, deleteButtonStyle, iconButtonStyle, primaryIconButtonStyle, Form, FormProps, useForm() (+40 more)
+### Community 3 - "App.tsx"
+Cohesion: 0.24
+Nodes (11): App(), NotFoundPage, PageAppDashboard, PageInfo, PagePrivacyPolicy, PageReferences, SignInPage, InitialAnimation() (+3 more)
 
 ### Community 4 - "preset/components/form/hook.ts"
-Cohesion: 0.08
-Nodes (45): hcToKcal(), KCAL_PER_HC_GRAM, TrainingDay, trainingNetKcal(), calculateKcalFromMacros(), calculateDerivedState(), commentField, Context (+37 more)
+Cohesion: 0.15
+Nodes (26): calculateDerivedState(), commentField, Context, createFieldForMeal(), createFieldForTrainingHc(), fieldIds, Meal, MealType (+18 more)
 
 ### Community 5 - "Planning Calendar & Shortcuts"
-Cohesion: 0.07
-Nodes (44): Keyboard Configuration README, Comment Editor Shortcuts, Global Configuration State (Redux config), Configurable Keyboard Shortcuts, Calendar WeekRow Module README, CalendarView.tsx, DayCell.tsx, @dnd-kit/core (+36 more)
+Cohesion: 0.12
+Nodes (26): WeeklyMeals Table README, addAction / onAction, ALL_IDS, APP_ROUTES.RACES, CellDisplay, CellMeal, CellNumeric, CellPresetDay (+18 more)
 
 ### Community 6 - "Measures Page & Colors"
 Cohesion: 0.10
 Nodes (35): APP_DOT_COLOR_CLASSES, COLOR_CLASS_TO_HEX, getChartColorFromClass(), getDeterministicMeasureColorClass(), BtnInsertMeasure(), Context, createDateField(), createMeasureField() (+27 more)
 
-### Community 7 - "react-i18next"
+### Community 7 - "table/styles.ts"
+Cohesion: 0.24
+Nodes (8): CellDisplayProps, CellRaceProps, cellChipStyle, displayChipStyle, highlightRingOnDarkStyle, highlightRingStyle, rowLabelStyle, sectionHeaderBoxStyle
+
+### Community 8 - "react-i18next"
 Cohesion: 0.06
-Nodes (77): lucide-react, InitialAnimationProps, PropsLoading, SectionLoading(), BaseDateInputProps, RangeDateProps, RangeValue, SingleDateProps (+69 more)
+Nodes (77): lucide-react, react-i18next, InputComponent, Numeric(), One(), Option, SelectOneInputProps, cardStyle (+69 more)
 
-### Community 8 - "RowInfo"
-Cohesion: 0.12
-Nodes (7): CellMealProps, CellNumericProps, CellRowLabelProps, CellTextProps, MealRowInfo, RowInfo, TrainingHcRowInfo
+### Community 9 - "columns.tsx"
+Cohesion: 0.21
+Nodes (13): @tanstack/react-table, useDaysOfWeek(), CellAutoGenerate(), CellDisplay(), CellPresetDay(), CellRace(), CellRowLabel(), features (+5 more)
 
-### Community 9 - "hasSubscription"
-Cohesion: 0.15
-Nodes (17): Auth Management README, App Language Switch, Logout, Stripe Customer Portal, No Clients Screen README, all_nutritionist Supabase Table, Shared Form Component, Nutritionist Name Prompt (+9 more)
+### Community 10 - "hasSubscription"
+Cohesion: 0.07
+Nodes (34): Auth Management README, App Language Switch, Logout, Stripe Customer Portal, Recipes README, Meal Type Filter, Recipe Rating, Recipe Name Search (+26 more)
 
-### Community 10 - "ConfigurationPages"
-Cohesion: 0.08
-Nodes (32): ConfigurationPages(), DisplayMealsForm(), OrderInput(), RenderCommandGroup(), TableCommands(), List(), placeholderRecipeImg, Recipes() (+24 more)
-
-### Community 11 - "chartData.ts"
-Cohesion: 0.14
-Nodes (27): recharts, assignLanes(), ChartData, ChartLandmark, ChartPoint, ChartSpan, landmarkLanes(), LandmarkOption (+19 more)
+### Community 11 - "posterData.ts"
+Cohesion: 0.05
+Nodes (75): recharts, SectionLoading(), rasterizeSvg(), resizeImage(), svgAspectRatio(), hcToKcal(), KCAL_PER_HC_GRAM, raceHc() (+67 more)
 
 ### Community 12 - "Stripe Edge Functions"
 Cohesion: 0.08
@@ -181,39 +186,39 @@ Nodes (23): useFetchTxt(), FetchText(), LangDefault(), LangEN(), LangES(), Descr
 
 ### Community 14 - "Package Manifest"
 Cohesion: 0.09
-Nodes (24): name, private, type, version, autoprefixer, @dnd-kit/utilities, eslint, @eslint/js (+16 more)
+Nodes (25): name, private, type, version, autoprefixer, @dnd-kit/utilities, eslint, @eslint/js (+17 more)
 
-### Community 15 - "error/hook.ts"
-Cohesion: 0.31
-Nodes (3): ErrorBoundary(), parseError(), useError()
+### Community 15 - "measures.ts"
+Cohesion: 0.13
+Nodes (18): TABLE_ALL_MEASURES, TABLE_USER_MEASURES, CompositeTypes, Constants, DatabaseWithoutInternals, DefaultSchema, Enums, Json (+10 more)
 
 ### Community 16 - "App TS Config"
 Cohesion: 0.08
 Nodes (25): compilerOptions, allowImportingTsExtensions, erasableSyntaxOnly, forceConsistentCasingInFileNames, jsx, lib, module, moduleDetection (+17 more)
 
-### Community 17 - "weekRow/index.tsx"
-Cohesion: 0.17
-Nodes (16): @dnd-kit/core, DayCell, DayCellProps, DraggableWeekRow(), DraggableWeekRowProps, CalendarView(), CalendarViewProps, PlaningType (+8 more)
+### Community 17 - "dates.ts"
+Cohesion: 0.12
+Nodes (26): @dnd-kit/core, FromDate, parseDateOnly(), useMonthsOfYear(), AppointmentDate(), daysUntil(), SelectDateHeader(), SelectDateHeaderProps (+18 more)
 
-### Community 18 - "error/store.ts"
-Cohesion: 0.29
-Nodes (4): ErrorPayload, errorSlice, ErrorState, initialState
+### Community 18 - "ConfigurationPages"
+Cohesion: 0.33
+Nodes (6): ConfigurationPages(), List(), placeholderRecipeImg, Recipes(), selectRecipes(), useFetchRecipes()
 
 ### Community 19 - "layout.ts"
-Cohesion: 0.07
-Nodes (48): AREA_BOTTOM, AREA_TOP, AXIS_FONT_SIZE, AXIS_INK, BOX_GAP, CARD_SIZES, CONNECTOR_DOT_RADIUS, CONNECTOR_WIDTH (+40 more)
+Cohesion: 0.05
+Nodes (87): downloadBlob(), altitudeAt(), AREA_BOTTOM, AREA_TOP, AXIS_FONT_SIZE, AXIS_INK, BOX_GAP, BOX_HEADER_HEIGHT (+79 more)
 
 ### Community 20 - "Runtime Dependencies"
 Cohesion: 0.09
 Nodes (22): dependencies, @dnd-kit/core, @dnd-kit/utilities, html-to-image, i18next, i18next-browser-languagedetector, lodash, lucide-react (+14 more)
 
-### Community 21 - "profile.ts"
-Cohesion: 0.12
-Nodes (16): TABLE_ALL_MACROS, TABLE_ALL_MEALS, TABLE_ALL_MEASURES, TABLE_ALL_USERS, TABLE_RECIPE_TYPE_MEALS, TABLE_RECIPE_TYPES, TABLE_USER_INFO, TABLE_USER_INVITATIONS (+8 more)
+### Community 21 - "types/index.ts"
+Cohesion: 0.31
+Nodes (6): CellMeal(), CellMealProps, getKcalColorClass(), ALL_IDS, AllIdsValues, MealRowInfo
 
-### Community 22 - "config/store.ts"
-Cohesion: 0.25
-Nodes (7): configSlice, defaultKeyboardCommands, initialState, KeyboardCategory, KeyboardCommandsState, mergeKeyboardCommands(), SetKeyboardCommandPayload
+### Community 22 - "useAppNavigation"
+Cohesion: 0.14
+Nodes (18): useAppNavigation(), DEFAULT_ROUTE_METADATA, ROUTE_METADATA, RouteMetadata, APP_ROUTES, AppRoute, useSearchParams(), SignOut() (+10 more)
 
 ### Community 23 - "Billing, Privacy & Deploy Docs"
 Cohesion: 0.13
@@ -227,49 +232,49 @@ Nodes (20): compilerOptions, allowImportingTsExtensions, erasableSyntaxOnly, for
 Cohesion: 0.10
 Nodes (20): devDependencies, autoprefixer, eslint, @eslint/js, eslint-plugin-react-refresh, gh-pages, globals, postcss (+12 more)
 
-### Community 26 - "config.ts"
+### Community 26 - "i18n/config.ts"
 Cohesion: 0.12
 Nodes (7): i18next, i18next-browser-languagedetector, instances, posterI18n(), resources, savedLngKey, supportedLngs
 
-### Community 27 - "posterData.ts"
-Cohesion: 0.30
-Nodes (13): toSupportedLanguage(), altitudePoints(), buildChartData(), chartSpans(), resolveLandmarks(), useDraftChart(), PosterTotals, raceTotals() (+5 more)
+### Community 27 - "react"
+Cohesion: 0.05
+Nodes (62): react, MultiLineTextInputProps, TextInputProps, iconButtonStyle, primaryIconButtonStyle, Form, FormProps, useForm() (+54 more)
 
-### Community 28 - "sideBar/list.tsx"
-Cohesion: 0.43
-Nodes (6): AnimationLoading(), checkUpcomingMeals(), ClosedSidebarClient(), List(), OpenSidebarClient(), SingleClient()
+### Community 28 - "configuration/index.tsx"
+Cohesion: 0.24
+Nodes (14): react-router-dom, getTrailingRoute(), Select(), SectionTitle(), SectionTitleProps, TitleRegion(), TitleUser(), ManageAuthState() (+6 more)
 
-### Community 29 - "SignUpPage.tsx"
-Cohesion: 0.52
-Nodes (5): Disclaimer(), Title(), SignUpPage(), useGetAuthInfo(), useVerifyAuth()
+### Community 29 - "planing.ts"
+Cohesion: 0.36
+Nodes (7): TABLE_USER_PLANING, fetchPlanningWeek(), Planing, PlanningData, selectFromPlaning(), upsertDayInWeek(), useMutatePlaning()
 
 ### Community 30 - "useAppSelector"
 Cohesion: 0.19
-Nodes (21): useDaysOfWeek(), useLanguageCode(), useMonthsOfYear(), SelectDateHeader(), SelectDateHeaderProps, SelectDateCalendar(), PresetDayEditor(), PresetOption (+13 more)
+Nodes (28): NewPoint, nextPositionOf(), PendingPoint, useFormAppointmentPoints(), queryKeys(), fetchClientThemesWithPoints(), invalidateClientAppointments(), PointKind (+20 more)
 
-### Community 31 - "columns.tsx"
-Cohesion: 0.13
-Nodes (25): @tanstack/react-table, CellAutoGenerate(), CellDisplay(), CellDisplayProps, CellNumeric(), CellPresetDay(), CellPresetDayProps, CellRace() (+17 more)
+### Community 31 - "state.config.keyboardCommands.tableNavigation"
+Cohesion: 0.60
+Nodes (5): Keyboard Configuration README, Comment Editor Shortcuts, Global Configuration State (Redux config), Configurable Keyboard Shortcuts, state.config.keyboardCommands.tableNavigation
 
-### Community 32 - "planing/index.tsx"
-Cohesion: 0.26
-Nodes (15): Age(), Email(), Goal(), InfoRow(), LastSeen(), metricStyles, Phone(), NavigateButton() (+7 more)
-
-### Community 33 - "posterPreview.tsx"
-Cohesion: 0.22
-Nodes (14): html-to-image, react-dom, downloadBlob(), rasterizeSvg(), resizeImage(), svgAspectRatio(), POSTER_WIDTH, renderPosterPng() (+6 more)
-
-### Community 34 - "FromDate"
-Cohesion: 0.20
-Nodes (12): FromDate, parseDateOnly(), Weight(), CellAutoGenerateProps, PresetDayEditorProps, WeeklyMeals(), Resume(), CHART_COLORS (+4 more)
-
-### Community 35 - "notification/store.ts"
-Cohesion: 0.33
-Nodes (5): @reduxjs/toolkit, initialState, Notification, NotificationSlice, NotificationState
-
-### Community 37 - "mealSelectInput.tsx"
+### Community 32 - "useGetAuthSession"
 Cohesion: 0.21
-Nodes (11): CellMeal(), getKcalColorClass(), getRoundedNumber(), NumericEditor(), ModalShell(), SelectEditor(), SelectEditorProps, TextEditor() (+3 more)
+Nodes (16): DisplayNotification(), getNotificationStyle(), Disclaimer(), Title(), SignUpPage(), ConfirmSetup(), useFormSetupContext(), TABLE_ALL_NUTRITIONISTS (+8 more)
+
+### Community 33 - "actions.tsx"
+Cohesion: 0.40
+Nodes (7): Context, useFormSetup(), NoClientsPage(), Fields(), Provider(), Message(), Title()
+
+### Community 35 - "date/index.tsx"
+Cohesion: 0.29
+Nodes (4): BaseDateInputProps, RangeDateProps, RangeValue, SingleDateProps
+
+### Community 36 - "planing/index.tsx"
+Cohesion: 0.19
+Nodes (20): ChartsAppointmentProgress(), progressStyles, ThemeProgressItem(), Age(), Email(), Goal(), InfoRow(), LastSeen() (+12 more)
+
+### Community 37 - "user/meals.ts"
+Cohesion: 0.17
+Nodes (19): CellPresetDayProps, SelectEditor(), MealTypeEditor(), MealTypeEditorProps, MealTypeOption, PresetDayEditor(), PresetDayEditorProps, PresetOption (+11 more)
 
 ### Community 38 - "Subscription SQL View"
 Cohesion: 0.25
@@ -291,17 +296,17 @@ Nodes (7): App Calendar Screenshot (mobile daily plan view), Bottom Tab Navigati
 Cohesion: 0.43
 Nodes (7): Web Dashboard Screenshot, Carbohidratos por hora de entrenamiento, Macronutrientes diarios (carbs per kg), Balance energetico (daily and weekly), Dark-green tabular dashboard layout, Meal Codes (CC / DES level), Weekly Meal Plan Grid (meal slots x weekdays)
 
-### Community 43 - "measures.ts"
-Cohesion: 0.15
-Nodes (21): @supabase/supabase-js, @tanstack/react-query, SupportedLanguage, supabase, supabaseAnonKey, supabaseUrl, TABLE_ALL_NUTRITIONISTS, Database (+13 more)
+### Community 43 - "profile.ts"
+Cohesion: 0.12
+Nodes (26): @tanstack/react-query, useLanguageCode(), SupportedLanguage, supabase, supabaseAnonKey, supabaseUrl, TABLE_ALL_MACROS, TABLE_ALL_MEALS (+18 more)
 
 ### Community 44 - "Invite Client Flow"
 Cohesion: 0.43
 Nodes (6): Invite Client README, Client Invite Code, invite_client RPC, Linked Clients List, Pending Invitations List, remove_client RPC
 
-### Community 45 - "supabase/types.ts"
-Cohesion: 0.22
-Nodes (8): CompositeTypes, Constants, DatabaseWithoutInternals, DefaultSchema, Enums, Json, Tables, TablesUpdate
+### Community 45 - "races/index.tsx"
+Cohesion: 0.21
+Nodes (14): StepNavigation(), StepProgress(), APPOINTMENT_STEPS, AppointmentStep, FormAppointment(), PageFormAppointment(), saveErrorKey(), BackButton() (+6 more)
 
 ### Community 47 - "Stripe Seats Trigger"
 Cohesion: 0.67
@@ -311,57 +316,77 @@ Nodes (4): public.trigger_sync_stripe_seats(), tr_sync_stripe_seats_del, tr_sync
 Cohesion: 0.33
 Nodes (5): compilerOptions, forceConsistentCasingInFileNames, strict, files, references
 
-### Community 49 - "rows.ts"
-Cohesion: 0.37
-Nodes (10): dayBalanceWithoutMeals(), AutoGenerateEditor(), AutoGenerateEditorProps, useTableRows(), fetchMeals(), useFetchMeals(), useFetchOrderedMealsForId(), useFetchBmr() (+2 more)
+### Community 49 - "info.tsx"
+Cohesion: 0.33
+Nodes (6): Button(), ButtonProps, ButtonSize, ButtonVariant, PhoneMockup(), PageInfo()
 
 ### Community 51 - "App Store Compliance Docs"
 Cohesion: 0.50
 Nodes (4): Privacy Policy README, Privacy Policy, References Page README, Nutrition and Web Development References
 
-### Community 68 - "queryKeys"
+### Community 66 - "store/store.ts"
+Cohesion: 0.15
+Nodes (13): react-redux, redux-persist, @reduxjs/toolkit, initialState, Notification, NotificationSlice, NotificationState, AppDispatch (+5 more)
+
+### Community 69 - "numericCell.tsx"
+Cohesion: 0.23
+Nodes (9): react-dom, CellNumeric(), CellNumericProps, CellText(), getRoundedNumber(), NumericEditor(), ModalShell(), SelectEditorProps (+1 more)
+
+### Community 70 - "recipes.ts"
+Cohesion: 0.33
+Nodes (9): renderMacroLabel(), RecipePieChart(), IngredientsList(), RecipeType(), ViewRecipe(), RecipeInfo, selectRecipeInfo(), useFetchRecipeInfo() (+1 more)
+
+### Community 73 - "sideBar/index.tsx"
 Cohesion: 0.27
-Nodes (12): useFetchHasSuscription(), startAuthListener(), toAuthSession(), useGetAuthSession(), useInsertAuthInfo(), useSignOut(), useMutateNutriRecipe(), queryKeys() (+4 more)
+Nodes (8): AppDashboard(), NavigateConfiguration(), NavigateDashboard(), NavigateHomePage(), SidebarNavItem(), useAddNotification(), useNotificationErrorQuery(), useAppDispatch()
 
-### Community 69 - "new.tsx"
-Cohesion: 0.17
-Nodes (20): cardStyle, fileInputStyle, ALLOWED_IMAGE_TYPES, amountFields, AmountKey, emptyIngredient, MAX_IMAGE_SIZE, ConfigRaceIngredients() (+12 more)
+### Community 75 - "config/store.ts"
+Cohesion: 0.12
+Nodes (14): KeyboardInput(), AnyKeyboardCommand, KeyboardCategory, KeyboardCommand, KeyboardCommandsState, RenderCommandGroupProps, configSlice, ConfigState (+6 more)
 
-### Community 70 - "vite.config.ts"
+### Community 77 - "inviteClient/index.tsx"
+Cohesion: 0.29
+Nodes (10): @supabase/supabase-js, InviteClient(), Invited(), InvitedClients(), TABLE_USER_INVITATIONS, INVITATION_MESSAGE_MAX_LENGTH, INVITATION_MESSAGE_MIN_LENGTH, inviteClientErrorKey() (+2 more)
+
+### Community 78 - "rows.ts"
+Cohesion: 0.29
+Nodes (11): dayBalanceWithoutMeals(), CellAutoGenerateProps, AutoGenerateEditor(), AutoGenerateEditorProps, useTableRows(), useFetchMeals(), useGeneratePlaningDay(), useFetchBmr() (+3 more)
+
+### Community 79 - "vite.config.ts"
 Cohesion: 0.40
 Nodes (3): rollup-plugin-visualizer, vite, @vitejs/plugin-react-swc
 
-### Community 71 - "store/store.ts"
-Cohesion: 0.21
-Nodes (10): react-redux, redux-persist, DisplayNotification(), getNotificationStyle(), AppDispatch, configPersistConfig, persistor, rootReducer (+2 more)
+### Community 80 - "useAppDispatch"
+Cohesion: 0.48
+Nodes (4): DisplayMealsForm(), OrderInput(), RenderCommandGroup(), TableCommands()
 
-### Community 74 - "renderCommandGroup.tsx"
-Cohesion: 0.22
-Nodes (7): KeyboardInput(), AnyKeyboardCommand, KeyboardCategory, KeyboardCommand, KeyboardCommandsState, RenderCommandGroupProps, ConfigState
+### Community 81 - "manage.tsx"
+Cohesion: 0.13
+Nodes (24): AnimationLoading(), InitialAnimationProps, PropsLoading, ManageClients(), PageInviteClient(), checkUpcomingMeals(), ClosedSidebarClient(), List() (+16 more)
 
-### Community 77 - "inviteClient/index.tsx"
+### Community 85 - "error/hook.ts"
 Cohesion: 0.18
-Nodes (19): InviteClient(), Invited(), InvitedClients(), ManageClients(), PageInviteClient(), INVITATION_MESSAGE_MAX_LENGTH, INVITATION_MESSAGE_MIN_LENGTH, inviteClientErrorKey() (+11 more)
+Nodes (5): ErrorBoundary(), parseError(), useError(), ErrorPayload, ErrorState
 
 ## Knowledge Gaps
 - **36 isolated node(s):** `@dnd-kit/utilities`, `react-day-picker`, `@types/lodash`, `@types/react`, `@types/react-dom` (+31 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 344 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 352 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **16 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `react` connect `dashboard/index.tsx` to `Form`, `preset/components/form/hook.ts`, `Measures Page & Colors`, `react-i18next`, `ConfigurationPages`, `chartData.ts`, `Privacy & References Text`, `Package Manifest`, `weekRow/index.tsx`, `layout.ts`, `posterData.ts`, `sideBar/list.tsx`, `SignUpPage.tsx`, `useAppSelector`, `columns.tsx`, `planing/index.tsx`, `posterPreview.tsx`, `FromDate`, `mealSelectInput.tsx`, `measures.ts`, `rows.ts`, `new.tsx`, `store/store.ts`, `renderCommandGroup.tsx`, `inviteClient/index.tsx`?**
-  _High betweenness centrality (0.222) - this node is a cross-community bridge._
+- **Why does `react-i18next` connect `react-i18next` to `preset/components/form/hook.ts`, `Measures Page & Colors`, `table/styles.ts`, `columns.tsx`, `posterData.ts`, `Privacy & References Text`, `Package Manifest`, `dates.ts`, `ConfigurationPages`, `layout.ts`, `useAppNavigation`, `i18n/config.ts`, `react`, `configuration/index.tsx`, `useGetAuthSession`, `actions.tsx`, `planing/index.tsx`, `user/meals.ts`, `profile.ts`, `races/index.tsx`, `info.tsx`, `recipes.ts`, `sideBar/index.tsx`, `config/store.ts`, `inviteClient/index.tsx`, `rows.ts`, `useAppDispatch`?**
+  _High betweenness centrality (0.218) - this node is a cross-community bridge._
 - **What connects `@dnd-kit/utilities`, `react-day-picker`, `@types/lodash` to the rest of the system?**
   _36 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `layout.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.10873440285204991 - nodes in this community are weakly interconnected._
-- **Why does `react-i18next` connect `dashboard/index.tsx` to `layout.ts`, `Form`, `preset/components/form/hook.ts`, `Measures Page & Colors`, `react-i18next`, `ConfigurationPages`, `chartData.ts`, `Privacy & References Text`, `Package Manifest`, `weekRow/index.tsx`, `layout.ts`, `config.ts`, `SignUpPage.tsx`, `useAppSelector`, `columns.tsx`, `planing/index.tsx`, `posterPreview.tsx`, `FromDate`, `mealSelectInput.tsx`, `rows.ts`, `new.tsx`, `store/store.ts`, `renderCommandGroup.tsx`, `inviteClient/index.tsx`?**
-  _High betweenness centrality (0.210) - this node is a cross-community bridge._
-- **Should `dashboard/index.tsx` be split into smaller, more focused modules?**
-  _Cohesion score 0.05425742574257426 - nodes in this community are weakly interconnected._
-- **Should `Form` be split into smaller, more focused modules?**
-  _Cohesion score 0.0612859097127223 - nodes in this community are weakly interconnected._
-- **Should `preset/components/form/hook.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.08013468013468013 - nodes in this community are weakly interconnected._
+- **Should `RowInfo` be split into smaller, more focused modules?**
+  _Cohesion score 0.14285714285714285 - nodes in this community are weakly interconnected._
+- **Why does `react` connect `react` to `App.tsx`, `preset/components/form/hook.ts`, `Measures Page & Colors`, `react-i18next`, `columns.tsx`, `posterData.ts`, `Privacy & References Text`, `Package Manifest`, `dates.ts`, `ConfigurationPages`, `layout.ts`, `useAppNavigation`, `configuration/index.tsx`, `useGetAuthSession`, `planing/index.tsx`, `user/meals.ts`, `profile.ts`, `races/index.tsx`, `info.tsx`, `store/store.ts`, `numericCell.tsx`, `recipes.ts`, `sideBar/index.tsx`, `config/store.ts`, `inviteClient/index.tsx`, `rows.ts`, `useAppDispatch`, `manage.tsx`?**
+  _High betweenness centrality (0.199) - this node is a cross-community bridge._
+- **Should `Planning Calendar & Shortcuts` be split into smaller, more focused modules?**
+  _Cohesion score 0.1206896551724138 - nodes in this community are weakly interconnected._
+- **Why does `Recipe Macro Chart README` connect `hasSubscription` to `recipes.ts`?**
+  _High betweenness centrality (0.061) - this node is a cross-community bridge._
+- **Should `Measures Page & Colors` be split into smaller, more focused modules?**
+  _Cohesion score 0.1026827012025902 - nodes in this community are weakly interconnected._

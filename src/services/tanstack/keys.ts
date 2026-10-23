@@ -71,6 +71,12 @@ export const queryKeys = ({
       treatedClientPoints: ["user", "appointments", userId, "treatedClientPoints"],
       pending: ["user", "appointments", userId, "pending"],
       treated: ["user", "appointments", userId, "treated"],
+      single: (appointmentId: number | null) => ["user", "appointments", userId, "single", appointmentId],
+      themesWithPoints: ["user", "appointments", userId, "themesWithPoints"],
+      undated: ["user", "appointments", userId, "undated"],
+      pendingPoints: ["user", "appointments", userId, "pendingPoints"],
+      // Prefijo de todas las anteriores: invalidarlo refresca todo lo de las consultas del cliente
+      all: ["user", "appointments", userId],
 
     },
   },

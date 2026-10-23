@@ -65,6 +65,13 @@
             "isVisible": "Visible"
         }
     },
+    "appointments": {
+        "fields": {
+            "name": "Appointment name (required with a date)",
+            "scheduledOn": "Date (optional)",            "videoUrl": "Video call link (optional)"
+        },        "errors": {            "videoUrl": "The link has to start with https://"
+        }
+    },
     "appointmentThemes": {
         "fields": {
             "name": "Theme name",

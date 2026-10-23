@@ -79,6 +79,7 @@
             "header": "Navigate to",
             "presets": "Presets",
             "measures": "Measures",
+            "appointments": "Appointments",
             "config": "Nutritionist configuration",
             "info": "See app info",
             "dashboard": "Dashboard"
@@ -294,6 +295,81 @@
         "carbsPerKg": "Carbs per kg",
         "proteinPerKg": "Protein per kg",
         "fatsPerKg": "Fats per kg"
+    },
+    "appointments": {
+        "title": "Appointments",
+        "new": "New appointment",
+        "assign": {
+            "title": "Assign theme",
+            "theme": "Theme",
+            "selectTheme": "Choose a theme",
+            "startDate": "Start date",
+            "submit": "Assign theme",
+            "noThemes": "Create themes in the configuration to assign them.",
+            "errors": {
+                "noPoints": "The theme has no points.",
+                "generic": "The theme could not be assigned.",
+                "load": "The themes could not be loaded."
+            }
+        },
+        "form": {
+            "backToList": "Back to appointments",
+            "previous": "Previous",
+            "saveAndContinue": "Save and continue",
+            "finish": "Finish",
+            "pointsLocked": "Save the appointment details first",
+            "steps": {
+                "details": {
+                    "title": "Appointment details",
+                    "description": "Name and date. Without a date, the appointment stays to be decided."
+                },
+                "points": {
+                    "title": "Points to discuss",
+                    "description": "Add points from the client's assigned themes or custom points. They are saved as you add them."
+                }
+            },
+            "points": {
+                "theme": "Theme",
+                "selectTheme": "Choose a theme",
+                "themePoint": "Theme point",
+                "next": "Next",
+                "selectThemePoint": "Choose a point",
+                "allAdded": "All its points have been added",
+                "addThemePoint": "Add point",
+                "allThemesFinished": "All the client's assigned themes are finished. You can add custom points.",
+                "noThemes": "The client has no assigned themes. You can add custom points.",
+                "pending": "Pending point",
+                "selectPending": "Choose a pending point",
+                "bringPending": "Bring to this appointment",
+                "noPending": "There are no points waiting to be scheduled.",
+                "customPoint": "Custom point",
+                "customPlaceholder": "...",
+                "addCustomPoint": "Add custom",
+                "remove": "Remove point",
+                "markTreated": "Mark as discussed",
+                "unmarkTreated": "Unmark as discussed"
+            },
+            "errors": {
+                "duplicateDay": "There is already an appointment with this client on that day. Choose another date or edit the existing one.",
+                "duplicateUndated": "This client already has an appointment without a date. Give this one a date or add the points to the existing one.",
+                "save": "The appointment could not be saved.",
+                "load": "The appointment could not be loaded.",
+                "points": "The change to the points could not be saved."
+            }
+        },
+        "pending": {
+            "noDate": "Date to be decided",
+            "today": "Today",
+            "daysLeft_one": "day",
+            "daysLeft_other": "days",
+            "daysLate_one": "day overdue",
+            "daysLate_other": "days overdue",
+            "undatedTitle": "Points waiting to be scheduled",
+            "untitled": "Appointment",
+            "noPoints": "No points to discuss yet",
+            "edit": "Manage appointment",
+            "clientPoint": "Suggested by the client"
+        }
     },
     "races": {
         "title": "Race planning",

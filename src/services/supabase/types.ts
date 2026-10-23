@@ -255,6 +255,7 @@ export type Database = {
           id: number
           point: string
           position: number
+          theme_point_id: number | null
           treated_at: string | null
         }
         Insert: {
@@ -263,6 +264,7 @@ export type Database = {
           id?: number
           point: string
           position?: number
+          theme_point_id?: number | null
           treated_at?: string | null
         }
         Update: {
@@ -271,6 +273,7 @@ export type Database = {
           id?: number
           point?: string
           position?: number
+          theme_point_id?: number | null
           treated_at?: string | null
         }
         Relationships: [
@@ -288,6 +291,13 @@ export type Database = {
             referencedRelation: "client_themes"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "appointment_points_theme_point_id_fkey"
+            columns: ["theme_point_id"]
+            isOneToOne: false
+            referencedRelation: "appointment_theme_points"
+            referencedColumns: ["id"]
+          },
         ]
       }
       appointment_theme_points: {
@@ -295,21 +305,18 @@ export type Database = {
           id: number
           in_days: number
           point: string
-          position: number
           theme_id: number
         }
         Insert: {
           id?: number
           in_days: number
           point: string
-          position?: number
           theme_id: number
         }
         Update: {
           id?: number
           in_days?: number
           point?: string
-          position?: number
           theme_id?: number
         }
         Relationships: [

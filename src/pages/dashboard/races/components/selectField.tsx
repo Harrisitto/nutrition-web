@@ -10,9 +10,14 @@ export const SelectField = ({
   label: string;
   placeholder: string;
   value: string;
-  options: { value: string | number; label: string }[];
+  // className: para resaltar una opción (p. ej. la sugerida)
+  options: { value: string | number; label: string; className?: string }[];
   onChange: (value: string) => void;
 }) => {
+  // El <select> cerrado muestra la opción elegida: con su mismo resaltado
+  const selectedClassName =
+    options.find((option) => String(option.value) === value)?.className ?? "";
+
   return (
     <label className="flex flex-col gap-2">
       <span className="text-sm text-gray-blue-600">{label}</span>
@@ -20,13 +25,13 @@ export const SelectField = ({
         required
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-md border border-gray-blue-300 bg-gray-blue-50 px-3 py-2 text-gray-blue-700 focus:border-gray-blue-500 focus:outline-none focus:ring-2 focus:ring-gray-blue-400"
+        className={`w-full rounded-md border border-gray-blue-300 bg-gray-blue-50 px-3 py-2 text-gray-blue-700 focus:border-gray-blue-500 focus:outline-none focus:ring-2 focus:ring-gray-blue-400 ${selectedClassName}`}
       >
         <option value="" disabled>
           {placeholder}
         </option>
         {options.map((option) => (
-          <option key={option.value} value={option.value}>
+          <option key={option.value} value={option.value} className={option.className}>
             {option.label}
           </option>
         ))}

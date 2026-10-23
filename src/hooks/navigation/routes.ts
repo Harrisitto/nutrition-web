@@ -17,13 +17,15 @@ export const APP_ROUTES = {
   RECIPES_CONFIG: "/dashboard/config/recipes-config",
   KEYBOARD: "/dashboard/config/keyboard",
   AUTH_MANAGEMENT: "/dashboard/config/auth-management",
+  RACE_INGREDIENTS: "/dashboard/config/race-ingredients",
+  APPOINTMENT_THEMES: "/dashboard/config/appointment-themes",
 
   FORM_PRESET: "/dashboard/form-preset",
   FORM_MEASURE: "/dashboard/form-measure",
+  FORM_APPOINTMENT: "/dashboard/form-appointment",
+  APPOINTMENTS: "/dashboard/appointments",
   RACES: "/dashboard/races",
 
-  RACE_INGREDIENTS: "/dashboard/config/race-ingredients",
-  APPOINTMENT_THEMES: "/dashboard/config/appointment-themes",
 
   // Error routes
   NOT_FOUND: "/404",

@@ -13,3 +13,7 @@ export const listItemStyle = (hasError = false) =>
   }`;
 
 export const emptyTextStyle = "p-4 text-sm text-text-muted";
+
+// Etiqueta de un punto de consulta (su temática o "Propuesto por el cliente")
+export const pointTagStyle =
+  "shrink-0 rounded-full bg-white-green px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-dark-green";
