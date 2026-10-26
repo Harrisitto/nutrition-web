@@ -1,10 +1,10 @@
 import { useMemo } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { queryOptions, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { StorageApiError } from "@supabase/supabase-js";
 import { queryKeys } from "../keys";
 import { supabase } from "@src/services/supabase/client";
 import FromDate from "@src/helpers/dates";
-import { hcToKcal, raceHc } from "@src/helpers/nutrition";
+import { hcToKcal, kcalByDate, raceHc } from "@src/helpers/nutrition";
 import { downloadBlob } from "@src/helpers/images";
 import { useAppSelector } from "@src/store/store";
 import type { Database } from "@src/services/supabase/types";
@@ -32,30 +32,26 @@ const selectRacesWithHc = () => {
   ` as const;
 };
 
-/**
- * Carreras del cliente seleccionado en la semana de `selectedDay`, con los
- * hidratos planeados (amount × hc_amount de cada toma) y sus kcal.
- */
-export const useFetchRacesForWeek = () => {
-  const savedDate = useAppSelector((state) => state.config.selectedDay);
-  const user = useAppSelector((state) => state.config.selectedUserId);
-
-  const selectedDate = new FromDate(savedDate);
-  const monday = selectedDate.thisMonday();
-  const sunday = selectedDate.thisSunday();
-
-  return useQuery({
-    queryKey: queryKeys({ userId: user }).user.races(
-      monday.save(),
-      sunday.save(),
-    ),
+// Carreras entre dos fechas (ambas incluidas) con los hidratos planeados
+// (amount × hc_amount de cada toma) y sus kcal
+const racesForDateRangeOptions = ({
+  userId,
+  start,
+  end,
+}: {
+  userId: string | null;
+  start: string;
+  end: string;
+}) =>
+  queryOptions({
+    queryKey: queryKeys({ userId }).user.races(start, end),
     queryFn: async () => {
       const { data, error } = await supabase
         .from("nutri_races")
         .select(selectRacesWithHc())
-        .eq("user_id", user || "")
-        .gte("race_date", monday.save())
-        .lte("race_date", sunday.save())
+        .eq("user_id", userId || "")
+        .gte("race_date", start)
+        .lte("race_date", end)
         .order("race_date");
 
       if (error) {
@@ -80,7 +76,47 @@ export const useFetchRacesForWeek = () => {
         };
       });
     },
-    enabled: !!user,
+    enabled: !!userId,
+  });
+
+/**
+ * Carreras del cliente seleccionado en la semana de `selectedDay`.
+ */
+export const useFetchRacesForWeek = () => {
+  const savedDate = useAppSelector((state) => state.config.selectedDay);
+  const selectedDate = new FromDate(savedDate);
+
+  return useFetchRacesForDateRange({
+    startDate: selectedDate.thisMonday(),
+    endDate: selectedDate.thisSunday(),
+  });
+};
+
+export const useFetchRacesForDateRange = ({
+  startDate,
+  endDate,
+}: {
+  startDate: FromDate;
+  endDate: FromDate;
+}) => {
+  const user = useAppSelector((state) => state.config.selectedUserId);
+  return useQuery(
+    racesForDateRangeOptions({ userId: user, start: startDate.save(), end: endDate.save() }),
+  );
+};
+
+// Kcal ingeridas en las carreras, por fecha ("YYYY-MM-DD")
+export const useFetchRacesKcalForDateRange = ({
+  startDate,
+  endDate,
+}: {
+  startDate: FromDate;
+  endDate: FromDate;
+}) => {
+  const user = useAppSelector((state) => state.config.selectedUserId);
+  return useQuery({
+    ...racesForDateRangeOptions({ userId: user, start: startDate.save(), end: endDate.save() }),
+    select: (races) => kcalByDate(races, (race) => race.totalKcal),
   });
 };
 

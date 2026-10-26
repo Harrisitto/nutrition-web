@@ -9,6 +9,8 @@ import {
   useFetchSingleAppointment,
   useFetchUndatedAppointment,
   useSaveAppointment,
+  useSetAppointmentStatus,
+  type AppointmentStatus,
 } from "../../../../services/tanstack/user/appointments";
 import { BackButton } from "../../races/components/backButton";
 import { Title } from "../../races/components/title";
@@ -18,6 +20,7 @@ import { StepDetails } from "./steps/details";
 import { StepPoints } from "./steps/points";
 import { fieldIds, useAppointmentForm } from "./configAppointment";
 import type { AppointmentStep } from "./constants";
+import StepHistory from "./steps/history";
 
 // 23505: una consulta por dia y cliente, y una sola sin fecha (indice unico
 // nutri_appointments_one_per_day, NULLS NOT DISTINCT)
@@ -48,17 +51,24 @@ const FormAppointment = () => {
   const appointmentQuery = useFetchSingleAppointment(appointmentId);
   const { form, Fields } = useAppointmentForm(appointmentQuery.data);
   const saveAppointment = useSaveAppointment();
+  const setAppointmentStatus = useSetAppointmentStatus();
 
   const goToList = () => navigateTo(APP_ROUTES.APPOINTMENTS);
 
-  const onSaveDetails = () => {
-    if (!form.validateForm()) return;
+  // Guarda los datos del paso 1 y después onSaved. Si no son válidos se vuelve a ese paso para
+  // ver los errores (desde puntos o historial estarían ocultos)
+  const saveDetails = (onSaved: () => void) => {
+    if (!form.validateForm()) {
+      setStep("details");
+      return;
+    }
     const state = form.getState();
     const scheduledOn = (state[fieldIds.scheduledOn] as string) || null;
     const name = (state[fieldIds.name] as string).trim();
     // Sin fecha el nombre es opcional: la lista muestra "Puntos pendientes por programar"
     if (scheduledOn !== null && name === "") {
       form.updateField(fieldIds.name, { errorMsg: "system:form.required" });
+      setStep("details");
       return;
     }
     // Entrando por la consulta sin fecha: ponerle fecha crea una consulta aparte y la sin fecha
@@ -75,10 +85,21 @@ const FormAppointment = () => {
         onSuccess: (saved) => {
           setSavedAppointmentId(saved.id);
           addFormSubmitSucess();
-          setStep("points");
+          onSaved();
         },
       },
     );
+  };
+
+  // La consulta sin fecha solo guarda puntos pendientes: no se empieza ni se termina
+  const appointment = appointmentQuery.data;
+  const status =
+    appointment && appointment.scheduled_on !== null
+      ? (appointment.status as AppointmentStatus)
+      : null;
+  const onChangeStatus = (next: AppointmentStatus) => {
+    if (appointmentId === null) return;
+    setAppointmentStatus.mutate({ id: appointmentId, status: next });
   };
 
   // Hasta tener la consulta a editar: si no, el formulario saldría vacío y después se rellenaría.
@@ -121,6 +142,9 @@ const FormAppointment = () => {
       <div hidden={step !== "points"}>
         {appointmentId !== null && <StepPoints appointmentId={appointmentId} />}
       </div>
+      <div hidden={step !== "history"}>
+        {appointmentId !== null && <StepHistory appointmentId={appointmentId} />}
+      </div>
 
       <StepNavigation
         currentStep={step}
@@ -128,11 +152,16 @@ const FormAppointment = () => {
         errorKey={
           saveAppointment.error
             ? saveErrorKey(saveAppointment.error, saveAppointment.variables?.scheduled_on)
-            : null
+            : setAppointmentStatus.isError
+              ? "data:appointments.form.errors.status"
+              : null
         }
+        status={status}
+        isChangingStatus={setAppointmentStatus.isPending}
         onPrevious={() => setStep("details")}
-        onSaveDetails={onSaveDetails}
-        onFinish={goToList}
+        onSaveDetails={() => saveDetails(() => setStep("points"))}
+        onSave={() => saveDetails(goToList)}
+        onChangeStatus={onChangeStatus}
       />
     </div>
   );

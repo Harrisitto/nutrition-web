@@ -1,7 +1,8 @@
 import FromDate from "@src/helpers/dates";
+import { kcalByDate } from "@src/helpers/nutrition";
 import { useLanguageCode } from "@src/hooks/helpers/language";
 import { useAppSelector } from "@src/store/store";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { queryOptions, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../keys";
 import { supabase } from "@src/services/supabase/client";
 import type { TablesInsert } from "@src/services/supabase/types";
@@ -88,6 +89,71 @@ export const useFetchPlaningMealsForDate = ({
     ...query,
     createMap
   };
+};
+
+// Comidas entre dos fechas (ambas incluidas). La lista y sus kcal por día comparten caché
+const mealsForDateRangeOptions = ({
+  userId,
+  language,
+  start,
+  end,
+}: {
+  userId: string | null;
+  language: ReturnType<typeof useLanguageCode>;
+  start: string;
+  end: string;
+}) =>
+  queryOptions({
+    queryKey: queryKeys({
+      userId,
+      language,
+    }).user.meals(start, end),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from(TABLE_NAME)
+        .select(selectFromMeal(language))
+        .eq("user_id", userId!)
+        .gte("date", start)
+        .lte("date", end);
+
+      if (error) throw new Error(error.message);
+
+      return data;
+    },
+    enabled: !!userId,
+  });
+
+// Comidas planificadas entre dos fechas cualesquiera (ambas incluidas)
+export const useFetchPlaningMealsForDateRange = ({
+  startDate,
+  endDate,
+}: {
+  startDate: FromDate;
+  endDate: FromDate;
+}) => {
+  const language = useLanguageCode();
+  const userId = useAppSelector((state) => state.config.selectedUserId);
+
+  return useQuery(
+    mealsForDateRangeOptions({ userId, language, start: startDate.save(), end: endDate.save() }),
+  );
+};
+
+// Kcal ingeridas en las comidas planificadas, por fecha ("YYYY-MM-DD")
+export const useFetchMealsKcalForDateRange = ({
+  startDate,
+  endDate,
+}: {
+  startDate: FromDate;
+  endDate: FromDate;
+}) => {
+  const language = useLanguageCode();
+  const userId = useAppSelector((state) => state.config.selectedUserId);
+
+  return useQuery({
+    ...mealsForDateRangeOptions({ userId, language, start: startDate.save(), end: endDate.save() }),
+    select: (meals) => kcalByDate(meals, (meal) => Number(meal.recipe_type?.kcal ?? 0)),
+  });
 };
 
 export const useMutatePlaningMeals = ({

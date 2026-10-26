@@ -316,7 +316,6 @@
             "backToList": "Volver a consultas",
             "previous": "Anterior",
             "saveAndContinue": "Guardar y continuar",
-            "finish": "Terminar",
             "pointsLocked": "Guarda primero los datos de la consulta",
             "steps": {
                 "details": {
@@ -326,6 +325,10 @@
                 "points": {
                     "title": "Puntos a tratar",
                     "description": "Añade puntos de las temáticas asignadas al cliente o puntos personalizados. Se guardan al añadirlos."
+                },
+                "history": {
+                    "title": "Historial",
+                    "description": "Repasa la planificación, las notas y las mediciones del cliente en un periodo. Pulsa un resultado de búsqueda para ir a su semana."
                 }
             },
             "points": {
@@ -349,13 +352,59 @@
                 "markTreated": "Marcar como tratado",
                 "unmarkTreated": "Desmarcar como tratado"
             },
+            "history": {
+                "period": "Periodo",
+                "noPlanning": "No hay planificación en este periodo.",
+                "pages": {
+                    "planing": "Planificación",
+                    "notes": "Notas",
+                    "measures": "Mediciones"
+                },
+                "summary": "Resumen del periodo",
+                "mealsKcal": "Kcal en comidas",
+                "trainingKcal": "Kcal en entrenamientos",
+                "events": "Eventos",
+                "comments": "Comentarios",
+                "event": "Evento",
+                "comment": "Comentario",
+                "noEvents": "Sin eventos en este periodo.",
+                "noComments": "Sin comentarios en este periodo.",
+                "noNotes": "No hay notas en este periodo.",
+                "noMeasures": "No hay mediciones en este periodo.",
+                "searchPlaning": "Buscar en comentarios y eventos",
+                "searchNotes": "Buscar en las notas",
+                "searchMeasures": "Buscar una medición",
+                "noResults": "Sin resultados.",
+                "goToWeek": "Ir a la semana del {{date}}",
+                "perWeek": "{{value}} por semana",
+                "kcalPerDay": "kcal/día",
+                "plannedDays_one": "Media diaria del día planificado del periodo.",
+                "plannedDays_other": "Media diaria de los {{count}} días planificados del periodo, con su tendencia semanal.",
+                "totalKcal": "Kcal totales ingeridas",
+                "racesKcal": "Kcal en carreras",
+                "balance": "Kcal ganadas o perdidas de media por semana",
+                "kcalPerWeek": "kcal/semana",
+                "gained": "Ganadas",
+                "lost": "Perdidas",
+                "bmr": "BMR (metabolismo basal): {{value}}",
+                "noBmr": "Sin BMR: no se puede calcular el balance energético.",
+                "newNote": "Nueva nota",
+                "notePlaceholder": "Escribe una nota sobre el cliente...",
+                "addNote": "Añadir nota",
+                "noteError": "No se ha podido guardar la nota. Inténtalo de nuevo."
+            },
             "errors": {
                 "duplicateDay": "Ya hay una consulta con este cliente ese día. Elige otra fecha o edita la que ya existe.",
                 "duplicateUndated": "Este cliente ya tiene una consulta sin fecha. Ponle fecha a esta o añade los puntos a la que ya existe.",
                 "save": "No se ha podido guardar la consulta.",
                 "load": "No se ha podido cargar la consulta.",
-                "points": "No se ha podido guardar el cambio en los puntos."
-            }
+                "points": "No se ha podido guardar el cambio en los puntos.",
+                "status": "No se ha podido cambiar el estado de la consulta. Inténtalo de nuevo."
+            },
+            "save": "Guardar",
+            "startAppointment": "Empezar consulta",
+            "finishAppointment": "Terminar consulta",
+            "appointmentDone": "Consulta terminada"
         },
         "pending": {
             "noDate": "Fecha por decidir",

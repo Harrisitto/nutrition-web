@@ -123,6 +123,44 @@ export const useFetchUserMeasuresForDateRange = ({
   });
 };
 
+const SEARCH_LIMIT = 50;
+
+// Registros del cliente de las mediciones cuyo nombre (en el idioma actual) contiene el texto
+export const useSearchUserMeasures = ({ search }: { search: string }) => {
+  const userId = useAppSelector((state) => state.config.selectedUserId);
+  const languageCode = useLanguageCode();
+  const allMeasures = useFetchAllMeasures();
+  const trimmed = search.trim().toLowerCase();
+  // El nombre es JSON por idioma: se filtra el catálogo aquí y se consulta por ids
+  const measureIds =
+    allMeasures.data
+      ?.filter((measure) => String(measure.name ?? "").toLowerCase().includes(trimmed))
+      .map((measure) => measure.id) ?? [];
+
+  return useQuery({
+    queryKey: queryKeys({
+      userId,
+      language: languageCode,
+    }).user.measuresSearch(trimmed),
+    queryFn: async () => {
+      if (!userId || measureIds.length === 0) return [];
+
+      const { data, error } = await supabase
+        .from(TABLE_USER_MEASURES.NAME)
+        .select("*")
+        .eq(TABLE_USER_MEASURES.COLS.USER_ID, userId)
+        .in(TABLE_USER_MEASURES.COLS.MEASURE_ID, measureIds)
+        .order(TABLE_USER_MEASURES.COLS.DATE, { ascending: false })
+        .limit(SEARCH_LIMIT);
+
+      if (error) throw error;
+      return data;
+    },
+    // Sin texto la búsqueda devolvería todas las mediciones
+    enabled: !!userId && trimmed !== "" && allMeasures.isSuccess,
+  });
+};
+
 export const useInsertUserMeasure = () => {
   const userId = useAppSelector((state) => state.config.selectedUserId);
   return useMutation({

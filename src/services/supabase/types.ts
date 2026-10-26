@@ -329,6 +329,55 @@ export type Database = {
           },
         ]
       }
+      client_notes: {
+        Row: {
+          appointment_id: number | null
+          created_at: string
+          id: number
+          note: string
+          nutri_id: string
+          user_id: string
+        }
+        Insert: {
+          appointment_id?: number | null
+          created_at?: string
+          id?: number
+          note: string
+          nutri_id?: string
+          user_id: string
+        }
+        Update: {
+          appointment_id?: number | null
+          created_at?: string
+          id?: number
+          note?: string
+          nutri_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_notes_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "nutri_appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_notes_nutri_id_fkey"
+            columns: ["nutri_id"]
+            isOneToOne: false
+            referencedRelation: "all_nutritionist"
+            referencedColumns: ["nutri_id"]
+          },
+          {
+            foreignKeyName: "client_notes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "all_users"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       client_themes: {
         Row: {
           created_at: string

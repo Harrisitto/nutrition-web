@@ -46,8 +46,10 @@ export const RangeDate = ({
     return (
         <label className="flex flex-col gap-2">
             {label && <span className="text-sm text-gray-blue-600">{label}</span>}
+            {/* El calendario no deja elegir un inicio posterior al fin ni al reves */}
             <input
                 type="date"
+                max={value?.endDate || undefined}
                 {...props}
                 value={value?.startDate || ""}
                 className="w-full px-3 py-2 rounded-md bg-gray-blue-50 border border-gray-blue-300 text-gray-blue-700 focus:outline-none focus:ring-2 focus:ring-gray-blue-400 focus:border-gray-blue-500"
@@ -58,6 +60,7 @@ export const RangeDate = ({
             />
             <input
                 type="date"
+                min={value?.startDate || undefined}
                 {...props}
                 value={value?.endDate || ""}
                 className="w-full px-3 py-2 rounded-md bg-gray-blue-50 border border-gray-blue-300 text-gray-blue-700 focus:outline-none focus:ring-2 focus:ring-gray-blue-400 focus:border-gray-blue-500"

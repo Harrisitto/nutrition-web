@@ -27,6 +27,12 @@ class FromDate extends Date {
     }
   }
 
+  saveMonth(): string {
+    const year = this.getFullYear();
+    const month = String(this.getMonth() + 1).padStart(2, "0");
+    return `${year}-${month}`;
+  }
+
   save(): string {
     const year = this.getFullYear();
     const month = String(this.getMonth() + 1).padStart(2, "0");

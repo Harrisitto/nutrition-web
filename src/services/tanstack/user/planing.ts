@@ -1,10 +1,11 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { queryOptions, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../keys";
 import { supabase } from "@src/services/supabase/client";
 import {
   TABLE_USER_PLANING,
 } from "@src/services/supabase/definitions";
 import FromDate from "@src/helpers/dates";
+import { kcalByDate, trainingIntakeKcal } from "@src/helpers/nutrition";
 import { useLanguageCode } from "@src/hooks/helpers/language";
 import { useNotification } from "@src/store/slices/notification/hook";
 import { useAppSelector } from "@src/store/store";
@@ -41,28 +42,95 @@ export const useFetchPlanning = ({
   forDate?: FromDate;
 } = {}) => {
   const savedDate = useAppSelector((state) => state.config.selectedDay);
-  const user = useAppSelector((state) => state.config.selectedUserId);
-  const languageCode = useLanguageCode();
 
   // Garantiza que paramStartDate sea siempre una instancia de FromDate
   const paramStartDate = new FromDate(forDate || savedDate);
 
-  // Usa los métodos que existen en tu clase FromDate
-  const monday = paramStartDate.thisMonday();
-  const sunday = paramStartDate.thisSunday();
+  return useFetchPlanningForDateRange({
+    startDate: paramStartDate.thisMonday(),
+    endDate: paramStartDate.thisSunday(),
+  });
+};
 
-  return useQuery({
-    queryKey: queryKeys({
-      userId: user,
-      language: languageCode,
-    }).user.planing(monday.save(), sunday.save()),
+// Días planificados entre dos fechas (ambas incluidas). Con un rango de lunes a domingo
+// comparte la clave con useFetchPlanning, así que las mutaciones también lo actualizan
+const planningForDateRangeOptions = ({
+  userId,
+  start,
+  end,
+}: {
+  userId: string | null;
+  start: string;
+  end: string;
+}) =>
+  queryOptions({
+    queryKey: queryKeys({ userId }).user.planing(start, end),
     queryFn: async () =>
       fetchPlanningWeek({
-        userId: user || "",
-        dateRange: { start: monday.save(), end: sunday.save() },
+        userId: userId || "",
+        dateRange: { start, end },
       }),
-    enabled: !!user,
+    enabled: !!userId,
     staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
+export const useFetchPlanningForDateRange = ({
+  startDate,
+  endDate,
+}: {
+  startDate: FromDate;
+  endDate: FromDate;
+}) => {
+  const user = useAppSelector((state) => state.config.selectedUserId);
+  return useQuery(
+    planningForDateRangeOptions({ userId: user, start: startDate.save(), end: endDate.save() }),
+  );
+};
+
+// Kcal ingeridas durante los entrenamientos (4 × HC de cada hora), por fecha ("YYYY-MM-DD")
+export const useFetchTrainingKcalForDateRange = ({
+  startDate,
+  endDate,
+}: {
+  startDate: FromDate;
+  endDate: FromDate;
+}) => {
+  const user = useAppSelector((state) => state.config.selectedUserId);
+  return useQuery({
+    ...planningForDateRangeOptions({ userId: user, start: startDate.save(), end: endDate.save() }),
+    select: (days) => kcalByDate(days, trainingIntakeKcal),
+  });
+};
+
+const SEARCH_LIMIT = 50;
+
+// Entre comillas dobles las comas y paréntesis del texto no rompen el filtro or() de PostgREST
+const orIlikeValue = (search: string) => `"%${search.replace(/[\\"]/g, "\\$&")}%"`;
+
+// Días del cliente cuyo comentario o evento contiene el texto, del más reciente al más antiguo
+export const useSearchPlanning = ({ search }: { search: string }) => {
+  const userId = useAppSelector((state) => state.config.selectedUserId);
+  const trimmed = search.trim();
+
+  return useQuery({
+    queryKey: queryKeys({ userId }).user.planingSearch(trimmed),
+    queryFn: async () => {
+      if (!userId) return [];
+      const value = orIlikeValue(trimmed);
+      const { data, error } = await supabase
+        .from(TABLE_USER_PLANING.NAME)
+        .select(selectFromPlaning())
+        .eq(TABLE_USER_PLANING.COLS.USER_ID, userId)
+        .or(
+          `${TABLE_USER_PLANING.COLS.COMMENT}.ilike.${value},${TABLE_USER_PLANING.COLS.EVENT}.ilike.${value}`,
+        )
+        .order(TABLE_USER_PLANING.COLS.DATE, { ascending: false })
+        .limit(SEARCH_LIMIT);
+      if (error) throw error;
+      return data || [];
+    },
+    // Sin texto la búsqueda devolvería todos los días
+    enabled: !!userId && trimmed !== "",
   });
 };
 

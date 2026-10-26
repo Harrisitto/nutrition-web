@@ -316,7 +316,6 @@
             "backToList": "Back to appointments",
             "previous": "Previous",
             "saveAndContinue": "Save and continue",
-            "finish": "Finish",
             "pointsLocked": "Save the appointment details first",
             "steps": {
                 "details": {
@@ -326,6 +325,10 @@
                 "points": {
                     "title": "Points to discuss",
                     "description": "Add points from the client's assigned themes or custom points. They are saved as you add them."
+                },
+                "history": {
+                    "title": "History",
+                    "description": "Review the client's planning, notes and measurements over a period. Click a search result to jump to its week."
                 }
             },
             "points": {
@@ -349,13 +352,59 @@
                 "markTreated": "Mark as discussed",
                 "unmarkTreated": "Unmark as discussed"
             },
+            "history": {
+                "period": "Period",
+                "noPlanning": "There is no planning in this period.",
+                "pages": {
+                    "planing": "Planning",
+                    "notes": "Notes",
+                    "measures": "Measurements"
+                },
+                "summary": "Period summary",
+                "mealsKcal": "Kcal from meals",
+                "trainingKcal": "Kcal during training",
+                "events": "Events",
+                "comments": "Comments",
+                "event": "Event",
+                "comment": "Comment",
+                "noEvents": "No events in this period.",
+                "noComments": "No comments in this period.",
+                "noNotes": "There are no notes in this period.",
+                "noMeasures": "There are no measurements in this period.",
+                "searchPlaning": "Search comments and events",
+                "searchNotes": "Search notes",
+                "searchMeasures": "Search a measurement",
+                "noResults": "No results.",
+                "goToWeek": "Go to the week of {{date}}",
+                "perWeek": "{{value}} per week",
+                "kcalPerDay": "kcal/day",
+                "plannedDays_one": "Daily average of the planned day in the period.",
+                "plannedDays_other": "Daily average of the {{count}} planned days in the period, with its weekly trend.",
+                "totalKcal": "Total kcal intake",
+                "racesKcal": "Kcal during races",
+                "balance": "Average kcal gained or lost per week",
+                "kcalPerWeek": "kcal/week",
+                "gained": "Gained",
+                "lost": "Lost",
+                "bmr": "BMR (basal metabolic rate): {{value}}",
+                "noBmr": "No BMR: the energy balance cannot be calculated.",
+                "newNote": "New note",
+                "notePlaceholder": "Write a note about the client...",
+                "addNote": "Add note",
+                "noteError": "The note could not be saved. Please try again."
+            },
             "errors": {
                 "duplicateDay": "There is already an appointment with this client on that day. Choose another date or edit the existing one.",
                 "duplicateUndated": "This client already has an appointment without a date. Give this one a date or add the points to the existing one.",
                 "save": "The appointment could not be saved.",
                 "load": "The appointment could not be loaded.",
-                "points": "The change to the points could not be saved."
-            }
+                "points": "The change to the points could not be saved.",
+                "status": "The appointment status could not be changed. Please try again."
+            },
+            "save": "Save",
+            "startAppointment": "Start appointment",
+            "finishAppointment": "Finish appointment",
+            "appointmentDone": "Appointment finished"
         },
         "pending": {
             "noDate": "Date to be decided",

@@ -21,16 +21,19 @@ type TrainingDay = {
 };
 
 /**
+ * Kcal ingeridas durante el entrenamiento de un día: 4 × HC de cada hora.
+ */
+export const trainingIntakeKcal = (day?: TrainingDay) =>
+  hcToKcal(
+    (day?.training_hc ?? []).reduce<number>((acc, hc) => acc + (hc || 0), 0),
+  );
+
+/**
  * Kcal netas del entrenamiento de un día: HC tomados durante el entrenamiento
  * menos el gasto del entrenamiento.
  */
-export const trainingNetKcal = (day?: TrainingDay) => {
-  const trainingHc = (day?.training_hc ?? []).reduce<number>(
-    (acc, hc) => acc + (hc || 0),
-    0,
-  );
-  return hcToKcal(trainingHc) - (day?.training_kcal || 0);
-};
+export const trainingNetKcal = (day?: TrainingDay) =>
+  trainingIntakeKcal(day) - (day?.training_kcal || 0);
 
 /**
  * Balance energético de un día sin contar las comidas: entrenamiento neto +
@@ -46,3 +49,18 @@ export const dayBalanceWithoutMeals = ({
   raceKcal: number;
   bmr: number;
 }) => trainingNetKcal(planning) + raceKcal - bmr;
+
+/**
+ * Suma las kcal de cada fila por su fecha ("YYYY-MM-DD"). Las filas sin fecha no cuentan.
+ */
+export const kcalByDate = <T extends { date: string | null }>(
+  rows: T[],
+  kcalOf: (row: T) => number,
+) => {
+  const totals = new Map<string, number>();
+  rows.forEach((row) => {
+    if (!row.date) return;
+    totals.set(row.date, (totals.get(row.date) ?? 0) + kcalOf(row));
+  });
+  return totals;
+};

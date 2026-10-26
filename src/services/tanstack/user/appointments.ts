@@ -8,6 +8,9 @@ import { queryClient } from "../queryClient";
 const APPOINTMENT_WITH_POINTS =
   '*, appointment_points(*, client_themes(theme_name)), user_appointment_points(*)';
 
+// Estados de una consulta: programada -> en curso (Empezar consulta) -> tratada (Terminar consulta)
+export type AppointmentStatus = "scheduled" | "in_progress" | "done";
+
 // Puntos del nutricionista (appointment_points) o temas del cliente (user_appointment_points)
 export type PointKind = "nutri" | "client";
 
@@ -74,7 +77,8 @@ export const useFetchClientPendingAppointments = () => {
         const response = await supabase.from('nutri_appointments')
         .select(APPOINTMENT_WITH_POINTS)
         .eq('user_id', clientId)
-        .eq('status', 'scheduled')
+        // Las empezadas siguen pendientes hasta terminarlas
+        .in('status', ['scheduled', 'in_progress'] satisfies AppointmentStatus[])
         // Por dias que faltan: primero las atrasadas, despues las proximas y al final las sin fecha
         .order('scheduled_on', { ascending: true, nullsFirst: false })
         .order('start_time', { ascending: true, nullsFirst: false })
@@ -330,6 +334,27 @@ export const useSaveAppointment = () => {
               .eq('id', id)
               .select()
               .single();
+
+        if (response.error) {
+          throw response.error;
+        }
+
+        return response.data;
+    },
+    onSuccess: () => invalidateClientAppointments(clientId),
+  });
+};
+
+export const useSetAppointmentStatus = () => {
+  const clientId = useAppSelector((state) => state.config.selectedUserId);
+
+  return useMutation({
+    mutationFn: async ({ id, status }: { id: number; status: AppointmentStatus }) => {
+        const response = await supabase.from('nutri_appointments')
+          .update({ status })
+          .eq('id', id)
+          .select()
+          .single();
 
         if (response.error) {
           throw response.error;

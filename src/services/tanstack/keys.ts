@@ -23,6 +23,8 @@ export const queryKeys = ({
       start,
       end,
     ],
+    // Mismo prefijo que la semana: invalidar planingBase refresca tambien las busquedas
+    planingSearch: (search: string) => ["user", "planing", userId, "search", search],
     mealsBase: ["user", "meals", userId],
     meals: (start: string, end: string) => [
       "user",
@@ -66,6 +68,8 @@ export const queryKeys = ({
       startDate.save(),
       endDate.save(),
     ],
+    // Fuera de measuresBase: las mutaciones de mediciones insertan en todas sus listas
+    measuresSearch: (search: string) => ["user", "measuresSearch", userId, language, search],
     appointments: {
       pendingClientPoints: ["user", "appointments", userId, "pendingClientPoints"],
       treatedClientPoints: ["user", "appointments", userId, "treatedClientPoints"],
@@ -78,6 +82,13 @@ export const queryKeys = ({
       // Prefijo de todas las anteriores: invalidarlo refresca todo lo de las consultas del cliente
       all: ["user", "appointments", userId],
 
+    },
+    notes: {
+      // Fechas "YYYY-MM-DD", ambas incluidas
+      range: (start: string, end: string) => ["user", "notes", userId, "range", start, end],
+      search: (search: string) => ["user", "notes", userId, "search", search],
+      // Prefijo de todas las anteriores
+      all: ["user", "notes", userId],
     },
   },
   data: {
