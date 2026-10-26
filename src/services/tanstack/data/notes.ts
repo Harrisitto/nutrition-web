@@ -4,6 +4,7 @@ import { queryKeys } from "../keys";
 import { queryClient } from "../queryClient";
 import { useAppSelector } from "../../../store/store";
 import FromDate from "@src/helpers/dates";
+import { useGetAuthInfo } from "../auth/get";
 
 // Invalida semanas y busquedas: una nota nueva o borrada puede aparecer en cualquiera
 // y el calendario del nutricionista
@@ -93,14 +94,14 @@ export const useSearchNutritionistNote = ({
     });
 };
 
-// Prioridad de una nota (columna priority): 0 normal, 1 alta, 2 urgente
-export const NOTE_PRIORITIES = [0, 1, 2] as const;
-export type NotePriority = (typeof NOTE_PRIORITIES)[number];
+// Prioridad de una nota (columna priority): entero de 0 (normal) a 10 (maxima)
+export const NOTE_PRIORITY_MIN = 0;
+export const NOTE_PRIORITY_MAX = 10;
 
 // Lo que se escribe en el formulario de la nota
 export type NoteFields = {
     note: string;
-    priority: NotePriority;
+    priority: number;
     // "YYYY-MM-DD" o null: dia en que hay que tenerla en cuenta (sale en el calendario)
     scheduled_date: string | null;
 };
@@ -161,5 +162,39 @@ export const useDeleteNutritionistNote = () => {
             return response.data;
         },
         onSuccess: (note) => invalidateClientNotes(note.user_id),
+    });
+};
+
+// Notas programadas para date ("YYYY-MM-DD") de todos los clientes del nutricionista, con el
+// nombre del cliente y de mayor a menor prioridad
+export const useFetchScheduledNutritionistNotes = ({
+    date,
+}: {
+    date: string;
+}) => {
+    const infoQuery = useGetAuthInfo();
+    const nutritionistId = infoQuery.data?.nutri_id ?? null;
+
+    return useQuery({
+        queryKey: queryKeys({ userId: nutritionistId }).nutritionist.notes.scheduled(date),
+        queryFn: async () => {
+            if (!nutritionistId) {
+                throw new Error("Nutritionist ID is not defined");
+            }
+
+            const response = await supabase.from('client_notes')
+                .select('*, client: all_users(name)')
+                .eq('nutri_id', nutritionistId)
+                .eq('scheduled_date', date)
+                .order('priority', { ascending: false })
+                .order('created_at');
+
+            if (response.error) {
+                throw response.error;
+            }
+
+            return response.data;
+        },
+        enabled: !!nutritionistId,
     });
 };

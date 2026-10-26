@@ -546,9 +546,10 @@
         "nextMonth": "Mes siguiente",
         "today": "Hoy",
         "appointments": "Consultas pendientes",
-        "notes": "Notas",
+        "scheduledNotes": "Notas programadas",
+        "noScheduledNotes": "No hay notas programadas para este día.",
+        "writtenNotes": "Notas escritas este día",
         "noAppointments": "No hay consultas pendientes este día.",
-        "noNotes": "No hay notas este día.",
         "inProgress": "En curso",
         "late": "Atrasada",
         "noTime": "Sin hora",
@@ -559,8 +560,7 @@
         "notesCount_other": "{{count}} notas",
         "errors": {
             "load": "No se ha podido cargar el calendario. Inténtalo de nuevo."
-        },
-        "priorityNotes": "Tiene notas prioritarias"
+        }
     },
     "notes": {
         "new": "Nueva nota",
@@ -568,11 +568,8 @@
         "add": "Añadir nota",
         "error": "No se ha podido guardar la nota. Inténtalo de nuevo.",
         "priority": "Prioridad",
-        "priorities": {
-            "normal": "Normal",
-            "high": "Alta",
-            "urgent": "Urgente"
-        },
+        "priorityDecrease": "Bajar prioridad",
+        "priorityIncrease": "Subir prioridad",
         "scheduledDate": "Fecha (opcional)",
         "scheduledFor": "Para el {{date}}",
         "edit": "Editar nota",

@@ -2,16 +2,26 @@ import { useTranslation } from "react-i18next";
 import { Flag, StickyNote } from "lucide-react";
 import FromDate from "@src/helpers/dates";
 import { useDaysOfWeek } from "@src/hooks/helpers/language";
+import { priorityClassName } from "../../@components/notes/priority";
 import { formatTime, type CalendarAppointment, type CalendarNote } from "./calendarDays";
 
-// Consultas que caben en una celda; el resto se resume en "+N"
+// Consultas y notas programadas que caben en una celda; el resto se resume en "+N"
 const MAX_CHIPS = 2;
+const MAX_NOTE_CHIPS = 2;
+
+// Punto de la celda en movil: el color de la nota programada mas prioritaria
+const noteDotClassName = (priority: number) => {
+  if (priority >= 8) return "bg-red-500";
+  if (priority >= 5) return "bg-amber-500";
+  return "bg-text-muted";
+};
 
 export const MonthGrid = ({
   month,
   days,
   appointmentsByDay,
-  notesByDay,
+  scheduledNotesByDay,
+  writtenNotesByDay,
   selectedDay,
   onSelectDay,
 }: {
@@ -19,7 +29,9 @@ export const MonthGrid = ({
   month: string;
   days: FromDate[];
   appointmentsByDay: Map<string, CalendarAppointment[]>;
-  notesByDay: Map<string, CalendarNote[]>;
+  // Ordenadas de mayor a menor prioridad (como vienen de la query)
+  scheduledNotesByDay: Map<string, CalendarNote[]>;
+  writtenNotesByDay: Map<string, CalendarNote[]>;
   selectedDay: string;
   onSelectDay: (day: string) => void;
 }) => {
@@ -38,7 +50,8 @@ export const MonthGrid = ({
       {days.map((day) => {
         const key = day.save();
         const appointments = appointmentsByDay.get(key) ?? [];
-        const notes = notesByDay.get(key) ?? [];
+        const scheduledNotes = scheduledNotesByDay.get(key) ?? [];
+        const writtenNotes = writtenNotesByDay.get(key) ?? [];
         const isSelected = key === selectedDay;
         const isOtherMonth = day.saveMonth() !== month;
         const isToday = key === today;
@@ -68,7 +81,11 @@ export const MonthGrid = ({
               {appointments.map((appointment) => (
                 <span key={appointment.id} className="h-1.5 w-1.5 rounded-full bg-nutrition-green" />
               ))}
-              {notes.length > 0 && <span className="h-1.5 w-1.5 rounded-full bg-text-muted" />}
+              {scheduledNotes.length > 0 && (
+                <span
+                  className={`h-1.5 w-1.5 rounded-full ${noteDotClassName(scheduledNotes[0].priority)}`}
+                />
+              )}
             </span>
 
             <span className="hidden flex-col gap-0.5 sm:flex">
@@ -91,18 +108,33 @@ export const MonthGrid = ({
                   {t("data:calendar.more", { count: appointments.length - MAX_CHIPS })}
                 </span>
               )}
-              {notes.length > 0 && (
+              {scheduledNotes.slice(0, MAX_NOTE_CHIPS).map((note) => (
+                <span
+                  key={note.id}
+                  className={`inline-flex min-w-0 items-center gap-1 rounded px-1 py-0.5 text-[11px] font-medium ${priorityClassName(note.priority)}`}
+                  title={note.note}
+                >
+                  {note.priority > 0 ? (
+                    <>
+                      <Flag size={10} className="shrink-0" aria-hidden />
+                      <span className="shrink-0 font-bold tabular-nums">{note.priority}</span>
+                    </>
+                  ) : (
+                    <StickyNote size={10} className="shrink-0" aria-hidden />
+                  )}
+                  <span className="truncate">{note.client?.name}</span>
+                </span>
+              ))}
+              {scheduledNotes.length > MAX_NOTE_CHIPS && (
+                <span className="text-[11px] text-text-muted">
+                  {t("data:calendar.more", { count: scheduledNotes.length - MAX_NOTE_CHIPS })}
+                </span>
+              )}
+              {/* Las escritas sin fecha no se resaltan: solo cuantas hay */}
+              {writtenNotes.length > 0 && (
                 <span className="inline-flex items-center gap-1 text-[11px] text-text-muted">
                   <StickyNote size={12} />
-                  {t("data:calendar.notesCount", { count: notes.length })}
-                  {/* Alguna alta o urgente: el detalle del dia dice cual */}
-                  {notes.some((note) => note.priority > 0) && (
-                    <Flag
-                      size={12}
-                      className="text-red-600"
-                      aria-label={t("data:calendar.priorityNotes")}
-                    />
-                  )}
+                  {t("data:calendar.notesCount", { count: writtenNotes.length })}
                 </span>
               )}
             </span>

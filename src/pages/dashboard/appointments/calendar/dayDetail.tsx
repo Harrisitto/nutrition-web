@@ -11,21 +11,25 @@ import {
   listItemStyle,
   pointTagStyle,
 } from "../../races/components/formStyles";
+import { useFetchScheduledNutritionistNotes } from "@src/services/tanstack/data/notes";
 import { NoteItem } from "../../@components/notes/noteItem";
 import { formatTime, type CalendarAppointment, type CalendarNote } from "./calendarDays";
 
-// Consultas pendientes y notas del dia elegido, de todos los clientes
+// Consultas pendientes y notas del dia elegido, de todos los clientes: las programadas para ese
+// dia y las escritas ese dia sin fecha
 export const DayDetail = ({
   day,
   appointments,
-  notes,
+  writtenNotes,
 }: {
   // "YYYY-MM-DD"
   day: string;
   appointments: CalendarAppointment[];
-  notes: CalendarNote[];
+  writtenNotes: CalendarNote[];
 }) => {
   const { t } = useTranslation();
+  const scheduledQuery = useFetchScheduledNutritionistNotes({ date: day });
+  const scheduledNotes = scheduledQuery.data ?? [];
   const language = useLanguageCode();
   const dispatch = useAppDispatch();
   const { navigateTo } = useAppNavigation();
@@ -91,13 +95,21 @@ export const DayDetail = ({
       </section>
 
       <section className="flex flex-col gap-2">
-        <h3 className="text-sm font-semibold text-text-title">{t("data:calendar.notes")}</h3>
-        {notes.length === 0 ? (
-          <p className={emptyTextStyle}>{t("data:calendar.noNotes")}</p>
+        <h3 className="text-sm font-semibold text-text-title">
+          {t("data:calendar.scheduledNotes")}
+        </h3>
+        {scheduledQuery.isError ? (
+          <p className="text-sm text-red-500" role="alert">
+            {t("data:calendar.errors.load")}
+          </p>
+        ) : scheduledNotes.length === 0 ? (
+          !scheduledQuery.isPending && (
+            <p className={emptyTextStyle}>{t("data:calendar.noScheduledNotes")}</p>
+          )
         ) : (
           <ul className="flex flex-col gap-2">
             {/* Ya vienen de la query de mayor a menor prioridad */}
-            {notes.map((note) => (
+            {scheduledNotes.map((note) => (
               <li key={note.id}>
                 <NoteItem note={note} />
               </li>
@@ -105,6 +117,22 @@ export const DayDetail = ({
           </ul>
         )}
       </section>
+
+      {/* Sin fecha programada: salen el dia en que se escribieron. Si no hay, no ocupan sitio */}
+      {writtenNotes.length > 0 && (
+        <section className="flex flex-col gap-2">
+          <h3 className="text-sm font-semibold text-text-title">
+            {t("data:calendar.writtenNotes")}
+          </h3>
+          <ul className="flex flex-col gap-2">
+            {writtenNotes.map((note) => (
+              <li key={note.id}>
+                <NoteItem note={note} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </div>
   );
 };

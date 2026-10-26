@@ -97,6 +97,10 @@ export const queryKeys = ({
     calendarBase: ["nutritionist", "calendar"],
     calendarNotes: (start: string, end: string) => ["nutritionist", "calendar", userId, "notes", start, end],
     calendarAppointments: (start: string, end: string) => ["nutritionist", "calendar", userId, "appointments", start, end],
+    notes: {
+      // Bajo calendarBase: cualquier mutacion de notas la refresca. Fecha "YYYY-MM-DD"
+      scheduled: (date: string) => ["nutritionist", "calendar", userId, "scheduled", date],
+    },
   },
   data: {
     meals: ["data", "meals", language],

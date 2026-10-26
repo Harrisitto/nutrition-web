@@ -26,10 +26,11 @@ const PageAppointmentsCalendar = () => {
   const notesQuery = useFetchCalendarNotes({ startDate: start, endDate: end });
 
   const appointmentsByDay = groupByDay(appointmentsQuery.data ?? [], (row) => row.scheduled_on);
-  // Las programadas van a su dia; las demas al dia (local) en que se crearon
-  const notesByDay = groupByDay(
-    notesQuery.data ?? [],
-    (row) => row.scheduled_date ?? new FromDate(row.created_at).save(),
+  // Las programadas van a su dia y se resaltan por prioridad; las demas al dia (local) en que
+  // se crearon
+  const scheduledNotesByDay = groupByDay(notesQuery.data ?? [], (row) => row.scheduled_date);
+  const writtenNotesByDay = groupByDay(notesQuery.data ?? [], (row) =>
+    row.scheduled_date ? null : new FromDate(row.created_at).save(),
   );
 
   // Un dia de otro mes de la cuadricula lleva a ese mes
@@ -96,7 +97,8 @@ const PageAppointmentsCalendar = () => {
             month={month}
             days={days}
             appointmentsByDay={appointmentsByDay}
-            notesByDay={notesByDay}
+            scheduledNotesByDay={scheduledNotesByDay}
+            writtenNotesByDay={writtenNotesByDay}
             selectedDay={selectedDay}
             onSelectDay={selectDay}
           />
@@ -106,7 +108,7 @@ const PageAppointmentsCalendar = () => {
           <DayDetail
             day={selectedDay}
             appointments={appointmentsByDay.get(selectedDay) ?? []}
-            notes={notesByDay.get(selectedDay) ?? []}
+            writtenNotes={writtenNotesByDay.get(selectedDay) ?? []}
           />
         </section>
       </div>

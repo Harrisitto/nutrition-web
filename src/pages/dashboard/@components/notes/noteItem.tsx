@@ -9,7 +9,6 @@ import {
   useDeleteNutritionistNote,
   useMutateNutritionistNote,
   type NoteFields,
-  type NotePriority,
 } from "@src/services/tanstack/data/notes";
 import {
   listItemStyle,
@@ -31,7 +30,7 @@ export const NoteItem = ({ note }: { note: Note }) => {
   const [mode, setMode] = useState<"view" | "edit" | "confirmDelete">("view");
   const [fields, setFields] = useState<NoteFields>({
     note: note.note,
-    priority: note.priority as NotePriority,
+    priority: note.priority,
     scheduled_date: note.scheduled_date,
   });
   const saveNote = useMutateNutritionistNote();
@@ -41,7 +40,7 @@ export const NoteItem = ({ note }: { note: Note }) => {
     // Parte siempre de lo guardado, no de una edicion cancelada
     setFields({
       note: note.note,
-      priority: note.priority as NotePriority,
+      priority: note.priority,
       scheduled_date: note.scheduled_date,
     });
     setMode("edit");
@@ -87,7 +86,7 @@ export const NoteItem = ({ note }: { note: Note }) => {
     <div className={`flex flex-col gap-1 ${listItemStyle()}`}>
       <div className="flex flex-wrap items-center gap-2">
         {note.client && <span className={pointTagStyle}>{note.client.name}</span>}
-        <PriorityTag priority={note.priority as NotePriority} />
+        <PriorityTag priority={note.priority} />
         {note.scheduled_date ? (
           <span className="inline-flex items-center gap-1 text-xs text-text-muted">
             <CalendarClock size={12} />

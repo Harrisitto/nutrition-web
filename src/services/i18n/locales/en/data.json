@@ -546,9 +546,10 @@
         "nextMonth": "Next month",
         "today": "Today",
         "appointments": "Pending appointments",
-        "notes": "Notes",
+        "scheduledNotes": "Scheduled notes",
+        "noScheduledNotes": "No notes scheduled for this day.",
+        "writtenNotes": "Notes written this day",
         "noAppointments": "No pending appointments this day.",
-        "noNotes": "No notes this day.",
         "inProgress": "In progress",
         "late": "Overdue",
         "noTime": "No time",
@@ -559,8 +560,7 @@
         "notesCount_other": "{{count}} notes",
         "errors": {
             "load": "The calendar could not be loaded. Please try again."
-        },
-        "priorityNotes": "Has priority notes"
+        }
     },
     "notes": {
         "new": "New note",
@@ -568,11 +568,8 @@
         "add": "Add note",
         "error": "The note could not be saved. Please try again.",
         "priority": "Priority",
-        "priorities": {
-            "normal": "Normal",
-            "high": "High",
-            "urgent": "Urgent"
-        },
+        "priorityDecrease": "Lower priority",
+        "priorityIncrease": "Raise priority",
         "scheduledDate": "Date (optional)",
         "scheduledFor": "For {{date}}",
         "edit": "Edit note",
