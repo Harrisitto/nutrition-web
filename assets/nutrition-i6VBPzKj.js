@@ -1,0 +1,1 @@
+function i(t){return t}const e=4,s=t=>t*e,u=(t,n)=>t.reduce((a,c)=>a+c.amount*(n(c)??0),0),r=t=>s((t?.training_hc??[]).reduce((n,a)=>n+(a||0),0)),o=t=>r(t)-(t?.training_kcal||0),l=({planning:t,raceKcal:n,bmr:a})=>o(t)+n-a,d=(t,n)=>{const a=new Map;return t.forEach(c=>{c.date&&a.set(c.date,(a.get(c.date)??0)+n(c))}),a};export{l as d,s as h,d as k,i as q,u as r,r as t};

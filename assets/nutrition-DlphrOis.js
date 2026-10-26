@@ -1,1 +1,0 @@
-const r=c=>c*4,s=(c,n)=>c.reduce((t,a)=>t+a.amount*(n(a)??0),0),o=c=>{const n=(c?.training_hc??[]).reduce((t,a)=>t+(a||0),0);return r(n)-(c?.training_kcal||0)},e=({planning:c,raceKcal:n,bmr:t})=>o(c)+n-t;export{e as d,r as h,s as r};
