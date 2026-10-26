@@ -18,7 +18,13 @@ const daysUntil = (date: string) => {
     return Math.round((new FromDate(date).getTime() - today.getTime()) / DAY_MS);
 };
 
-const AppointmentDate = ({ scheduledOn }: { scheduledOn: string | null }) => {
+const AppointmentDate = ({
+    scheduledOn,
+    startTime,
+}: {
+    scheduledOn: string | null;
+    startTime: string | null;
+}) => {
     const { t } = useTranslation();
     const language = useLanguageCode();
 
@@ -49,7 +55,10 @@ const AppointmentDate = ({ scheduledOn }: { scheduledOn: string | null }) => {
                     </span>
                 </>
             )}
-            <span className={itemStyles.dateLabel}>{formattedDate}</span>
+            <span className={itemStyles.dateLabel}>
+                {/* start_time es time ("HH:MM:SS"): se muestra sin segundos */}
+                {startTime ? `${formattedDate} · ${startTime.slice(0, 5)}` : formattedDate}
+            </span>
         </div>
     );
 };
@@ -97,7 +106,7 @@ export const PendingAppointmentItem = ({ appointment }: { appointment: PendingAp
                                 : "data:appointments.pending.undatedTitle",
                         )}
                 </h2>
-                <AppointmentDate scheduledOn={appointment.scheduled_on} />
+                <AppointmentDate scheduledOn={appointment.scheduled_on} startTime={appointment.start_time} />
             </header>
 
             {points.length === 0 ? (

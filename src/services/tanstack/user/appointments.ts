@@ -299,8 +299,12 @@ export const useFetchPendingPoints = ({ enabled }: { enabled: boolean }) => {
   });
 };
 
+// Tambien el calendario del nutricionista, que muestra las consultas de todos sus clientes
 const invalidateClientAppointments = (clientId: string | null) =>
-  queryClient.invalidateQueries({ queryKey: queryKeys({ userId: clientId }).user.appointments.all });
+  Promise.all([
+    queryClient.invalidateQueries({ queryKey: queryKeys({ userId: clientId }).user.appointments.all }),
+    queryClient.invalidateQueries({ queryKey: queryKeys().nutritionist.calendarBase }),
+  ]);
 
 // id null = consulta nueva. Devuelve la consulta guardada
 export const useSaveAppointment = () => {
@@ -311,12 +315,15 @@ export const useSaveAppointment = () => {
       id,
       description,
       scheduled_on,
+      start_time,
       video_url,
     }: {
       id: number | null;
       // null = sin nombre: la lista muestra uno por defecto
       description: string | null;
       scheduled_on: string | null;
+      // "HH:MM" o null (sin hora)
+      start_time: string | null;
       // Solo https:// (CHECK de la tabla)
       video_url: string | null;
     }) => {
@@ -326,11 +333,11 @@ export const useSaveAppointment = () => {
 
         const response = id === null
           ? await supabase.from('nutri_appointments')
-              .insert({ user_id: clientId, description, scheduled_on, video_url })
+              .insert({ user_id: clientId, description, scheduled_on, start_time, video_url })
               .select()
               .single()
           : await supabase.from('nutri_appointments')
-              .update({ description, scheduled_on, video_url })
+              .update({ description, scheduled_on, start_time, video_url })
               .eq('id', id)
               .select()
               .single();

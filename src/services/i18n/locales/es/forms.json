@@ -67,8 +67,12 @@
     "appointments": {
         "fields": {
             "name": "Nombre de la consulta (obligatorio con fecha)",
-            "scheduledOn": "Fecha (opcional)",            "videoUrl": "Enlace de la videollamada (opcional)"
-        },        "errors": {            "videoUrl": "El enlace tiene que empezar por https://"
+            "scheduledOn": "Fecha (opcional)",
+            "videoUrl": "Enlace de la videollamada (opcional)",
+            "startTime": "Hora (opcional)"
+        },
+        "errors": {
+            "videoUrl": "El enlace tiene que empezar por https://"
         }
     },
     "appointmentThemes": {

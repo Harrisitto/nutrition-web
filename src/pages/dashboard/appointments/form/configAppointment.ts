@@ -11,6 +11,7 @@ export const fieldIds = {
   name: "name",
   scheduledOn: "scheduledOn",
   videoUrl: "videoUrl",
+  startTime: "startTime",
 } as const;
 
 // El nombre se guarda en nutri_appointments.description (titulo de la consulta). Obligatorio solo
@@ -57,6 +58,17 @@ const createVideoUrlField = (currentValue: string) =>
     },
   }) as InputState<"text">;
 
+// Opcional: "" = sin hora (start_time null). Sin fecha no se guarda
+const createStartTimeField = (label: string, currentValue: string) =>
+  ({
+    id: fieldIds.startTime,
+    type: "time",
+    currentValue,
+    inputProps: {
+      label, // time inputs render the label as is, so it arrives translated
+    },
+  }) as InputState<"time">;
+
 // appointment undefined = consulta nueva (o aun cargando): campos vacios
 const useConfig = (appointment: Appointment | undefined) => {
   const { t } = useTranslation();
@@ -64,6 +76,8 @@ const useConfig = (appointment: Appointment | undefined) => {
   const description = appointment?.description ?? "";
   const scheduledOn = appointment?.scheduled_on ?? "";
   const videoUrl = appointment?.video_url ?? "";
+  // La columna es time: llega como "HH:MM:SS" y el input usa "HH:MM"
+  const startTime = appointment?.start_time?.slice(0, 5) ?? "";
 
   return useMemo(
     () =>
@@ -71,8 +85,9 @@ const useConfig = (appointment: Appointment | undefined) => {
         createNameField(description),
         createScheduledOnField(t("forms:appointments.fields.scheduledOn"), scheduledOn),
         createVideoUrlField(videoUrl),
-      ] as InputState<"text" | "date">[],
-    [t, description, scheduledOn, videoUrl],
+        createStartTimeField(t("forms:appointments.fields.startTime"), startTime),
+      ] as InputState<"text" | "date" | "time">[],
+    [t, description, scheduledOn, videoUrl, startTime],
   );
 };
 

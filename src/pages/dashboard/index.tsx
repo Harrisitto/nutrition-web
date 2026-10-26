@@ -16,6 +16,7 @@ const PagePlaningForm = lazy(() => import("./planing/index"));
 const PageNutriRaces = lazy(() => import("./races/index"));
 const PageAppointments = lazy(() => import("./appointments/view/index"));
 const PageAppointmentForm = lazy(() => import("./appointments/form/index"));
+const PageAppointmentsCalendar = lazy(() => import("./appointments/calendar/index"));
 
 const ScreenNoClients = lazy(
   () => import("./@components/noClientsScreen/index"),
@@ -120,10 +121,12 @@ export default function PageDashboard() {
             path={getTrailingRoute(APP_ROUTES.FORM_APPOINTMENT)}
             element={<PageAppointmentForm />}
           />
+          <Route
+            path={getTrailingRoute(APP_ROUTES.APPOINTMENTS_CALENDAR)}
+            element={<PageAppointmentsCalendar />}
+          />
           {/*
           Falta por hacer la pagina que vera el nutricionista cuando este en una consulta, ( con busqueda de comentarios, eventos, los puntos de la consulta, para poner el enlace a la videollamada...)
-          Y el calendario de consultas, al que podra acceder con otro icono en la barra lateral izquierda.
-          Falta tambien poner la hora a la consulta en el formulario para crear una nueva.
           Tambien podemos hacer una tabla que ponga nutritionist availability y client availability? Preguntar a martin cual es la mejor forma de agendar consultas.
           */}
         </Routes>

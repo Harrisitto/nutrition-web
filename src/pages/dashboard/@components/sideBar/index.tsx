@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from "@src/store/store";
 import { setSidebarOpen } from "@src/store/slices/config/store";
 import { useCallback } from "react";
 import {
+  NavigateCalendar,
   NavigateConfiguration,
   NavigateDashboard,
   NavigateHomePage,
@@ -29,6 +30,7 @@ const AppDashboard = ({ children }: { children?: React.ReactNode }) => {
         onMouseLeave={() => toggleSidebarOpen(false)}
       >
         <NavigateDashboard />
+        <NavigateCalendar />
         <NavigateHomePage />
         <NavigateConfiguration />
         <SidebarUserList />

@@ -79,6 +79,8 @@ const FormAppointment = () => {
         id: isUndatedEntry && scheduledOn !== null ? null : appointmentId,
         description: name || null,
         scheduled_on: scheduledOn,
+        // Una hora sin dia no tiene sentido: sin fecha se guarda sin hora
+        start_time: scheduledOn !== null ? (state[fieldIds.startTime] as string) || null : null,
         video_url: (state[fieldIds.videoUrl] as string).trim() || null,
       },
       {

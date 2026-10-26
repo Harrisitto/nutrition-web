@@ -91,6 +91,13 @@ export const queryKeys = ({
       all: ["user", "notes", userId],
     },
   },
+  // userId = el nutricionista: notas y consultas de todos sus clientes
+  nutritionist: {
+    // Prefijo sin userId: las mutaciones de cualquier cliente lo invalidan
+    calendarBase: ["nutritionist", "calendar"],
+    calendarNotes: (start: string, end: string) => ["nutritionist", "calendar", userId, "notes", start, end],
+    calendarAppointments: (start: string, end: string) => ["nutritionist", "calendar", userId, "appointments", start, end],
+  },
   data: {
     meals: ["data", "meals", language],
     allTypes: ["data", "allTypes", language],

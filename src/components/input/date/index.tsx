@@ -37,6 +37,27 @@ export const SingleDate = ({
     );
 };
 
+// Valor en formato "HH:MM"
+export const SingleTime = ({
+    label,
+    value,
+    onChange,
+    ...props
+}: SingleDateProps) => {
+    return (
+        <label className="flex flex-col gap-2">
+            {label && <span className="text-sm text-gray-blue-600">{label}</span>}
+            <input
+                type="time"
+                {...props}
+                value={value}
+                className="w-full px-3 py-2 rounded-md bg-gray-blue-50 border border-gray-blue-300 text-gray-blue-700 focus:outline-none focus:ring-2 focus:ring-gray-blue-400 focus:border-gray-blue-500"
+                onChange={(e) => onChange(e.target.value)}
+            />
+        </label>
+    );
+};
+
 export const RangeDate = ({
     label,
     onChange,

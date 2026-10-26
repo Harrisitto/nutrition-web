@@ -14,6 +14,7 @@ import {
 } from "./@components/header/fields";
 import { WeeklyMeals } from "./@components/table";
 import ChartsAppointmentProgress from "./@components/appointmentProgress";
+import { AddNoteForm } from "../@components/notes/addNoteForm";
 
 const PagePlaningForm = () => {
   return (
@@ -38,6 +39,8 @@ const PagePlaningForm = () => {
           <div className="flex flex-row flex-wrap gap-2">
             <ChartsAppointmentProgress />
           </div>
+          {/* Nota suelta del cliente: sin consulta */}
+          <AddNoteForm appointmentId={null} />
         </div>
         <SelectDateCalendar />
       </div>

@@ -7,6 +7,7 @@ import {
   SettingsIcon,
   InfoIcon,
   HouseIcon,
+  CalendarDaysIcon,
   type LucideIcon,
 } from "lucide-react";
 
@@ -71,6 +72,14 @@ export const NavigateDashboard = () => (
     labelKey="data:dashboardTable.navigation.dashboard"
     icon={HouseIcon}
     exact
+  />
+);
+
+export const NavigateCalendar = () => (
+  <SidebarNavItem
+    to={APP_ROUTES.APPOINTMENTS_CALENDAR}
+    labelKey="data:dashboardTable.navigation.calendar"
+    icon={CalendarDaysIcon}
   />
 );
 

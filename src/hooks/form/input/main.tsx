@@ -83,6 +83,18 @@ const SwitchField = ({
         />
       );
     }
+    case "time": {
+      const thisField = field as FormFieldUpdate<"time">;
+      return (
+        <InputComponent.Date.SingleTime
+          label={thisField.inputProps?.label ?? ""}
+          value={thisField.currentValue}
+          onChange={(newValue) => {
+            form.requestUpdate(id, newValue);
+          }}
+        />
+      );
+    }
     case "dateRange": {
       const thisField = field as FormFieldUpdate<"dateRange">;
       return (

@@ -24,6 +24,7 @@ export const APP_ROUTES = {
   FORM_MEASURE: "/dashboard/form-measure",
   FORM_APPOINTMENT: "/dashboard/form-appointment",
   APPOINTMENTS: "/dashboard/appointments",
+  APPOINTMENTS_CALENDAR: "/dashboard/calendar",
   RACES: "/dashboard/races",
 
 

@@ -30,6 +30,12 @@ interface InputTypes {
     };
     value: string; // ISO date string (e.g., "2024-01-31")
   };
+  time: {
+    props: {
+      label?: string;
+    };
+    value: string; // "HH:MM"
+  };
   dateRange: {
     props: {
       label?: string;

@@ -11,7 +11,7 @@ import {
   type HistoryItem,
   type HistoryPageProps,
 } from "../shared/components";
-import { AddNoteForm } from "./addNoteForm";
+import { AddNoteForm } from "../../../../../@components/notes/addNoteForm";
 
 type Note = NonNullable<ReturnType<typeof useFetchNutritionistNotesForDateRange>["data"]>[number];
 

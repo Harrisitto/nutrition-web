@@ -25,7 +25,6 @@
             "fat": "Fat",
             "protein": "Protein",
             "macro": "Macro",
-
             "submit": "Save Preset"
         }
     },
@@ -68,8 +67,12 @@
     "appointments": {
         "fields": {
             "name": "Appointment name (required with a date)",
-            "scheduledOn": "Date (optional)",            "videoUrl": "Video call link (optional)"
-        },        "errors": {            "videoUrl": "The link has to start with https://"
+            "scheduledOn": "Date (optional)",
+            "videoUrl": "Video call link (optional)",
+            "startTime": "Time (optional)"
+        },
+        "errors": {
+            "videoUrl": "The link has to start with https://"
         }
     },
     "appointmentThemes": {
