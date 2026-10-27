@@ -1,12 +1,16 @@
 import { useTranslation } from "react-i18next";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import FromDate from "@src/helpers/dates";
 import { useLanguageCode } from "@src/hooks/helpers/language";
-import { cardStyle, primaryButtonStyle } from "@src/components/styles";
+import { cardStyle, deleteButtonStyle, primaryButtonStyle } from "@src/components/styles";
 import { pointTagStyle } from "../../races/components/formStyles";
 import useAppNavigation from "@src/hooks/navigation";
 import { APP_ROUTES } from "@src/hooks/navigation/routes";
-import type { useFetchClientPendingAppointments } from "../../../../services/tanstack/user/appointments";
+import { useNotification } from "@src/store/slices/notification/hook";
+import {
+    useDeleteAppointment,
+    type useFetchClientPendingAppointments,
+} from "../../../../services/tanstack/user/appointments";
 
 type PendingAppointment = NonNullable<ReturnType<typeof useFetchClientPendingAppointments>["data"]>[0];
 
@@ -66,6 +70,8 @@ const AppointmentDate = ({
 export const PendingAppointmentItem = ({ appointment }: { appointment: PendingAppointment }) => {
     const { t } = useTranslation();
     const { navigateTo } = useAppNavigation();
+    const { add: addNotification } = useNotification();
+    const { mutate: deleteAppointment, isPending: isDeleting } = useDeleteAppointment();
 
     // Primero los puntos del nutricionista y despues los del cliente, cada uno por su position
     // (ya ordenados por la query)
@@ -94,6 +100,22 @@ export const PendingAppointmentItem = ({ appointment }: { appointment: PendingAp
         (appointment.scheduled_on
             ? [...themeNames].sort((a, b) => a.localeCompare(b)).join(", ")
             : "");
+
+    const onDelete = () => {
+        if (!window.confirm(t("data:appointments.pending.confirmDelete"))) return;
+        deleteAppointment(appointment.id, {
+            // 23503: la FK de sus puntos no deja borrarla mientras tenga alguno
+            onError: (error) =>
+                addNotification({
+                    type: "error",
+                    message:
+                        "code" in error && error.code === "23503"
+                            ? "data:appointments.pending.deleteHasPoints"
+                            : "data:appointments.pending.deleteError",
+                    duration: 6000,
+                }),
+        });
+    };
 
     return (
         <article className={itemStyles.card}>
@@ -132,6 +154,16 @@ export const PendingAppointmentItem = ({ appointment }: { appointment: PendingAp
                 >
                     <Pencil size={16} />
                     {t("data:appointments.pending.edit")}
+                </button>
+                <button
+                    type="button"
+                    title={t("data:appointments.pending.delete")}
+                    aria-label={t("data:appointments.pending.delete")}
+                    disabled={isDeleting}
+                    onClick={onDelete}
+                    className={`${deleteButtonStyle} ml-auto`}
+                >
+                    <Trash2 size={16} />
                 </button>
             </footer>
         </article>

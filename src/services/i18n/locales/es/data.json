@@ -414,7 +414,11 @@
             "untitled": "Consulta",
             "noPoints": "Todavía no hay puntos que tratar",
             "edit": "Gestionar consulta",
-            "clientPoint": "Propuesto por el cliente"
+            "clientPoint": "Propuesto por el cliente",
+            "delete": "Eliminar consulta",
+            "confirmDelete": "¿Eliminar esta consulta? No se puede deshacer.",
+            "deleteError": "No se ha podido eliminar la consulta. Inténtalo de nuevo.",
+            "deleteHasPoints": "No se puede eliminar una consulta que todavía tiene puntos. Quítalos o muévelos a otra consulta primero."
         }
     },
     "races": {

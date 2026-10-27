@@ -414,7 +414,11 @@
             "untitled": "Appointment",
             "noPoints": "No points to discuss yet",
             "edit": "Manage appointment",
-            "clientPoint": "Suggested by the client"
+            "clientPoint": "Suggested by the client",
+            "delete": "Delete appointment",
+            "confirmDelete": "Delete this appointment? This cannot be undone.",
+            "deleteError": "The appointment could not be deleted. Please try again.",
+            "deleteHasPoints": "An appointment that still has points cannot be deleted. Remove them or move them to another appointment first."
         }
     },
     "races": {

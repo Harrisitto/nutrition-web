@@ -373,6 +373,28 @@ export const useSetAppointmentStatus = () => {
   });
 };
 
+// .single(): si RLS no deja borrarla no hay fila y da error en vez de no hacer nada
+export const useDeleteAppointment = () => {
+  const clientId = useAppSelector((state) => state.config.selectedUserId);
+
+  return useMutation({
+    mutationFn: async (appointmentId: number) => {
+        const response = await supabase.from('nutri_appointments')
+          .delete()
+          .eq('id', appointmentId)
+          .select()
+          .single();
+
+        if (response.error) {
+          throw response.error;
+        }
+
+        return response.data;
+    },
+    onSuccess: () => invalidateClientAppointments(clientId),
+  });
+};
+
 // Punto del nutricionista en una consulta: personalizado (sin client_theme_id) o de una
 // tematica asignada (con client_theme_id y theme_point_id)
 export const useInsertAppointmentPointToAppointment = () => {

@@ -14,6 +14,10 @@
         "search": "Buscar",
         "noResults": "Sin resultados"
     },
+    "dateRange": {
+        "start": "Fecha de inicio",
+        "end": "Fecha de fin"
+    },
     "form": {
         "invalidEmail": "Ingresa una direccion de correo valida",
         "minLength": "Se necesitan mas caracteres",
