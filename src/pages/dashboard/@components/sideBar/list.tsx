@@ -4,6 +4,8 @@ import { useFetchNutritionistUsers } from "@src/services/tanstack/user/profile";
 import { RefreshCcwIcon, SearchIcon } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@src/store/store";
 import { setSelectedUserId } from "@src/store/slices/config/store";
+import useAppNavigation from "../../../../hooks/navigation";
+import { APP_ROUTES } from "../../../../hooks/navigation/routes";
 
 
 const checkUpcomingMeals = (planingDateStr: string | undefined): boolean => {
@@ -51,9 +53,13 @@ const SingleClient = ({
 }) => {
   const selectedUser = useAppSelector((state) => state.config.selectedUserId);
   const sidebarOpen = useAppSelector((state) => state.config.sidebarOpen);
+  const {navigateTo} = useAppNavigation();
   const dispatch = useAppDispatch();
+  
+  
   const setSelectedUser = (id: string) => {
     dispatch(setSelectedUserId(id));
+    navigateTo(APP_ROUTES.DASHBOARD);
   };
 
 
