@@ -1,13 +1,16 @@
 import { useTranslation } from "react-i18next";
+import { useIsGlobalPreset } from "../form/hook";
 
 export const Title = () => {
     const { t } = useTranslation();
-    return <h2 className="text-xl font-semibold">{t("forms:preset.title")}</h2>;
+    const isGlobal = useIsGlobalPreset();
+    return <h2 className="text-xl font-semibold">{t(isGlobal ? "forms:preset.globalTitle" : "forms:preset.title")}</h2>;
 }
 
 export const Description = () => {
     const { t } = useTranslation();
-    return <p className="text-sm text-gray-blue-600">{t("forms:preset.description")}</p>;
+    const isGlobal = useIsGlobalPreset();
+    return <p className="text-sm text-gray-blue-600">{t(isGlobal ? "forms:preset.globalDescription" : "forms:preset.description")}</p>;
 }
 
 export const NewPreset = () => {

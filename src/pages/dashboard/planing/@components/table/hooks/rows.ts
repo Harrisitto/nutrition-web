@@ -325,6 +325,21 @@ const useTableRows = () => {
       );
   }, [planingQuery.data, t]);
 
+  const createCustomUrlRow = useMemo(() => {
+    return new RowInfo({
+      id: "INPUT_CUSTOM_URL",
+      isEditable: "text",
+      isFullWidth: false,
+    })
+      .addLabel(t("data:dashboardTable.customUrlRow.header"))
+      .addMap(
+        planingQuery.data?.map((planing) => [
+          planing.date,
+          planing.custom_url ?? "",
+        ]) ?? [],
+      );
+  }, [planingQuery.data, t]);
+
   const rows = useMemo<RowInfo[]>(() => {
     const { carbsRow, proteinRow, fatRow } = createUserMacros;
 
@@ -365,6 +380,7 @@ const useTableRows = () => {
       }).addLabel(t("data:dashboardTable.commentsRows.header")),
       createCommentsRow,
       createEventsRow,
+      createCustomUrlRow,
     ];
   }, [
     createMealRows,
@@ -375,6 +391,7 @@ const useTableRows = () => {
     createUserMacros,
     createCommentsRow,
     createEventsRow,
+    createCustomUrlRow,
     t,
   ]);
 

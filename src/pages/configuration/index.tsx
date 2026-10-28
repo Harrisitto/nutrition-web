@@ -11,6 +11,7 @@ import ConfigRaceIngredients from "./raceIngredients";
 
 const PageInviteClient = lazy(() => import("./inviteClient/index"));
 const PageAppointmentThemes = lazy(() => import("./appointmentThemes/index"));
+const PageUserPreset = lazy(() => import("../dashboard/preset/index"));
 
 const PageNutritionistConfiguration = () => {
   const { t } = useTranslation();
@@ -49,7 +50,12 @@ const PageNutritionistConfiguration = () => {
             route: APP_ROUTES.APPOINTMENT_THEMES,
             label: t("data:configuration.sections.appointmentThemes.title"),
             onClick: () => navigateTo(APP_ROUTES.APPOINTMENT_THEMES),
-          }
+          },
+          {
+            route: APP_ROUTES.GLOBAL_USER_PRESETS,
+            label: t("data:configuration.sections.globalUserPresets.title"),
+            onClick: () => navigateTo(APP_ROUTES.GLOBAL_USER_PRESETS),
+          },
         ]}
       />
       <Routes>
@@ -80,6 +86,10 @@ const PageNutritionistConfiguration = () => {
         <Route
           path={getTrailingRoute(APP_ROUTES.APPOINTMENT_THEMES)}
           element={<PageAppointmentThemes />}
+        />
+        <Route
+          path={getTrailingRoute(APP_ROUTES.GLOBAL_USER_PRESETS)}
+          element={<PageUserPreset global />}
         />
       </Routes>
     </div>

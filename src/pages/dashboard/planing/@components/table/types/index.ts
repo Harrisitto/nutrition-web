@@ -17,6 +17,7 @@ export const ALL_IDS = {
   HEADER_COMMENTS: "headerComments",
   INPUT_COMMENTS: "inputComments",
   INPUT_EVENTS: "inputEvents",
+  INPUT_CUSTOM_URL: "inputCustomUrl",
 } as const;
 
 export type AllIdsValues = (typeof ALL_IDS)[keyof typeof ALL_IDS];

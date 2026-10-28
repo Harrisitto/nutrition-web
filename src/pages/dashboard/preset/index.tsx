@@ -2,9 +2,9 @@ import { FieldMeal, FieldText, FieldTrainingHc, InsertData, Provider, Resume } f
 import { List } from "./components/manage";
 import { Description, FormResume, Meals, NewPreset, Title, TrainingHc } from "./components/text";
 
-const PageUserPreset = () => {
+const PageUserPreset = ({ global = false }: { global?: boolean }) => {
   return (
-    <Provider>
+    <Provider global={global}>
       <div className="p-24 justify-center items-center w-full">
         <Title />
         <Description />

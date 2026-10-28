@@ -2,7 +2,11 @@ import type { ReactNode } from "react";
 import type FromDate from "@src/helpers/dates";
 import type { RowInfo } from "../../types";
 import NumericEditor from "../inputs/default/numericInput";
-import { cellChipStyle, highlightRingStyle } from "../../styles";
+import {
+  cellChipStyle,
+  highlightRingStyle,
+  overflowRevealStyle,
+} from "../../styles";
 
 interface CellNumericProps {
   rowInfo: RowInfo;
@@ -36,7 +40,7 @@ const CellNumeric = ({
       <button
         type="button"
         onClick={openEditor}
-        className={`${cellChipStyle} text-dark-green ${
+        className={`${cellChipStyle} ${overflowRevealStyle} text-dark-green ${
           isHighlighted ? highlightRingStyle : ""
         }`}
       >

@@ -108,6 +108,7 @@ refetch no dispara el scroll — solo un cambio real de fila lo hace.
 | `INPUT_TRAINING_HC`, `INPUT_TRAINING_KCAL` | `CellNumeric` | `NumericInput` |
 | `INPUT_RACES` | `CellRace` | — (`onAction`: navega a `APP_ROUTES.RACES`) |
 | `INPUT_COMMENTS`, `INPUT_EVENTS` | `CellText` | `TextInput` |
+| `INPUT_CUSTOM_URL` | `CellText` (solo `https://`) | `TextInput` con `validate` |
 | resto (`DISPLAY_*`) | `CellDisplay` | — (solo lectura) |
 
 Cada celda editable recibe `isEditing`/`isHighlighted` para su estilo y

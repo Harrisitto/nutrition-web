@@ -24,7 +24,7 @@ import type { ConfigState } from './slices/config/store'
 const configPersistConfig: PersistConfig<ConfigState> = {
 	key: 'config',
 	storage,
-	whitelist: ['keyboardCommands', 'showMealsInTable'],
+	whitelist: ['keyboardCommands', 'showMealsInTable', 'autoAdjustMeals'],
 	// Merge saved shortcuts over the current defaults so newly added commands
 	// get their default key instead of being undefined
 	stateReconciler: (inbound, original, reduced, config) => {

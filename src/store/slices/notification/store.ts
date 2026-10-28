@@ -4,6 +4,8 @@ export interface Notification {
     id: string;
     type: "success" | "error" | "info";
     message?: string;
+    // Valores para interpolar en el mensaje (clave i18n)
+    params?: Record<string, string | number>;
     duration?: number; // Duration in milliseconds
 }
 

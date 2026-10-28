@@ -1,7 +1,11 @@
 import type FromDate from "@src/helpers/dates";
 import type { RowInfo } from "../../types";
 import TextEditor from "../inputs/default/textInput";
-import { cellChipStyle, highlightRingStyle } from "../../styles";
+import {
+  cellChipStyle,
+  highlightRingStyle,
+  overflowRevealStyle,
+} from "../../styles";
 
 interface CellTextProps {
   rowInfo: RowInfo;
@@ -13,6 +17,7 @@ interface CellTextProps {
   openEditor: () => void;
   closeEditor: () => void;
   onSave: (value: string) => void;
+  validate?: (value: string) => string | null;
 }
 
 const CellText = ({
@@ -25,6 +30,7 @@ const CellText = ({
   openEditor,
   closeEditor,
   onSave,
+  validate,
 }: CellTextProps) => {
   const textValue = String(cellValue ?? "");
 
@@ -33,7 +39,7 @@ const CellText = ({
       <button
         type="button"
         onClick={openEditor}
-        className={`${cellChipStyle} truncate text-left text-dark-green ${
+        className={`${cellChipStyle} ${overflowRevealStyle} text-left text-dark-green ${
           isHighlighted ? highlightRingStyle : ""
         }`}
       >
@@ -51,6 +57,7 @@ const CellText = ({
             closeEditor();
           }}
           onClose={closeEditor}
+          validate={validate}
         />
       )}
     </>

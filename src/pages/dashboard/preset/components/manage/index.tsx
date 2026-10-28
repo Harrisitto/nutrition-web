@@ -9,21 +9,27 @@ import { Chart } from "./trainingHcChart";
 import { KcalResume } from "./kcalResume";
 import { calculateKcalFromMacros } from "@src/hooks/helpers/constants";
 import { MacrosResume } from "./macrosResume";
+import { useIsGlobalPreset } from "../form/hook";
 
 type Preset = NonNullable<ReturnType<typeof useFetchPresets>["data"]>[number];
 
 const Header = ({
   id,
   title,
+  isShared,
   isSelected,
   viewDetails,
 }: {
   id: number;
   title: string;
+  // Preset global visto desde un cliente: solo se gestiona en configuración
+  isShared: boolean;
   isSelected: boolean;
   viewDetails: () => void;
 }) => {
-  const deleteQuery = useDeletePreset();
+  const { t } = useTranslation();
+  const isGlobal = useIsGlobalPreset();
+  const deleteQuery = useDeletePreset({ global: isGlobal });
   return (
     <div className="flex items-center justify-between gap-3 rounded-xl border border-nutrition-green/20 bg-white-green/60 px-4 py-3 transition-colors hover:bg-white-green/80">
       <button
@@ -40,14 +46,20 @@ const Header = ({
           {title}
         </h3>
       </button>
-      <button
-        type="button"
-        className="rounded-md p-2 text-text-muted transition-colors hover:bg-nutrition-red/10 hover:text-nutrition-red"
-        aria-label={`Delete ${title}`}
-        onClick={() => deleteQuery.mutateAsync(id)}
-      >
-        <Trash className="h-4 w-4 cursor-pointer" />
-      </button>
+      {isShared ? (
+        <span className="shrink-0 rounded-md bg-nutrition-green/10 px-2 py-1 text-xs font-semibold text-dark-green">
+          {t("forms:preset.globalBadge")}
+        </span>
+      ) : (
+        <button
+          type="button"
+          className="rounded-md p-2 text-text-muted transition-colors hover:bg-nutrition-red/10 hover:text-nutrition-red"
+          aria-label={`Delete ${title}`}
+          onClick={() => deleteQuery.mutateAsync(id)}
+        >
+          <Trash className="h-4 w-4 cursor-pointer" />
+        </button>
+      )}
     </div>
   );
 };
@@ -116,11 +128,13 @@ const Details = ({
 
 const RenderOne = ({ preset }: { preset: Preset }) => {
   const [viewDetails, setViewDetails] = useState(false);
+  const isGlobal = useIsGlobalPreset();
   return (
     <div className="">
       <Header
         id={preset.id}
         title={preset.name}
+        isShared={!isGlobal && preset.user_id === null}
         isSelected={viewDetails}
         viewDetails={() => setViewDetails((prev) => !prev)}
       />
@@ -139,7 +153,7 @@ const RenderOne = ({ preset }: { preset: Preset }) => {
 };
 
 export const List = () => {
-  const presetsQuery = useFetchPresets();
+  const presetsQuery = useFetchPresets({ global: useIsGlobalPreset() });
   if (!presetsQuery.data?.length) {
     return (
       <div className="rounded-lg border border-nutrition-green/20 bg-white-green/30 px-3 py-5 text-center text-sm text-text-muted">

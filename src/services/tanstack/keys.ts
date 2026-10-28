@@ -44,6 +44,9 @@ export const queryKeys = ({
       end,
     ],
     presets: ["user", "presets", userId],
+    // Presets con user_id null del nutricionista `userId`, compartidos por todos sus clientes
+    globalPresets: ["user", "presets", "global", userId],
+    presetsBase: ["user", "presets"],
     measuresBase: ["user", "measuresBase", userId],
     basalMetabolicRate: (startDate: FromDate, endDate: FromDate) => [
       "user",

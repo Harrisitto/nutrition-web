@@ -156,7 +156,8 @@ export const WeeklyMeals = () => {
                   // 2. Las 7 columnas restantes se dividen el espacio restante a partes iguales (100% / 7 = 14.28%).
                   const cellStyle = isStickyLabel
                     ? `sticky left-0 z-10 w-px whitespace-nowrap`
-                    : "w-[14.28%] px-1.5 py-2 align-middle";
+                    : // max-w-0: el contenido no cuenta para el ancho de la columna (table-layout auto)
+                      "w-[14.28%] max-w-0 px-1.5 py-2 align-middle";
 
                   return (
                     <td key={cell.id} className={cellStyle}>

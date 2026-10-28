@@ -15,6 +15,7 @@ import {
 import { WeeklyMeals } from "./@components/table";
 import ChartsAppointmentProgress from "./@components/appointmentProgress";
 import { AddNoteForm } from "../@components/notes/addNoteForm";
+import { AutoAdjustMeals } from "./@components/macrosAdjustmentSettings";
 
 const PagePlaningForm = () => {
   return (
@@ -42,7 +43,10 @@ const PagePlaningForm = () => {
           {/* Nota suelta del cliente: sin consulta */}
           <AddNoteForm appointmentId={null} />
         </div>
-        <SelectDateCalendar />
+        <div className="flex flex-0 flex-col gap-2 justify-start">
+          <SelectDateCalendar />
+          <AutoAdjustMeals />
+        </div>
       </div>
 
       <div className="my-4" />

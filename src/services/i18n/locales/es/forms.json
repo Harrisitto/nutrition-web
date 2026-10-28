@@ -1,5 +1,8 @@
 {
     "preset": {
+        "globalTitle": "Preajustes globales",
+        "globalDescription": "Estos preajustes no pertenecen a ningún cliente: aparecen en la planificación de todos tus clientes junto a sus preajustes propios.",
+        "globalBadge": "Global",
         "title": "Preajustes de usuario para planificacion",
         "description": "Crea y gestiona tus propios preajustes para completar rapidamente los formularios al crear un nuevo plan o receta.",
         "fields": {

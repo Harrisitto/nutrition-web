@@ -4,6 +4,7 @@ import { setMealDisplay } from "../../../../store/slices/config/store";
 import { useAppDispatch, useAppSelector } from "../../../../store/store";
 import { useTranslation } from "react-i18next";
 import { Eye } from "lucide-react";
+import InputComponent from "@src/components/input";
 
 // Keeps the typed value locally and only commits on blur/Enter, so the list
 // doesn't re-sort (and move the row) on every keystroke
@@ -132,22 +133,11 @@ const DisplayMealsForm = () => {
               >
                 {mealType.name}
               </span>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={isVisible}
-                aria-label={`${t("dashboardOptions.fields.isVisible")} ${mealType.name}`}
-                onClick={() => updateMeal(mealType.id, !isVisible, order)}
-                className={`relative h-5 w-9 shrink-0 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nutrition-green/50 focus-visible:ring-offset-1 ${
-                  isVisible ? "bg-nutrition-green" : "bg-dark-green/20"
-                }`}
-              >
-                <span
-                  className={`absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white-green shadow transition-transform ${
-                    isVisible ? "translate-x-4" : "translate-x-0"
-                  }`}
-                />
-              </button>
+              <InputComponent.Toggle
+                checked={isVisible}
+                label={`${t("dashboardOptions.fields.isVisible")} ${mealType.name}`}
+                onChange={(visible) => updateMeal(mealType.id, visible, order)}
+              />
             </li>
           );
         })}

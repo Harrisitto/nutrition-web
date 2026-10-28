@@ -5,6 +5,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLanguageCode } from "@src/hooks/helpers/language";
 import { queryClient } from "../queryClient";
 import { useAppSelector } from "@src/store/store";
+import { useGetAuthSession } from "../auth/get";
 
 type Preset = NonNullable<ReturnType<typeof useFetchPresets>["data"]>[number];
 
@@ -25,6 +26,11 @@ const selectFromMeal = (languageCode: ReturnType<typeof useLanguageCode>) => {
 const updatePresetList = (
     newPreset: Preset
 ) => {
+    // Un preset global aparece en la lista de cada cliente: se refrescan todas
+    if (newPreset.user_id === null) {
+        queryClient.invalidateQueries({ queryKey: queryKeys().user.presetsBase });
+        return;
+    }
     queryClient.setQueryData<Preset[]>(
         queryKeys({
             userId: newPreset.user_id,
@@ -40,8 +46,12 @@ const updatePresetList = (
 
 const removePresetFromList = (
     presetId: number,
-    userId: string
+    userId: string | null
 ) => {
+    if (userId === null) {
+        queryClient.invalidateQueries({ queryKey: queryKeys().user.presetsBase });
+        return;
+    }
     queryClient.setQueryData<Preset[]>(
         queryKeys({
             userId,
@@ -53,20 +63,37 @@ const removePresetFromList = (
     );
 }
 
-export const useFetchPresets = () => {
+// global: solo los presets con user_id null. Si no, los globales más los del cliente
+export const useFetchPresets = ({ global = false }: { global?: boolean } = {}) => {
     const userId = useAppSelector((state) => state.config.selectedUserId);
+    const { data: session } = useGetAuthSession();
+    const nutriId = session?.userId;
     const languageCode = useLanguageCode();
 
     return useQuery({
-        queryKey: queryKeys({
-            userId,
-        }).user.presets,
+        queryKey: global
+            ? queryKeys({ userId: nutriId }).user.globalPresets
+            : queryKeys({
+                userId,
+            }).user.presets,
         queryFn: async () => {
-            if (!userId) throw new Error("User ID is required to fetch presets");
-            const { data, error } = await supabase
+            const query = supabase
                 .from(TABLE_USER_PRESET.NAME)
-                .select(selectFromMeal(languageCode))
-                .eq(TABLE_USER_PRESET.COLS.USER_ID, userId)
+                .select(selectFromMeal(languageCode));
+
+            if (global) {
+                if (!nutriId) throw new Error("Nutritionist ID is required to fetch global presets");
+                const { data, error } = await query
+                    .is(TABLE_USER_PRESET.COLS.USER_ID, null)
+                    .eq(TABLE_USER_PRESET.COLS.NUTRI_ID, nutriId);
+                if (error) throw error;
+                return data;
+            }
+
+            if (!userId) throw new Error("User ID is required to fetch presets");
+            const { data, error } = await query.or(
+                `${TABLE_USER_PRESET.COLS.USER_ID}.is.null,${TABLE_USER_PRESET.COLS.USER_ID}.eq.${userId}`,
+            );
 
             if (error) throw error;
             return data;
@@ -74,8 +101,10 @@ export const useFetchPresets = () => {
     })
 }
 
-export const useInsertPreset = () => {
+export const useInsertPreset = ({ global = false }: { global?: boolean } = {}) => {
     const userId = useAppSelector((state) => state.config.selectedUserId);
+    const { data: session } = useGetAuthSession();
+    const nutriId = session?.userId;
     const languageCode = useLanguageCode();
 
     return useMutation({
@@ -93,11 +122,13 @@ export const useInsertPreset = () => {
                 type_id: number;
             }[];
         }) => {
-            if (!userId) throw new Error("User ID is required to insert preset");
+            if (!global && !userId) throw new Error("User ID is required to insert preset");
+            if (!nutriId) throw new Error("Nutritionist ID is required to insert preset");
             const { data, error } = await supabase
                 .from(TABLE_USER_PRESET.NAME)
                 .upsert({
-                    [TABLE_USER_PRESET.COLS.USER_ID]: userId,
+                    [TABLE_USER_PRESET.COLS.USER_ID]: global ? null : userId,
+                    [TABLE_USER_PRESET.COLS.NUTRI_ID]: nutriId,
                     [TABLE_USER_PRESET.COLS.NAME]: name,
                     [TABLE_USER_PRESET.COLS.COMMENT]: comment,
                     [TABLE_USER_PRESET.COLS.TRAINING_HC]: training_hc,
@@ -136,22 +167,33 @@ export const useInsertPreset = () => {
     })
 }
 
-export const useDeletePreset = () => {
+export const useDeletePreset = ({ global = false }: { global?: boolean } = {}) => {
     const userId = useAppSelector((state) => state.config.selectedUserId);
 
     return useMutation({
         mutationFn: async (presetId: number) => {
-            if (!userId) throw new Error("User ID is required to delete preset");
-            const { error } = await supabase
+            const query = supabase
                 .from(TABLE_USER_PRESET.NAME)
                 .delete()
-                .eq(TABLE_USER_PRESET.COLS.ID, presetId)
-                .eq(TABLE_USER_PRESET.COLS.USER_ID, userId);
+                .eq(TABLE_USER_PRESET.COLS.ID, presetId);
+
+            if (global) {
+                const { error } = await query.is(TABLE_USER_PRESET.COLS.USER_ID, null);
+                if (error) throw error;
+                return presetId;
+            }
+
+            if (!userId) throw new Error("User ID is required to delete preset");
+            const { error } = await query.eq(TABLE_USER_PRESET.COLS.USER_ID, userId);
 
             if (error) throw error;
             return presetId;
         },
         onSuccess: (presetId) => {
+            if (global) {
+                removePresetFromList(presetId, null);
+                return;
+            }
             if (!userId) return;
             removePresetFromList(presetId, userId);
         }

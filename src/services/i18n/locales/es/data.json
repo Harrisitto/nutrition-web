@@ -51,11 +51,16 @@
             "header": "Eventos",
             "rowHeader": "Para"
         },
+        "customUrlRow": {
+            "header": "Enlace",
+            "placeholder": "https://...",
+            "invalidUrl": "Introduce una URL válida que empiece por https://"
+        },
         "autoGenerate": {
             "header": "Generar",
             "button": "Generar automáticamente",
             "title": "Generar automáticamente",
-            "description": "Se elegirán los tipos de las comidas seleccionadas según el historial del último mes, buscando un balance energético cercano a 0. Las comidas que no existen se crearán y las recetas se elegirán de nuevo.",
+            "description": "Se elegirán los tipos de las comidas seleccionadas según el historial de la última semana. Si el día ya tiene comidas se mantienen sus kcal; si está vacío, se calculan con el balance energético de la última semana. Las comidas que no existen se crearán y las recetas se elegirán de nuevo.",
             "confirm": "Generar",
             "cancel": "Cancelar",
             "generating": "Generando...",
@@ -65,9 +70,11 @@
             "selectMeals": "Comidas a generar",
             "selectAll": "Todas",
             "selectNone": "Ninguna",
-            "target": "Objetivo",
             "current": "Actual",
-            "noHistory": "Sin historial en el último mes para: {{meals}}. Esas comidas no se han generado."
+            "noHistory": "No se han puesto: {{meals}}. No tienen historial en la última semana o el objetivo de kcal no las necesitaba.",
+            "noClientHistory": "El cliente no tiene comidas en la última semana: no se puede generar el día.",
+            "noCombination": "No se encontró una combinación de comidas para {{target}} kcal.",
+            "noCombinationClosest": "No se encontró una combinación de comidas para {{target}} kcal: la más cercana se queda en {{closest}} kcal (margen ±{{margin}} kcal)."
         },
         "calendar": {
             "training": "Entrenamiento",
@@ -246,6 +253,9 @@
                     "liquid_amount": "Líquido",
                     "image": "Imagen"
                 }
+            },
+            "globalUserPresets": {
+                "title": "Preajustes globales"
             },
             "appointmentThemes": {
                 "title": "Temáticas de planificación",
@@ -592,5 +602,13 @@
         "statusError": "No se ha podido actualizar la tarea. Inténtalo de nuevo.",
         "statusPending": "Tarea pendiente",
         "statusDone": "Tarea completada"
+    },
+    "planing": {
+        "autoAdjustMeals": {
+            "title": "Ajuste automático de comidas",
+            "description": "Recalcula las comidas del día cuando cambias el entrenamiento.",
+            "onTrainingKcalChange": "Al cambiar las kcal de entrenamiento",
+            "onTrainingCarbsChange": "Al cambiar los carbohidratos de entrenamiento"
+        }
     }
 }

@@ -15,12 +15,17 @@ export const sectionHeaderBoxStyle = `${headerVisual} flex h-full w-full flex-co
 export const rowLabelStyle =
   "flex h-full min-w-[168px] flex-col justify-center gap-0.5 px-3 py-2 text-text-title";
 
+// Text that doesn't fit is cut with an ellipsis and revealed on hover by
+// wrapping inside the same width, so content never widens the day column.
+export const overflowRevealStyle =
+  "truncate hover:whitespace-normal hover:[overflow-wrap:anywhere]";
+
 // Base chip look shared by every interactive/data cell in the day columns.
 export const cellChipStyle =
   "w-full cursor-pointer rounded-lg bg-fade-green/10 px-2 py-1.5 text-center text-xs font-medium text-text-body transition-colors";
 
 export const displayChipStyle =
-  "w-full rounded-lg bg-fade-green/10 px-2 py-1.5 text-center text-xs font-semibold text-dark-green";
+  `${overflowRevealStyle} w-full rounded-lg bg-fade-green/10 px-2 py-1.5 text-center text-xs font-semibold text-dark-green`;
 
 // Keyboard-selection indicator for cells on the pale chip backgrounds
 // (meal/numeric/text/display cells). Nutrition-blue has enough luminance

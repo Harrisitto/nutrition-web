@@ -30,6 +30,10 @@ export interface ConfigState {
     isVisible: boolean;
     order: number;
   }][];
+  autoAdjustMeals: {
+    onTrainingKcalChange: boolean;
+    onTrainingCarbsChange: boolean;
+  }
 }
 
 type KeyboardCommandsState = ConfigState["keyboardCommands"];
@@ -60,7 +64,7 @@ export const defaultKeyboardCommands = {
   },
   commentsEditor: {
     closeEditor: "Escape",
-  },
+  }
 } as const;
 
 /**
@@ -102,6 +106,10 @@ const initialState: ConfigState = {
     ...defaultKeyboardCommands,
   },
   showMealsInTable: [],
+  autoAdjustMeals: {
+    onTrainingKcalChange: false,
+    onTrainingCarbsChange: false,
+  }
 };
 
 const configSlice = createSlice({
@@ -160,6 +168,21 @@ const configSlice = createSlice({
         state.showMealsInTable.push([mealId, { isVisible, order }]);
       }
     },
+    setAutoAdjustMeals: (
+      state,
+      action: PayloadAction<{
+        onTrainingKcalChange?: boolean;
+        onTrainingCarbsChange?: boolean;
+      }>,
+    ) => {
+      const { onTrainingKcalChange, onTrainingCarbsChange } = action.payload;
+      if (onTrainingKcalChange !== undefined) {
+        state.autoAdjustMeals.onTrainingKcalChange = onTrainingKcalChange;
+      }
+      if (onTrainingCarbsChange !== undefined) {
+        state.autoAdjustMeals.onTrainingCarbsChange = onTrainingCarbsChange;
+      }
+    },
   },
 });
 
@@ -170,5 +193,6 @@ export const {
   setKeyboardCommand,
   setDefaultKeyboardCommands,
   setMealDisplay,
+  setAutoAdjustMeals
 } = configSlice.actions;
 export default configSlice.reducer;

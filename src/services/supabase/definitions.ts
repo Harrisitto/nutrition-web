@@ -19,6 +19,7 @@ export const TABLE_USER_PLANING = {
         TRAINING_KCAL: 'training_kcal',
         COMMENT: 'comment',
         EVENT: 'event',
+        CUSTOM_URL: 'custom_url',
     }
 } as const
 
@@ -68,6 +69,8 @@ export const TABLE_USER_PRESET = {
     COLS: {
         ID: 'id',
         USER_ID: 'user_id',
+        // Dueño de los presets globales (user_id null)
+        NUTRI_ID: 'nutri_id',
         NAME: 'name',
         TRAINING_HC: 'training_hc',
         COMMENT: 'comment',

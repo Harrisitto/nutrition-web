@@ -1,5 +1,8 @@
 {
     "preset": {
+        "globalTitle": "Global presets",
+        "globalDescription": "These presets don't belong to any client: they show up in every client's planning alongside their own presets.",
+        "globalBadge": "Global",
         "title": "User Presets For Planing",
         "description": "Create and manage your own presets to quickly fill in the forms when creating a new plan or recipe.",
         "fields": {

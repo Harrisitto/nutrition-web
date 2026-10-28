@@ -14,6 +14,18 @@ import CellRace from "../@components/cells/raceCell";
 import type FromDate from "@src/helpers/dates";
 import { features } from "../features";
 import { useMutatePlaning } from "@src/services/tanstack/user/planing";
+import { useSaveTraining } from "./training";
+
+// Solo se aceptan enlaces https; vacío borra el enlace
+const isValidHttpsUrl = (value: string) => {
+  if (/\s/.test(value)) return false;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" && url.hostname.includes(".");
+  } catch {
+    return false;
+  }
+};
 
 const useTableColumns = ({
   editingCell,
@@ -31,6 +43,8 @@ const useTableColumns = ({
   const { t } = useTranslation();
   const daysOfWeek = useDaysOfWeek();
   const planingMutation = useMutatePlaning();
+  // Con el ajuste automatico activo tambien reajustan las comidas del dia
+  const { saveTrainingKcal, saveTrainingHc } = useSaveTraining();
 
   const columns = useMemo<Array<ColumnDef<typeof features, RowInfo>>>(() => {
     const rowLabelCol: ColumnDef<typeof features, RowInfo> = {
@@ -100,10 +114,7 @@ const useTableColumns = ({
                     openEditor={openEditor}
                     closeEditor={closeEditor}
                     onSave={(num) => {
-                      planingMutation.mutateAsync({
-                        date,
-                        training_hc: rowInfo.getUpdatedArray(date.save(), num),
-                      });
+                      saveTrainingHc(date, rowInfo.getUpdatedArray(date.save(), num));
                     }}
                   />
                 );
@@ -119,10 +130,7 @@ const useTableColumns = ({
                     openEditor={openEditor}
                     closeEditor={closeEditor}
                     onSave={(num) => {
-                      planingMutation.mutateAsync({
-                        date,
-                        training_kcal: num,
-                      });
+                      saveTrainingKcal(date, num);
                     }}
                   />
                 );
@@ -179,6 +187,32 @@ const useTableColumns = ({
                     }}
                   />
                 );
+              case ALL_IDS.INPUT_CUSTOM_URL:
+                return (
+                  <CellText
+                    rowInfo={rowInfo}
+                    date={date}
+                    cellValue={cellValue}
+                    isEditing={isEditing}
+                    isHighlighted={isHighlighted}
+                    placeholder={t(
+                      "data:dashboardTable.customUrlRow.placeholder",
+                    )}
+                    openEditor={openEditor}
+                    closeEditor={closeEditor}
+                    validate={(val) =>
+                      !val || isValidHttpsUrl(val)
+                        ? null
+                        : t("data:dashboardTable.customUrlRow.invalidUrl")
+                    }
+                    onSave={(val) => {
+                      planingMutation.mutateAsync({
+                        date,
+                        custom_url: val || null,
+                      });
+                    }}
+                  />
+                );
 
               case ALL_IDS.DISPLAY_ENERGY_BALANCE:
               case ALL_IDS.DISPLAY_CARBS_PER_KG:
@@ -200,6 +234,8 @@ const useTableColumns = ({
     closeEditor,
     daysOfWeek,
     planingMutation,
+    saveTrainingKcal,
+    saveTrainingHc,
     t,
   ]);
 

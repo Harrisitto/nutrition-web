@@ -240,3 +240,10 @@ export const Context = createContext<ReturnType<typeof useFormPreset> | null>(
 export const useContextFormPreset = () => {
   return useContext(Context);
 };
+
+// Presets globales (user_id null): se crean desde configuración y los ven todos los clientes
+export const ScopeContext = createContext<{ global: boolean }>({ global: false });
+
+export const useIsGlobalPreset = () => {
+  return useContext(ScopeContext).global;
+};

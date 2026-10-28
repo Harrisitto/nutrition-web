@@ -1,5 +1,5 @@
 import { useNotification } from "@src/store/slices/notification/hook";
-import { Check } from "lucide-react";
+import { Check, Info, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const getNotificationStyle = (type: string) => {
@@ -12,12 +12,12 @@ const getNotificationStyle = (type: string) => {
     case "error":
       return {
         bgClass: "bg-nutrition-red",
-        icon: <Check className="w-5 h-5 text-white" />,
+        icon: <X className="w-5 h-5 text-white" />,
       };
     case "info":
       return {
         bgClass: "bg-nutrition-blue",
-        icon: <Check className="w-5 h-5 text-white" />,
+        icon: <Info className="w-5 h-5 text-white" />,
       };
     default:
       return {
@@ -41,7 +41,7 @@ export const DisplayNotification = () => {
             className={`flex items-center space-x-2 px-4 py-2 rounded shadow-md text-white ${bgClass}`}
           >
             {icon}
-            {notification.message && <span>{t(notification.message)}</span>}
+            {notification.message && <span>{t(notification.message, notification.params)}</span>}
           </div>
         );
       })}

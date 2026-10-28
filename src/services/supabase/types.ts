@@ -1039,6 +1039,7 @@ export type Database = {
       user_planing: {
         Row: {
           comment: string
+          custom_url: string | null
           date: string
           event: string
           training_hc: number[]
@@ -1047,6 +1048,7 @@ export type Database = {
         }
         Insert: {
           comment?: string
+          custom_url?: string | null
           date: string
           event?: string
           training_hc?: number[]
@@ -1055,6 +1057,7 @@ export type Database = {
         }
         Update: {
           comment?: string
+          custom_url?: string | null
           date?: string
           event?: string
           training_hc?: number[]
@@ -1129,24 +1132,34 @@ export type Database = {
           comment: string
           id: number
           name: string
+          nutri_id: string
           training_hc: number[]
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           comment?: string
           id?: number
           name: string
+          nutri_id: string
           training_hc: number[]
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           comment?: string
           id?: number
           name?: string
+          nutri_id?: string
           training_hc?: number[]
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "user_preset_nutri_id_fkey"
+            columns: ["nutri_id"]
+            isOneToOne: false
+            referencedRelation: "all_nutritionist"
+            referencedColumns: ["nutri_id"]
+          },
           {
             foreignKeyName: "user_preset_user_id_fkey"
             columns: ["user_id"]
@@ -1301,6 +1314,10 @@ export type Database = {
         Args: {
           p_changable_meal_ids: number[]
           p_date: string
+          p_new_training_hc?: number[]
+          p_new_training_kcal?: number
+          p_old_training_hc?: number[]
+          p_old_training_kcal?: number
           p_seed: number
           p_target_kcal?: number
           p_training_kcal: number

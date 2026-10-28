@@ -1,7 +1,7 @@
 import type FromDate from "@src/helpers/dates";
 import type { MealRowInfo } from "../../types";
 import MealTypeEditor from "../inputs/mealSelectInput";
-import { highlightRingStyle } from "../../styles";
+import { highlightRingStyle, overflowRevealStyle } from "../../styles";
 
 interface CellMealProps {
   rowInfo: MealRowInfo;
@@ -41,7 +41,7 @@ const CellMeal = ({
       <button
         type="button"
         onClick={openEditor}
-        className={`w-full cursor-pointer rounded-lg px-2 py-1.5 text-center text-xs font-semibold transition-colors ${colorClass} ${
+        className={`${overflowRevealStyle} w-full cursor-pointer rounded-lg px-2 py-1.5 text-center text-xs font-semibold transition-colors ${colorClass} ${
           isHighlighted ? highlightRingStyle : ""
         }`}
       >

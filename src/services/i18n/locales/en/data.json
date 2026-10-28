@@ -51,11 +51,16 @@
             "header": "Events",
             "rowHeader": "For"
         },
+        "customUrlRow": {
+            "header": "Link",
+            "placeholder": "https://...",
+            "invalidUrl": "Enter a valid URL starting with https://"
+        },
         "autoGenerate": {
             "header": "Generate",
             "button": "Generate automatically",
             "title": "Generate automatically",
-            "description": "Meal types for the selected meals will be picked from last month's history, aiming for an energy balance close to 0. Missing meals will be created and recipes will be picked again.",
+            "description": "Meal types for the selected meals will be picked from last week's history. If the day already has meals their kcal are kept; if it is empty, they are worked out from last week's energy balance. Missing meals will be created and recipes will be picked again.",
             "confirm": "Generate",
             "cancel": "Cancel",
             "generating": "Generating...",
@@ -65,9 +70,11 @@
             "selectMeals": "Meals to generate",
             "selectAll": "All",
             "selectNone": "None",
-            "target": "Target",
             "current": "Current",
-            "noHistory": "No history in the last month for: {{meals}}. Those meals were not generated."
+            "noHistory": "Not added: {{meals}}. They have no history in the last week or the kcal target did not need them.",
+            "noClientHistory": "The client has no meals in the last week: the day can't be generated.",
+            "noCombination": "No meal combination was found for {{target}} kcal.",
+            "noCombinationClosest": "No meal combination was found for {{target}} kcal: the closest is {{closest}} kcal (margin ±{{margin}} kcal)."
         },
         "calendar": {
             "training": "Training",
@@ -246,6 +253,9 @@
                     "liquid_amount": "Liquid",
                     "image": "Image"
                 }
+            },
+            "globalUserPresets": {
+                "title": "Global presets"
             },
             "appointmentThemes": {
                 "title": "Appointment themes",
@@ -592,5 +602,13 @@
         "statusError": "The task could not be updated. Please try again.",
         "statusPending": "Pending task",
         "statusDone": "Completed task"
+    },
+    "planing": {
+        "autoAdjustMeals": {
+            "title": "Automatic meal adjustment",
+            "description": "Recalculates the day's meals when you change the training.",
+            "onTrainingKcalChange": "When training kcal change",
+            "onTrainingCarbsChange": "When training carbs change"
+        }
     }
 }

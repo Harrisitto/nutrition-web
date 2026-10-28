@@ -19,6 +19,7 @@ export const APP_ROUTES = {
   AUTH_MANAGEMENT: "/dashboard/config/auth-management",
   RACE_INGREDIENTS: "/dashboard/config/race-ingredients",
   APPOINTMENT_THEMES: "/dashboard/config/appointment-themes",
+  GLOBAL_USER_PRESETS: "/dashboard/config/global-user-presets",
 
   FORM_PRESET: "/dashboard/form-preset",
   FORM_MEASURE: "/dashboard/form-measure",

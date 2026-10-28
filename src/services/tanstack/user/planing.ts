@@ -174,6 +174,7 @@ export const useMutatePlaning = () => {
       training_kcal?: number;
       comment?: string;
       event?: string;
+      custom_url?: string | null;
     }) => {
       if (!userId)
         throw new Error("User ID is required to insert planing data");
@@ -204,6 +205,7 @@ export const useMutatePlaning = () => {
         user_id: userId ?? "",
         comment: "",
         event: "",
+        custom_url: null,
         training_hc: [],
         training_kcal: 0,
         ...current,

@@ -5,10 +5,7 @@ import type FromDate from "@src/helpers/dates";
 import { useFetchMeals } from "@src/services/tanstack/data/meals";
 import { useFetchPlanning } from "@src/services/tanstack/user/planing";
 import { useFetchPlaningMealsForDate } from "@src/services/tanstack/user/meals";
-import { useFetchBmr } from "@src/services/tanstack/user/info";
-import { useGeneratePlaningDay } from "@src/services/tanstack/user/generate";
-import { useRaceTotalsByDate } from "@src/services/tanstack/user/races";
-import { dayBalanceWithoutMeals } from "@src/helpers/nutrition";
+import { parseGenerateError, useGeneratePlaningDay } from "@src/services/tanstack/user/generate";
 
 interface AutoGenerateEditorProps {
   date: FromDate;
@@ -20,8 +17,6 @@ const AutoGenerateEditor = ({ date, onClose }: AutoGenerateEditorProps) => {
   const mealsQuery = useFetchMeals();
   const planingQuery = useFetchPlanning();
   const userMeals = useFetchPlaningMealsForDate();
-  const bmr = useFetchBmr();
-  const races = useRaceTotalsByDate();
   const generate = useGeneratePlaningDay();
   const [message, setMessage] = useState<string | null>(null);
   // `null` hasta que el usuario toque algo: por defecto todas las comidas
@@ -49,19 +44,8 @@ const AutoGenerateEditor = ({ date, onClose }: AutoGenerateEditorProps) => {
     0,
   );
 
-  const targetKcal = useMemo(() => {
-    if (typeof bmr.data !== "number") return null;
-    // Mismo cálculo que la fila de balance energético, despejado para que el
-    // balance del día quede en 0.
-    return -dayBalanceWithoutMeals({
-      planning: day,
-      raceKcal: races.totalsByDate.get(date.save())?.kcal ?? 0,
-      bmr: bmr.data,
-    });
-  }, [bmr.data, day, races.totalsByDate, date]);
 
-  // Sin las carreras cargadas el objetivo no las tendría en cuenta
-  const isReady = !!mealsQuery.data && targetKcal !== null && !races.isLoading;
+  const isReady = !!mealsQuery.data;
 
   const toggleMeal = (mealId: number) => {
     const next = new Set(selectedIds);
@@ -71,7 +55,7 @@ const AutoGenerateEditor = ({ date, onClose }: AutoGenerateEditorProps) => {
   };
 
   const handleGenerate = async () => {
-    if (targetKcal === null || selectedIds.size === 0) return;
+    if (selectedIds.size === 0) return;
     setMessage(null);
 
     // Tipos antes de generar, para saber si la RPC llegó a cambiar algo.
@@ -84,10 +68,9 @@ const AutoGenerateEditor = ({ date, onClose }: AutoGenerateEditorProps) => {
         date,
         mealIds: Array.from(selectedIds),
         trainingKcal: day?.training_kcal ?? 0,
-        targetKcal,
       });
 
-      // Una comida seleccionada que sigue sin fila no tenía historial.
+      // Una comida seleccionada que sigue sin fila no tenía historial o el objetivo no la necesitaba.
       const resultIds = new Set(result.map((meal) => meal.meal_id));
       const missing = meals
         .filter((meal) => selectedIds.has(meal.id) && !resultIds.has(meal.id))
@@ -110,6 +93,8 @@ const AutoGenerateEditor = ({ date, onClose }: AutoGenerateEditorProps) => {
       }
       onClose();
     } catch (error) {
+      // Sin historial o sin combinacion: ya lo avisa la notificacion del hook
+      if (parseGenerateError(error)) return;
       console.error("Error generating day:", error);
       setMessage(t("data:dashboardTable.autoGenerate.error"));
     }
@@ -131,11 +116,7 @@ const AutoGenerateEditor = ({ date, onClose }: AutoGenerateEditorProps) => {
           </p>
         ) : (
           <>
-            <div className="flex justify-between gap-2 rounded-lg bg-fade-green/10 px-3 py-2 text-xs font-semibold text-dark-green">
-              <span>
-                {t("data:dashboardTable.autoGenerate.target")}:{" "}
-                {Math.round(targetKcal)} kcal
-              </span>
+            <div className="rounded-lg bg-fade-green/10 px-3 py-2 text-xs font-semibold text-dark-green">
               <span>
                 {t("data:dashboardTable.autoGenerate.current")}:{" "}
                 {Math.round(currentKcal)} kcal

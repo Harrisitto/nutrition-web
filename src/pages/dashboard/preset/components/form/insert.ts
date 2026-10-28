@@ -1,4 +1,4 @@
-import { fieldIds, useContextFormPreset } from "./hook";
+import { fieldIds, useContextFormPreset, useIsGlobalPreset } from "./hook";
 import { useInsertPreset } from "@src/services/tanstack/user/preset";
 import { useCallback } from "react";
 import type { InputState } from "@src/hooks/form/types";
@@ -9,7 +9,7 @@ export const useInsert = () => {
   const { data } = useGetAuthSession();
   const userId = data?.userId;
     const formPreset = useContextFormPreset();
-    const insertPreset = useInsertPreset();
+    const insertPreset = useInsertPreset({ global: useIsGlobalPreset() });
 
     const hadleSubmit = useCallback(async () => {
         if (!formPreset || !userId) return;
