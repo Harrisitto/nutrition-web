@@ -12,6 +12,7 @@ import { secondaryButtonStyle } from "../../races/components/formStyles";
 import { groupByDay, monthGrid, shiftMonth } from "./calendarDays";
 import { MonthGrid } from "./monthGrid";
 import { DayDetail } from "./dayDetail";
+import { PendingTasks } from "./pendingTasks";
 
 // Calendario del nutricionista: consultas pendientes y notas de todos sus clientes
 const PageAppointmentsCalendar = () => {
@@ -110,6 +111,10 @@ const PageAppointmentsCalendar = () => {
             appointments={appointmentsByDay.get(selectedDay) ?? []}
             writtenNotes={writtenNotesByDay.get(selectedDay) ?? []}
           />
+        </section>
+
+        <section className={`${cardStyle} p-3 sm:p-5`}>
+          <PendingTasks />
         </section>
       </div>
     </div>

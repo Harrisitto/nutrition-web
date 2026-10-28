@@ -5,7 +5,6 @@ import { Circle, CircleCheck, StickyNote } from "lucide-react";
 import FromDate from "@src/helpers/dates";
 import {
   useFetchNutritionistNotesForDateRange,
-  useFetchPendingNutritionistNotes,
   useSearchNutritionistNote,
 } from "@src/services/tanstack/data/notes";
 import {
@@ -15,8 +14,6 @@ import {
   type HistoryPageProps,
 } from "../shared/components";
 import { AddNoteForm } from "../../../../../@components/notes/addNoteForm";
-import { NoteItem } from "../../../../../@components/notes/noteItem";
-import { emptyTextStyle } from "../../../../../races/components/formStyles";
 
 type Note = NonNullable<ReturnType<typeof useFetchNutritionistNotesForDateRange>["data"]>[number];
 
@@ -66,35 +63,10 @@ export const HistoryNotes = ({
     endDate: period.end,
   });
   const searchQuery = useSearchNutritionistNote({ search });
-  const pendingQuery = useFetchPendingNutritionistNotes();
 
   return (
     <div className="flex flex-col gap-5">
       <AddNoteForm appointmentId={appointmentId} />
-
-      {/* Todas las tareas sin completar, no solo las del periodo: se completan desde aqui */}
-      <section className="flex flex-col gap-3">
-        <h3 className="font-semibold text-text-title">
-          {t("data:appointments.form.history.pendingTasks")}
-        </h3>
-        {pendingQuery.isError && (
-          <p className="text-sm text-red-500" role="alert">
-            {t("data:appointments.form.errors.load")}
-          </p>
-        )}
-        {pendingQuery.isSuccess &&
-          (pendingQuery.data.length === 0 ? (
-            <p className={emptyTextStyle}>{t("data:appointments.form.history.noPendingTasks")}</p>
-          ) : (
-            <ul className="flex flex-col gap-2">
-              {pendingQuery.data.map((note) => (
-                <li key={note.id}>
-                  <NoteItem note={note} />
-                </li>
-              ))}
-            </ul>
-          ))}
-      </section>
 
       <HistorySearch
         placeholder={t("data:appointments.form.history.searchNotes")}

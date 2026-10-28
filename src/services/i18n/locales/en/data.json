@@ -388,9 +388,7 @@
                 "gained": "Gained",
                 "lost": "Lost",
                 "bmr": "BMR (basal metabolic rate): {{value}}",
-                "noBmr": "No BMR: the energy balance cannot be calculated.",
-                "pendingTasks": "Pending tasks",
-                "noPendingTasks": "There are no pending tasks."
+                "noBmr": "No BMR: the energy balance cannot be calculated."
             },
             "errors": {
                 "duplicateDay": "There is already an appointment with this client on that day. Choose another date or edit the existing one.",
@@ -564,6 +562,8 @@
         "more_other": "+{{count}} more",
         "notesCount_one": "{{count}} note",
         "notesCount_other": "{{count}} notes",
+        "pendingTasks": "Pending tasks",
+        "noPendingTasks": "There are no pending tasks.",
         "errors": {
             "load": "The calendar could not be loaded. Please try again."
         }

@@ -1116,9 +1116,9 @@
     "semantic_hash": "a0c1e7dd54c7ce6a5963f37497768f29"
   },
   "src/services/i18n/locales/en/data.json": {
-    "mtime": 1793183768.1568732,
-    "seen": 1793183783.9699044,
-    "ast_hash": "5f52280f00d18f3caeb8db4ef0d3ad97",
+    "mtime": 1793184187.7806787,
+    "seen": 1793184256.7418642,
+    "ast_hash": "0e7aaada2a52cac6e56cda0879abc514",
     "semantic_hash": ""
   },
   "src/services/i18n/locales/en/forms.json": {
@@ -1146,9 +1146,9 @@
     "semantic_hash": "8edc5a2e8af07df1b1ae8bd461ce4290"
   },
   "src/services/i18n/locales/es/data.json": {
-    "mtime": 1793183768.1568732,
-    "seen": 1793183783.9699109,
-    "ast_hash": "4d2f4e01c3c036cd2db8a0ae25ffe777",
+    "mtime": 1793184187.7806787,
+    "seen": 1793184256.7418823,
+    "ast_hash": "e959761f395c0b474695493647a7b308",
     "semantic_hash": ""
   },
   "src/services/i18n/locales/es/forms.json": {
@@ -1230,9 +1230,9 @@
     "semantic_hash": "e48ab8dc38133cdafe82bc173918da92"
   },
   "src/services/tanstack/keys.ts": {
-    "mtime": 1793183768.1488733,
-    "seen": 1793183783.9699314,
-    "ast_hash": "49d953b2f486c1453ad3d812d145bffc",
+    "mtime": 1793184187.7766788,
+    "seen": 1793184256.7419415,
+    "ast_hash": "e7479f6e89e52ae8db93e1e78400359f",
     "semantic_hash": ""
   },
   "src/services/tanstack/queryClient.ts": {
@@ -1836,9 +1836,9 @@
     "semantic_hash": ""
   },
   "src/pages/dashboard/appointments/calendar/index.tsx": {
-    "mtime": 1793041583.7183173,
-    "seen": 1793041624.377081,
-    "ast_hash": "e3244b6dbdc55579510edc36350aa3ab",
+    "mtime": 1793184240.3885314,
+    "seen": 1793184256.7413375,
+    "ast_hash": "c6d1a86474cafa8233df4c681184b6d9",
     "semantic_hash": ""
   },
   "src/pages/dashboard/appointments/form/steps/history/index.tsx": {
@@ -1848,9 +1848,9 @@
     "semantic_hash": ""
   },
   "src/services/tanstack/data/notes.ts": {
-    "mtime": 1793183768.1488733,
-    "seen": 1793183783.9699264,
-    "ast_hash": "c0eb76f2af549b405459f1526bba5a58",
+    "mtime": 1793184187.7766788,
+    "seen": 1793184256.7419271,
+    "ast_hash": "602b5a9fcdbed69348e14adc1e7caf60",
     "semantic_hash": ""
   },
   "src/helpers/statistics.ts": {
@@ -1866,9 +1866,9 @@
     "semantic_hash": ""
   },
   "src/pages/dashboard/appointments/form/steps/history/notes/index.tsx": {
-    "mtime": 1793183768.1568732,
-    "seen": 1793183783.9697428,
-    "ast_hash": "4dab66aa37389fb76d116e7bbd4bb35a",
+    "mtime": 1793184187.7766788,
+    "seen": 1793184256.7413876,
+    "ast_hash": "fe6eb4658d14505272635ebf73a7a5f8",
     "semantic_hash": ""
   },
   "src/pages/dashboard/appointments/form/steps/history/planing/index.tsx": {
@@ -1959,6 +1959,12 @@
     "mtime": 1793040808.757815,
     "seen": 1793040830.8988802,
     "ast_hash": "495638ed23c0611de3352e225e7924f5",
+    "semantic_hash": ""
+  },
+  "src/pages/dashboard/appointments/calendar/pendingTasks.tsx": {
+    "mtime": 1793184187.784679,
+    "seen": 1793184256.741345,
+    "ast_hash": "64d8c06548728749ead2372b36503de2",
     "semantic_hash": ""
   }
 }

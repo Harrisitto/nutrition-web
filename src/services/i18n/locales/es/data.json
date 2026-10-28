@@ -388,9 +388,7 @@
                 "gained": "Ganadas",
                 "lost": "Perdidas",
                 "bmr": "BMR (metabolismo basal): {{value}}",
-                "noBmr": "Sin BMR: no se puede calcular el balance energético.",
-                "pendingTasks": "Tareas pendientes",
-                "noPendingTasks": "No hay tareas pendientes."
+                "noBmr": "Sin BMR: no se puede calcular el balance energético."
             },
             "errors": {
                 "duplicateDay": "Ya hay una consulta con este cliente ese día. Elige otra fecha o edita la que ya existe.",
@@ -564,6 +562,8 @@
         "more_other": "+{{count}} más",
         "notesCount_one": "{{count}} nota",
         "notesCount_other": "{{count}} notas",
+        "pendingTasks": "Tareas pendientes",
+        "noPendingTasks": "No hay tareas pendientes.",
         "errors": {
             "load": "No se ha podido cargar el calendario. Inténtalo de nuevo."
         }

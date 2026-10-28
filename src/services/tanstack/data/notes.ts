@@ -94,34 +94,6 @@ export const useSearchNutritionistNote = ({
     });
 };
 
-// Tareas sin completar del cliente, sean de la fecha que sean: primero las de mas prioridad
-export const useFetchPendingNutritionistNotes = () => {
-    const clientId = useAppSelector((state) => state.config.selectedUserId);
-
-    return useQuery({
-        queryKey: queryKeys({ userId: clientId }).user.notes.pending,
-        queryFn: async () => {
-            if (!clientId) {
-                throw new Error("Client ID is not defined");
-            }
-
-            const response = await supabase.from('client_notes')
-                .select('*')
-                .eq('user_id', clientId)
-                .eq('status', 'pending')
-                .order('priority', { ascending: false })
-                .order('created_at');
-
-            if (response.error) {
-                throw response.error;
-            }
-
-            return response.data;
-        },
-        enabled: !!clientId,
-    });
-};
-
 // Prioridad de una nota (columna priority): entero de 0 (normal) a 10 (maxima)
 export const NOTE_PRIORITY_MIN = 0;
 export const NOTE_PRIORITY_MAX = 10;
@@ -244,6 +216,36 @@ export const useFetchScheduledNutritionistNotes = ({
                 .select('*, client: all_users(name)')
                 .eq('nutri_id', nutritionistId)
                 .eq('scheduled_date', date)
+                .order('priority', { ascending: false })
+                .order('created_at');
+
+            if (response.error) {
+                throw response.error;
+            }
+
+            return response.data;
+        },
+        enabled: !!nutritionistId,
+    });
+};
+
+// Tareas sin completar de todos los clientes del nutricionista, sean de la fecha que sean, con el
+// nombre del cliente: primero las de mas prioridad
+export const useFetchPendingNutritionistTasks = () => {
+    const infoQuery = useGetAuthInfo();
+    const nutritionistId = infoQuery.data?.nutri_id ?? null;
+
+    return useQuery({
+        queryKey: queryKeys({ userId: nutritionistId }).nutritionist.notes.pending,
+        queryFn: async () => {
+            if (!nutritionistId) {
+                throw new Error("Nutritionist ID is not defined");
+            }
+
+            const response = await supabase.from('client_notes')
+                .select('*, client: all_users(name)')
+                .eq('nutri_id', nutritionistId)
+                .eq('status', 'pending')
                 .order('priority', { ascending: false })
                 .order('created_at');
 
