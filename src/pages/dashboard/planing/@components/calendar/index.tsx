@@ -84,8 +84,9 @@ export const SelectDateCalendar = () => {
         {/* Grid del Calendario */}
         <CalendarView weeksGrid={calendarGrid} />
 
-        {/* Leyenda */}
-        <div className="flex flex-wrap items-center gap-3 border-t border-nutrition-green/10 pt-3 text-xs text-dark-green/75">
+        {/* Leyenda: w-0 para no ensanchar la tarjeta (w-fit) y min-w-full para ocupar el ancho
+            del calendario; asi hace wrap en vez de estirarla */}
+        <div className="flex w-0 min-w-full flex-wrap items-center gap-3 border-t border-nutrition-green/10 pt-3 text-xs text-dark-green/75">
           <span className="inline-flex items-center gap-1.5">
             <span className="h-2 w-3 rounded-xs bg-nutrition-green/35" />
             {t("data:dashboardTable.calendar.selectedWeek")}
