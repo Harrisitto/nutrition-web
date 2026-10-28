@@ -388,7 +388,9 @@
                 "gained": "Ganadas",
                 "lost": "Perdidas",
                 "bmr": "BMR (metabolismo basal): {{value}}",
-                "noBmr": "Sin BMR: no se puede calcular el balance energético."
+                "noBmr": "Sin BMR: no se puede calcular el balance energético.",
+                "pendingTasks": "Tareas pendientes",
+                "noPendingTasks": "No hay tareas pendientes."
             },
             "errors": {
                 "duplicateDay": "Ya hay una consulta con este cliente ese día. Elige otra fecha o edita la que ya existe.",
@@ -581,6 +583,14 @@
         "confirmDelete": "¿Eliminar?",
         "cancel": "Cancelar",
         "save": "Guardar",
-        "deleteError": "No se ha podido eliminar la nota. Inténtalo de nuevo."
+        "deleteError": "No se ha podido eliminar la nota. Inténtalo de nuevo.",
+        "type": "Tipo",
+        "typeNote": "Nota",
+        "typeTask": "Tarea",
+        "markDone": "Marcar como completada",
+        "markPending": "Marcar como pendiente",
+        "statusError": "No se ha podido actualizar la tarea. Inténtalo de nuevo.",
+        "statusPending": "Tarea pendiente",
+        "statusDone": "Tarea completada"
     }
 }

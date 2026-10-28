@@ -6,6 +6,7 @@ import { useLanguageCode } from "@src/hooks/helpers/language";
 import { deleteButtonStyle, primaryButtonStyle } from "@src/components/styles";
 import type { Tables } from "@src/services/supabase/types";
 import {
+  useCompleteNutritionistNote,
   useDeleteNutritionistNote,
   useMutateNutritionistNote,
   type NoteFields,
@@ -20,29 +21,33 @@ import { PriorityTag } from "./priorityTag";
 
 type Note = Tables<"client_notes"> & { client?: { name: string } | null };
 
+// Lo guardado de la nota, tal como lo edita el formulario
+const toFields = (note: Note): NoteFields => ({
+  note: note.note,
+  priority: note.priority,
+  scheduled_date: note.scheduled_date,
+  status: note.status === null ? "note" : "task",
+});
+
 const iconButtonStyle =
   "shrink-0 rounded-md p-1.5 text-text-muted transition hover:bg-white-green hover:text-text-title disabled:opacity-50";
 
-// Nota con su prioridad y fecha programada; se puede editar o eliminar (con confirmacion)
+// Nota con su prioridad y fecha programada; se puede editar o eliminar (con confirmacion).
+// Si es una tarea, el tick la marca como completada (o la vuelve a dejar pendiente)
 export const NoteItem = ({ note }: { note: Note }) => {
   const { t } = useTranslation();
   const language = useLanguageCode();
   const [mode, setMode] = useState<"view" | "edit" | "confirmDelete">("view");
-  const [fields, setFields] = useState<NoteFields>({
-    note: note.note,
-    priority: note.priority,
-    scheduled_date: note.scheduled_date,
-  });
+  const [fields, setFields] = useState<NoteFields>(() => toFields(note));
   const saveNote = useMutateNutritionistNote();
   const deleteNote = useDeleteNutritionistNote();
+  const completeNote = useCompleteNutritionistNote();
+  const isTask = note.status !== null;
+  const isDone = note.status === "done";
 
   const startEdit = () => {
     // Parte siempre de lo guardado, no de una edicion cancelada
-    setFields({
-      note: note.note,
-      priority: note.priority,
-      scheduled_date: note.scheduled_date,
-    });
+    setFields(toFields(note));
     setMode("edit");
   };
 
@@ -50,7 +55,7 @@ export const NoteItem = ({ note }: { note: Note }) => {
     e.preventDefault();
     if (fields.note.trim() === "") return;
     saveNote.mutate(
-      { ...fields, id: note.id, note: fields.note.trim() },
+      { ...fields, id: note.id, note: fields.note.trim(), done: isDone },
       { onSuccess: () => setMode("view") },
     );
   };
@@ -85,6 +90,24 @@ export const NoteItem = ({ note }: { note: Note }) => {
   return (
     <div className={`flex flex-col gap-1 ${listItemStyle()}`}>
       <div className="flex flex-wrap items-center gap-2">
+        {isTask && (
+          <button
+            type="button"
+            role="checkbox"
+            aria-checked={isDone}
+            className={`flex size-5 shrink-0 items-center justify-center rounded border transition disabled:opacity-50 ${
+              isDone
+                ? "border-nutrition-green bg-nutrition-green text-white hover:opacity-90"
+                : "border-gray-blue-300 bg-gray-blue-50 text-transparent hover:border-nutrition-green hover:text-nutrition-green"
+            }`}
+            disabled={completeNote.isPending}
+            onClick={() => completeNote.mutate({ id: note.id, done: !isDone })}
+            aria-label={t(isDone ? "data:notes.markPending" : "data:notes.markDone")}
+            title={t(isDone ? "data:notes.markPending" : "data:notes.markDone")}
+          >
+            <Check size={14} strokeWidth={3} />
+          </button>
+        )}
         {note.client && <span className={pointTagStyle}>{note.client.name}</span>}
         <PriorityTag priority={note.priority} />
         {note.scheduled_date ? (
@@ -154,7 +177,16 @@ export const NoteItem = ({ note }: { note: Note }) => {
           )}
         </div>
       </div>
-      <p className="whitespace-pre-line text-sm text-text-title">{note.note}</p>
+      <p
+        className={`whitespace-pre-line text-sm ${isDone ? "text-text-muted line-through" : "text-text-title"}`}
+      >
+        {note.note}
+      </p>
+      {completeNote.isError && (
+        <p className="text-sm text-red-500" role="alert">
+          {t("data:notes.statusError")}
+        </p>
+      )}
       {deleteNote.isError && (
         <p className="text-sm text-red-500" role="alert">
           {t("data:notes.deleteError")}

@@ -24,6 +24,9 @@ export type HistoryItem = {
   date: FromDate;
   tag?: string;
   text: ReactNode;
+  // Icono delante de la fecha y clases extra de la tarjeta (p. ej. el tipo de nota)
+  icon?: ReactNode;
+  className?: string;
 };
 
 // Valor del periodo y su tendencia semanal (sin tendencia, solo el valor)
@@ -111,7 +114,7 @@ export const SummaryList = ({
       ) : (
         <ul className="flex flex-col gap-2">
           {items.map((item) => (
-            <li key={item.key} className={listItemStyle()}>
+            <li key={item.key} className={`${listItemStyle()} ${item.className ?? ""}`}>
               <ItemContent item={item} formattedDate={formatDate(item.date)} />
             </li>
           ))}
@@ -130,6 +133,7 @@ const ItemContent = ({
 }) => (
   <div className="flex flex-col gap-1">
     <div className="flex items-center gap-2">
+      {item.icon}
       <span className="text-xs text-text-muted">{formattedDate}</span>
       {item.tag && <span className={pointTagStyle}>{item.tag}</span>}
     </div>
@@ -202,8 +206,8 @@ export const HistorySearch = ({
                   onClick={() => onSelectWeek(item.date)}
                   title={t("data:appointments.form.history.goToWeek", { date: formattedDate })}
                   className={`w-full text-left transition hover:border-nutrition-green ${listItemStyle()} ${
-                    isInPeriod(item.date, period) ? "ring-2 ring-light-green/50" : ""
-                  }`}
+                    item.className ?? ""
+                  } ${isInPeriod(item.date, period) ? "ring-2 ring-light-green/50" : ""}`}
                 >
                   <ItemContent item={item} formattedDate={formattedDate} />
                 </button>

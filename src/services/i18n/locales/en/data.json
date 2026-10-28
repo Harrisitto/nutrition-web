@@ -388,7 +388,9 @@
                 "gained": "Gained",
                 "lost": "Lost",
                 "bmr": "BMR (basal metabolic rate): {{value}}",
-                "noBmr": "No BMR: the energy balance cannot be calculated."
+                "noBmr": "No BMR: the energy balance cannot be calculated.",
+                "pendingTasks": "Pending tasks",
+                "noPendingTasks": "There are no pending tasks."
             },
             "errors": {
                 "duplicateDay": "There is already an appointment with this client on that day. Choose another date or edit the existing one.",
@@ -581,6 +583,14 @@
         "confirmDelete": "Delete?",
         "cancel": "Cancel",
         "save": "Save",
-        "deleteError": "The note could not be deleted. Please try again."
+        "deleteError": "The note could not be deleted. Please try again.",
+        "type": "Type",
+        "typeNote": "Note",
+        "typeTask": "Task",
+        "markDone": "Mark as done",
+        "markPending": "Mark as pending",
+        "statusError": "The task could not be updated. Please try again.",
+        "statusPending": "Pending task",
+        "statusDone": "Completed task"
     }
 }

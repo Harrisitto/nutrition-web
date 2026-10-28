@@ -338,6 +338,7 @@ export type Database = {
           nutri_id: string
           priority: number
           scheduled_date: string | null
+          status: string | null
           user_id: string
         }
         Insert: {
@@ -348,6 +349,7 @@ export type Database = {
           nutri_id?: string
           priority?: number
           scheduled_date?: string | null
+          status?: string | null
           user_id: string
         }
         Update: {
@@ -358,6 +360,7 @@ export type Database = {
           nutri_id?: string
           priority?: number
           scheduled_date?: string | null
+          status?: string | null
           user_id?: string
         }
         Relationships: [

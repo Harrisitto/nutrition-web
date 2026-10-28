@@ -87,6 +87,7 @@ export const queryKeys = ({
       // Fechas "YYYY-MM-DD", ambas incluidas
       range: (start: string, end: string) => ["user", "notes", userId, "range", start, end],
       search: (search: string) => ["user", "notes", userId, "search", search],
+      pending: ["user", "notes", userId, "pending"],
       // Prefijo de todas las anteriores
       all: ["user", "notes", userId],
     },

@@ -94,6 +94,34 @@ export const useSearchNutritionistNote = ({
     });
 };
 
+// Tareas sin completar del cliente, sean de la fecha que sean: primero las de mas prioridad
+export const useFetchPendingNutritionistNotes = () => {
+    const clientId = useAppSelector((state) => state.config.selectedUserId);
+
+    return useQuery({
+        queryKey: queryKeys({ userId: clientId }).user.notes.pending,
+        queryFn: async () => {
+            if (!clientId) {
+                throw new Error("Client ID is not defined");
+            }
+
+            const response = await supabase.from('client_notes')
+                .select('*')
+                .eq('user_id', clientId)
+                .eq('status', 'pending')
+                .order('priority', { ascending: false })
+                .order('created_at');
+
+            if (response.error) {
+                throw response.error;
+            }
+
+            return response.data;
+        },
+        enabled: !!clientId,
+    });
+};
+
 // Prioridad de una nota (columna priority): entero de 0 (normal) a 10 (maxima)
 export const NOTE_PRIORITY_MIN = 0;
 export const NOTE_PRIORITY_MAX = 10;
@@ -104,6 +132,7 @@ export type NoteFields = {
     priority: number;
     // "YYYY-MM-DD" o null: dia en que hay que tenerla en cuenta (sale en el calendario)
     scheduled_date: string | null;
+    status: "note" | "task";
 };
 
 // Sin id crea la nota del cliente seleccionado; con id la edita (sea del cliente que sea, p. ej.
@@ -115,25 +144,54 @@ export const useMutateNutritionistNote = () => {
         mutationFn: async ({
             id,
             appointment_id,
+            status,
+            done = false,
             ...fields
         }: NoteFields & {
             id: number | null;
             appointment_id?: number | null;
+            // Al editar una tarea completada sigue completada
+            done?: boolean;
         }) => {
             if (id === null && !clientId) {
                 throw new Error("Client ID is not defined");
             }
 
+            // Columna status: null es una nota; "pending" o "done", una tarea
+            const finalStatus = status === "note" ? null : done ? "done" : "pending";
+
             const response = id === null
                 ? await supabase.from('client_notes')
-                    .insert({ ...fields, user_id: clientId!, appointment_id: appointment_id ?? null })
+                    .insert({ ...fields, status: finalStatus, user_id: clientId!, appointment_id: appointment_id ?? null })
                     .select()
                     .single()
                 : await supabase.from('client_notes')
-                    .update(appointment_id === undefined ? fields : { ...fields, appointment_id })
+                    .update(appointment_id === undefined
+                        ? { ...fields, status: finalStatus }
+                        : { ...fields, status: finalStatus, appointment_id })
                     .eq('id', id)
                     .select()
                     .single();
+
+            if (response.error) {
+                throw response.error;
+            }
+
+            return response.data;
+        },
+        onSuccess: (note) => invalidateClientNotes(note.user_id),
+    });
+};
+
+// Marca una tarea como completada o la devuelve a pendiente
+export const useCompleteNutritionistNote = () => {
+    return useMutation({
+        mutationFn: async ({ id, done }: { id: number; done: boolean }) => {
+            const response = await supabase.from('client_notes')
+                .update({ status: done ? "done" : "pending" })
+                .eq('id', id)
+                .select('user_id')
+                .single();
 
             if (response.error) {
                 throw response.error;

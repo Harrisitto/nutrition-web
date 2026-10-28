@@ -1116,9 +1116,9 @@
     "semantic_hash": "a0c1e7dd54c7ce6a5963f37497768f29"
   },
   "src/services/i18n/locales/en/data.json": {
-    "mtime": 1793136644.0223947,
-    "seen": 1793136660.2971697,
-    "ast_hash": "e575c175fdf922fc73e57964fd624aed",
+    "mtime": 1793183768.1568732,
+    "seen": 1793183783.9699044,
+    "ast_hash": "5f52280f00d18f3caeb8db4ef0d3ad97",
     "semantic_hash": ""
   },
   "src/services/i18n/locales/en/forms.json": {
@@ -1146,9 +1146,9 @@
     "semantic_hash": "8edc5a2e8af07df1b1ae8bd461ce4290"
   },
   "src/services/i18n/locales/es/data.json": {
-    "mtime": 1793136644.0223947,
-    "seen": 1793136660.2971764,
-    "ast_hash": "102c2b4bfb370190553642e78f807032",
+    "mtime": 1793183768.1568732,
+    "seen": 1793183783.9699109,
+    "ast_hash": "4d2f4e01c3c036cd2db8a0ae25ffe777",
     "semantic_hash": ""
   },
   "src/services/i18n/locales/es/forms.json": {
@@ -1188,9 +1188,9 @@
     "semantic_hash": "64f20c556a81671766a4d1c5d5ea1822"
   },
   "src/services/supabase/types.ts": {
-    "mtime": 1793030609.769566,
-    "seen": 1793030843.9349797,
-    "ast_hash": "f899ac500a207e1cc768b243ddced88e",
+    "mtime": 1793182631.0739765,
+    "seen": 1793183396.5709405,
+    "ast_hash": "ff5001adcbacfe5ee91501175235341e",
     "semantic_hash": ""
   },
   "src/services/tanstack/auth/get.ts": {
@@ -1230,9 +1230,9 @@
     "semantic_hash": "e48ab8dc38133cdafe82bc173918da92"
   },
   "src/services/tanstack/keys.ts": {
-    "mtime": 1793041564.2542944,
-    "seen": 1793041624.3772979,
-    "ast_hash": "8fbe5ab76bf0bf7d7e900ddec29ff547",
+    "mtime": 1793183768.1488733,
+    "seen": 1793183783.9699314,
+    "ast_hash": "49d953b2f486c1453ad3d812d145bffc",
     "semantic_hash": ""
   },
   "src/services/tanstack/queryClient.ts": {
@@ -1848,9 +1848,9 @@
     "semantic_hash": ""
   },
   "src/services/tanstack/data/notes.ts": {
-    "mtime": 1793041564.2582946,
-    "seen": 1793041624.3772924,
-    "ast_hash": "ed2472609a90fe768cdd821e06144b2e",
+    "mtime": 1793183768.1488733,
+    "seen": 1793183783.9699264,
+    "ast_hash": "c0eb76f2af549b405459f1526bba5a58",
     "semantic_hash": ""
   },
   "src/helpers/statistics.ts": {
@@ -1866,9 +1866,9 @@
     "semantic_hash": ""
   },
   "src/pages/dashboard/appointments/form/steps/history/notes/index.tsx": {
-    "mtime": 1793030159.8996365,
-    "seen": 1793030176.8557503,
-    "ast_hash": "b98fb0cd66ca338da92b860c36aacc4c",
+    "mtime": 1793183768.1568732,
+    "seen": 1793183783.9697428,
+    "ast_hash": "4dab66aa37389fb76d116e7bbd4bb35a",
     "semantic_hash": ""
   },
   "src/pages/dashboard/appointments/form/steps/history/planing/index.tsx": {
@@ -1884,9 +1884,9 @@
     "semantic_hash": ""
   },
   "src/pages/dashboard/appointments/form/steps/history/shared/components.tsx": {
-    "mtime": 1793026497.385308,
-    "seen": 1793026512.491206,
-    "ast_hash": "639baa7c98d7aa69131180c5d5eed3ab",
+    "mtime": 1793183580.2887943,
+    "seen": 1793183596.5434768,
+    "ast_hash": "6811c33997c279e9217d1f976729cba2",
     "semantic_hash": ""
   },
   "src/pages/dashboard/appointments/form/steps/history/shared/format.ts": {
@@ -1926,21 +1926,21 @@
     "semantic_hash": ""
   },
   "src/pages/dashboard/@components/notes/addNoteForm.tsx": {
-    "mtime": 1793030797.7119508,
-    "seen": 1793030843.9347656,
-    "ast_hash": "0d41a55112228b749a64c7f55ce5255e",
+    "mtime": 1793183350.6569211,
+    "seen": 1793183396.5707097,
+    "ast_hash": "c12826084315714eec70576b04ae089f",
     "semantic_hash": ""
   },
   "src/pages/dashboard/@components/notes/noteFields.tsx": {
-    "mtime": 1793040811.153805,
-    "seen": 1793040830.8988702,
-    "ast_hash": "07e76d0e13ed29fae448bde6de2b1dd1",
+    "mtime": 1793183349.8369222,
+    "seen": 1793183396.5707114,
+    "ast_hash": "a574c6a1d1b95cad792c4471df24535c",
     "semantic_hash": ""
   },
   "src/pages/dashboard/@components/notes/noteItem.tsx": {
-    "mtime": 1793040786.1739151,
-    "seen": 1793040830.8988738,
-    "ast_hash": "dc85ba375a89e7846ae560e2462bda5f",
+    "mtime": 1793183379.7488832,
+    "seen": 1793183396.5707126,
+    "ast_hash": "099fb1f7549ab193ec857ba0066b1ff6",
     "semantic_hash": ""
   },
   "src/pages/dashboard/@components/notes/priority.ts": {

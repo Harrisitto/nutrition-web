@@ -14,7 +14,7 @@ type AddNoteFormProps = {
   appointmentId: number | null;
 };
 
-const EMPTY_NOTE: NoteFields = { note: "", priority: 0, scheduled_date: null };
+const EMPTY_NOTE: NoteFields = { note: "", priority: 0, scheduled_date: null, status: "note" };
 
 const NoteForm = ({ appointmentId }: AddNoteFormProps) => {
   const { t } = useTranslation();
