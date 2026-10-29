@@ -1,3 +1,5 @@
+import { getYoutubeVideoId } from "@src/helpers/youtube";
+
 export const ValidateStringRequired = (value: string) => {
     if (!value.trim()) { return 'system:form.required'; } return '';
 };
@@ -38,3 +40,17 @@ export const ValidateMaxValue = (value: number, max: number) => {
     return ''; 
 };
 
+export const ValidateIsUrl = (value: string) => {
+    try {
+        const url = new URL(value.trim());
+        if (url.protocol === 'https:') { return ''; }
+    } catch {
+        // URL lanza si el texto no es una URL
+    }
+    return 'system:form.invalidUrl';
+};
+
+export const ValidateYoutubeUrl = (value: string) => {
+    if (!getYoutubeVideoId(value)) { return 'system:form.invalidYoutubeUrl'; }
+    return '';
+};

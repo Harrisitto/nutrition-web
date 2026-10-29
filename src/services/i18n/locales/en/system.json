@@ -24,7 +24,9 @@
         "maxLength": "Too many characters",
         "minValue": "Value is too low",
         "maxValue": "Value is too high",
-        "required": "This field is required"
+        "required": "This field is required",
+        "invalidUrl": "Please enter a valid link starting with https://",
+        "invalidYoutubeUrl": "Please enter a valid YouTube link"
     },
     "privacyPolicy": {
         "title": "Privacy Policy",

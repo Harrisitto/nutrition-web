@@ -84,5 +84,12 @@
             "point": "Point",
             "inDays": "In days"
         }
+    },
+    "myVideos": {
+        "fields": {
+            "name": "Video name",
+            "url": "Video link",
+            "description": "Description"
+        }
     }
 }

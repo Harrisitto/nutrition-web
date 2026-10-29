@@ -12,6 +12,7 @@ import ConfigRaceIngredients from "./raceIngredients";
 const PageInviteClient = lazy(() => import("./inviteClient/index"));
 const PageAppointmentThemes = lazy(() => import("./appointmentThemes/index"));
 const PageUserPreset = lazy(() => import("../dashboard/preset/index"));
+const PageMyVideos = lazy(() => import("./myVideos/index"));
 
 const PageNutritionistConfiguration = () => {
   const { t } = useTranslation();
@@ -56,6 +57,11 @@ const PageNutritionistConfiguration = () => {
             label: t("data:configuration.sections.globalUserPresets.title"),
             onClick: () => navigateTo(APP_ROUTES.GLOBAL_USER_PRESETS),
           },
+          {
+            route: APP_ROUTES.MY_VIDEOS,
+            label: t("data:configuration.sections.myVideos.title"),
+            onClick: () => navigateTo(APP_ROUTES.MY_VIDEOS),
+          },
         ]}
       />
       <Routes>
@@ -90,6 +96,10 @@ const PageNutritionistConfiguration = () => {
         <Route
           path={getTrailingRoute(APP_ROUTES.GLOBAL_USER_PRESETS)}
           element={<PageUserPreset global />}
+        />
+        <Route
+          path={getTrailingRoute(APP_ROUTES.MY_VIDEOS)}
+          element={<PageMyVideos />}
         />
       </Routes>
     </div>

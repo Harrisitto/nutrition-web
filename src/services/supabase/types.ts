@@ -229,6 +229,7 @@ export type Database = {
           description: string
           id: number
           name: string
+          nutri_id: string
           updated: string
           url: string
         }
@@ -236,6 +237,7 @@ export type Database = {
           description?: string
           id?: number
           name: string
+          nutri_id?: string
           updated?: string
           url: string
         }
@@ -243,10 +245,19 @@ export type Database = {
           description?: string
           id?: number
           name?: string
+          nutri_id?: string
           updated?: string
           url?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "all_videos_nutri_id_fkey"
+            columns: ["nutri_id"]
+            isOneToOne: false
+            referencedRelation: "all_nutritionist"
+            referencedColumns: ["nutri_id"]
+          },
+        ]
       }
       appointment_points: {
         Row: {
@@ -1314,10 +1325,13 @@ export type Database = {
         Args: {
           p_changable_meal_ids: number[]
           p_date: string
+          p_new_meal_kcal?: number
           p_new_training_hc?: number[]
           p_new_training_kcal?: number
+          p_old_meal_kcal?: number
           p_old_training_hc?: number[]
           p_old_training_kcal?: number
+          p_removed_meal_ids?: number[]
           p_seed: number
           p_target_kcal?: number
           p_training_kcal: number

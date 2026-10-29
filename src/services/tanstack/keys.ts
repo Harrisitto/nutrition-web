@@ -112,7 +112,7 @@ export const queryKeys = ({
     orderedTypes: ["data", "orderedTypes", language],
     measures: ["data", "measures"],
     receipts: ["data", "receipts"],
-    videos: ["data", "videos"],
+    videos: ["data", "videos", userId],
     singleRecipe: (id: number) => ["data", "recipe", id, language],
     recipes: ["data", "recipes", language, searchStr],
     raceIngredients: ["data", "raceIngredients", userId],

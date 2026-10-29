@@ -292,6 +292,20 @@
                     }
                 },
                 "selectTheme": "Selecciona una temática para gestionar sus puntos."
+            },
+            "myVideos": {
+                "title": "Mis vídeos",
+                "description": "Añade los vídeos que quieras compartir con tus clientes.",
+                "listTitle": "Tus vídeos",
+                "addTitle": "Nuevo vídeo",
+                "add": "Añadir vídeo",
+                "delete": "Eliminar vídeo",
+                "confirmDelete": "¿Eliminar el vídeo «{{name}}»?",
+                "empty": "Todavía no has añadido ningún vídeo.",
+                "loadError": "No se han podido cargar tus vídeos.",
+                "saveError": "No se ha podido guardar el vídeo.",
+                "preview": "Vista previa del vídeo",
+                "onlyYoutube": "Solo se admiten vídeos de YouTube."
             }
         }
     },

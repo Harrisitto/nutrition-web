@@ -24,7 +24,9 @@
         "maxLength": "Demasiados caracteres",
         "minValue": "El valor es demasiado bajo",
         "maxValue": "El valor es demasiado alto",
-        "required": "Este campo es obligatorio"
+        "required": "Este campo es obligatorio",
+        "invalidUrl": "Ingresa un enlace valido que empiece por https://",
+        "invalidYoutubeUrl": "Ingresa un enlace valido de YouTube"
     },
     "privacyPolicy": {
         "title": "Politica de privacidad",

@@ -292,6 +292,20 @@
                     }
                 },
                 "selectTheme": "Select a theme to manage its points."
+            },
+            "myVideos": {
+                "title": "My videos",
+                "description": "Add the videos you want to share with your clients.",
+                "listTitle": "Your videos",
+                "addTitle": "New video",
+                "add": "Add video",
+                "delete": "Delete video",
+                "confirmDelete": "Delete the video “{{name}}”?",
+                "empty": "You have not added any videos yet.",
+                "loadError": "Your videos could not be loaded.",
+                "saveError": "The video could not be saved.",
+                "preview": "Video preview",
+                "onlyYoutube": "Only YouTube videos are allowed."
             }
         }
     },
