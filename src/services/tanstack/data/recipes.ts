@@ -2,7 +2,6 @@ import { useLanguageCode } from "@src/hooks/helpers/language"
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryKeys } from "../keys";
 import { useEffect, useState } from "react";
-import { debounce } from "lodash";
 import { supabase } from "@src/services/supabase/client";
 import type { SupportedLanguage } from "@src/services/i18n/config";
 import { queryClient } from "../queryClient";
@@ -55,27 +54,35 @@ export const selectRecipeInfo = (lang: SupportedLanguage) => {
 
 export const useFetchRecipes = ({
     searchStr = '',
+    typeIds = [],
+}: {
+    searchStr: string;
+    typeIds?: number[];
 }) => {
     const langCode = useLanguageCode();
     const [search, setSearch] = useState(searchStr);
 
     useEffect(() => {
-        debounce(() => {
-            setSearch(searchStr);
-        }, 500)();
+        const timeout = setTimeout(() => setSearch(searchStr), 500);
+        return () => clearTimeout(timeout);
     }, [searchStr]);
 
     return useQuery({
         queryKey: queryKeys({
             language: langCode,
             searchStr: search,
-        }).data.recipes,
+        }).data.recipes(typeIds),
         queryFn: async () => {
-            const { data, error } = await supabase
+            let query = supabase
                 .from("all_recipes")
                 .select(selectRecipes(langCode))
-                .ilike("name->>" + langCode, `%${search}%`)
-                .limit(20)
+                .ilike("name->>" + langCode, `%${search}%`);
+
+            if (typeIds.length > 0) {
+                query = query.in("type_id", typeIds);
+            }
+
+            const { data, error } = await query;
 
             if (error) {
                 throw error;
@@ -183,11 +190,14 @@ export const useMutateNutriRecipe = ({
                 }
             );
 
-            queryClient.setQueryData(
-                queryKeys({
-                    language: langCode,
-                }).data.recipes,
-                (oldData: RecipeInfo[]) => {
+            // Todas las busquedas cacheadas (texto y tipos) que puedan contener la receta
+            queryClient.setQueriesData(
+                {
+                    queryKey: queryKeys({
+                        language: langCode,
+                    }).data.recipesBase,
+                },
+                (oldData: RecipeInfo[] | undefined) => {
                     if (!oldData) return oldData;
                     return oldData.map(recipe => {
                         if (recipe.id === recipeId) {

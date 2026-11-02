@@ -114,7 +114,9 @@ export const queryKeys = ({
     receipts: ["data", "receipts"],
     videos: ["data", "videos", userId],
     singleRecipe: (id: number) => ["data", "recipe", id, language],
-    recipes: ["data", "recipes", language, searchStr],
+    // Prefijo de todas las busquedas de recetas del idioma
+    recipesBase: ["data", "recipes", language],
+    recipes: (typeIds: number[]) => ["data", "recipes", language, searchStr, [...typeIds].sort((a, b) => a - b)],
     raceIngredients: ["data", "raceIngredients", userId],
     raceLandmarks: ["data", "raceLandmarks", language],
     appointmentThemes: ["data", "appointmentThemes"],

@@ -216,7 +216,7 @@
                 "title": "Configuracion de recetas",
                 "description": "Gestiona tus recetas y personaliza tus planes de comida segun tus preferencias.",
                 "ingredients": "Ingredientes",
-                "rating": "Calificacion",
+                "rating": "Calificación",
                 "macros": "Macronutrientes de la receta",
                 "showAllTypes": "Mostrar todo"
             },

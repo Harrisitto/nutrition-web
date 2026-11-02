@@ -8,6 +8,8 @@ import { useTranslation } from "react-i18next";
 import { RecipePieChart } from "./@components/chart/pieChart";
 import { IngredientsList } from "./@components/ingredients";
 import { RecipeType } from "./@components/type";
+import { RecipeDescription } from "./@components/description";
+import { placeholderRecipeImg } from "../constants";
 
 export const ViewRecipe = ({
   searchStr,
@@ -51,50 +53,41 @@ export const ViewRecipe = ({
       >
         <ChevronLeft />
       </button>
-      <div className="flex flex-row gap-6 rounded-2xl border border-nutrition-green/20 bg-gradient-to-br from-white to-white-green/70 p-5 shadow-md">
-        <div className="aspect-square">
-          <img
-            src={recipe.url ?? undefined}
-            alt={recipe.name}
-            className="w-64 h-64 object-cover rounded-lg"
-          />
-        </div>
-        <div className="flex flex-col gap-4">
-          <h2 className="text-2xl font-bold uppercase text-text-title">
-            {recipe.name}
-          </h2>
-          <p className="text-text-subtitle">{recipe.description}</p>
-          <div>
-            <label className="block mb-1 font-medium text-sm text-text-subtitle">
-              {t("data:configuration.sections.recipes.rating")}
-            </label>
-            <div className="relative">
-              <div className="absolute w-48 flex flex-row justify-between">
+      <div className="flex flex-col gap-6 rounded-2xl border border-nutrition-green/20 bg-gradient-to-br from-white to-white-green/70 p-5 shadow-md sm:flex-row">
+        <img
+          src={recipe.url ?? placeholderRecipeImg}
+          alt={recipe.name}
+          className="aspect-square w-full shrink-0 self-start rounded-xl object-cover shadow-sm sm:w-64"
+        />
+        <div className="flex min-w-0 flex-1 flex-col gap-5">
+          <div className="flex flex-wrap items-start justify-between gap-3 border-b border-nutrition-green/15 pb-3">
+            <h2 className="text-2xl font-bold uppercase leading-tight text-text-title">
+              {recipe.name}
+            </h2>
+            <div className="flex flex-col items-end">
+              <span className="text-xs font-medium text-text-muted">
+                {t("data:configuration.sections.recipes.rating")}
+              </span>
+              <div className="flex flex-row">
                 {Array.from({ length: 5 }).map((_, i) => (
-                  <span
+                  <button
                     key={i}
-                    className={
+                    type="button"
+                    aria-label={`${i + 1}/5`}
+                    onClick={() => updateRating((i + 1) * 20)}
+                    className={`px-0.5 text-2xl leading-none transition-transform hover:scale-110 ${
                       i < recipeRating
-                        ? "text-yellow-400 text-3xl"
-                        : "text-nutrition-green/20 text-3xl"
-                    }
+                        ? "text-yellow-400"
+                        : "text-nutrition-green/20 hover:text-yellow-300"
+                    }`}
                   >
                     ★
-                  </span>
+                  </button>
                 ))}
               </div>
-              <input
-                type="range"
-                min={1}
-                max={5}
-                step={1}
-                value={recipeRating}
-                onChange={(e) => updateRating(Number(e.target.value) * 20)}
-                className="w-48 absolute opacity-0 h-12 cursor-pointer"
-                style={{ top: 0, left: 0 }}
-              />
             </div>
           </div>
+          <RecipeDescription description={recipe.description} />
         </div>
       </div>
       <div className="flex flex-row gap-6 mt-6">

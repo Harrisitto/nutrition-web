@@ -3,15 +3,15 @@ import { Loader } from "lucide-react";
 import { placeholderRecipeImg } from "../constants";
 
 export const List = ({
-  typeId,
+  typeIds,
   searchStr,
   onSelectRecipe,
 }: {
-  typeId?: number;
+  typeIds?: number[];
   searchStr: string;
   onSelectRecipe: (id: number) => void;
 }) => {
-  const { data: recipes, isLoading } = useFetchRecipes({ searchStr });
+  const { data: recipes, isLoading } = useFetchRecipes({ searchStr, typeIds });
   
   return isLoading ? (
     <div className="flex items-center justify-center space-x-2 p-8 text-nutrition-green">
@@ -20,7 +20,7 @@ export const List = ({
   ) : (
     <ul className="flex flex-row flex-wrap justify-around gap-3">
       {recipes
-      ?.filter((recipe) => !typeId || (recipe.type_id.id === typeId))
+      ?.slice()
       .sort((a, b) => {
         if (!a.nutri_recipe[0]?.rating) return 1;
         if (!b.nutri_recipe[0]?.rating) return -1;

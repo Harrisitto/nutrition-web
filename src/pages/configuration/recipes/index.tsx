@@ -58,7 +58,7 @@ export const Recipes = () => {
         ) : (
           <div className="flex justify-center">
             <List
-              typeId={selectedType !== -1 ? selectedType : undefined}
+              typeIds={selectedType !== -1 ? [selectedType] : undefined}
               searchStr={searchStr}
               onSelectRecipe={(id) => {
                 setSelectedRecipeId(id);
