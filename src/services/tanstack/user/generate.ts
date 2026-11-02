@@ -43,7 +43,9 @@ export const parseGenerateError = (error: unknown): GenerateError | null => {
  * El objetivo lo calcula la RPC: parte de las kcal de las comidas actuales y
  * les suma el cambio de entreno (de `previous*` a `trainingKcal` y
  * `trainingHc`; sin `previous*`, desde lo guardado). Con el día vacío lo saca
- * del historial. El entreno nuevo lo guarda la propia RPC.
+ * del historial. El entreno nuevo lo guarda quien llama, antes de la RPC, así
+ * que al cambiar el entreno `previous*` es obligatorio en la práctica: sin él
+ * la RPC partiría del entreno ya nuevo y la diferencia sería 0.
  *
  * Sin historial en la última semana o sin combinación dentro del margen, la
  * RPC falla y se avisa con una notificación.

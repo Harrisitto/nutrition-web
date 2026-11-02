@@ -6,9 +6,10 @@ import { useFetchPlaningMealsForDate } from "@src/services/tanstack/user/meals";
 import { useGeneratePlaningDay } from "@src/services/tanstack/user/generate";
 
 // Guarda las kcal o los HC por hora de entreno de un dia. Con el ajuste automatico activado
-// para ese cambio lo guarda la RPC de generar, que ademas reajusta las comidas del dia a la
-// diferencia de entreno. Si la RPC falla (sin historial o sin combinacion, ya avisado con una
-// notificacion) deshace tambien el entreno, asi que se guarda sin ajustar para no perderlo
+// para ese cambio, despues de guardar el entreno llama a la RPC de generar, que reajusta las
+// comidas del dia a la diferencia de entreno. Si el guardado falla no se llama a la RPC; si
+// falla la RPC (sin historial o sin combinacion, ya avisado con una notificacion) el entreno
+// queda guardado sin ajustar las comidas
 export const useSaveTraining = () => {
   const autoAdjust = useAppSelector((state) => state.config.autoAdjustMeals);
   const planingMutation = useMutatePlaning();
@@ -33,16 +34,16 @@ export const useSaveTraining = () => {
     if (!autoAdjust.onTrainingKcalChange || kcal === previous) {
       return planingMutation.mutateAsync({ date, training_kcal: kcal });
     }
-    try {
-      await generate.mutateAsync({
+    await planingMutation.mutateAsync({ date, training_kcal: kcal });
+    // El entreno nuevo ya esta guardado: sin `previous*` la diferencia seria 0
+    await generate
+      .mutateAsync({
         date,
         mealIds: getMealIds(date),
         trainingKcal: kcal,
         previousTrainingKcal: previous,
-      });
-    } catch {
-      await planingMutation.mutateAsync({ date, training_kcal: kcal });
-    }
+      })
+      .catch(() => {});
   };
 
   const saveTrainingHc = async (date: FromDate, hc: number[]) => {
@@ -53,18 +54,19 @@ export const useSaveTraining = () => {
     if (!autoAdjust.onTrainingCarbsChange || isUnchanged) {
       return planingMutation.mutateAsync({ date, training_hc: hc });
     }
-    try {
-      await generate.mutateAsync({
+    await planingMutation.mutateAsync({ date, training_hc: hc });
+    // Las kcal de entreno no cambian; se pasan como anteriores para no depender de lo guardado
+    const trainingKcal = day?.training_kcal ?? 0;
+    await generate
+      .mutateAsync({
         date,
         mealIds: getMealIds(date),
-        // Obligatorio en la RPC: las kcal de entreno no cambian
-        trainingKcal: day?.training_kcal ?? 0,
+        trainingKcal,
+        previousTrainingKcal: trainingKcal,
         trainingHc: hc,
         previousTrainingHc: previous,
-      });
-    } catch {
-      await planingMutation.mutateAsync({ date, training_hc: hc });
-    }
+      })
+      .catch(() => {});
   };
 
   return { saveTrainingKcal, saveTrainingHc };
