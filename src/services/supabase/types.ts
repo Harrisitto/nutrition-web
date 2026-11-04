@@ -136,6 +136,45 @@ export type Database = {
         }
         Relationships: []
       }
+      all_recipe_groups: {
+        Row: {
+          comment: Json
+          id: number
+        }
+        Insert: {
+          comment?: Json
+          id?: number
+        }
+        Update: {
+          comment?: Json
+          id?: number
+        }
+        Relationships: []
+      }
+      all_recipe_tags: {
+        Row: {
+          id: number
+          recipe_description: Json
+          recipe_name: Json
+          user_description: Json
+          user_name: Json
+        }
+        Insert: {
+          id?: number
+          recipe_description: Json
+          recipe_name: Json
+          user_description: Json
+          user_name: Json
+        }
+        Update: {
+          id?: number
+          recipe_description?: Json
+          recipe_name?: Json
+          user_description?: Json
+          user_name?: Json
+        }
+        Relationships: []
+      }
       all_recipes: {
         Row: {
           description: Json | null
@@ -783,6 +822,84 @@ export type Database = {
           },
         ]
       }
+      recipe_editors: {
+        Row: {
+          comment: string
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          comment?: string
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      recipe_groups: {
+        Row: {
+          group_id: number
+          recipe_id: number
+        }
+        Insert: {
+          group_id: number
+          recipe_id: number
+        }
+        Update: {
+          group_id?: number
+          recipe_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipe_groups_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "all_recipe_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recipe_groups_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "all_recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recipe_tags: {
+        Row: {
+          recipe_id: number
+          tag_id: number
+        }
+        Insert: {
+          recipe_id: number
+          tag_id: number
+        }
+        Update: {
+          recipe_id?: number
+          tag_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipe_tags_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "all_recipes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recipe_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "all_recipe_tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       recipe_type: {
         Row: {
           comment: Json | null
@@ -874,19 +991,31 @@ export type Database = {
       }
       recipe_type_custom_relation: {
         Row: {
+          fat: number
+          hc: number
           id: number
           macro_type: string | null
           meal_type: string | null
+          name: Json
+          prot: number
         }
         Insert: {
+          fat?: number
+          hc?: number
           id?: number
           macro_type?: string | null
           meal_type?: string | null
+          name?: Json
+          prot?: number
         }
         Update: {
+          fat?: number
+          hc?: number
           id?: number
           macro_type?: string | null
           meal_type?: string | null
+          name?: Json
+          prot?: number
         }
         Relationships: []
       }
@@ -965,6 +1094,36 @@ export type Database = {
           },
           {
             foreignKeyName: "user_appointment_points_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "all_users"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      user_food_tags: {
+        Row: {
+          tag_id: number
+          user_id: string
+        }
+        Insert: {
+          tag_id: number
+          user_id: string
+        }
+        Update: {
+          tag_id?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_food_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "all_recipe_tags"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_food_tags_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "all_users"
@@ -1088,6 +1247,7 @@ export type Database = {
       user_planing_meal: {
         Row: {
           date: string
+          is_fixed_recipe: boolean
           meal_id: number
           recipe_id: number | null
           type_id: number
@@ -1095,6 +1255,7 @@ export type Database = {
         }
         Insert: {
           date: string
+          is_fixed_recipe?: boolean
           meal_id: number
           recipe_id?: number | null
           type_id: number
@@ -1102,6 +1263,7 @@ export type Database = {
         }
         Update: {
           date?: string
+          is_fixed_recipe?: boolean
           meal_id?: number
           recipe_id?: number | null
           type_id?: number
@@ -1325,6 +1487,7 @@ export type Database = {
         Args: {
           p_changable_meal_ids: number[]
           p_date: string
+          p_max_deficit_kcal?: number
           p_new_meal_kcal?: number
           p_new_training_hc?: number[]
           p_new_training_kcal?: number
@@ -1339,6 +1502,7 @@ export type Database = {
         }
         Returns: {
           date: string
+          is_fixed_recipe: boolean
           meal_id: number
           recipe_id: number | null
           type_id: number
@@ -1355,9 +1519,20 @@ export type Database = {
         Args: { end_date: string; start_date: string; user_uuid: string }
         Returns: number
       }
+      get_recipe_alternatives: {
+        Args: { p_lang: string; p_recipe_id: number; p_user_id: string }
+        Returns: {
+          id: number
+          name: string
+          type_id: number
+        }[]
+      }
       get_top_recipes_for_type: {
         Args: {
+          p_after_id?: number
+          p_after_score?: number
           p_lang: string
+          p_page_size?: number
           p_search?: string
           p_type_id: number
           p_user_id: string
@@ -1436,8 +1611,22 @@ export type Database = {
         Args: { p_nutri_id: string }
         Returns: string
       }
+      pick_recipe: {
+        Args: {
+          p_date: string
+          p_group_ids?: number[]
+          p_meal_id: number
+          p_type_id: number
+          p_user_id: string
+        }
+        Returns: number
+      }
       process_stripe_seat_sync_queue: { Args: never; Returns: number }
       race_image_race_id: { Args: { p_name: string }; Returns: number }
+      recipe_fits_user: {
+        Args: { p_recipe_id: number; p_user_id: string }
+        Returns: boolean
+      }
       remove_client: {
         Args: { p_user_id: string }
         Returns: {
@@ -1475,6 +1664,10 @@ export type Database = {
           p_user_id: string
         }
         Returns: number
+      }
+      set_user_food_tags: {
+        Args: { p_tag_ids: number[]; p_user_id: string }
+        Returns: undefined
       }
       unaccent: { Args: { "": string }; Returns: string }
     }

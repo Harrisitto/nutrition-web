@@ -1,13 +1,16 @@
 import { useLanguageCode } from "@src/hooks/helpers/language"
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 import { queryKeys } from "../keys";
 import { useEffect, useState } from "react";
 import { supabase } from "@src/services/supabase/client";
 import type { SupportedLanguage } from "@src/services/i18n/config";
 import { queryClient } from "../queryClient";
 import { useGetAuthSession } from "../auth/get";
+import { useAppSelector } from "../../../store/store";
 
 type RecipeInfo = NonNullable<ReturnType<typeof useFetchRecipeInfo>["data"]>;
+
+const TOP_RECIPES_PAGE_SIZE = 20;
 
 export const selectRecipes = (lang: SupportedLanguage) => {
     return `
@@ -103,6 +106,64 @@ export const useFetchRecipes = ({
         placeholderData: [],
     });
 }
+
+type TopRecipesCursor = { score: number; id: number } | null;
+
+export const useFetchTopRecipesForUser = ({
+    typeId,
+    search = '',
+}: {
+    typeId?: number;
+    search?: string;
+}) => {
+    const langCode = useLanguageCode();
+    const userId = useAppSelector(state => state.config.selectedUserId);
+
+    return useInfiniteQuery({
+        queryKey: queryKeys({
+            language: langCode,
+            userId,
+            searchStr: search,
+        }).data.topRecipesForUser(typeId),
+        queryFn: async ({ pageParam }) => {
+            const { data, error } = await supabase.rpc("get_top_recipes_for_type", {
+                p_user_id: userId!,
+                p_type_id: typeId!,
+                p_lang: langCode,
+                p_search: search || undefined,
+                p_page_size: TOP_RECIPES_PAGE_SIZE,
+                p_after_score: pageParam?.score,
+                p_after_id: pageParam?.id,
+            });
+
+            if (error) {
+                throw error;
+            }
+
+            if (!data.length) {
+                return [];
+            }
+
+            const signedUrls = await supabase.storage.from('recipe_images').createSignedUrls(
+                data.map(recipe => `receta_${recipe.id}.jpg`),
+                60 * 60 // 1 hour
+            );
+
+            return data.map((recipe, index) => ({
+                ...recipe,
+                url: signedUrls.data?.[index]?.signedUrl ?? null,
+            }));
+        },
+        initialPageParam: null as TopRecipesCursor,
+        // Cursor = (score, id) de la ultima receta. Pagina incompleta = no hay mas
+        getNextPageParam: (lastPage): TopRecipesCursor | undefined => {
+            const last = lastPage.at(-1);
+            if (!last || lastPage.length < TOP_RECIPES_PAGE_SIZE) return undefined;
+            return { score: last.score, id: last.id };
+        },
+        enabled: !!userId && typeId !== undefined,
+    });
+};
 
 export const useFetchRecipeInfo = ({
     recipeId,
@@ -213,6 +274,12 @@ export const useMutateNutriRecipe = ({
                     });
                 }
             );
+        },
+        onSettled: () => {
+            // El rating cambia el orden del top: refetch en vez de parchear las paginas
+            queryClient.invalidateQueries({
+                queryKey: queryKeys().data.topRecipesBase,
+            });
         },
     });
 }

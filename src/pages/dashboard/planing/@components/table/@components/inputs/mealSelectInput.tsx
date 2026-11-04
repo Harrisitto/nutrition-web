@@ -1,9 +1,10 @@
 import { useTranslation } from "react-i18next";
 import FromDate from "@src/helpers/dates";
 import { useFetchOrderedMealsForId } from "@src/services/tanstack/data/meals";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useDeletePlaningMeal, useMutatePlaningMeals } from "@src/services/tanstack/user/meals";
 import SelectEditor from "./default/selectInput";
+import RecipeSelectEditor from "./recipeSelectInput";
 
 const CLEAR_MEAL_ID = -1;
 
@@ -33,6 +34,8 @@ const MealTypeEditor = ({
   onClose,
 }: MealTypeEditorProps) => {
   const { t } = useTranslation();
+  // Tipo para el que se esta eligiendo receta fija
+  const [recipeTypeId, setRecipeTypeId] = useState<number | undefined>(undefined);
 
   const mealTypes = useFetchOrderedMealsForId({
     mealId,
@@ -63,19 +66,36 @@ const MealTypeEditor = ({
     [options, selectedTypeId],
   );
 
+  const saveMeal = (typeId: number, recipeId: number | null) => {
+    insertMeal
+      .mutateAsync([{
+        meal_id: mealId,
+        type_id: typeId,
+        // Con receta elegida queda fija; sin ella deja de serlo
+        recipe_id: recipeId,
+        is_fixed_recipe: recipeId !== null,
+      }])
+      .finally(onClose);
+  };
+
   const handleSave = (selected: MealTypeOption) => {
     if (selected.isClear || selected.id === CLEAR_MEAL_ID) {
       deleteMeal.mutateAsync(mealId).finally(onClose);
       return;
     }
 
-    insertMeal
-      .mutateAsync([{
-        meal_id: mealId,
-        type_id: selected.id,
-      }])
-      .finally(onClose);
+    saveMeal(selected.id, null);
   };
+
+  if (recipeTypeId !== undefined) {
+    return (
+      <RecipeSelectEditor
+        typeId={recipeTypeId}
+        onSave={(recipeId) => saveMeal(recipeTypeId, recipeId)}
+        onClose={onClose}
+      />
+    );
+  }
 
   return (
     <SelectEditor<MealTypeOption>
@@ -149,6 +169,17 @@ const MealTypeEditor = ({
                 )}
               </div>
             )}
+            <button
+              type="button"
+              onClick={(e) => {
+                // Sin esto el click tambien selecciona el tipo y cierra
+                e.stopPropagation();
+                setRecipeTypeId(opt.id);
+              }}
+              className="self-start rounded-md border border-nutrition-purple/40 px-2 py-0.5 text-[11px] font-semibold text-nutrition-purple transition-colors hover:border-nutrition-purple hover:bg-nutrition-purple hover:text-white"
+            >
+              {t("data:dashboardTable.selectRecipe")}
+            </button>
           </div>
         );
       }}

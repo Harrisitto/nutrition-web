@@ -23,6 +23,10 @@ export interface SelectEditorProps<T> {
   onSave: (value: T) => void;
   onClose: () => void;
   searchable?: boolean;
+  /** Se llama al acercarse al final de la lista (paginacion infinita) */
+  onScrollEnd?: () => void;
+  /** Contenido extra al final de la lista, p.ej. "Cargando..." */
+  listFooter?: ReactNode;
 }
 
 export function SelectEditor<T>({
@@ -35,6 +39,8 @@ export function SelectEditor<T>({
   onSave,
   onClose,
   searchable = true,
+  onScrollEnd,
+  listFooter,
 }: SelectEditorProps<T>) {
   const saveKey = useAppSelector(
     (state) => state.config.keyboardCommands.tableNavigation.saveData,
@@ -96,6 +102,21 @@ export function SelectEditor<T>({
 
     return () => cancelAnimationFrame(frameId);
   }, [focusedIndex, filteredOptions]);
+
+  // Al llegar con el teclado a las ultimas opciones tambien se pide mas
+  useEffect(() => {
+    if (onScrollEnd && focusedIndex >= filteredOptions.length - 3) {
+      onScrollEnd();
+    }
+  }, [focusedIndex, filteredOptions.length, onScrollEnd]);
+
+  const handleScroll = () => {
+    const container = listRef.current;
+    if (!container || !onScrollEnd) return;
+    if (container.scrollTop + container.clientHeight >= container.scrollHeight - 40) {
+      onScrollEnd();
+    }
+  };
 
   const handleSave = useCallback(
     (itemToSave?: T) => {
@@ -161,6 +182,7 @@ export function SelectEditor<T>({
           ref={listRef}
           tabIndex={searchable ? -1 : 0}
           autoFocus={!searchable}
+          onScroll={handleScroll}
           className="relative max-h-60 overflow-y-auto rounded-lg outline-none"
         >
           {filteredOptions.length === 0 ? (
@@ -202,6 +224,7 @@ export function SelectEditor<T>({
             })
           )}
         </div>
+        {listFooter}
 
         <div className="flex justify-end gap-2">
           <button

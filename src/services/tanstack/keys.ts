@@ -117,6 +117,9 @@ export const queryKeys = ({
     // Prefijo de todas las busquedas de recetas del idioma
     recipesBase: ["data", "recipes", language],
     recipes: (typeIds: number[]) => ["data", "recipes", language, searchStr, [...typeIds].sort((a, b) => a - b)],
+    // Fuera de recipesBase: su cache es InfiniteData, no un array
+    topRecipesBase: ["data", "topRecipes"],
+    topRecipesForUser: (typeId?: number) => ["data", "topRecipes", language, userId, typeId ?? null, searchStr],
     raceIngredients: ["data", "raceIngredients", userId],
     raceLandmarks: ["data", "raceLandmarks", language],
     appointmentThemes: ["data", "appointmentThemes"],

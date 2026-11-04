@@ -11,6 +11,8 @@
         "energyBalanceResume": "Suma semanal",
         "weekBalance": "Balance semanal",
         "search": "Buscar",
+        "selectRecipe": "Elegir receta",
+        "noFixedRecipe": "Sin receta fija",
         "dailyMacros": {
             "header": "Macronutrientes diarios",
             "carbsPerkg": "Carbohidratos/kg",
@@ -74,7 +76,8 @@
             "noHistory": "No se han puesto: {{meals}}. No tienen historial en la última semana o el objetivo de kcal no las necesitaba.",
             "noClientHistory": "El cliente no tiene comidas en la última semana: no se puede generar el día.",
             "noCombination": "No se encontró una combinación de comidas para {{target}} kcal.",
-            "noCombinationClosest": "No se encontró una combinación de comidas para {{target}} kcal: la más cercana se queda en {{closest}} kcal (margen ±{{margin}} kcal)."
+            "noCombinationClosest": "No se encontró una combinación de comidas para {{target}} kcal: la más cercana se queda en {{closest}} kcal (margen ±{{margin}} kcal).",
+            "deficit": "El día quedaría con un déficit de {{deficit}} kcal (máximo {{max}} kcal): las comidas no cubren el entreno. Revisa el entreno o planifica las comidas a mano."
         },
         "calendar": {
             "training": "Entrenamiento",

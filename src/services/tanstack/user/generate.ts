@@ -14,7 +14,8 @@ const round = (kcal: number | undefined) =>
 // Errores P0001 que lanza la RPC a proposito; su hint dice cual es
 type GenerateError =
   | { kind: "noHistory" }
-  | { kind: "noCombination"; target: string; closest?: string; margin?: string };
+  | { kind: "noCombination"; target: string; closest?: string; margin?: string }
+  | { kind: "deficit"; deficit: string; max: string };
 
 export const parseGenerateError = (error: unknown): GenerateError | null => {
   if (typeof error !== "object" || error === null) return null;
@@ -24,6 +25,9 @@ export const parseGenerateError = (error: unknown): GenerateError | null => {
     hint?: string;
   };
   if (code !== "P0001") return null;
+  // 'El día quedaría con un déficit de X kcal (máximo: Y kcal)'
+  const deficit = message.match(/déficit de (\d+) kcal \(máximo: (\d+) kcal\)/);
+  if (deficit) return { kind: "deficit", deficit: deficit[1], max: deficit[2] };
   // 'Las comidas cambiables no tienen historial en los últimos 7 días.'
   if (hint.includes("historial")) return { kind: "noHistory" };
   // 'No se encontró una combinación ... (objetivo: X kcal)' con hint
@@ -97,6 +101,13 @@ export const useGeneratePlaningDay = () => {
       addNotification(
         generateError.kind === "noHistory"
           ? { type: "error", duration: 6000, message: "data:dashboardTable.autoGenerate.noClientHistory" }
+          : generateError.kind === "deficit"
+          ? {
+              type: "error",
+              duration: 8000,
+              message: "data:dashboardTable.autoGenerate.deficit",
+              params: generateError,
+            }
           : {
               type: "error",
               duration: 6000,

@@ -12,7 +12,7 @@ import { useRefreshClientOrder } from "./profile";
 const TABLE_NAME = "user_planing_meal" as const;
 
 const selectFromMeal = (languageCode: ReturnType<typeof useLanguageCode>) => {
-  return `*, recipe_type(*, name: name->>${languageCode})` as const;
+  return `*, recipe_type(*, name: name->>${languageCode}), fixed_recipe: all_recipes(name: name->>${languageCode})` as const;
 };
 
 type MealType = NonNullable<ReturnType<typeof useFetchPlaningMealsForDate>["data"]>[number];
@@ -184,6 +184,8 @@ export const useMutatePlaningMeals = ({
         date: m.date ?? safeDate.save(),
         meal_id: m.meal_id!,
         recipe_id: m.recipe_id ?? null,
+        // Solo es fija si se eligio receta a mano
+        is_fixed_recipe: m.recipe_id != null && (m.is_fixed_recipe ?? false),
         type_id: m.type_id!,
       }));
 

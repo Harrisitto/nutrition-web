@@ -84,16 +84,29 @@ export class RowInfo {
  */
 export class MealRowInfo extends RowInfo {
   mealId: number;
-  kcal: number;
+  // Fecha ("YYYY-MM-DD") -> kcal del tipo de comida de ese dia
+  private kcalByDate: Map<string, number>;
+  // Fecha ("YYYY-MM-DD") -> nombre de la receta fija de ese dia
+  private fixedRecipes: Map<string, string>;
 
-  constructor(mealId: number, kcal: number) {
+  constructor(mealId: number, kcalByDate: Map<string, number>, fixedRecipes = new Map<string, string>()) {
     super({
       id: "INPUT_MEAL",
       isEditable: "meals",
       isFullWidth: false,
     });
     this.mealId = mealId;
-    this.kcal = kcal;
+    this.kcalByDate = kcalByDate;
+    this.fixedRecipes = fixedRecipes;
+  }
+
+  getKcal(date: string) {
+    return this.kcalByDate.get(date) ?? 0;
+  }
+
+  /** Nombre de la receta fija, o undefined si ese dia no hay */
+  getFixedRecipe(date: string) {
+    return this.fixedRecipes.get(date);
   }
 
   override getCellId(date: string) {

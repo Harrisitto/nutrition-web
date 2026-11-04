@@ -41,7 +41,8 @@ const useTableRows = () => {
       number,
       {
         namesMap: Map<string, string>;
-        totalKcal: number;
+        fixedRecipes: Map<string, string>;
+        kcalByDate: Map<string, number>;
       }
     >();
 
@@ -56,19 +57,23 @@ const useTableRows = () => {
       if (!entry) {
         entry = {
           namesMap: new Map<string, string>(),
-          totalKcal: 0,
+          fixedRecipes: new Map<string, string>(),
+          kcalByDate: new Map<string, number>(),
         };
         userMealsMap.set(scheduledMeal.meal_id, entry);
       }
 
       entry.namesMap.set(date, name);
-      entry.totalKcal += kcal;
+      if (scheduledMeal.is_fixed_recipe) {
+        entry.fixedRecipes.set(date, String(scheduledMeal.fixed_recipe?.name ?? ""));
+      }
+      entry.kcalByDate.set(date, kcal);
     });
 
     return mealsQuery.data.map((meal) => {
       const mealData = userMealsMap.get(meal.id);
 
-      return new MealRowInfo(meal.id, mealData?.totalKcal ?? 0)
+      return new MealRowInfo(meal.id, mealData?.kcalByDate ?? new Map(), mealData?.fixedRecipes)
         .addLabel(String(meal.name))
         .addMap(mealData?.namesMap ?? new Map());
     });
