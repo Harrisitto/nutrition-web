@@ -20,6 +20,11 @@ export const rowLabelStyle =
 export const overflowRevealStyle =
   "truncate hover:whitespace-normal hover:[overflow-wrap:anywhere]";
 
+// Same reveal, forced (e.g. the keyboard-selected cell). Use together with
+// `overflowRevealStyle` inside an `ExpandableCell` so it grows over its
+// neighbours instead of stretching the row.
+export const expandedRevealStyle = "whitespace-normal [overflow-wrap:anywhere]";
+
 // Base chip look shared by every interactive/data cell in the day columns.
 export const cellChipStyle =
   "w-full cursor-pointer rounded-lg bg-fade-green/10 px-2 py-1.5 text-center text-xs font-medium text-text-body transition-colors";
@@ -38,3 +43,9 @@ export const highlightRingStyle = "ring-2 ring-inset ring-nutrition-blue";
 // palette's lightest tone instead, which actually contrasts against a dark
 // fill.
 export const highlightRingOnDarkStyle = "ring-2 ring-inset ring-gray-blue-200";
+
+// Botones secundarios dentro de las opciones del selector de comida/receta
+export const optionActionButtonStyle =
+  "shrink-0 self-start rounded-md border border-nutrition-purple/40 px-2 py-0.5 text-[11px] font-semibold text-nutrition-purple transition-colors hover:border-nutrition-purple hover:bg-nutrition-purple hover:text-white";
+export const addIngredientsButtonStyle =
+  "shrink-0 self-center rounded-md border border-nutrition-green/40 px-2 py-0.5 text-[11px] font-semibold text-dark-green transition-colors hover:border-nutrition-green hover:bg-nutrition-green hover:text-white";

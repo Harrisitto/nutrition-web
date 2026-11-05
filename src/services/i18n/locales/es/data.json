@@ -115,6 +115,30 @@
             "goal": "Objetivo",
             "lastSeen": "Visto por ultima vez hace {{days}} dias",
             "neverSeen": "Visto por ultima vez: nunca"
+        },
+        "documentRow": {
+            "header": "Documento",
+            "select": "Adjuntar documento",
+            "empty": "No tienes documentos. Súbelos en Configuración > Mis documentos.",
+            "other": "Documento"
+        },
+        "ingredients": {
+            "title": "Ingredientes adicionales",
+            "titleFor": "Ingredientes adicionales: {{meal}}",
+            "added": "Añadidos",
+            "empty": "Esta comida aún no tiene ingredientes adicionales",
+            "add": "Añadir ingrediente",
+            "noResults": "No se han encontrado ingredientes",
+            "amount": "Cantidad",
+            "remove": "Quitar ingrediente",
+            "done": "Hecho",
+            "addToMeal": "+ Ingredientes",
+            "cellBadge": "{{count}} ingredientes adicionales",
+            "back": "Volver"
+        },
+        "recipeComment": {
+            "label": "Comentario sobre la receta",
+            "placeholder": "Ej.: sin lactosa, ración pequeña..."
         }
     },
     "references": {
@@ -309,6 +333,32 @@
                 "saveError": "No se ha podido guardar el vídeo.",
                 "preview": "Vista previa del vídeo",
                 "onlyYoutube": "Solo se admiten vídeos de YouTube."
+            },
+            "documents": {
+                "title": "Mis documentos",
+                "description": "Sube los documentos que quieras compartir con tus clientes: PDF, imágenes u hojas de cálculo.",
+                "listTitle": "Tus documentos",
+                "addTitle": "Nuevo documento",
+                "file": "Archivo",
+                "allowedTypes": "PDF, PNG, JPG, WEBP, CSV, Excel u OpenDocument. Máximo {{max}}.",
+                "invalidType": "Este tipo de archivo no está permitido.",
+                "tooLarge": "El archivo supera el máximo de {{max}}.",
+                "add": "Subir documento",
+                "uploading": "Subiendo...",
+                "open": "Abrir documento",
+                "rename": "Cambiar nombre",
+                "save": "Guardar nombre",
+                "cancel": "Cancelar",
+                "delete": "Eliminar documento",
+                "confirmDelete": "¿Eliminar el documento «{{name}}»? También se quitará de las consultas y planificaciones donde esté adjunto.",
+                "empty": "Todavía no has subido ningún documento.",
+                "loadError": "No se han podido cargar tus documentos.",
+                "saveError": "No se ha podido subir el documento. Comprueba que no tengas otro con el mismo nombre.",
+                "types": {
+                    "pdf": "PDF",
+                    "image": "Imagen",
+                    "spreadsheet": "Hoja de cálculo"
+                }
             }
         }
     },

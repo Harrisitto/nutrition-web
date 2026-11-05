@@ -115,6 +115,30 @@
             "lastSeenLabel": "Last seen",
             "lastSeen": "{{days}} days ago",
             "neverSeen": "Last seen never"
+        },
+        "documentRow": {
+            "header": "Document",
+            "select": "Attach document",
+            "empty": "You have no documents. Upload them in Settings > My documents.",
+            "other": "Document"
+        },
+        "ingredients": {
+            "title": "Additional ingredients",
+            "titleFor": "Additional ingredients: {{meal}}",
+            "added": "Added",
+            "empty": "This meal has no additional ingredients yet",
+            "add": "Add ingredient",
+            "noResults": "No ingredients found",
+            "amount": "Amount",
+            "remove": "Remove ingredient",
+            "done": "Done",
+            "addToMeal": "+ Ingredients",
+            "cellBadge": "{{count}} additional ingredients",
+            "back": "Back"
+        },
+        "recipeComment": {
+            "label": "Comment about the recipe",
+            "placeholder": "E.g. lactose-free, small portion..."
         }
     },
     "references": {
@@ -309,6 +333,32 @@
                 "saveError": "The video could not be saved.",
                 "preview": "Video preview",
                 "onlyYoutube": "Only YouTube videos are allowed."
+            },
+            "documents": {
+                "title": "My documents",
+                "description": "Upload the documents you want to share with your clients: PDFs, images or spreadsheets.",
+                "listTitle": "Your documents",
+                "addTitle": "New document",
+                "file": "File",
+                "allowedTypes": "PDF, PNG, JPG, WEBP, CSV, Excel or OpenDocument. Up to {{max}}.",
+                "invalidType": "This file type is not allowed.",
+                "tooLarge": "The file exceeds the {{max}} limit.",
+                "add": "Upload document",
+                "uploading": "Uploading...",
+                "open": "Open document",
+                "rename": "Rename",
+                "save": "Save name",
+                "cancel": "Cancel",
+                "delete": "Delete document",
+                "confirmDelete": "Delete the document “{{name}}”? It will also be removed from the appointments and plans it is attached to.",
+                "empty": "You have not uploaded any documents yet.",
+                "loadError": "Your documents could not be loaded.",
+                "saveError": "The document could not be uploaded. Check that you don't have another one with the same name.",
+                "types": {
+                    "pdf": "PDF",
+                    "image": "Image",
+                    "spreadsheet": "Spreadsheet"
+                }
             }
         }
     },

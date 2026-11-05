@@ -4,9 +4,11 @@ import type { RowInfo } from "../../types";
 import NumericEditor from "../inputs/default/numericInput";
 import {
   cellChipStyle,
+  expandedRevealStyle,
   highlightRingStyle,
   overflowRevealStyle,
 } from "../../styles";
+import ExpandableCell from "./expandableCell";
 
 interface CellNumericProps {
   rowInfo: RowInfo;
@@ -37,15 +39,17 @@ const CellNumeric = ({
 
   return (
     <>
-      <button
-        type="button"
-        onClick={openEditor}
-        className={`${cellChipStyle} ${overflowRevealStyle} text-dark-green ${
-          isHighlighted ? highlightRingStyle : ""
-        }`}
-      >
-        {cellValue !== "" && cellValue !== undefined ? cellValue : "-"}
-      </button>
+      <ExpandableCell isExpanded={isHighlighted}>
+        <button
+          type="button"
+          onClick={openEditor}
+          className={`${cellChipStyle} ${overflowRevealStyle} text-dark-green ${
+            isHighlighted ? `${highlightRingStyle} ${expandedRevealStyle}` : ""
+          }`}
+        >
+          {cellValue !== "" && cellValue !== undefined ? cellValue : "-"}
+        </button>
+      </ExpandableCell>
 
       {isEditing &&
         (editor ?? (

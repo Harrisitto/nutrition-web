@@ -12,7 +12,8 @@
         "mutationError": "Ocurrio un error al procesar tu solicitud. Intentalo de nuevo.",
         "clear": "Limpiar",
         "search": "Buscar",
-        "noResults": "Sin resultados"
+        "noResults": "Sin resultados",
+        "save": "Guardar"
     },
     "dateRange": {
         "start": "Fecha de inicio",

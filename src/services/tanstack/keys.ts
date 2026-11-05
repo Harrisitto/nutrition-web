@@ -15,6 +15,8 @@ export const queryKeys = ({
     single: ["user", "single", userId],
     fromNutritionist: ["user", "myUsers", userId],
     formBrand: ["user", "brandUsers"],
+    // Planificación de todos los clientes (p.ej. al borrar un documento adjunto a varios)
+    planingAllUsers: ["user", "planing"],
     planingBase: ["user", "planing", userId],
     planing: (start: string, end: string) => [
       "user",
@@ -31,6 +33,25 @@ export const queryKeys = ({
       "meals",
       userId,
       language,
+      start,
+      end,
+    ],
+    // Ingredientes añadidos a las comidas planificadas (user_planing_meal_ingredients)
+    mealIngredientsBase: ["user", "mealIngredients", userId],
+    mealIngredients: (start: string, end: string) => [
+      "user",
+      "mealIngredients",
+      userId,
+      language,
+      start,
+      end,
+    ],
+    // Kcal y macros diarios calculados por la RPC calculate_macros_for_date_range
+    macrosBase: ["user", "macros", userId],
+    macros: (start: string, end: string) => [
+      "user",
+      "macros",
+      userId,
       start,
       end,
     ],
@@ -113,6 +134,7 @@ export const queryKeys = ({
     measures: ["data", "measures"],
     receipts: ["data", "receipts"],
     videos: ["data", "videos", userId],
+    documents: ["data", "documents", userId],
     singleRecipe: (id: number) => ["data", "recipe", id, language],
     // Prefijo de todas las busquedas de recetas del idioma
     recipesBase: ["data", "recipes", language],
@@ -121,6 +143,7 @@ export const queryKeys = ({
     topRecipesBase: ["data", "topRecipes"],
     topRecipesForUser: (typeId?: number) => ["data", "topRecipes", language, userId, typeId ?? null, searchStr],
     raceIngredients: ["data", "raceIngredients", userId],
+    customIngredients: ["data", "customIngredients", language],
     raceLandmarks: ["data", "raceLandmarks", language],
     appointmentThemes: ["data", "appointmentThemes"],
     appointmentPoints: (themeId: number) => ["data", "appointmentThemes", themeId, "points"],

@@ -2,11 +2,25 @@ import { useTranslation } from "react-i18next";
 import FromDate from "@src/helpers/dates";
 import { useFetchOrderedMealsForId } from "@src/services/tanstack/data/meals";
 import { useMemo, useState } from "react";
-import { useDeletePlaningMeal, useMutatePlaningMeals } from "@src/services/tanstack/user/meals";
+import {
+  useDeletePlaningMeal,
+  useFetchPlaningMealsForDate,
+  useMutatePlaningMeals,
+} from "@src/services/tanstack/user/meals";
+import { useAppSelector } from "@src/store/store";
+import {
+  filterMealIngredients,
+  useFetchMealIngredientsForDate,
+  useReplaceMealIngredients,
+  type DraftMealIngredient,
+} from "@src/services/tanstack/data/ingredients";
+import { useNotification } from "@src/store/slices/notification/hook";
 import SelectEditor from "./default/selectInput";
 import RecipeSelectEditor from "./recipeSelectInput";
+import { optionActionButtonStyle } from "../../styles";
 
 const CLEAR_MEAL_ID = -1;
+const RECIPE_COMMENT_MAX_LENGTH = 200;
 
 interface MealTypeOption {
   id: number;
@@ -34,8 +48,8 @@ const MealTypeEditor = ({
   onClose,
 }: MealTypeEditorProps) => {
   const { t } = useTranslation();
-  // Tipo para el que se esta eligiendo receta fija
-  const [recipeTypeId, setRecipeTypeId] = useState<number | undefined>(undefined);
+  // Tipo cuyo listado de recetas se está mostrando (null = listado de tipos)
+  const [recipeTypeId, setRecipeTypeId] = useState<number | null>(null);
 
   const mealTypes = useFetchOrderedMealsForId({
     mealId,
@@ -48,6 +62,35 @@ const MealTypeEditor = ({
   const deleteMeal = useDeletePlaningMeal({
     forDate: date
   });
+
+  const replaceIngredients = useReplaceMealIngredients();
+  const saveKey = useAppSelector(
+    (state) => state.config.keyboardCommands.tableNavigation.saveData,
+  );
+  const closeKey = useAppSelector(
+    (state) => state.config.keyboardCommands.tableNavigation.exitCell,
+  );
+
+  // Comentario sobre la receta: parte del guardado y se envía con cualquier guardado del editor
+  const { data: weekMeals } = useFetchPlaningMealsForDate({ date });
+  const currentMeal = weekMeals?.find(
+    (m) => m.date === date.save() && m.meal_id === mealId,
+  );
+  const [recipeComment, setRecipeComment] = useState(
+    () => currentMeal?.recipe_comment ?? "",
+  );
+
+  // Ingredientes ya guardados: el editor parte de ellos si se vuelve a la misma receta
+  const { data: weekIngredients } = useFetchMealIngredientsForDate({ date });
+  const savedIngredients = useMemo<DraftMealIngredient[]>(
+    () =>
+      filterMealIngredients(weekIngredients, { date: date.save(), mealId }).map(
+        (el) => ({ ingredientId: el.ingredient_id, amount: el.amount }),
+      ),
+    [weekIngredients, date, mealId],
+  );
+  const { addMutationError } = useNotification();
+
 
   const rawOptions = mealTypes.data ?? [];
 
@@ -66,16 +109,41 @@ const MealTypeEditor = ({
     [options, selectedTypeId],
   );
 
-  const saveMeal = (typeId: number, recipeId: number | null) => {
-    insertMeal
-      .mutateAsync([{
-        meal_id: mealId,
-        type_id: typeId,
-        // Con receta elegida queda fija; sin ella deja de serlo
-        recipe_id: recipeId,
-        is_fixed_recipe: recipeId !== null,
-      }])
-      .finally(onClose);
+  const saveMeal = (typeId: number, recipeId: number | null) =>
+    insertMeal.mutateAsync([{
+      meal_id: mealId,
+      type_id: typeId,
+      // Con receta elegida queda fija; sin ella deja de serlo
+      recipe_id: recipeId,
+      is_fixed_recipe: recipeId !== null,
+      recipe_comment: recipeComment.trim() || null,
+    }]);
+
+  /**
+   * "Hecho" en los ingredientes. Orden obligado: la comida primero (los ingredientes
+   * cuelgan de ella por FK; si cambia la receta, el upsert borra los antiguos) y
+   * después se reemplazan sus ingredientes por los del borrador.
+   */
+  const saveMealWithIngredients = async (
+    typeId: number,
+    // null: sin receta fija, saveMeal la guarda con is_fixed_recipe = false
+    recipeId: number | null,
+    ingredients: DraftMealIngredient[],
+  ) => {
+    // Si algo falla el editor sigue abierto con el borrador, para reintentar
+    try {
+      await saveMeal(typeId, recipeId);
+    } catch {
+      addMutationError();
+      return;
+    }
+    try {
+      await replaceIngredients.mutateAsync({ date, mealId, ingredients });
+    } catch {
+      // Ya lo notifica el onError de la mutación
+      return;
+    }
+    onClose();
   };
 
   const handleSave = (selected: MealTypeOption) => {
@@ -84,14 +152,29 @@ const MealTypeEditor = ({
       return;
     }
 
-    saveMeal(selected.id, null);
+    saveMeal(selected.id, null).finally(onClose);
   };
 
-  if (recipeTypeId !== undefined) {
+  if (recipeTypeId !== null) {
+    // Misma elección que la guardada (receta fija o, sin ella, mismo tipo): sus
+    // ingredientes siguen valiendo. Con otra, el guardado los borra y se empieza vacío
+    const ingredientsFor = (recipeId: number | null) => {
+      if (!currentMeal) return [];
+      const sameChoice =
+        recipeId === null
+          ? !currentMeal.is_fixed_recipe && currentMeal.type_id === recipeTypeId
+          : currentMeal.is_fixed_recipe && currentMeal.recipe_id === recipeId;
+      return sameChoice ? savedIngredients : [];
+    };
+
     return (
       <RecipeSelectEditor
         typeId={recipeTypeId}
-        onSave={(recipeId) => saveMeal(recipeTypeId, recipeId)}
+        initialIngredientsFor={ingredientsFor}
+        onSave={(recipeId) => saveMeal(recipeTypeId, recipeId).finally(onClose)}
+        onSaveWithIngredients={(recipeId, ingredients) =>
+          saveMealWithIngredients(recipeTypeId, recipeId, ingredients)
+        }
         onClose={onClose}
       />
     );
@@ -107,6 +190,34 @@ const MealTypeEditor = ({
       onSave={handleSave}
       onClose={onClose}
       searchable
+      bottomContent={
+        <label className="flex flex-col gap-1">
+          <span className="text-xs font-semibold text-text-muted">
+            {t("data:dashboardTable.recipeComment.label")}
+          </span>
+          <input
+            type="text"
+            value={recipeComment}
+            maxLength={RECIPE_COMMENT_MAX_LENGTH}
+            placeholder={t("data:dashboardTable.recipeComment.placeholder")}
+            onChange={(e) => setRecipeComment(e.target.value)}
+            onKeyDown={(e) => {
+              // Guardar desde el comentario guarda el tipo actual, no la opción enfocada
+              // de la lista (podría ser "Limpiar" y borrar la comida)
+              if (e.key === saveKey && saveKey.length > 1) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (initialValue) handleSave(initialValue);
+                return;
+              }
+              // Cerrar sigue funcionando; el resto de teclas (flechas, letras si se
+              // configuraron como atajo) son para escribir, no para la lista
+              if (e.key !== closeKey) e.stopPropagation();
+            }}
+            className="w-full rounded-lg border border-nutrition-green/30 px-3 py-1.5 text-sm text-dark-green outline-none focus:border-dark-green"
+          />
+        </label>
+      }
       renderOption={(opt) => {
         if (opt.isClear) {
           return (
@@ -169,17 +280,19 @@ const MealTypeEditor = ({
                 )}
               </div>
             )}
-            <button
-              type="button"
-              onClick={(e) => {
-                // Sin esto el click tambien selecciona el tipo y cierra
-                e.stopPropagation();
-                setRecipeTypeId(opt.id);
-              }}
-              className="self-start rounded-md border border-nutrition-purple/40 px-2 py-0.5 text-[11px] font-semibold text-nutrition-purple transition-colors hover:border-nutrition-purple hover:bg-nutrition-purple hover:text-white"
-            >
-              {t("data:dashboardTable.selectRecipe")}
-            </button>
+            <div className="flex flex-wrap items-center gap-2 pt-1">
+              <button
+                type="button"
+                onClick={(e) => {
+                  // Sin esto el click tambien selecciona el tipo y cierra
+                  e.stopPropagation();
+                  setRecipeTypeId(opt.id);
+                }}
+                className={optionActionButtonStyle}
+              >
+                {t("data:dashboardTable.selectRecipe")}
+              </button>
+            </div>
           </div>
         );
       }}

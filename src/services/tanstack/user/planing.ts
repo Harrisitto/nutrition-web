@@ -9,6 +9,7 @@ import { kcalByDate, trainingIntakeKcal } from "@src/helpers/nutrition";
 import { useLanguageCode } from "@src/hooks/helpers/language";
 import { useNotification } from "@src/store/slices/notification/hook";
 import { useAppSelector } from "@src/store/store";
+import { invalidateMacros } from "./macros";
 
 type Planing = ReturnType<typeof useFetchPlanning>["data"];
 type PlanningData = NonNullable<Planing>;
@@ -175,6 +176,8 @@ export const useMutatePlaning = () => {
       comment?: string;
       event?: string;
       custom_url?: string | null;
+      // Documento del nutricionista adjunto al día (nutritionist_documents.id), null lo quita
+      document_id?: string | null;
     }) => {
       if (!userId)
         throw new Error("User ID is required to insert planing data");
@@ -206,6 +209,7 @@ export const useMutatePlaning = () => {
         comment: "",
         event: "",
         custom_url: null,
+        document_id: null,
         training_hc: [],
         training_kcal: 0,
         ...current,
@@ -226,6 +230,10 @@ export const useMutatePlaning = () => {
     // `data.date` ("YYYY-MM-DD") la parsearía como UTC y en husos por detrás de
     // UTC caería en la semana anterior, escribiendo en la clave equivocada.
     onSuccess: (data, variables) => {
+      // Comentarios, eventos, url y documento no cuentan en los macros
+      if (variables.training_hc !== undefined || variables.training_kcal !== undefined) {
+        invalidateMacros(userId);
+      }
       if (!data) return;
       queryClient.setQueryData<PlanningData>(
         weekQueryKey(variables.date),
@@ -263,6 +271,7 @@ export const useDeletePlaning = ({ forDate }: { forDate?: FromDate } = {}) => {
       return { date: targetDate };
     },
     onSuccess: ({ date }) => {
+      invalidateMacros(userId);
       const { monday, sunday } = safeDate.thisWeek();
       queryClient.setQueryData<PlanningData>(
         queryKeys({

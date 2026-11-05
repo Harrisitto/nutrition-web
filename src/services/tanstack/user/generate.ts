@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@src/services/supabase/client";
 import { queryKeys } from "../keys";
+import { invalidateMacros } from "./macros";
 import { useAppSelector } from "@src/store/store";
 import { useLanguageCode } from "@src/hooks/helpers/language";
 import type FromDate from "@src/helpers/dates";
@@ -121,7 +122,12 @@ export const useGeneratePlaningDay = () => {
     // La RPC también puede crear la fila de `user_planing` y las recetas las
     // elige el trigger, así que se recargan ambas queries de la semana.
     onSuccess: (_data, { date }) => {
+      invalidateMacros(userId);
       const { monday, sunday } = date.thisWeek();
+      // Las comidas reemplazadas pueden haber perdido sus ingredientes adicionales
+      queryClient.invalidateQueries({
+        queryKey: queryKeys({ userId }).user.mealIngredientsBase,
+      });
       queryClient.invalidateQueries({
         queryKey: queryKeys({ userId, language }).user.planing(
           monday.save(),

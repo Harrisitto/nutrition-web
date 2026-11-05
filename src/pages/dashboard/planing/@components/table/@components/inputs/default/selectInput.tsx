@@ -7,6 +7,7 @@ import {
   type ReactNode,
   type KeyboardEvent,
 } from "react";
+import { useTranslation } from "react-i18next";
 import ModalShell from "./portal";
 import { useAppSelector } from "@src/store/store";
 
@@ -27,6 +28,8 @@ export interface SelectEditorProps<T> {
   onScrollEnd?: () => void;
   /** Contenido extra al final de la lista, p.ej. "Cargando..." */
   listFooter?: ReactNode;
+  /** Contenido extra entre la lista y los botones, p.ej. un campo de comentario */
+  bottomContent?: ReactNode;
 }
 
 export function SelectEditor<T>({
@@ -41,7 +44,9 @@ export function SelectEditor<T>({
   searchable = true,
   onScrollEnd,
   listFooter,
+  bottomContent,
 }: SelectEditorProps<T>) {
+  const { t } = useTranslation();
   const saveKey = useAppSelector(
     (state) => state.config.keyboardCommands.tableNavigation.saveData,
   );
@@ -72,9 +77,11 @@ export function SelectEditor<T>({
     initialValue,
   );
 
+  // Al buscar se enfoca el primer resultado; sin búsqueda, la opción ya elegida
+  // (antes se ponía a 0 también al montar y se perdía el valor inicial)
   useEffect(() => {
-    setFocusedIndex(0);
-  }, [searchQuery]);
+    setFocusedIndex(searchQuery.trim() ? 0 : initialIndex);
+  }, [searchQuery, initialIndex]);
 
   // Ajuste de scroll garantizando medidas correctas en el DOM
   useEffect(() => {
@@ -172,7 +179,7 @@ export function SelectEditor<T>({
             autoFocus
             type="text"
             value={searchQuery}
-            placeholder="Search..."
+            placeholder={t("system:messages.search")}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full rounded-lg border border-nutrition-green/30 px-3 py-2 text-sm text-dark-green outline-none focus:border-dark-green"
           />
@@ -187,7 +194,7 @@ export function SelectEditor<T>({
         >
           {filteredOptions.length === 0 ? (
             <div className="p-3 text-center text-xs text-gray-500">
-              No options found
+              {t("system:messages.noResults")}
             </div>
           ) : (
             filteredOptions.map((option, index) => {
@@ -225,6 +232,7 @@ export function SelectEditor<T>({
           )}
         </div>
         {listFooter}
+        {bottomContent}
 
         <div className="flex justify-end gap-2">
           <button
@@ -232,7 +240,7 @@ export function SelectEditor<T>({
             onClick={onClose}
             className="rounded-md border border-nutrition-green/30 px-3 py-2 text-xs font-semibold text-dark-green"
           >
-            Cancel
+            {t("system:messages.cancel")}
           </button>
           <button
             type="button"
@@ -240,7 +248,7 @@ export function SelectEditor<T>({
             disabled={filteredOptions.length === 0}
             className="rounded-md bg-dark-green px-3 py-2 text-xs font-semibold text-white disabled:opacity-50"
           >
-            Save
+            {t("system:messages.save")}
           </button>
         </div>
       </div>

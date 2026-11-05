@@ -11,6 +11,7 @@ import { queryClient } from "../queryClient";
 import { useGetAuthSession } from "../auth/get";
 import { useAppSelector } from "@src/store/store";
 import type FromDate from "@src/helpers/dates";
+import { invalidateMacros } from "./macros";
 
 type UserMeasure = Tables<"user_measures">;
 type UserMeasuresData = UserMeasure[];
@@ -184,6 +185,8 @@ export const useInsertUserMeasure = () => {
     },
     onSuccess: (data) => {
       updateUserMeasure(data);
+      // El peso y el BMR salen de las mediciones
+      invalidateMacros(userId);
     },
   });
 };
@@ -213,6 +216,8 @@ export const useDeleteMeasures = () => {
       if (error) throw error;
     },
     onSuccess: (_, measureIds) => {
+      // userId aquí es el de la sesión, no el del cliente: se invalidan todos
+      invalidateMacros();
       if (!userId) return;
       updateMeasuresQueries(userId, (oldData) => {
         if (!oldData) return oldData;

@@ -5,6 +5,7 @@ import { useAppSelector } from "@src/store/store";
 import { useLanguageCode } from "@src/hooks/helpers/language";
 import type FromDate from "@src/helpers/dates";
 import { useRefreshClientOrder } from "./profile";
+import { invalidateMacros } from "./macros";
 
 export const useCloneWeek = () => {
   const userId = useAppSelector((state) => state.config.selectedUserId);
@@ -28,7 +29,12 @@ export const useCloneWeek = () => {
       return { fromMonday, toMonday };
     },
     onSuccess: ({ toMonday }) => {
+      invalidateMacros(userId);
       const toSunday = toMonday.thisSunday();
+      // Las comidas reemplazadas pueden haber perdido sus ingredientes adicionales
+      queryClient.invalidateQueries({
+        queryKey: queryKeys({ userId }).user.mealIngredientsBase,
+      });
       queryClient.invalidateQueries({
         queryKey: queryKeys({ userId, language }).user.planing(
           toMonday.save(),

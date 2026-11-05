@@ -2,17 +2,26 @@ import { useTranslation } from "react-i18next";
 import { Header } from "./@components/header";
 import { Routes, Route } from "react-router-dom";
 import { APP_ROUTES, getTrailingRoute } from "@src/hooks/navigation/routes";
-import { Recipes } from "./recipes";
-import { TableCommands } from "./keyboard";
-import { ManageAuthState } from "./authManagement";
 import useAppNavigation from "@src/hooks/navigation";
 import { lazy } from "react";
-import ConfigRaceIngredients from "./raceIngredients";
 
 const PageInviteClient = lazy(() => import("./inviteClient/index"));
 const PageAppointmentThemes = lazy(() => import("./appointmentThemes/index"));
 const PageUserPreset = lazy(() => import("../dashboard/preset/index"));
 const PageMyVideos = lazy(() => import("./myVideos/index"));
+const PageRaceIngredients = lazy(() => import("./raceIngredients/index"));
+const PageDocuments = lazy(() => import("./documents/index"));
+const PageRecipes = lazy(() =>
+  import("./recipes/index").then((m) => ({ default: m.Recipes })),
+);
+const PageTableCommands = lazy(() =>
+  import("./keyboard/index").then((m) => ({ default: m.TableCommands })),
+);
+const PageManageAuthState = lazy(() =>
+  import("./authManagement/index").then((m) => ({
+    default: m.ManageAuthState,
+  })),
+);
 
 const PageNutritionistConfiguration = () => {
   const { t } = useTranslation();
@@ -62,6 +71,11 @@ const PageNutritionistConfiguration = () => {
             label: t("data:configuration.sections.myVideos.title"),
             onClick: () => navigateTo(APP_ROUTES.MY_VIDEOS),
           },
+          {
+            route: APP_ROUTES.DOCUMENTS,
+            label: t("data:configuration.sections.documents.title"),
+            onClick: () => navigateTo(APP_ROUTES.DOCUMENTS),
+          },
         ]}
       />
       <Routes>
@@ -75,19 +89,19 @@ const PageNutritionistConfiguration = () => {
         />
         <Route
           path={getTrailingRoute(APP_ROUTES.RECIPES_CONFIG)}
-          element={<Recipes />}
+          element={<PageRecipes />}
         />
         <Route
           path={getTrailingRoute(APP_ROUTES.KEYBOARD)}
-          element={<TableCommands />}
+          element={<PageTableCommands />}
         />
         <Route
           path={getTrailingRoute(APP_ROUTES.AUTH_MANAGEMENT)}
-          element={<ManageAuthState />}
+          element={<PageManageAuthState />}
         />
         <Route
           path={getTrailingRoute(APP_ROUTES.RACE_INGREDIENTS)}
-          element={<ConfigRaceIngredients />}
+          element={<PageRaceIngredients />}
         />
         <Route
           path={getTrailingRoute(APP_ROUTES.APPOINTMENT_THEMES)}
@@ -100,6 +114,10 @@ const PageNutritionistConfiguration = () => {
         <Route
           path={getTrailingRoute(APP_ROUTES.MY_VIDEOS)}
           element={<PageMyVideos />}
+        />
+        <Route
+          path={getTrailingRoute(APP_ROUTES.DOCUMENTS)}
+          element={<PageDocuments />}
         />
       </Routes>
     </div>

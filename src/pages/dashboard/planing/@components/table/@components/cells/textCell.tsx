@@ -3,9 +3,11 @@ import type { RowInfo } from "../../types";
 import TextEditor from "../inputs/default/textInput";
 import {
   cellChipStyle,
+  expandedRevealStyle,
   highlightRingStyle,
   overflowRevealStyle,
 } from "../../styles";
+import ExpandableCell from "./expandableCell";
 
 interface CellTextProps {
   rowInfo: RowInfo;
@@ -36,15 +38,17 @@ const CellText = ({
 
   return (
     <>
-      <button
-        type="button"
-        onClick={openEditor}
-        className={`${cellChipStyle} ${overflowRevealStyle} text-left text-dark-green ${
-          isHighlighted ? highlightRingStyle : ""
-        }`}
-      >
-        {textValue || "-"}
-      </button>
+      <ExpandableCell isExpanded={isHighlighted}>
+        <button
+          type="button"
+          onClick={openEditor}
+          className={`${cellChipStyle} ${overflowRevealStyle} text-left text-dark-green ${
+            isHighlighted ? `${highlightRingStyle} ${expandedRevealStyle}` : ""
+          }`}
+        >
+          {textValue || "-"}
+        </button>
+      </ExpandableCell>
 
       {isEditing && (
         <TextEditor

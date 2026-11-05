@@ -1,7 +1,13 @@
 import { useTranslation } from "react-i18next";
 import type FromDate from "@src/helpers/dates";
 import AutoGenerateEditor from "../inputs/autoGenerateInput";
-import { cellChipStyle, highlightRingStyle } from "../../styles";
+import {
+  cellChipStyle,
+  expandedRevealStyle,
+  highlightRingStyle,
+  overflowRevealStyle,
+} from "../../styles";
+import ExpandableCell from "./expandableCell";
 
 interface CellAutoGenerateProps {
   date: FromDate;
@@ -22,15 +28,17 @@ const CellAutoGenerate = ({
 
   return (
     <>
-      <button
-        type="button"
-        onClick={openEditor}
-        className={`${cellChipStyle} text-dark-green hover:bg-fade-green/25 ${
-          isHighlighted ? highlightRingStyle : ""
-        }`}
-      >
-        {t("data:dashboardTable.autoGenerate.button")}
-      </button>
+      <ExpandableCell isExpanded={isHighlighted}>
+        <button
+          type="button"
+          onClick={openEditor}
+          className={`${cellChipStyle} ${overflowRevealStyle} text-dark-green hover:bg-fade-green/25 ${
+            isHighlighted ? `${highlightRingStyle} ${expandedRevealStyle}` : ""
+          }`}
+        >
+          {t("data:dashboardTable.autoGenerate.button")}
+        </button>
+      </ExpandableCell>
 
       {isEditing && <AutoGenerateEditor date={date} onClose={closeEditor} />}
     </>

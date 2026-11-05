@@ -1,4 +1,5 @@
 import { displayChipStyle } from "../../styles";
+import ExpandableCell from "./expandableCell";
 
 interface CellDisplayProps {
   cellValue: string | number;
@@ -6,7 +7,11 @@ interface CellDisplayProps {
 
 const CellDisplay = ({ cellValue }: CellDisplayProps) => {
   return (
-    <div className={displayChipStyle}>{cellValue !== "" ? cellValue : "-"}</div>
+    <ExpandableCell>
+      <div className={displayChipStyle}>
+        {cellValue !== "" ? cellValue : "-"}
+      </div>
+    </ExpandableCell>
   );
 };
 

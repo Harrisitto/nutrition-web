@@ -3,7 +3,7 @@
 Tabla semanal (7 columnas de día + 1 columna de etiqueta) que muestra y edita
 la planificación nutricional del usuario: presets del día, comidas, horas de
 entrenamiento, kcal de entrenamiento, carreras, balance energético, macros por kg y
-comentarios/eventos. Se monta desde [index.tsx](index.tsx) como
+comentarios/eventos/enlace y el documento adjunto del día. Se monta desde [index.tsx](index.tsx) como
 `WeeklyMeals`.
 
 ## Piezas principales
@@ -13,10 +13,15 @@ comentarios/eventos. Se monta desde [index.tsx](index.tsx) como
   y renderiza el `<table>`.
 - **[hooks/rows.ts](hooks/rows.ts)** — construye el array de `RowInfo` (una
   entrada por fila) a partir de varias queries de TanStack Query (planning,
-  meals, meals del usuario, BMR, peso, carreras de la semana). Cada bloque de datos (comidas,
-  entrenamiento, balance energético, macros, comentarios/eventos) se calcula
+  meals, meals del usuario, carreras de la semana y macros diarios). Cada bloque de datos (comidas,
+  entrenamiento, balance energético, macros, comentarios/eventos) se monta
   en su propio `useMemo` y luego se concatenan, intercalando filas de
   cabecera (`isFullWidth: true`) entre secciones.
+  El balance energético y los macros por kg **no se calculan en el cliente**:
+  salen de la RPC `calculate_macros_for_date_range` (`useFetchMacrosForDateRange`
+  en `services/tanstack/user/macros.ts`). Cualquier mutación que cambie comidas,
+  ingredientes extra, kcal/HC de entrenamiento, carreras o mediciones debe llamar
+  a `invalidateMacros(userId)`.
 - **[hooks/columns.tsx](hooks/columns.tsx)** — define las columnas de
   `react-table`: una columna fija de etiqueta (`rowLabel`) y una por cada día
   de la semana. La celda de cada columna de día decide qué componente de
@@ -40,7 +45,7 @@ comentarios/eventos. Se monta desde [index.tsx](index.tsx) como
 Cada fila de la tabla es una instancia de `RowInfo` con:
 
 - `id` — uno de los valores de `ALL_IDS`, identifica el *tipo* de fila.
-- `isEditable` — `"numeric" | "text" | "meals" | "presets" | "action"` si la
+- `isEditable` — `"numeric" | "text" | "meals" | "presets" | "action" | "document"` si la
   fila se puede editar o abrir, o `undefined` si es de solo lectura.
 - `onAction` (opcional, `addAction()`) — en filas `"action"` que no abren
   editor: abrir la celda (click o Enter) ejecuta `onAction(date)` en vez de
@@ -111,6 +116,13 @@ refetch no dispara el scroll — solo un cambio real de fila lo hace.
 | `INPUT_CUSTOM_URL` | `CellText` (solo `https://`) | `TextInput` con `validate` |
 | resto (`DISPLAY_*`) | `CellDisplay` | — (solo lectura) |
 
+Las columnas de día usan siempre el mismo `columnDef.cell`
+([cells/dayCell.tsx](@components/cells/dayCell.tsx)) y el contenido sale de
+`renderDayCell` por `DayCellContext` ([hooks/dayCellContext.ts](hooks/dayCellContext.ts)).
+`FlexRender` hace `createElement(cell)`: si `cell` fuera una función nueva cada vez
+que cambian los datos, React remontaría todas las celdas y los editores abiertos
+perderían su estado (p.ej. el paso de receta a ingredientes).
+
 Cada celda editable recibe `isEditing`/`isHighlighted` para su estilo y
 `openEditor`/`closeEditor` para disparar el modal. El modal en sí vive en
 `@components/inputs/@portal.tsx` y se renderiza en un portal; cada input usa
@@ -123,3 +135,56 @@ La primera columna es `sticky left-0` para mantener la etiqueta visible al
 hacer scroll horizontal (`overflow-x-auto` en el contenedor). Las 7 columnas
 de día se reparten el espacio restante a partes iguales (`w-[14.28%]`). Las
 filas de cabecera de sección ocupan todo el ancho con `colSpan`.
+
+## Fila de documento
+
+La última fila (`INPUT_DOCUMENT`) adjunta al día uno de los documentos del
+nutricionista. Su `map` guarda el `user_planing.document_id` de cada fecha y
+[cells/documentCell.tsx](@components/cells/documentCell.tsx) busca el nombre en
+`useFetchMyDocuments`. Al abrirla, [inputs/documentSelectInput.tsx](@components/inputs/documentSelectInput.tsx)
+muestra un select con todos sus documentos (más "Limpiar", que lo quita) y hace
+upsert de `document_id` con `useMutatePlaning`. La base de datos
+(`tr_protect_user_planing_document`) solo deja adjuntar documentos propios a
+clientes propios con suscripción activa.
+
+## Ingredientes adicionales de una comida
+
+Además del tipo de comida y su receta fija, a cada comida planificada se le
+pueden añadir ingredientes sueltos con su cantidad
+(`user_planing_meal_ingredients`, queries en `services/tanstack/data/ingredients.ts`).
+La fila apunta a la comida por `(meal_id, user_id, date)`, así que la comida tiene
+que estar guardada antes de añadirle ingredientes.
+
+Los ingredientes se añaden después de elegir receta (o "Sin receta fija"):
+
+- En [inputs/mealSelectInput.tsx](@components/inputs/mealSelectInput.tsx) se elige
+  el tipo y "Elegir receta" abre el selector de recetas de ese tipo.
+  Debajo de la lista hay un campo para comentar la receta (`recipe_comment`,
+  máx. 200 caracteres). Empieza con el comentario guardado y se envía con cualquier
+  guardado del editor (tipo, receta o "Hecho"); vacío lo borra. `useMutatePlaningMeals`
+  solo lo envía si viene en la llamada, así los presets no lo pisan. La tecla de guardar
+  dentro del comentario guarda el tipo actual, nunca la opción enfocada de la lista.
+- En [inputs/recipeSelectInput.tsx](@components/inputs/recipeSelectInput.tsx) cada
+  receta, y también "Sin receta fija", tiene "+ Ingredientes", que abre el editor de ingredientes **sin guardar
+  nada**. Si es la misma elección que la guardada (la misma receta fija, o "Sin receta
+  fija" con el mismo tipo), el borrador empieza con los ingredientes guardados; si no,
+  vacío (el guardado borrará los antiguos).
+- [inputs/ingredientsSelectInput.tsx](@components/inputs/ingredientsSelectInput.tsx)
+  es un borrador local: añadir del catálogo `recipe_type_custom_ingredients` (con su
+  cantidad de referencia), cambiar cantidades y quitar. "Volver" descarta el borrador
+  y vuelve a las recetas. "Hecho" guarda, en este orden: la comida con su tipo y
+  receta (`useMutatePlaningMeals`; con "Sin receta fija" va `recipe_id: null` y
+  `is_fixed_recipe: false`, para que el cliente elija la receta) y después sus ingredientes
+  (`useReplaceMealIngredients`, que borra los que había e inserta los del borrador).
+  Después cierra el modal. Si algo falla, el editor sigue abierto. Los macros se escalan con `mealIngredientMacros`.
+- Si la comida cambia de receta, se queda sin receta fija o se borra, sus
+  ingredientes adicionales se borran (`useMutatePlaningMeals` compara la elección
+  guardada antes del upsert: la receta si es fija, el tipo si no, porque sin receta
+  fija el `recipe_id` lo pone el trigger `recommend_recipe`; `useDeletePlaningMeal`
+  los borra antes que la comida). Si ese borrado falla tras guardar la comida, se
+  avisa con `addMutationError` pero la mutación no falla.
+- [cells/mealCell.tsx](@components/cells/mealCell.tsx) muestra `+N` cuando la
+  comida tiene ingredientes adicionales. Con hover (o con la celda seleccionada)
+  muestra la receta fija, cada ingrediente con su cantidad y el comentario sobre la
+  receta (`MealRowInfo.getRecipeComment`); lo mismo va en el `title` de la celda. Aún no se suman a las kcal de la celda
+  ni a los totales del día.

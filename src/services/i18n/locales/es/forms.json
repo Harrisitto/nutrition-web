@@ -91,5 +91,10 @@
             "url": "Enlace del vídeo",
             "description": "Descripción"
         }
+    },
+    "documents": {
+        "fields": {
+            "name": "Nombre del documento"
+        }
     }
 }

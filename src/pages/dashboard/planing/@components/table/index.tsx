@@ -4,6 +4,7 @@ import FromDate from "@src/helpers/dates";
 import { useAppSelector } from "@src/store/store";
 import useTableRows from "./hooks/rows";
 import useTableColumns from "./hooks/columns";
+import { DayCellContext } from "./hooks/dayCellContext";
 import useKeyboardNavigation from "./hooks/navigation";
 import { features } from "./features";
 import { sectionHeaderTdStyle } from "./styles";
@@ -111,7 +112,7 @@ export const WeeklyMeals = () => {
     dayDatesLength: dayDates.length,
   });
 
-  const columns = useTableColumns({
+  const { columns, renderDayCell } = useTableColumns({
     editingCell,
     selectCell,
     closeEditor,
@@ -126,51 +127,53 @@ export const WeeklyMeals = () => {
   });
 
   return (
-    <div className="overflow-x-auto rounded-2xl bg-white-green shadow-md">
-      <table className="w-full min-w-[920px] border-separate border-spacing-0 text-sm">
-        <tbody>
-          {table.getRowModel().rows.map((row) => {
-            if (row.original.isFullWidth) {
+    <DayCellContext.Provider value={renderDayCell}>
+      <div className="overflow-x-auto rounded-2xl bg-white-green shadow-md">
+        <table className="w-full min-w-[920px] border-separate border-spacing-0 text-sm">
+          <tbody>
+            {table.getRowModel().rows.map((row) => {
+              if (row.original.isFullWidth) {
+                return (
+                  <tr key={row.id}>
+                    <td
+                      className={sectionHeaderTdStyle}
+                      colSpan={dayDates.length + 1}
+                    >
+                      {row.original.label}
+                    </td>
+                  </tr>
+                );
+              }
+
               return (
-                <tr key={row.id}>
-                  <td
-                    className={sectionHeaderTdStyle}
-                    colSpan={dayDates.length + 1}
-                  >
-                    {row.original.label}
-                  </td>
+                <tr
+                  key={row.id}
+                  data-row-key={row.original.getCellId("")}
+                  className={`transition-colors`}
+                >
+                  {row.getAllCells().map((cell, index) => {
+                    const isStickyLabel = index === 0;
+
+                    // 1. La primera columna (index === 0) se ajusta al mínimo necesario sin romper línea.
+                    // 2. Las 7 columnas restantes se dividen el espacio restante a partes iguales (100% / 7 = 14.28%).
+                    const cellStyle = isStickyLabel
+                      ? `sticky left-0 z-10 w-px whitespace-nowrap`
+                      : // max-w-0: el contenido no cuenta para el ancho de la columna (table-layout auto)
+                        "w-[14.28%] max-w-0 px-1.5 py-2 align-middle";
+
+                    return (
+                      <td key={cell.id} className={cellStyle}>
+                        <table.FlexRender cell={cell} />
+                      </td>
+                    );
+                  })}
                 </tr>
               );
-            }
-
-            return (
-              <tr
-                key={row.id}
-                data-row-key={row.original.getCellId("")}
-                className={`transition-colors`}
-              >
-                {row.getAllCells().map((cell, index) => {
-                  const isStickyLabel = index === 0;
-
-                  // 1. La primera columna (index === 0) se ajusta al mínimo necesario sin romper línea.
-                  // 2. Las 7 columnas restantes se dividen el espacio restante a partes iguales (100% / 7 = 14.28%).
-                  const cellStyle = isStickyLabel
-                    ? `sticky left-0 z-10 w-px whitespace-nowrap`
-                    : // max-w-0: el contenido no cuenta para el ancho de la columna (table-layout auto)
-                      "w-[14.28%] max-w-0 px-1.5 py-2 align-middle";
-
-                  return (
-                    <td key={cell.id} className={cellStyle}>
-                      <table.FlexRender cell={cell} />
-                    </td>
-                  );
-                })}
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+            })}
+          </tbody>
+        </table>
+      </div>
+    </DayCellContext.Provider>
   );
 };
 

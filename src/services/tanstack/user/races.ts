@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { queryOptions, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { StorageApiError } from "@supabase/supabase-js";
 import { queryKeys } from "../keys";
+import { invalidateMacros } from "./macros";
 import { supabase } from "@src/services/supabase/client";
 import FromDate from "@src/helpers/dates";
 import { hcToKcal, kcalByDate, raceHc } from "@src/helpers/nutrition";
@@ -369,6 +370,7 @@ export const useSaveRacePlan = () => {
       queryClient.invalidateQueries({
         queryKey: queryKeys({ userId: draft.userId }).user.racesBase,
       });
+      invalidateMacros(draft.userId);
     },
   });
 };
@@ -447,6 +449,7 @@ export const useDeleteRace = () => {
       queryClient.invalidateQueries({
         queryKey: queryKeys({ userId: user }).user.racesBase,
       });
+      invalidateMacros(user);
     },
   });
 };

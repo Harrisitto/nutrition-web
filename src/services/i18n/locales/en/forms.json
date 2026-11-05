@@ -91,5 +91,10 @@
             "url": "Video link",
             "description": "Description"
         }
+    },
+    "documents": {
+        "fields": {
+            "name": "Document name"
+        }
     }
 }

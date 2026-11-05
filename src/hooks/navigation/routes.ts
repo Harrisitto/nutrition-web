@@ -21,6 +21,7 @@ export const APP_ROUTES = {
   APPOINTMENT_THEMES: "/dashboard/config/appointment-themes",
   GLOBAL_USER_PRESETS: "/dashboard/config/global-user-presets",
   MY_VIDEOS: "/dashboard/config/my-videos",
+  DOCUMENTS: "/dashboard/config/documents",
 
   FORM_PRESET: "/dashboard/form-preset",
   FORM_MEASURE: "/dashboard/form-measure",

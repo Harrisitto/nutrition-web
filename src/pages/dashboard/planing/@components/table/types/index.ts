@@ -18,6 +18,7 @@ export const ALL_IDS = {
   INPUT_COMMENTS: "inputComments",
   INPUT_EVENTS: "inputEvents",
   INPUT_CUSTOM_URL: "inputCustomUrl",
+  INPUT_DOCUMENT: "inputDocument",
 } as const;
 
 export type AllIdsValues = (typeof ALL_IDS)[keyof typeof ALL_IDS];
@@ -27,7 +28,7 @@ export type AllIdsValues = (typeof ALL_IDS)[keyof typeof ALL_IDS];
  */
 export class RowInfo {
   private id: AllIdsValues;
-  isEditable?: "numeric" | "text" | "meals" | "presets" | "action";
+  isEditable?: "numeric" | "text" | "meals" | "presets" | "action" | "document";
   isFullWidth: boolean = false;
   label: string = "";
   resume?: string;
@@ -37,7 +38,7 @@ export class RowInfo {
 
   constructor(props: {
     id: keyof typeof ALL_IDS;
-    isEditable?: "numeric" | "text" | "meals" | "presets" | "action";
+    isEditable?: "numeric" | "text" | "meals" | "presets" | "action" | "document";
     isFullWidth?: boolean;
     resume?: string;
     map?: Map<string, string | number>;
@@ -88,8 +89,15 @@ export class MealRowInfo extends RowInfo {
   private kcalByDate: Map<string, number>;
   // Fecha ("YYYY-MM-DD") -> nombre de la receta fija de ese dia
   private fixedRecipes: Map<string, string>;
+  // Fecha ("YYYY-MM-DD") -> comentario del nutricionista sobre la receta
+  private recipeComments: Map<string, string>;
 
-  constructor(mealId: number, kcalByDate: Map<string, number>, fixedRecipes = new Map<string, string>()) {
+  constructor(
+    mealId: number,
+    kcalByDate: Map<string, number>,
+    fixedRecipes = new Map<string, string>(),
+    recipeComments = new Map<string, string>(),
+  ) {
     super({
       id: "INPUT_MEAL",
       isEditable: "meals",
@@ -98,6 +106,7 @@ export class MealRowInfo extends RowInfo {
     this.mealId = mealId;
     this.kcalByDate = kcalByDate;
     this.fixedRecipes = fixedRecipes;
+    this.recipeComments = recipeComments;
   }
 
   getKcal(date: string) {
@@ -107,6 +116,11 @@ export class MealRowInfo extends RowInfo {
   /** Nombre de la receta fija, o undefined si ese dia no hay */
   getFixedRecipe(date: string) {
     return this.fixedRecipes.get(date);
+  }
+
+  /** Comentario sobre la receta, o undefined si ese dia no hay */
+  getRecipeComment(date: string) {
+    return this.recipeComments.get(date);
   }
 
   override getCellId(date: string) {

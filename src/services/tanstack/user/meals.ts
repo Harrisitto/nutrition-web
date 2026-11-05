@@ -8,6 +8,12 @@ import { supabase } from "@src/services/supabase/client";
 import type { TablesInsert } from "@src/services/supabase/types";
 import { useCallback } from "react";
 import { useRefreshClientOrder } from "./profile";
+import { invalidateMacros } from "./macros";
+import { useNotification } from "@src/store/slices/notification/hook";
+import {
+  deleteMealIngredientsForDate,
+  deleteMealIngredientsForSlots,
+} from "../data/ingredients";
 
 const TABLE_NAME = "user_planing_meal" as const;
 
@@ -166,6 +172,7 @@ export const useMutatePlaningMeals = ({
   const language = useLanguageCode();
   const queryClient = useQueryClient();
   const refreshClientOrder = useRefreshClientOrder();
+  const { addMutationError } = useNotification();
 
   const safeDate = forDate ?? new FromDate(d);
 
@@ -187,17 +194,53 @@ export const useMutatePlaningMeals = ({
         // Solo es fija si se eligio receta a mano
         is_fixed_recipe: m.recipe_id != null && (m.is_fixed_recipe ?? false),
         type_id: m.type_id!,
+        // Solo si se envía: los presets no lo traen y el upsert no debe borrarlo
+        ...(m.recipe_comment !== undefined && { recipe_comment: m.recipe_comment }),
       }));
+
+      // Receta guardada antes del upsert: si cambia, sus ingredientes adicionales sobran
+      const { data: previous, error: previousError } = await supabase
+        .from(TABLE_NAME)
+        .select("date, meal_id, recipe_id, type_id, is_fixed_recipe")
+        .eq("user_id", userId)
+        .in("date", [...new Set(safeMeals.map((m) => m.date))])
+        .in("meal_id", [...new Set(safeMeals.map((m) => m.meal_id))]);
+      if (previousError) throw new Error(previousError.message);
+
+      // Sin receta fija, recipe_id lo rellena el trigger recommend_recipe y la petición
+      // lleva null: lo que identifica la elección es el tipo, no la receta guardada
+      const recipeChoice = (m: Pick<TablesInsert<'user_planing_meal'>, "is_fixed_recipe" | "recipe_id" | "type_id">) =>
+        m.is_fixed_recipe ? `recipe:${m.recipe_id}` : `type:${m.type_id}`;
+      const recipeChanged = safeMeals
+        .filter((m) => {
+          const old = previous.find((p) => p.date === m.date && p.meal_id === m.meal_id);
+          return !!old && recipeChoice(old) !== recipeChoice(m);
+        })
+        .map((m) => ({ date: m.date, mealId: m.meal_id }));
 
       const { data, error } = await supabase
         .from(TABLE_NAME)
         .upsert(safeMeals)
         .select(selectFromMeal(language));
       if (error) throw new Error(error.message);
+
+      // Después del upsert: si este falla, los ingredientes no se pierden. Si falla el
+      // borrado la comida ya está guardada: se avisa pero no se rechaza la mutación,
+      // para que onSuccess actualice la caché con lo que hay en la base de datos
+      try {
+        await deleteMealIngredientsForSlots(userId, recipeChanged);
+      } catch (e) {
+        console.error(e);
+        addMutationError();
+      }
       return data;
     },
     onSuccess: (data) => {
+      invalidateMacros(userId);
       if (!data?.length) return;
+      queryClient.invalidateQueries({
+        queryKey: queryKeys({ userId }).user.mealIngredientsBase,
+      });
       const { monday, sunday } = mealsWeekRange(safeDate);
       queryClient.setQueryData(
         queryKeys({
@@ -243,7 +286,9 @@ export const useDeletePlaningMeal = ({
         throw new Error("User ID is required to delete a meal.");
       }
 
+      // Primero los ingredientes adicionales: cuelgan de la comida por FK
       if (mealId === undefined) {
+        await deleteMealIngredientsForDate(userId, safeDate.save());
         const { data, error } = await supabase
         .from(TABLE_NAME)
         .delete()
@@ -254,6 +299,7 @@ export const useDeletePlaningMeal = ({
         return data;
       } 
 
+      await deleteMealIngredientsForSlots(userId, [{ date: safeDate.save(), mealId }]);
       const { data, error } = await supabase
         .from(TABLE_NAME)
         .delete()
@@ -265,6 +311,10 @@ export const useDeletePlaningMeal = ({
       return data;
     },
     onSuccess: (data) => {
+      invalidateMacros(userId);
+      queryClient.invalidateQueries({
+        queryKey: queryKeys({ userId }).user.mealIngredientsBase,
+      });
       if (!data) return;
       // La clave era (día, día) y la query guarda por (lunes, domingo): el
       // borrado nunca llegaba a tocar la caché que lee la tabla.

@@ -489,6 +489,39 @@ export type Database = {
           },
         ]
       }
+      nutri_appointment_documents: {
+        Row: {
+          appointment_id: number
+          created_at: string
+          document_id: string
+        }
+        Insert: {
+          appointment_id: number
+          created_at?: string
+          document_id: string
+        }
+        Update: {
+          appointment_id?: number
+          created_at?: string
+          document_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nutri_appointment_documents_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "nutri_appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nutri_appointment_documents_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "nutritionist_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       nutri_appointment_themes: {
         Row: {
           created_at: string
@@ -694,6 +727,47 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "all_recipes"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      nutritionist_documents: {
+        Row: {
+          created_at: string
+          document_type: string
+          id: string
+          mime_type: string
+          name: string
+          nutri_id: string
+          size_bytes: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          document_type?: string
+          id: string
+          mime_type: string
+          name: string
+          nutri_id: string
+          size_bytes: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          document_type?: string
+          id?: string
+          mime_type?: string
+          name?: string
+          nutri_id?: string
+          size_bytes?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nutritionist_documents_nutri_id_fkey"
+            columns: ["nutri_id"]
+            isOneToOne: false
+            referencedRelation: "all_nutritionist"
+            referencedColumns: ["nutri_id"]
           },
         ]
       }
@@ -965,19 +1039,37 @@ export type Database = {
       }
       recipe_type_custom_ingredients: {
         Row: {
+          amount: number
+          fat: number
+          hc: number
           id: number
+          kcal: number
           name: Json | null
+          prot: number
           relation: number | null
+          units: Json
         }
         Insert: {
+          amount?: number
+          fat?: number
+          hc?: number
           id?: number
+          kcal?: number
           name?: Json | null
+          prot?: number
           relation?: number | null
+          units?: Json
         }
         Update: {
+          amount?: number
+          fat?: number
+          hc?: number
           id?: number
+          kcal?: number
           name?: Json | null
+          prot?: number
           relation?: number | null
+          units?: Json
         }
         Relationships: [
           {
@@ -1211,6 +1303,7 @@ export type Database = {
           comment: string
           custom_url: string | null
           date: string
+          document_id: string | null
           event: string
           training_hc: number[]
           training_kcal: number
@@ -1220,6 +1313,7 @@ export type Database = {
           comment?: string
           custom_url?: string | null
           date: string
+          document_id?: string | null
           event?: string
           training_hc?: number[]
           training_kcal?: number
@@ -1229,12 +1323,20 @@ export type Database = {
           comment?: string
           custom_url?: string | null
           date?: string
+          document_id?: string | null
           event?: string
           training_hc?: number[]
           training_kcal?: number
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "user_planing_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "nutritionist_documents"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "user_planing_user_id_fkey"
             columns: ["user_id"]
@@ -1249,6 +1351,7 @@ export type Database = {
           date: string
           is_fixed_recipe: boolean
           meal_id: number
+          recipe_comment: string | null
           recipe_id: number | null
           type_id: number
           user_id: string
@@ -1257,6 +1360,7 @@ export type Database = {
           date: string
           is_fixed_recipe?: boolean
           meal_id: number
+          recipe_comment?: string | null
           recipe_id?: number | null
           type_id: number
           user_id: string
@@ -1265,6 +1369,7 @@ export type Database = {
           date?: string
           is_fixed_recipe?: boolean
           meal_id?: number
+          recipe_comment?: string | null
           recipe_id?: number | null
           type_id?: number
           user_id?: string
@@ -1297,6 +1402,48 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "all_users"
             referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      user_planing_meal_ingredients: {
+        Row: {
+          amount: number
+          date: string
+          id: number
+          ingredient_id: number
+          meal_id: number
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          date: string
+          id?: number
+          ingredient_id: number
+          meal_id: number
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          date?: string
+          id?: number
+          ingredient_id?: number
+          meal_id?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_planing_meal_ingredients_ingredient_id_fkey"
+            columns: ["ingredient_id"]
+            isOneToOne: false
+            referencedRelation: "recipe_type_custom_ingredients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_planing_meal_ingredients_meal_fkey"
+            columns: ["meal_id", "user_id", "date"]
+            isOneToOne: false
+            referencedRelation: "user_planing_meal"
+            referencedColumns: ["meal_id", "user_id", "date"]
           },
         ]
       }
@@ -1454,6 +1601,49 @@ export type Database = {
         Args: { p_start_date: string; p_theme_id: number; p_user_id: string }
         Returns: number
       }
+      calculate_macros_for_date_range: {
+        Args: { p_end_date: string; p_start_date: string; p_user_id: string }
+        Returns: {
+          bmr_kcal: number
+          date: string
+          final_kcal_balance: number
+          total_burning_training_kcal: number
+          total_burnt_kcal: number
+          total_eating_fat: number
+          total_eating_fat_per_kg: number
+          total_eating_hc: number
+          total_eating_hc_per_kg: number
+          total_eating_kcal: number
+          total_eating_prot: number
+          total_eating_prot_per_kg: number
+          total_eating_race_hc: number
+          total_eating_race_kcal: number
+          total_eating_training_hc: number
+          total_intake_kcal: number
+          weight_kg: number
+        }[]
+      }
+      calculate_meal_macros_for_date_range: {
+        Args: { p_end_date: string; p_start_date: string; p_user_id: string }
+        Returns: {
+          date: string
+          extra_fat: number
+          extra_hc: number
+          extra_kcal: number
+          extra_prot: number
+          fat: number
+          hc: number
+          kcal: number
+          meal_id: number
+          prot: number
+          recipe_id: number
+          type_id: number
+        }[]
+      }
+      check_date_range: {
+        Args: { p_end_date: string; p_start_date: string }
+        Returns: undefined
+      }
       clone_week_planing: {
         Args: { p_from_monday: string; p_to_monday: string; p_user_id: string }
         Returns: undefined
@@ -1504,6 +1694,7 @@ export type Database = {
           date: string
           is_fixed_recipe: boolean
           meal_id: number
+          recipe_comment: string | null
           recipe_id: number | null
           type_id: number
           user_id: string
@@ -1570,6 +1761,10 @@ export type Database = {
         Args: { p_appointment_id: number }
         Returns: boolean
       }
+      is_nutritionist_document_owner: {
+        Args: { p_document_id: string }
+        Returns: boolean
+      }
       is_race_owner: { Args: { p_race_id: number }; Returns: boolean }
       leave_nutritionist: {
         Args: never
@@ -1609,6 +1804,12 @@ export type Database = {
       }
       nutri_stripe_customer_id: {
         Args: { p_nutri_id: string }
+        Returns: string
+      }
+      nutritionist_document_path: {
+        Args: {
+          p_doc: Database["public"]["Tables"]["nutritionist_documents"]["Row"]
+        }
         Returns: string
       }
       pick_recipe: {
@@ -1664,6 +1865,29 @@ export type Database = {
           p_user_id: string
         }
         Returns: number
+      }
+      set_planing_meal_recipe: {
+        Args: {
+          p_date: string
+          p_meal_id: number
+          p_recipe_id: number
+          p_type_id?: number
+        }
+        Returns: {
+          date: string
+          is_fixed_recipe: boolean
+          meal_id: number
+          recipe_comment: string | null
+          recipe_id: number | null
+          type_id: number
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "user_planing_meal"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       set_user_food_tags: {
         Args: { p_tag_ids: number[]; p_user_id: string }
