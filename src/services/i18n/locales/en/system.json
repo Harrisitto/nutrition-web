@@ -27,7 +27,9 @@
         "maxValue": "Value is too high",
         "required": "This field is required",
         "invalidUrl": "Please enter a valid link starting with https://",
-        "invalidYoutubeUrl": "Please enter a valid YouTube link"
+        "invalidYoutubeUrl": "Please enter a valid YouTube link",
+        "invalidFileType": "File type not allowed",
+        "fileTooLarge": "The file is too large"
     },
     "privacyPolicy": {
         "title": "Privacy Policy",

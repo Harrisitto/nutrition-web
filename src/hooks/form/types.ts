@@ -45,6 +45,14 @@ interface InputTypes {
       endDate: string;   // ISO date string
     };
   };
+  file: {
+    props: {
+      label?: string;  // T function key
+      accept?: string; // atributo accept del <input>, p.ej. "application/pdf,image/*"
+      hint?: string;   // texto de ayuda bajo el input, ya traducido (suele llevar parámetros)
+    };
+    value: File | null;
+  };
 }
 
 export type ValueOfInputTypes = InputTypes[KeyofInputTypes]['value'];

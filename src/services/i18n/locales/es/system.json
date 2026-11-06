@@ -27,7 +27,9 @@
         "maxValue": "El valor es demasiado alto",
         "required": "Este campo es obligatorio",
         "invalidUrl": "Ingresa un enlace valido que empiece por https://",
-        "invalidYoutubeUrl": "Ingresa un enlace valido de YouTube"
+        "invalidYoutubeUrl": "Ingresa un enlace valido de YouTube",
+        "invalidFileType": "Tipo de archivo no permitido",
+        "fileTooLarge": "El archivo es demasiado grande"
     },
     "privacyPolicy": {
         "title": "Politica de privacidad",

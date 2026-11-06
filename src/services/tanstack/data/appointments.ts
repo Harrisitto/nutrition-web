@@ -97,7 +97,9 @@ export const useFetchAppointmentThemeById = (themeId: number) => {
         .from('appointment_theme_points')
         .select('*')
         .eq('theme_id', themeId)
-        .order('in_days', { ascending: true });
+        .order('in_days', { ascending: true })
+        // El mismo día, por orden de creación (como al llevarlos a una consulta)
+        .order('id', { ascending: true });
 
       if (response.error) {
         throw new Error(response.error.message);
@@ -110,7 +112,15 @@ export const useFetchAppointmentThemeById = (themeId: number) => {
 
 export const useInsertAppointmentPoint = () => {
   return useMutation({
-    mutationFn: async (newPoint: { theme_id: number; point: string; in_days: number }) => {
+    // group_name: el del día al que se añade (todos los puntos de un día comparten grupo)
+    // document_id: documento del nutricionista que se copia al punto al llevarlo a una consulta
+    mutationFn: async (newPoint: {
+      theme_id: number;
+      point: string;
+      in_days: number;
+      group_name: string | null;
+      document_id: string | null;
+    }) => {
       const response = await supabase
         .from('appointment_theme_points')
         .insert(newPoint)
@@ -132,10 +142,22 @@ export const useInsertAppointmentPoint = () => {
 
 export const useChangeAppointmentPoint = () => {
   return useMutation({
-    mutationFn: async (updatedPoint: { id: number; point: string; in_days: number }) => {
+    // group_name: el del día de destino, que puede haber cambiado con in_days
+    mutationFn: async (updatedPoint: {
+      id: number;
+      point: string;
+      in_days: number;
+      group_name: string | null;
+      document_id: string | null;
+    }) => {
       const response = await supabase
         .from('appointment_theme_points')
-        .update({ point: updatedPoint.point, in_days: updatedPoint.in_days })
+        .update({
+          point: updatedPoint.point,
+          in_days: updatedPoint.in_days,
+          group_name: updatedPoint.group_name,
+          document_id: updatedPoint.document_id,
+        })
         .eq('id', updatedPoint.id)
         .select()
         .single();
@@ -149,6 +171,26 @@ export const useChangeAppointmentPoint = () => {
     onSuccess: (data) => {
       // Invalidate the query to refetch the appointment points for the specific theme after a successful update
       queryClient.invalidateQueries({ queryKey: queryKeys().data.appointmentPoints(data.theme_id) });
+    },
+  });
+};
+
+// Nombre del grupo de los puntos de una temática que caen el mismo día: se escribe en todos
+export const useRenameAppointmentPointGroup = () => {
+  return useMutation({
+    mutationFn: async (group: { theme_id: number; in_days: number; group_name: string | null }) => {
+      const response = await supabase
+        .from('appointment_theme_points')
+        .update({ group_name: group.group_name })
+        .eq('theme_id', group.theme_id)
+        .eq('in_days', group.in_days);
+
+      if (response.error) {
+        throw new Error(response.error.message);
+      }
+    },
+    onSuccess: (_, group) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys().data.appointmentPoints(group.theme_id) });
     },
   });
 };

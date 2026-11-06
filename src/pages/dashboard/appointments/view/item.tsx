@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Pencil, Trash2 } from "lucide-react";
 import FromDate from "@src/helpers/dates";
+import { appointmentTitle } from "@src/helpers/appointments";
 import { useLanguageCode } from "@src/hooks/helpers/language";
 import { cardStyle, deleteButtonStyle, primaryButtonStyle } from "@src/components/styles";
 import { pointTagStyle } from "../../races/components/formStyles";
@@ -88,18 +89,8 @@ export const PendingAppointmentItem = ({ appointment }: { appointment: PendingAp
         })),
     ];
 
-    // description null = los nombres de las tematicas de sus puntos, en orden alfabetico. La sin
-    // fecha junta puntos de cualquier tematica: usa su nombre por defecto
-    const themeNames = new Set(
-        appointment.appointment_points
-            .map((point) => point.client_themes?.theme_name)
-            .filter((name): name is string => !!name),
-    );
-    const description =
-        appointment.description ||
-        (appointment.scheduled_on
-            ? [...themeNames].sort((a, b) => a.localeCompare(b)).join(", ")
-            : "");
+    // Sin título (la sin fecha, o una con fecha sin description ni temáticas) usa uno por defecto
+    const description = appointmentTitle(appointment);
 
     const onDelete = () => {
         if (!window.confirm(t("data:appointments.pending.confirmDelete"))) return;

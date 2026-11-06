@@ -2,14 +2,14 @@ import { Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { APPOINTMENT_STEPS, type AppointmentStep } from "../constants";
 
-// Como el de carreras, pero los puntos no se abren hasta guardar la consulta
+// Como el de carreras, pero solo se pasa del primer paso guardando la consulta
 export const StepProgress = ({
   currentStep,
-  canOpenPoints,
+  isSaved,
   onSelectStep,
 }: {
   currentStep: AppointmentStep;
-  canOpenPoints: boolean;
+  isSaved: boolean;
   onSelectStep: (step: AppointmentStep) => void;
 }) => {
   const { t } = useTranslation();
@@ -31,7 +31,7 @@ export const StepProgress = ({
         {APPOINTMENT_STEPS.map((step, index) => {
           const isDone = index < currentIndex;
           const isCurrent = index === currentIndex;
-          const isLocked = step === "points" && !canOpenPoints;
+          const isLocked = step !== "details" && !isSaved;
           const title = t(`data:appointments.form.steps.${step}.title`);
 
           return (
@@ -40,7 +40,7 @@ export const StepProgress = ({
                 type="button"
                 disabled={isLocked}
                 onClick={() => onSelectStep(step)}
-                title={isLocked ? t("data:appointments.form.pointsLocked") : title}
+                title={isLocked ? t("data:appointments.form.stepsLocked") : title}
                 aria-label={title}
                 aria-current={isCurrent ? "step" : undefined}
                 className={`relative flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${

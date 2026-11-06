@@ -298,7 +298,12 @@
                         "cancel": "Cancel"
                     },
                     "points": {
-                        "title": "Theme points"
+                        "title": "Theme points",
+                        "groupName": "Group name",
+                        "editGroup": "Name the group",
+                        "unnamedGroup": "Unnamed group",
+                        "pointsCount_one": "{{count}} point",
+                        "pointsCount_other": "{{count}} points"
                     }
                 },
                 "forms": {
@@ -315,7 +320,11 @@
                         "save": "Save changes",
                         "cancel": "Cancel",
                         "delete": "Delete point",
-                        "confirmDelete": "Delete the point “{{name}}”? This action cannot be undone."
+                        "confirmDelete": "Delete the point “{{name}}”? This action cannot be undone.",
+                        "document": "Document (optional)",
+                        "noDocument": "No document",
+                        "newDocument": "+ Add a new document",
+                        "uploadAndSelect": "Upload and select"
                     }
                 },
                 "selectTheme": "Select a theme to manage its points."
@@ -341,8 +350,6 @@
                 "addTitle": "New document",
                 "file": "File",
                 "allowedTypes": "PDF, PNG, JPG, WEBP, CSV, Excel or OpenDocument. Up to {{max}}.",
-                "invalidType": "This file type is not allowed.",
-                "tooLarge": "The file exceeds the {{max}} limit.",
                 "add": "Upload document",
                 "uploading": "Uploading...",
                 "open": "Open document",
@@ -394,7 +401,7 @@
             "backToList": "Back to appointments",
             "previous": "Previous",
             "saveAndContinue": "Save and continue",
-            "pointsLocked": "Save the appointment details first",
+            "stepsLocked": "Save the appointment details first",
             "steps": {
                 "details": {
                     "title": "Appointment details",
@@ -428,7 +435,8 @@
                 "addCustomPoint": "Add custom",
                 "remove": "Remove point",
                 "markTreated": "Mark as discussed",
-                "unmarkTreated": "Unmark as discussed"
+                "unmarkTreated": "Unmark as discussed",
+                "pointDocument": "Point document:"
             },
             "history": {
                 "period": "Period",

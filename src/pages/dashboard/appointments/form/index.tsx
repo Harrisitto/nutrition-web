@@ -131,9 +131,11 @@ const FormAppointment = () => {
         </Title>
       </div>
 
+      {/* Puntos e historial no se abren hasta guardar el paso 1 en esta visita, también en una
+          consulta ya creada: así queda guardado el nombre que propone el formulario */}
       <StepProgress
         currentStep={step}
-        canOpenPoints={appointmentId !== null}
+        isSaved={savedAppointmentId !== null}
         onSelectStep={setStep}
       />
 

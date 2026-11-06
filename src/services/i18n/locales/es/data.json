@@ -298,7 +298,12 @@
                         "cancel": "Cancelar"
                     },
                     "points": {
-                        "title": "Puntos de la temática"
+                        "title": "Puntos de la temática",
+                        "groupName": "Nombre del grupo",
+                        "editGroup": "Ponerle nombre al grupo",
+                        "unnamedGroup": "Grupo sin nombre",
+                        "pointsCount_one": "{{count}} punto",
+                        "pointsCount_other": "{{count}} puntos"
                     }
                 },
                 "forms": {
@@ -315,7 +320,11 @@
                         "save": "Guardar cambios",
                         "cancel": "Cancelar",
                         "delete": "Eliminar punto",
-                        "confirmDelete": "¿Eliminar el punto «{{name}}»? Esta acción no se puede deshacer."
+                        "confirmDelete": "¿Eliminar el punto «{{name}}»? Esta acción no se puede deshacer.",
+                        "document": "Documento (opcional)",
+                        "noDocument": "Sin documento",
+                        "newDocument": "+ Añadir documento nuevo",
+                        "uploadAndSelect": "Subir y elegir"
                     }
                 },
                 "selectTheme": "Selecciona una temática para gestionar sus puntos."
@@ -341,8 +350,6 @@
                 "addTitle": "Nuevo documento",
                 "file": "Archivo",
                 "allowedTypes": "PDF, PNG, JPG, WEBP, CSV, Excel u OpenDocument. Máximo {{max}}.",
-                "invalidType": "Este tipo de archivo no está permitido.",
-                "tooLarge": "El archivo supera el máximo de {{max}}.",
                 "add": "Subir documento",
                 "uploading": "Subiendo...",
                 "open": "Abrir documento",
@@ -394,7 +401,7 @@
             "backToList": "Volver a consultas",
             "previous": "Anterior",
             "saveAndContinue": "Guardar y continuar",
-            "pointsLocked": "Guarda primero los datos de la consulta",
+            "stepsLocked": "Guarda primero los datos de la consulta",
             "steps": {
                 "details": {
                     "title": "Datos de la consulta",
@@ -428,7 +435,8 @@
                 "addCustomPoint": "Añadir personalizado",
                 "remove": "Quitar punto",
                 "markTreated": "Marcar como tratado",
-                "unmarkTreated": "Desmarcar como tratado"
+                "unmarkTreated": "Desmarcar como tratado",
+                "pointDocument": "Documento del punto:"
             },
             "history": {
                 "period": "Periodo",

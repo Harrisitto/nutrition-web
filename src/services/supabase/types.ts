@@ -352,24 +352,37 @@ export type Database = {
       }
       appointment_theme_points: {
         Row: {
+          document_id: string | null
+          group_name: string | null
           id: number
           in_days: number
           point: string
           theme_id: number
         }
         Insert: {
+          document_id?: string | null
+          group_name?: string | null
           id?: number
           in_days: number
           point: string
           theme_id: number
         }
         Update: {
+          document_id?: string | null
+          group_name?: string | null
           id?: number
           in_days?: number
           point?: string
           theme_id?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "appointment_theme_points_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "nutritionist_documents"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "appointment_theme_points_theme_id_fkey"
             columns: ["theme_id"]
@@ -734,6 +747,7 @@ export type Database = {
         Row: {
           created_at: string
           document_type: string
+          extension: string | null
           id: string
           mime_type: string
           name: string
@@ -744,6 +758,7 @@ export type Database = {
         Insert: {
           created_at?: string
           document_type?: string
+          extension?: string | null
           id: string
           mime_type: string
           name: string
@@ -754,6 +769,7 @@ export type Database = {
         Update: {
           created_at?: string
           document_type?: string
+          extension?: string | null
           id?: string
           mime_type?: string
           name?: string

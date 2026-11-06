@@ -4,29 +4,20 @@ import type { Form } from "@src/hooks/form/class";
 import { useUploadDocument } from "@src/services/tanstack/data/documents";
 import { fieldIds } from "./form";
 
-interface Props {
-  form: Form;
-  file: File | null;
-  onUploaded: () => void;
-}
-
-export const BtnUploadDocument = ({ form, file, onUploaded }: Props) => {
+export const BtnUploadDocument = ({ form }: { form: Form }) => {
   const { t } = useTranslation();
   const uploadDocument = useUploadDocument();
 
   const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    // Values live in the Form instance, read them at click time
-    if (!file || !form.validateForm()) return;
+    // Values live in the Form instance, read them at click time.
+    // validateForm already marks the file as required
+    if (!form.validateForm()) return;
     const state = form.getState();
     uploadDocument.mutate(
-      { file, name: state[fieldIds.name] as string },
-      {
-        onSuccess: () => {
-          form.reset();
-          onUploaded();
-        },
-      },
+      { file: state[fieldIds.file] as File, name: state[fieldIds.name] as string },
+      // reset also clears the native file <input>
+      { onSuccess: () => form.reset() },
     );
   };
 
@@ -40,7 +31,7 @@ export const BtnUploadDocument = ({ form, file, onUploaded }: Props) => {
       <button
         type="submit"
         onClick={handleSubmit}
-        disabled={!file || uploadDocument.isPending}
+        disabled={uploadDocument.isPending}
         className={`${primaryButtonStyle} mt-2 w-full`}
       >
         {uploadDocument.isPending

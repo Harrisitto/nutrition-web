@@ -7,7 +7,7 @@ import { formatFileSize } from "@src/helpers/files";
 import { useNotification } from "@src/store/slices/notification/hook";
 import {
   type NutritionistDocument,
-  getDocumentSignedUrl,
+  openDocumentInNewTab,
   useDeleteDocument,
   useRenameDocument,
 } from "@src/services/tanstack/data/documents";
@@ -29,22 +29,7 @@ export const DocumentItem = ({ document }: { document: NutritionistDocument }) =
     trimmedName.length <= DOCUMENT_NAME_MAX_LENGTH &&
     trimmedName !== document.name;
 
-  const onOpen = async () => {
-    // La ventana se abre antes del await: si se abre después, el navegador la bloquea como popup
-    const win = window.open("", "_blank");
-    try {
-      const url = await getDocumentSignedUrl(document);
-      if (win) {
-        win.opener = null;
-        win.location.href = url;
-      } else {
-        window.location.href = url;
-      }
-    } catch {
-      win?.close();
-      addFormSubmitError();
-    }
-  };
+  const onOpen = () => openDocumentInNewTab(document).catch(() => addFormSubmitError());
 
   const onSaveName = () => {
     if (!canSave) return;

@@ -3,6 +3,7 @@ import { ValidateMaxLength } from "@src/hooks/form/service/validate";
 import type { InputState } from "@src/hooks/form/types";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { appointmentTitle } from "@src/helpers/appointments";
 import type { useFetchSingleAppointment } from "../../../../services/tanstack/user/appointments";
 
 type Appointment = NonNullable<ReturnType<typeof useFetchSingleAppointment>["data"]>;
@@ -73,7 +74,9 @@ const createStartTimeField = (label: string, currentValue: string) =>
 const useConfig = (appointment: Appointment | undefined) => {
   const { t } = useTranslation();
   // Solo los valores: un refetch con los mismos datos no reinicia el formulario
-  const description = appointment?.description ?? "";
+  // Sin description sale el título que ve en la lista (las temáticas de sus puntos): al guardar
+  // queda como su nombre
+  const description = appointment ? appointmentTitle(appointment) : "";
   const scheduledOn = appointment?.scheduled_on ?? "";
   const videoUrl = appointment?.video_url ?? "";
   // La columna es time: llega como "HH:MM:SS" y el input usa "HH:MM"

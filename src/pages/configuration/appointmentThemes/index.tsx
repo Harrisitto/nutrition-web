@@ -9,6 +9,7 @@ import { PointsTimeline } from "./listPoints/timeline";
 import { BtnInsertAppointment } from "./newAppointment/insert";
 import { BtnInsertAppointmentPoint } from "./newPoint/insert";
 import { useFitToScrollParent } from "./useFitToScrollParent";
+import { DocumentPicker } from "./@components/documentPicker";
 
 
 export default function PageAppointmentThemes() {
@@ -16,6 +17,8 @@ export default function PageAppointmentThemes() {
   const appointmentForm = useNewAppointmentForm();
   const pointForm = useNewPointForm();
   const [selectedThemeId, setSelectedThemeId] = useState<number | null>(null);
+  // Documento del punto nuevo: no es un campo de useForm (sube documentos al vuelo)
+  const [pointDocumentId, setPointDocumentId] = useState("");
   const rowRef = useRef<HTMLDivElement>(null);
   const rowHeight = useFitToScrollParent(rowRef);
 
@@ -62,11 +65,21 @@ export default function PageAppointmentThemes() {
                             {t("data:configuration.sections.appointmentThemes.forms.point.title")}
                         </div>
                         <div className="flex items-end gap-2">
-                            <div className="min-w-0 flex-1">{pointForm.Fields}</div>
+                            <div className="min-w-0 flex-1">
+                                {pointForm.Fields}
+                                <div className="mb-4">
+                                    <DocumentPicker
+                                        value={pointDocumentId}
+                                        onChange={setPointDocumentId}
+                                    />
+                                </div>
+                            </div>
                             <div className="mb-4">
                                 <BtnInsertAppointmentPoint
                                     form={pointForm.form}
                                     theme_id={selectedThemeId}
+                                    documentId={pointDocumentId}
+                                    onInserted={() => setPointDocumentId("")}
                                 />
                             </div>
                         </div>

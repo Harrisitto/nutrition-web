@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { ChevronRight } from "lucide-react";
 import FromDate from "@src/helpers/dates";
+import { appointmentTitle } from "@src/helpers/appointments";
 import { useLanguageCode } from "@src/hooks/helpers/language";
 import useAppNavigation from "@src/hooks/navigation";
 import { APP_ROUTES } from "@src/hooks/navigation/routes";
@@ -75,9 +76,9 @@ export const DayDetail = ({
                     <span className="truncate text-sm font-semibold text-text-title">
                       {appointment.client?.name}
                     </span>
-                    {appointment.description && (
+                    {appointmentTitle(appointment) && (
                       <span className="truncate text-xs text-text-muted">
-                        {appointment.description}
+                        {appointmentTitle(appointment)}
                       </span>
                     )}
                   </span>

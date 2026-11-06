@@ -4,9 +4,10 @@ import { useAppSelector } from "../../../store/store";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "../queryClient";
 
-// Consulta con sus puntos: los del nutricionista (con su tematica) y los temas del cliente
+// Consulta con sus puntos: los del nutricionista (con su tematica y el grupo de su punto de la
+// plantilla) y los temas del cliente
 const APPOINTMENT_WITH_POINTS =
-  '*, appointment_points(*, client_themes(theme_name)), user_appointment_points(*)';
+  '*, appointment_points(*, client_themes(theme_name), appointment_theme_points(group_name, document_id)), user_appointment_points(*)';
 
 // Estados de una consulta: programada -> en curso (Empezar consulta) -> tratada (Terminar consulta)
 export type AppointmentStatus = "scheduled" | "in_progress" | "done";
@@ -126,7 +127,7 @@ const fetchClientThemesWithPoints = async (clientId: string | null) => {
   }
 
   const response = await supabase.from('client_themes')
-    .select('id, theme_name, start_date, nutri_appointment_themes(appointment_theme_points(id, point, in_days)), appointment_points(theme_point_id, treated_at)')
+    .select('id, theme_name, start_date, nutri_appointment_themes(appointment_theme_points(id, point, in_days, group_name, document_id)), appointment_points(theme_point_id, treated_at)')
     .eq('user_id', clientId)
     .order('start_date', { ascending: false });
 
@@ -396,7 +397,9 @@ export const useDeleteAppointment = () => {
 };
 
 // Punto del nutricionista en una consulta: personalizado (sin client_theme_id) o de una
-// tematica asignada (con client_theme_id y theme_point_id)
+// tematica asignada (con client_theme_id y theme_point_id). El grupo y el documento son del punto
+// de la plantilla (theme_point_id): no se guardan en el punto. El cliente lee el documento porque
+// tiene el punto en su consulta (is_theme_point_document_of_user)
 export const useInsertAppointmentPointToAppointment = () => {
   const clientId = useAppSelector((state) => state.config.selectedUserId);
 

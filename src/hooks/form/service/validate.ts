@@ -54,3 +54,19 @@ export const ValidateYoutubeUrl = (value: string) => {
     if (!getYoutubeVideoId(value)) { return 'system:form.invalidYoutubeUrl'; }
     return '';
 };
+
+export const ValidateFileRequired = (value: File | null) => {
+    if (!value) { return 'system:form.required'; }
+    return '';
+};
+
+// Sin fichero no hay nada que comprobar: la obligatoriedad va en ValidateFileRequired
+export const ValidateFileType = (value: File | null, allowedMimeTypes: readonly string[]) => {
+    if (value && !allowedMimeTypes.includes(value.type)) { return 'system:form.invalidFileType'; }
+    return '';
+};
+
+export const ValidateFileMaxSize = (value: File | null, maxBytes: number) => {
+    if (value && value.size > maxBytes) { return 'system:form.fileTooLarge'; }
+    return '';
+};

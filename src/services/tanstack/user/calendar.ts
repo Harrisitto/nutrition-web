@@ -33,7 +33,7 @@ export const useFetchCalendarNotes = ({
       }
 
       const response = await supabase.from('client_notes')
-        .select('*, client: all_users(name)')
+        .select('*, client: all_users(name), appointment_points(client_themes(theme_name))')
         .eq('nutri_id', nutriId)
         // Entre comillas: los instantes ISO llevan ":" y "." que el filtro or() no admite sueltos
         .or(
@@ -75,7 +75,7 @@ export const useFetchCalendarAppointments = ({
       }
 
       const response = await supabase.from('nutri_appointments')
-        .select('*, client: all_users(name)')
+        .select('*, client: all_users(name), appointment_points(client_themes(theme_name))')
         .eq('nutri_id', nutriId)
         .in('status', ['scheduled', 'in_progress'] satisfies AppointmentStatus[])
         .gte('scheduled_on', start)

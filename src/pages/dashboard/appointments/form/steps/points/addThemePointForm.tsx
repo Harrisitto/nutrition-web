@@ -1,12 +1,17 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus } from "lucide-react";
+import { FileText, Plus } from "lucide-react";
 import FromDate from "@src/helpers/dates";
 import { useLanguageCode } from "@src/hooks/helpers/language";
 import { primaryButtonStyle } from "@src/components/styles";
 import { SelectField } from "../../../../races/components/selectField";
 import { emptyTextStyle } from "../../../../races/components/formStyles";
 import type { Points } from "../../configPoints";
+import { useNotification } from "@src/store/slices/notification/hook";
+import {
+  openDocumentInNewTab,
+  useFetchMyDocuments,
+} from "@src/services/tanstack/data/documents";
 
 // Próximo punto pendiente de la temática (el sugerido)
 const nextPointStyle = "font-bold text-nutrition-green";
@@ -23,6 +28,9 @@ export const AddThemePointForm = ({
   const themes = allThemes.filter((option) => !option.isFinished);
   const [clientThemeId, setClientThemeId] = useState("");
   const [themePointId, setThemePointId] = useState("");
+  // Nombre y ruta del documento del punto elegido
+  const { data: documents } = useFetchMyDocuments();
+  const { addFormSubmitError } = useNotification();
 
   if (!themes.length) {
     return (
@@ -41,13 +49,22 @@ export const AddThemePointForm = ({
   const selectedPointId =
     themePointId || (theme?.nextPointId ? String(theme.nextPointId) : "");
   const canAdd = !!theme && !!selectedPointId && !isAdding;
+  const selectedPoint = availablePoints.find((point) => point.id === Number(selectedPointId));
+  const selectedDocument = selectedPoint?.document_id
+    ? documents?.find((document) => document.id === selectedPoint.document_id)
+    : undefined;
 
   const onAdd = (e: React.FormEvent) => {
     e.preventDefault();
-    const themePoint = availablePoints.find((point) => point.id === Number(selectedPointId));
+    const themePoint = selectedPoint;
     if (!theme || !themePoint) return;
     addPoint(
-      { point: themePoint.point, client_theme_id: theme.id, theme_point_id: themePoint.id },
+      {
+        point: themePoint.point,
+        client_theme_id: theme.id,
+        // El grupo y el documento no se guardan en el punto: salen del de la plantilla
+        theme_point_id: themePoint.id,
+      },
       () => setThemePointId(""),
     );
   };
@@ -83,21 +100,39 @@ export const AddThemePointForm = ({
             : t("data:appointments.form.points.selectThemePoint")
         }
         value={selectedPointId}
-        options={availablePoints.map((point) =>
-          point.id === theme?.nextPointId
+        options={availablePoints.map((point) => {
+          // Con el nombre de su grupo delante, si lo tiene
+          const label = point.group_name ? `${point.group_name} · ${point.point}` : point.point;
+          return point.id === theme?.nextPointId
             ? {
                 value: point.id,
-                label: `${t("data:appointments.form.points.next")}: ${point.point}`,
+                label: `${t("data:appointments.form.points.next")}: ${label}`,
                 className: nextPointStyle,
               }
-            : { value: point.id, label: point.point },
-        )}
+            : { value: point.id, label };
+        })}
         onChange={setThemePointId}
       />
       <button type="submit" disabled={!canAdd} className={primaryButtonStyle}>
         <Plus size={16} />
         {t("data:appointments.form.points.addThemePoint")}
       </button>
+      {/* El documento del punto de la plantilla, que se copiará a la consulta */}
+      {selectedDocument && (
+        <div className="flex items-center gap-2 text-sm text-text-muted md:col-span-3">
+          {t("data:appointments.form.points.pointDocument")}
+          <button
+            type="button"
+            title={selectedDocument.name}
+            aria-label={`${t("data:configuration.sections.documents.open")}: ${selectedDocument.name}`}
+            onClick={() => openDocumentInNewTab(selectedDocument).catch(() => addFormSubmitError())}
+            className="flex min-w-0 items-center gap-1 rounded-md border border-fade-green px-2 py-0.5 text-xs text-nutrition-green transition hover:bg-white-green/60"
+          >
+            <FileText size={14} className="shrink-0" />
+            <span className="truncate">{selectedDocument.name}</span>
+          </button>
+        </div>
+      )}
     </form>
   );
 };

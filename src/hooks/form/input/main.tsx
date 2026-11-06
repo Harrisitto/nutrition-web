@@ -107,6 +107,20 @@ const SwitchField = ({
         />
       );
     }
+    case "file": {
+      const thisField = field as FormFieldUpdate<"file">;
+      return (
+        <InputComponent.File
+          label={t(thisField.inputProps?.label ?? "")}
+          hint={thisField.inputProps?.hint}
+          accept={thisField.inputProps?.accept}
+          value={thisField.currentValue ?? null}
+          onChange={(file) => {
+            form.requestUpdate(id, file);
+          }}
+        />
+      );
+    }
     default:
       return null;
   }

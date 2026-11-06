@@ -55,6 +55,26 @@ export const getDocumentSignedUrl = async (
     return data.signedUrl;
 };
 
+/**
+ * Abre un documento en una pestaña nueva. La ventana se abre antes del await: si se abre después,
+ * el navegador la bloquea como popup. Si falla la URL firmada, cierra la pestaña y lanza el error
+ */
+export const openDocumentInNewTab = async (document: Pick<NutritionistDocument, "path">) => {
+    const win = window.open("", "_blank");
+    try {
+        const url = await getDocumentSignedUrl(document);
+        if (win) {
+            win.opener = null;
+            win.location.href = url;
+        } else {
+            window.location.href = url;
+        }
+    } catch (error) {
+        win?.close();
+        throw error;
+    }
+};
+
 /** Documentos del nutricionista autenticado, los más recientes primero */
 export const useFetchMyDocuments = () => {
     const { data: sessionData } = useGetAuthSession();
@@ -167,6 +187,8 @@ export const useDeleteDocument = () => {
             queryClient.invalidateQueries({ queryKey: queryKeys({ userId: nutriId }).data.documents });
             // Los días de la planificación que lo tenían adjunto pasan a document_id null
             queryClient.invalidateQueries({ queryKey: queryKeys().user.planingAllUsers });
+            // Y los puntos de las temáticas (appointment_theme_points.document_id on delete set null)
+            queryClient.invalidateQueries({ queryKey: queryKeys().data.appointmentThemes });
         },
     });
 };
