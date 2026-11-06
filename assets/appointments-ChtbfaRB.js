@@ -1,0 +1,1 @@
+const s=t=>t.description?t.description:t.scheduled_on?[...new Set(t.appointment_points.map(e=>e.client_themes?.theme_name).filter(e=>!!e))].sort((e,r)=>e.localeCompare(r)).join(", "):"";export{s as a};
