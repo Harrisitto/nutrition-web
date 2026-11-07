@@ -17,16 +17,24 @@ import type { PersistConfig } from 'redux-persist'
 
 import errorReducer from './slices/error/store'
 import notificationReducer from './slices/notification/store'
-import configReducer, { mergeKeyboardCommands } from './slices/config/store'
+import configReducer, {
+	mergeKeyboardCommands,
+	mergeRowsVisibility,
+} from './slices/config/store'
 import type { ConfigState } from './slices/config/store'
 
 // Only user preferences survive a reload; session state (selected client, day…) does not
 const configPersistConfig: PersistConfig<ConfigState> = {
 	key: 'config',
 	storage,
-	whitelist: ['keyboardCommands', 'showMealsInTable', 'autoAdjustMeals'],
-	// Merge saved shortcuts over the current defaults so newly added commands
-	// get their default key instead of being undefined
+	whitelist: [
+		'keyboardCommands',
+		'showMealsInTable',
+		'showRowsInTable',
+		'autoAdjustMeals',
+	],
+	// Merge saved shortcuts and row visibility over the current defaults so
+	// newly added commands/rows get their default value instead of being undefined
 	stateReconciler: (inbound, original, reduced, config) => {
 		const merged = autoMergeLevel1(inbound, original, reduced, config)
 		return {
@@ -35,6 +43,7 @@ const configPersistConfig: PersistConfig<ConfigState> = {
 			showMealsInTable: Array.isArray(inbound?.showMealsInTable)
 				? inbound.showMealsInTable
 				: merged.showMealsInTable,
+			showRowsInTable: mergeRowsVisibility(inbound?.showRowsInTable),
 		}
 	},
 }

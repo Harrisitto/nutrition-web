@@ -191,8 +191,9 @@ export const useMutatePlaningMeals = ({
         date: m.date ?? safeDate.save(),
         meal_id: m.meal_id!,
         recipe_id: m.recipe_id ?? null,
-        // Solo es fija si se eligio receta a mano
-        is_fixed_recipe: m.recipe_id != null && (m.is_fixed_recipe ?? false),
+        // Solo es fija si se eligio receta a mano. Puede serlo sin recipe_id: las recetas
+        // propias (custom_recipes) no están en all_recipes y van como ingredientes
+        is_fixed_recipe: m.is_fixed_recipe ?? false,
         type_id: m.type_id!,
         // Solo si se envía: los presets no lo traen y el upsert no debe borrarlo
         ...(m.recipe_comment !== undefined && { recipe_comment: m.recipe_comment }),

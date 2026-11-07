@@ -107,6 +107,9 @@ export const queryKeys = ({
       all: ["user", "appointments", userId],
 
     },
+    // Recetas propias cuyo dueño (owner_id) es `userId`: un cliente o el propio nutricionista
+    customRecipesBase: ["user", "customRecipes", userId],
+    customRecipes: ["user", "customRecipes", userId, language],
     notes: {
       // Fechas "YYYY-MM-DD", ambas incluidas
       range: (start: string, end: string) => ["user", "notes", userId, "range", start, end],
@@ -144,6 +147,8 @@ export const queryKeys = ({
     topRecipesForUser: (typeId?: number) => ["data", "topRecipes", language, userId, typeId ?? null, searchStr],
     raceIngredients: ["data", "raceIngredients", userId],
     customIngredients: ["data", "customIngredients", language],
+    // Id del recipe_type "receta propia" (RPC custom_recipe_type_id): no cambia
+    customRecipeTypeId: ["data", "customRecipeTypeId"],
     raceLandmarks: ["data", "raceLandmarks", language],
     appointmentThemes: ["data", "appointmentThemes"],
     appointmentPoints: (themeId: number) => ["data", "appointmentThemes", themeId, "points"],

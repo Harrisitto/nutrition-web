@@ -5,9 +5,10 @@ import { MealRowInfo, RowInfo, TrainingHcRowInfo } from "../types";
 import { useFetchPlaningMealsForDate } from "@src/services/tanstack/user/meals";
 import { useTranslation } from "react-i18next";
 import { useFetchMacrosForDateRange } from "@src/services/tanstack/user/macros";
-import { useAppDispatch } from "@src/store/store";
+import { useAppDispatch, useAppSelector } from "@src/store/store";
 import { useRaceTotalsByDate } from "@src/services/tanstack/user/races";
 import { setSelectedDay } from "@src/store/slices/config/store";
+import type { TableRowKey } from "@src/store/slices/config/store";
 import useAppNavigation from "@src/hooks/navigation";
 import { APP_ROUTES } from "@src/hooks/navigation/routes";
 
@@ -151,23 +152,39 @@ const useTableRows = () => {
       (day) => day.bmr_kcal || day.total_intake_kcal || day.total_burnt_kcal,
     );
 
-    const totalBalance = days.reduce(
-      (acc, day) => acc + day.final_kcal_balance,
-      0,
-    );
+    // Fila de solo lectura con el valor diario en kcal y la suma semanal
+    const kcalRow = (
+      id:
+        | "DISPLAY_INTAKE_KCAL"
+        | "DISPLAY_BURNT_KCAL"
+        | "DISPLAY_ENERGY_BALANCE",
+      label: string,
+      kcal: (day: (typeof days)[number]) => number,
+    ) => {
+      const total = days.reduce((acc, day) => acc + kcal(day), 0);
+      return new RowInfo({ id, isFullWidth: false })
+        .addLabel(t(label))
+        .addMap(days.map((day) => [day.date, `${Math.round(kcal(day))} Kcal`]))
+        .addResume(`${total.toFixed(0)} Kcal`);
+    };
 
-    return new RowInfo({
-      id: "DISPLAY_ENERGY_BALANCE",
-      isFullWidth: false,
-    })
-      .addLabel(t("data:dashboardTable.energyBalanceResume"))
-      .addMap(
-        days.map((day) => [
-          day.date,
-          `${Math.round(day.final_kcal_balance)} Kcal`,
-        ]),
-      )
-      .addResume(totalBalance.toFixed(0) + " Kcal");
+    return {
+      intakeRow: kcalRow(
+        "DISPLAY_INTAKE_KCAL",
+        "data:dashboardTable.intakeKcalRow",
+        (day) => day.total_intake_kcal,
+      ),
+      burntRow: kcalRow(
+        "DISPLAY_BURNT_KCAL",
+        "data:dashboardTable.burntKcalRow",
+        (day) => day.total_burnt_kcal,
+      ),
+      balanceRow: kcalRow(
+        "DISPLAY_ENERGY_BALANCE",
+        "data:dashboardTable.energyBalanceResume",
+        (day) => day.final_kcal_balance,
+      ),
+    };
   }, [macrosByDate, t]);
 
   const createUserMacros = useMemo(() => {
@@ -272,48 +289,87 @@ const useTableRows = () => {
       );
   }, [planingQuery.data, t]);
 
+  const rowsVisibility = useAppSelector(
+    (state) => state.config.showRowsInTable,
+  );
+
   const rows = useMemo<RowInfo[]>(() => {
     const { carbsRow, proteinRow, fatRow } = createUserMacros;
+    const { intakeRow, burntRow, balanceRow } = createEnergyBalance;
+    // Solo las filas que el nutricionista no ha ocultado en la configuración
+    const visible = (
+      entries: [TableRowKey, RowInfo | RowInfo[]][],
+    ): RowInfo[] =>
+      entries.flatMap(([key, row]) => (rowsVisibility[key] ? row : []));
+    // La cabecera de una sección solo se muestra si queda alguna fila visible
+    const section = (header: RowInfo, sectionRows: RowInfo[]) =>
+      sectionRows.length ? [header, ...sectionRows] : [];
 
     return [
-      new RowInfo({
-        id: "INPUT_PRESET",
-        isEditable: "presets",
-        isFullWidth: false,
-      }).addLabel(t("data:dashboardTable.navigation.presets")),
-      new RowInfo({
-        id: "INPUT_AUTO_GENERATE",
-        isEditable: "action",
-        isFullWidth: false,
-      }).addLabel(t("data:dashboardTable.autoGenerate.header")),
+      ...visible([
+        [
+          "presets",
+          new RowInfo({
+            id: "INPUT_PRESET",
+            isEditable: "presets",
+            isFullWidth: false,
+          }).addLabel(t("data:dashboardTable.navigation.presets")),
+        ],
+        [
+          "autoGenerate",
+          new RowInfo({
+            id: "INPUT_AUTO_GENERATE",
+            isEditable: "action",
+            isFullWidth: false,
+          }).addLabel(t("data:dashboardTable.autoGenerate.header")),
+        ],
+      ]),
       ...createMealRows,
-      new RowInfo({
-        id: "HEADER_TRAINING",
-        isFullWidth: true,
-      }).addLabel(t("data:dashboardTable.hcHeader")),
-      createTrainingKcal,
-      ...createTrainingHcRows,
-      createRacesRow,
-      new RowInfo({
-        id: "HEADER_ENERGY_BALANCE",
-        isFullWidth: true,
-      }).addLabel(t("data:dashboardTable.energyBalanceHeader")),
-      createEnergyBalance,
-      new RowInfo({
-        id: "HEADER_DAILY_MACROS",
-        isFullWidth: true,
-      }).addLabel(t("data:dashboardTable.dailyMacros.header")),
-      carbsRow,
-      proteinRow,
-      fatRow,
-      new RowInfo({
-        id: "HEADER_COMMENTS",
-        isFullWidth: true,
-      }).addLabel(t("data:dashboardTable.commentsRows.header")),
-      createCommentsRow,
-      createEventsRow,
-      createCustomUrlRow,
-      createDocumentRow,
+      ...section(
+        new RowInfo({
+          id: "HEADER_TRAINING",
+          isFullWidth: true,
+        }).addLabel(t("data:dashboardTable.hcHeader")),
+        visible([
+          ["trainingKcal", createTrainingKcal],
+          ["trainingHc", createTrainingHcRows],
+          ["races", createRacesRow],
+        ]),
+      ),
+      ...section(
+        new RowInfo({
+          id: "HEADER_ENERGY_BALANCE",
+          isFullWidth: true,
+        }).addLabel(t("data:dashboardTable.energyBalanceHeader")),
+        visible([
+          ["intakeKcal", intakeRow],
+          ["burntKcal", burntRow],
+          ["energyBalance", balanceRow],
+        ]),
+      ),
+      ...section(
+        new RowInfo({
+          id: "HEADER_DAILY_MACROS",
+          isFullWidth: true,
+        }).addLabel(t("data:dashboardTable.dailyMacros.header")),
+        visible([
+          ["carbsPerKg", carbsRow],
+          ["proteinPerKg", proteinRow],
+          ["fatPerKg", fatRow],
+        ]),
+      ),
+      ...section(
+        new RowInfo({
+          id: "HEADER_COMMENTS",
+          isFullWidth: true,
+        }).addLabel(t("data:dashboardTable.commentsRows.header")),
+        visible([
+          ["comments", createCommentsRow],
+          ["events", createEventsRow],
+          ["links", createCustomUrlRow],
+          ["documents", createDocumentRow],
+        ]),
+      ),
     ];
   }, [
     createMealRows,
@@ -326,6 +382,7 @@ const useTableRows = () => {
     createEventsRow,
     createCustomUrlRow,
     createDocumentRow,
+    rowsVisibility,
     t,
   ]);
 

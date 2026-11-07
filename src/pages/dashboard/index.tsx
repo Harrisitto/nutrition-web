@@ -17,6 +17,7 @@ const PageNutriRaces = lazy(() => import("./races/index"));
 const PageAppointments = lazy(() => import("./appointments/view/index"));
 const PageAppointmentForm = lazy(() => import("./appointments/form/index"));
 const PageAppointmentsCalendar = lazy(() => import("./appointments/calendar/index"));
+const PageClientRecipes = lazy(() => import("./recipes/index"));
 
 const ScreenNoClients = lazy(
   () => import("./@components/noClientsScreen/index"),
@@ -104,6 +105,10 @@ export default function PageDashboard() {
           <Route
             path={getTrailingRoute(APP_ROUTES.FORM_MEASURE)}
             element={<PageFormMeasure />}
+          />
+          <Route
+            path={getTrailingRoute(APP_ROUTES.FORM_CLIENT_RECIPES)}
+            element={<PageClientRecipes />}
           />
           <Route
             path={getTrailingRoute(APP_ROUTES.RACES)}

@@ -15,8 +15,11 @@ import {
   type DraftMealIngredient,
 } from "@src/services/tanstack/data/ingredients";
 import { useNotification } from "@src/store/slices/notification/hook";
+import { useSelectCustomRecipeId } from "@src/services/tanstack/user/customRecipes";
 import SelectEditor from "./default/selectInput";
 import RecipeSelectEditor from "./recipeSelectInput";
+import CustomRecipeSelectEditor from "./customRecipeSelectInput";
+import { customRecipeComment } from "@src/components/shared/recipes/helpers";
 import { optionActionButtonStyle } from "../../styles";
 
 const CLEAR_MEAL_ID = -1;
@@ -90,6 +93,8 @@ const MealTypeEditor = ({
     [weekIngredients, date, mealId],
   );
   const { addMutationError } = useNotification();
+  // Tipo "receta propia": su selector ofrece las recetas propias en vez del catálogo
+  const { data: customRecipeTypeId } = useSelectCustomRecipeId();
 
 
   const rawOptions = mealTypes.data ?? [];
@@ -109,14 +114,21 @@ const MealTypeEditor = ({
     [options, selectedTypeId],
   );
 
-  const saveMeal = (typeId: number, recipeId: number | null) =>
+  // isFixed sin recipeId: receta propia, cuyos alimentos van como ingredientes de la comida.
+  // comment sustituye al del campo de comentario (la receta propia pone el suyo)
+  const saveMeal = (
+    typeId: number,
+    recipeId: number | null,
+    isFixed = recipeId !== null,
+    comment = recipeComment,
+  ) =>
     insertMeal.mutateAsync([{
       meal_id: mealId,
       type_id: typeId,
       // Con receta elegida queda fija; sin ella deja de serlo
       recipe_id: recipeId,
-      is_fixed_recipe: recipeId !== null,
-      recipe_comment: recipeComment.trim() || null,
+      is_fixed_recipe: isFixed,
+      recipe_comment: comment.trim() || null,
     }]);
 
   /**
@@ -129,10 +141,12 @@ const MealTypeEditor = ({
     // null: sin receta fija, saveMeal la guarda con is_fixed_recipe = false
     recipeId: number | null,
     ingredients: DraftMealIngredient[],
+    isFixed = recipeId !== null,
+    comment = recipeComment,
   ) => {
     // Si algo falla el editor sigue abierto con el borrador, para reintentar
     try {
-      await saveMeal(typeId, recipeId);
+      await saveMeal(typeId, recipeId, isFixed, comment);
     } catch {
       addMutationError();
       return;
@@ -166,6 +180,27 @@ const MealTypeEditor = ({
           : currentMeal.is_fixed_recipe && currentMeal.recipe_id === recipeId;
       return sameChoice ? savedIngredients : [];
     };
+
+    if (recipeTypeId === customRecipeTypeId) {
+      return (
+        <CustomRecipeSelectEditor
+          savedIngredients={ingredientsFor(null)}
+          onSave={() => saveMeal(recipeTypeId, null).finally(onClose)}
+          onSaveWithIngredients={(ingredients, recipe) =>
+            recipe
+              ? saveMealWithIngredients(
+                  recipeTypeId,
+                  null,
+                  ingredients,
+                  true,
+                  customRecipeComment(recipe),
+                )
+              : saveMealWithIngredients(recipeTypeId, null, ingredients)
+          }
+          onClose={onClose}
+        />
+      );
+    }
 
     return (
       <RecipeSelectEditor

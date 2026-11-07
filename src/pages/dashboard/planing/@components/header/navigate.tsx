@@ -1,6 +1,6 @@
 import useAppNavigation from "@src/hooks/navigation";
 import { APP_ROUTES, type AppRoute } from "@src/hooks/navigation/routes";
-import { ActivityIcon, Calendar, ForkKnifeCrossedIcon } from "lucide-react";
+import { ActivityIcon, BookOpen, Calendar, ForkKnifeCrossedIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 type NavigateButtonProps = {
@@ -48,5 +48,13 @@ export const NavigateAppointments = () => (
     route={APP_ROUTES.APPOINTMENTS}
     labelKey="data:dashboardTable.navigation.appointments"
     icon={<Calendar className="h-3.5 w-3.5" />}
+  />
+);
+
+export const NavigateClientRecipes = () => (
+  <NavigateButton
+    route={APP_ROUTES.FORM_CLIENT_RECIPES}
+    labelKey="data:dashboardTable.navigation.recipes"
+    icon={<BookOpen className="h-3.5 w-3.5" />}
   />
 );

@@ -1,6 +1,7 @@
 import { SelectDateCalendar } from "./@components/calendar";
 import {
   NavigateAppointments,
+  NavigateClientRecipes,
   NavigateMeasures,
   NavigateUserPreset,
 } from "./@components/header/navigate";
@@ -28,6 +29,7 @@ const PagePlaningForm = () => {
             <Navigation />
             <NavigateUserPreset />
             <NavigateMeasures />
+            <NavigateClientRecipes />
             <NavigateAppointments />
           </div>
           <div className="flex flex-row flex-wrap justify-between gap-2">

@@ -8,6 +8,8 @@
         "racesCellEmpty": "Carreras del {{day}}: ninguna",
         "trainingKcalHeader": "Kcal de entrenamiento",
         "energyBalanceHeader": "Balance energetico",
+        "intakeKcalRow": "Kcal ingeridas",
+        "burntKcalRow": "Kcal gastadas",
         "energyBalanceResume": "Suma semanal",
         "weekBalance": "Balance semanal",
         "search": "Buscar",
@@ -94,7 +96,8 @@
             "config": "Configuracion del nutricionista",
             "info": "Ver informacion de la app",
             "dashboard": "Tablero",
-            "calendar": "Calendario de consultas"
+            "calendar": "Calendario de consultas",
+            "recipes": "Recetas"
         },
         "actions": {
             "cloneWeek": "Clonar semana anterior",
@@ -139,6 +142,11 @@
         "recipeComment": {
             "label": "Comentario sobre la receta",
             "placeholder": "Ej.: sin lactosa, ración pequeña..."
+        },
+        "selectCustomRecipe": "Elegir receta propia",
+        "customRecipeOwner": {
+            "mine": "Tuya",
+            "client": "Cliente"
         }
     },
     "references": {
@@ -366,6 +374,10 @@
                     "image": "Imagen",
                     "spreadsheet": "Hoja de cálculo"
                 }
+            },
+            "myRecipes": {
+                "title": "Mis recetas",
+                "description": "Crea tus recetas a partir de los alimentos del catálogo."
             }
         }
     },
@@ -684,6 +696,38 @@
             "description": "Recalcula las comidas del día cuando cambias el entrenamiento.",
             "onTrainingKcalChange": "Al cambiar las kcal de entrenamiento",
             "onTrainingCarbsChange": "Al cambiar los carbohidratos de entrenamiento"
+        }
+    },
+    "customRecipes": {
+        "form": {
+            "newTitle": "Nueva receta",
+            "editTitle": "Editar receta",
+            "ingredients": "Alimentos",
+            "noIngredients": "Añade al menos un alimento",
+            "addIngredient": "Añadir alimento",
+            "search": "Buscar alimento...",
+            "noResults": "Sin resultados",
+            "amount": "Cantidad",
+            "removeIngredient": "Quitar alimento",
+            "cancel": "Cancelar",
+            "save": "Guardar cambios",
+            "create": "Crear receta"
+        },
+        "list": {
+            "title": "Tus recetas",
+            "edit": "Editar receta",
+            "delete": "Eliminar receta",
+            "confirmDelete": "¿Eliminar la receta «{{name}}»?",
+            "empty": "Todavía no hay ninguna receta.",
+            "loadError": "No se han podido cargar las recetas.",
+            "ingredientsCount_one": "{{count}} alimento",
+            "ingredientsCount_other": "{{count}} alimentos",
+            "total": "Total",
+            "type": "Tipo"
+        },
+        "client": {
+            "title": "Recetas del cliente",
+            "description": "Recetas propias de este cliente, hechas con alimentos del catálogo."
         }
     }
 }

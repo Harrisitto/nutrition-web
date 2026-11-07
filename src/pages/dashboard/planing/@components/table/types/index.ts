@@ -9,6 +9,8 @@ export const ALL_IDS = {
   INPUT_TRAINING_KCAL: "trainingKcal",
   INPUT_RACES: "races",
   HEADER_ENERGY_BALANCE: "headerEnergyBalance",
+  DISPLAY_INTAKE_KCAL: "displayIntakeKcal",
+  DISPLAY_BURNT_KCAL: "displayBurntKcal",
   DISPLAY_ENERGY_BALANCE: "displayEnergyBalance",
   HEADER_DAILY_MACROS: "headerDailyMacros",
   DISPLAY_CARBS_PER_KG: "displayCarbsPerKg",

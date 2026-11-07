@@ -8,6 +8,8 @@
         "racesCellEmpty": "Races on {{day}}: none",
         "trainingKcalHeader": "Training Kcal",
         "energyBalanceHeader": "Energy Balance",
+        "intakeKcalRow": "Intake kcal",
+        "burntKcalRow": "Burnt kcal",
         "energyBalanceResume": "Week sum",
         "weekBalance": "Week Balance",
         "search": "Search",
@@ -93,7 +95,8 @@
             "config": "Nutritionist configuration",
             "info": "See app info",
             "dashboard": "Dashboard",
-            "calendar": "Appointments calendar"
+            "calendar": "Appointments calendar",
+            "recipes": "Recipes"
         },
         "actions": {
             "cloneWeek": "Clone last week",
@@ -139,6 +142,11 @@
         "recipeComment": {
             "label": "Comment about the recipe",
             "placeholder": "E.g. lactose-free, small portion..."
+        },
+        "selectCustomRecipe": "Choose own recipe",
+        "customRecipeOwner": {
+            "mine": "Yours",
+            "client": "Client"
         }
     },
     "references": {
@@ -366,6 +374,10 @@
                     "image": "Image",
                     "spreadsheet": "Spreadsheet"
                 }
+            },
+            "myRecipes": {
+                "title": "My recipes",
+                "description": "Create your own recipes from the food catalogue."
             }
         }
     },
@@ -684,6 +696,38 @@
             "description": "Recalculates the day's meals when you change the training.",
             "onTrainingKcalChange": "When training kcal change",
             "onTrainingCarbsChange": "When training carbs change"
+        }
+    },
+    "customRecipes": {
+        "form": {
+            "newTitle": "New recipe",
+            "editTitle": "Edit recipe",
+            "ingredients": "Foods",
+            "noIngredients": "Add at least one food",
+            "addIngredient": "Add food",
+            "search": "Search food...",
+            "noResults": "No results",
+            "amount": "Amount",
+            "removeIngredient": "Remove food",
+            "cancel": "Cancel",
+            "save": "Save changes",
+            "create": "Create recipe"
+        },
+        "list": {
+            "title": "Your recipes",
+            "edit": "Edit recipe",
+            "delete": "Delete recipe",
+            "confirmDelete": "Delete the recipe \"{{name}}\"?",
+            "empty": "There are no recipes yet.",
+            "loadError": "The recipes could not be loaded.",
+            "ingredientsCount_one": "{{count}} food",
+            "ingredientsCount_other": "{{count}} foods",
+            "total": "Total",
+            "type": "Type"
+        },
+        "client": {
+            "title": "Client recipes",
+            "description": "This client’s own recipes, made with foods from the catalogue."
         }
     }
 }

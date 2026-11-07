@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { RenderCommandGroup } from "./@components/renderCommandGroup";
 import { ConfigurationPages } from "@src/pages/configuration/@components/title";
 import DisplayMealsForm from "./@components/displaymealsForm";
+import DisplayRowsForm from "./@components/displayRowsForm";
 
 export const TableCommands = () => {
   const { t } = useTranslation("data");
@@ -42,7 +43,10 @@ export const TableCommands = () => {
           />
         </div>
         <div className="my-4 h-px w-full bg-nutrition-green/20" />
-        <DisplayMealsForm />
+        <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
+          <DisplayMealsForm />
+          <DisplayRowsForm />
+        </div>
       </div>
     </ConfigurationPages>
   );

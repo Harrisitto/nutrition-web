@@ -2,7 +2,7 @@
 
 Tabla semanal (7 columnas de día + 1 columna de etiqueta) que muestra y edita
 la planificación nutricional del usuario: presets del día, comidas, horas de
-entrenamiento, kcal de entrenamiento, carreras, balance energético, macros por kg y
+entrenamiento, kcal de entrenamiento, carreras, kcal ingeridas y gastadas, balance energético, macros por kg y
 comentarios/eventos/enlace y el documento adjunto del día. Se monta desde [index.tsx](index.tsx) como
 `WeeklyMeals`.
 
@@ -17,7 +17,12 @@ comentarios/eventos/enlace y el documento adjunto del día. Se monta desde [inde
   entrenamiento, balance energético, macros, comentarios/eventos) se monta
   en su propio `useMemo` y luego se concatenan, intercalando filas de
   cabecera (`isFullWidth: true`) entre secciones.
-  El balance energético y los macros por kg **no se calculan en el cliente**:
+  Las filas fijas se filtran según `state.config.showRowsInTable` (Redux,
+  persistido; se edita en Configuración → Teclado). Las claves y su sección
+  están en `TABLE_ROW_SECTIONS` del slice `config`. Si una sección se queda
+  sin filas visibles, su cabecera tampoco se muestra.
+  Las kcal ingeridas (`total_intake_kcal`), las gastadas (`total_burnt_kcal`),
+  el balance energético y los macros por kg **no se calculan en el cliente**:
   salen de la RPC `calculate_macros_for_date_range` (`useFetchMacrosForDateRange`
   en `services/tanstack/user/macros.ts`). Cualquier mutación que cambie comidas,
   ingredientes extra, kcal/HC de entrenamiento, carreras o mediciones debe llamar
@@ -177,6 +182,16 @@ Los ingredientes se añaden después de elegir receta (o "Sin receta fija"):
   `is_fixed_recipe: false`, para que el cliente elija la receta) y después sus ingredientes
   (`useReplaceMealIngredients`, que borra los que había e inserta los del borrador).
   Después cierra el modal. Si algo falla, el editor sigue abierto. Los macros se escalan con `mealIngredientMacros`.
+- Tipo "receta propia" (su id sale de la RPC `custom_recipe_type_id`, hook
+  `useSelectCustomRecipeId`): "Elegir receta" abre
+  [inputs/customRecipeSelectInput.tsx](@components/inputs/customRecipeSelectInput.tsx) en vez del
+  selector del catálogo. Lista las recetas propias del cliente y del nutricionista
+  (`custom_recipes`). Elegir una guarda la comida con ese tipo como receta fija
+  (`is_fixed_recipe: true`) pero sin `recipe_id` (no están en `all_recipes`), con
+  `recipe_comment` = "Nombre: descripción" (`customRecipeComment`; solo el nombre si no tiene
+  descripción, y sustituye lo escrito en el campo de comentario), y copia los
+  alimentos de la receta a sus ingredientes adicionales. "+ Ingredientes" abre el editor con esos
+  alimentos para ajustarlos antes de guardar; en "Sin receta fija" empieza con los guardados.
 - Si la comida cambia de receta, se queda sin receta fija o se borra, sus
   ingredientes adicionales se borran (`useMutatePlaningMeals` compara la elección
   guardada antes del upsert: la receta si es fija, el tipo si no, porque sin receta

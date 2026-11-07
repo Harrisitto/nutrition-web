@@ -22,9 +22,11 @@ export const APP_ROUTES = {
   GLOBAL_USER_PRESETS: "/dashboard/config/global-user-presets",
   MY_VIDEOS: "/dashboard/config/my-videos",
   DOCUMENTS: "/dashboard/config/documents",
+  MY_RECIPES: "/dashboard/config/my-recipes",
 
   FORM_PRESET: "/dashboard/form-preset",
   FORM_MEASURE: "/dashboard/form-measure",
+  FORM_CLIENT_RECIPES: "/dashboard/form-client-recipes",
   FORM_APPOINTMENT: "/dashboard/form-appointment",
   APPOINTMENTS: "/dashboard/appointments",
   APPOINTMENTS_CALENDAR: "/dashboard/calendar",

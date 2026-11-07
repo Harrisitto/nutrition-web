@@ -67,6 +67,34 @@
             "isVisible": "Visible"
         }
     },
+    "dashboardRows": {
+        "title": "Filas de la tabla",
+        "description": "Elige qué filas se muestran en la planificación. Si una sección se queda sin filas, también se oculta su título.",
+        "sections": {
+            "tools": "Herramientas",
+            "training": "Entrenamiento",
+            "energyBalance": "Balance energético",
+            "dailyMacros": "Macronutrientes diarios",
+            "comments": "Comentarios"
+        },
+        "rows": {
+            "presets": "Presets del día",
+            "autoGenerate": "Generar comidas",
+            "trainingKcal": "Kcal de entrenamiento",
+            "trainingHc": "Carbohidratos por hora",
+            "races": "Carreras",
+            "intakeKcal": "Kcal ingeridas",
+            "burntKcal": "Kcal gastadas",
+            "energyBalance": "Balance energético diario",
+            "carbsPerKg": "Carbohidratos por kg",
+            "proteinPerKg": "Proteínas por kg",
+            "fatPerKg": "Grasas por kg",
+            "comments": "Comentarios",
+            "events": "Eventos",
+            "links": "Enlace",
+            "documents": "Documento"
+        }
+    },
     "appointments": {
         "fields": {
             "name": "Nombre de la consulta (obligatorio con fecha)",
@@ -95,6 +123,12 @@
     "documents": {
         "fields": {
             "name": "Nombre del documento"
+        }
+    },
+    "customRecipes": {
+        "fields": {
+            "name": "Nombre de la receta",
+            "description": "Descripción"
         }
     }
 }

@@ -216,6 +216,8 @@ const useTableColumns = ({
             />
           );
 
+        case ALL_IDS.DISPLAY_INTAKE_KCAL:
+        case ALL_IDS.DISPLAY_BURNT_KCAL:
         case ALL_IDS.DISPLAY_ENERGY_BALANCE:
         case ALL_IDS.DISPLAY_CARBS_PER_KG:
         case ALL_IDS.DISPLAY_PROTEIN_PER_KG:

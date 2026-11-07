@@ -67,6 +67,34 @@
             "isVisible": "Visible"
         }
     },
+    "dashboardRows": {
+        "title": "Table rows",
+        "description": "Choose which rows are shown in the planning table. If a section has no rows left, its title is hidden too.",
+        "sections": {
+            "tools": "Tools",
+            "training": "Training",
+            "energyBalance": "Energy balance",
+            "dailyMacros": "Daily macronutrients",
+            "comments": "Comments"
+        },
+        "rows": {
+            "presets": "Day presets",
+            "autoGenerate": "Generate meals",
+            "trainingKcal": "Training kcal",
+            "trainingHc": "Carbs per hour",
+            "races": "Races",
+            "intakeKcal": "Intake kcal",
+            "burntKcal": "Burnt kcal",
+            "energyBalance": "Daily energy balance",
+            "carbsPerKg": "Carbs per kg",
+            "proteinPerKg": "Protein per kg",
+            "fatPerKg": "Fat per kg",
+            "comments": "Comments",
+            "events": "Events",
+            "links": "Link",
+            "documents": "Document"
+        }
+    },
     "appointments": {
         "fields": {
             "name": "Appointment name (required with a date)",
@@ -95,6 +123,12 @@
     "documents": {
         "fields": {
             "name": "Document name"
+        }
+    },
+    "customRecipes": {
+        "fields": {
+            "name": "Recipe name",
+            "description": "Description"
         }
     }
 }

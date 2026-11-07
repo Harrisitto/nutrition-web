@@ -30,11 +30,51 @@ export interface ConfigState {
     isVisible: boolean;
     order: number;
   }][];
+  showRowsInTable: Record<TableRowKey, boolean>;
   autoAdjustMeals: {
     onTrainingKcalChange: boolean;
     onTrainingCarbsChange: boolean;
   }
 }
+
+/**
+ * Filas fijas de la tabla de planificación que se pueden ocultar desde la
+ * configuración, agrupadas por la sección (cabecera) bajo la que aparecen.
+ * Las comidas tienen su propia configuración en `showMealsInTable`.
+ */
+export const TABLE_ROW_SECTIONS = {
+  tools: ["presets", "autoGenerate"],
+  training: ["trainingKcal", "trainingHc", "races"],
+  energyBalance: ["intakeKcal", "burntKcal", "energyBalance"],
+  dailyMacros: ["carbsPerKg", "proteinPerKg", "fatPerKg"],
+  comments: ["comments", "events", "links", "documents"],
+} as const;
+
+export type TableRowSection = keyof typeof TABLE_ROW_SECTIONS;
+export type TableRowKey = (typeof TABLE_ROW_SECTIONS)[TableRowSection][number];
+
+export const defaultRowsVisibility = Object.fromEntries(
+  Object.values(TABLE_ROW_SECTIONS)
+    .flat()
+    .map((row) => [row, true]),
+) as Record<TableRowKey, boolean>;
+
+/**
+ * Mezcla la visibilidad guardada sobre los valores por defecto: las filas
+ * añadidas después de que el usuario guardara aparecen visibles y las que ya
+ * no existen se descartan.
+ */
+export const mergeRowsVisibility = (
+  saved: unknown,
+): Record<TableRowKey, boolean> => {
+  const savedRows = (saved ?? {}) as Partial<Record<string, unknown>>;
+  const merged = { ...defaultRowsVisibility };
+  for (const row of Object.keys(merged) as TableRowKey[]) {
+    const value = savedRows[row];
+    if (typeof value === "boolean") merged[row] = value;
+  }
+  return merged;
+};
 
 type KeyboardCommandsState = ConfigState["keyboardCommands"];
 type KeyboardCategory = keyof KeyboardCommandsState;
@@ -109,7 +149,8 @@ const initialState: ConfigState = {
   autoAdjustMeals: {
     onTrainingKcalChange: false,
     onTrainingCarbsChange: false,
-  }
+  },
+  showRowsInTable: { ...defaultRowsVisibility },
 };
 
 const configSlice = createSlice({
@@ -183,6 +224,13 @@ const configSlice = createSlice({
         state.autoAdjustMeals.onTrainingCarbsChange = onTrainingCarbsChange;
       }
     },
+    setRowVisibility: (
+      state,
+      action: PayloadAction<{ row: TableRowKey; isVisible: boolean }>,
+    ) => {
+      const { row, isVisible } = action.payload;
+      state.showRowsInTable[row] = isVisible;
+    },
   },
 });
 
@@ -193,6 +241,7 @@ export const {
   setKeyboardCommand,
   setDefaultKeyboardCommands,
   setMealDisplay,
-  setAutoAdjustMeals
+  setAutoAdjustMeals,
+  setRowVisibility,
 } = configSlice.actions;
 export default configSlice.reducer;

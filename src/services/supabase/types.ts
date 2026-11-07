@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           amount: Json
           comment: Json
+          cooked_amount: Json | null
           id: number
           name: Json
           recipe_id: number
@@ -26,6 +27,7 @@ export type Database = {
         Insert: {
           amount: Json
           comment: Json
+          cooked_amount?: Json | null
           id?: number
           name: Json
           recipe_id: number
@@ -34,6 +36,7 @@ export type Database = {
         Update: {
           amount?: Json
           comment?: Json
+          cooked_amount?: Json | null
           id?: number
           name?: Json
           recipe_id?: number
@@ -499,6 +502,71 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "all_users"
             referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      custom_recipe_ingredients: {
+        Row: {
+          amount: number
+          custom_recipe_id: number
+          ingredient_id: number
+        }
+        Insert: {
+          amount?: number
+          custom_recipe_id: number
+          ingredient_id: number
+        }
+        Update: {
+          amount?: number
+          custom_recipe_id?: number
+          ingredient_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_recipe_ingredients_custom_recipe_id_fkey"
+            columns: ["custom_recipe_id"]
+            isOneToOne: false
+            referencedRelation: "custom_recipes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "custom_recipe_ingredients_ingredient_id_fkey"
+            columns: ["ingredient_id"]
+            isOneToOne: false
+            referencedRelation: "recipe_type_custom_ingredients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      custom_recipes: {
+        Row: {
+          description: string | null
+          id: number
+          name: string
+          owner_id: string
+          type_id: number | null
+        }
+        Insert: {
+          description?: string | null
+          id?: number
+          name: string
+          owner_id?: string
+          type_id?: number | null
+        }
+        Update: {
+          description?: string | null
+          id?: number
+          name?: string
+          owner_id?: string
+          type_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_recipes_type_id_fkey"
+            columns: ["type_id"]
+            isOneToOne: false
+            referencedRelation: "recipe_type"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1056,6 +1124,7 @@ export type Database = {
       recipe_type_custom_ingredients: {
         Row: {
           amount: number
+          cooked_amount: number | null
           fat: number
           hc: number
           id: number
@@ -1067,6 +1136,7 @@ export type Database = {
         }
         Insert: {
           amount?: number
+          cooked_amount?: number | null
           fat?: number
           hc?: number
           id?: number
@@ -1078,6 +1148,7 @@ export type Database = {
         }
         Update: {
           amount?: number
+          cooked_amount?: number | null
           fat?: number
           hc?: number
           id?: number
@@ -1656,6 +1727,11 @@ export type Database = {
           type_id: number
         }[]
       }
+      can_write_custom_recipes_of: {
+        Args: { p_owner_id: string }
+        Returns: boolean
+      }
+      can_write_own_custom_recipes: { Args: never; Returns: boolean }
       check_date_range: {
         Args: { p_end_date: string; p_start_date: string }
         Returns: undefined
@@ -1664,6 +1740,11 @@ export type Database = {
         Args: { p_from_monday: string; p_to_monday: string; p_user_id: string }
         Returns: undefined
       }
+      custom_recipe_matching_type_id: {
+        Args: { p_custom_recipe_id: number }
+        Returns: number
+      }
+      custom_recipe_type_id: { Args: never; Returns: number }
       delete_expired_invitations: { Args: never; Returns: number }
       detach_client: {
         Args: { p_nutri_id: string; p_user_id: string }
@@ -1782,6 +1863,10 @@ export type Database = {
         Returns: boolean
       }
       is_race_owner: { Args: { p_race_id: number }; Returns: boolean }
+      is_theme_point_document_of_user: {
+        Args: { p_document_id: string }
+        Returns: boolean
+      }
       leave_nutritionist: {
         Args: never
         Returns: {
@@ -1882,6 +1967,13 @@ export type Database = {
         }
         Returns: number
       }
+      search_documents_for_client_by_date_range: {
+        Args: { p_end_date: string; p_name?: string; p_start_date: string }
+        Returns: {
+          date: string
+          document: Json
+        }[]
+      }
       set_planing_meal_recipe: {
         Args: {
           p_date: string
@@ -1910,6 +2002,16 @@ export type Database = {
         Returns: undefined
       }
       unaccent: { Args: { "": string }; Returns: string }
+      upsert_custom_recipe: {
+        Args: {
+          p_description: string
+          p_id: number
+          p_ingredients: Json
+          p_name: string
+          p_owner_id: string
+        }
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never

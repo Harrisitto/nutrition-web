@@ -14,6 +14,9 @@ const PageDocuments = lazy(() => import("./documents/index"));
 const PageRecipes = lazy(() =>
   import("./recipes/index").then((m) => ({ default: m.Recipes })),
 );
+const PageNutritionistRecipes = lazy(() =>
+  import("./myRecipes/index").then((m) => ({ default: m.default })),
+);
 const PageTableCommands = lazy(() =>
   import("./keyboard/index").then((m) => ({ default: m.TableCommands })),
 );
@@ -76,6 +79,11 @@ const PageNutritionistConfiguration = () => {
             label: t("data:configuration.sections.documents.title"),
             onClick: () => navigateTo(APP_ROUTES.DOCUMENTS),
           },
+          {
+            route: APP_ROUTES.MY_RECIPES,
+            label: t("data:configuration.sections.myRecipes.title"),
+            onClick: () => navigateTo(APP_ROUTES.MY_RECIPES),
+          },
         ]}
       />
       <Routes>
@@ -118,6 +126,10 @@ const PageNutritionistConfiguration = () => {
         <Route
           path={getTrailingRoute(APP_ROUTES.DOCUMENTS)}
           element={<PageDocuments />}
+        />
+        <Route
+          path={getTrailingRoute(APP_ROUTES.MY_RECIPES)}
+          element={<PageNutritionistRecipes />}
         />
       </Routes>
     </div>

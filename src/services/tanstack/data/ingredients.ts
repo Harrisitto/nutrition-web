@@ -19,7 +19,7 @@ const MEAL_INGREDIENTS_TABLE = "user_planing_meal_ingredients" as const;
  */
 
 // `name` y `units` son JSON por idioma: se piden ya traducidos
-const selectIngredient = (language: ReturnType<typeof useLanguageCode>) =>
+export const selectIngredient = (language: ReturnType<typeof useLanguageCode>) =>
   `id, amount, kcal, prot, hc, fat, relation, name: name->>${language}, units: units->>${language}` as const;
 
 const selectMealIngredient = (language: ReturnType<typeof useLanguageCode>) =>
