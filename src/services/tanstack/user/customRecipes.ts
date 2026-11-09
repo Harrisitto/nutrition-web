@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 import { useLanguageCode } from "@src/hooks/helpers/language";
 import { supabase } from "@src/services/supabase/client";
 import { useAppSelector } from "@src/store/store";
@@ -14,11 +14,12 @@ import { queryClient } from "../queryClient";
  * (owner_id) es un cliente o el nutricionista. El nutricionista lee y escribe las suyas y las de sus
  * clientes actuales (escribir requiere suscripción activa; lo comprueba la RLS).
  * Se guardan con la RPC upsert_custom_recipe: receta y alimentos en una sola transacción.
- * type_id (FK a recipe_type) lo eligen clientes y nutricionista; la base de datos comprueba que las
+ * type_id (FK a recipe_type, obligatorio) lo eligen clientes y nutricionista; la base de datos comprueba que las
  * macros encajan (salvo el tipo "receta propia", que no se comprueba).
  */
 
 const RECIPES_TABLE = "custom_recipes" as const;
+const RECIPES_FOR_TYPE_PAGE_SIZE = 20;
 
 const selectCustomRecipe = (language: ReturnType<typeof useLanguageCode>) =>
   `*, 
@@ -114,6 +115,49 @@ export const useFetchClientAndMyCustomRecipes = (): CustomRecipesQuery => {
 };
 
 /**
+ * Recetas propias de un tipo (RPC get_custom_recipes_for_type): las del nutricionista y las del
+ * cliente seleccionado, paginadas por cursor (id de la última). Solo traen los datos de la receta,
+ * sin alimentos
+ */
+export const useFetchCustomRecipesForType = ({
+  typeId,
+  search = "",
+  enabled = true,
+}: {
+  typeId?: number;
+  search?: string;
+  enabled?: boolean;
+}) => {
+  const userId = useAppSelector((state) => state.config.selectedUserId);
+
+  return useInfiniteQuery({
+    queryKey: queryKeys({ userId, searchStr: search }).user.customRecipesForType(typeId),
+    queryFn: async ({ pageParam }) => {
+      const { data, error } = await supabase.rpc("get_custom_recipes_for_type", {
+        p_user_id: userId!,
+        p_type_id: typeId!,
+        p_search: search || undefined,
+        p_page_size: RECIPES_FOR_TYPE_PAGE_SIZE,
+        p_after_id: pageParam ?? undefined,
+      });
+
+      if (error) {
+        throw error;
+      }
+      return data;
+    },
+    initialPageParam: null as number | null,
+    // Página incompleta = no hay más
+    getNextPageParam: (lastPage): number | undefined => {
+      const last = lastPage.at(-1);
+      if (!last || lastPage.length < RECIPES_FOR_TYPE_PAGE_SIZE) return undefined;
+      return last.id;
+    },
+    enabled: enabled && !!userId && typeId !== undefined,
+  });
+};
+
+/**
  * Crea (sin `id`) o actualiza una receta propia con la lista completa de sus alimentos: los que no
  * vienen se borran de la receta. `toClient`: la receta nueva es del cliente seleccionado; si no, del
  * nutricionista. Al actualizar, el dueño no cambia. Devuelve el id de la receta
@@ -135,8 +179,8 @@ export const useUpsertCustomRecipe = ({ toClient = false }: { toClient?: boolean
       id?: number;
       name: string;
       description: string | null;
-      /** null = sin tipo. Un tipo del catálogo cuyas macros no encajan da error 23514 */
-      typeId: number | null;
+      /** Obligatorio (type_id not null). Un tipo del catálogo cuyas macros no encajan da error 23514 */
+      typeId: number;
       ingredients: { ingredient_id: number; amount: number }[];
     }) => {
       if (!id && !ownerId) throw new Error("Owner ID is required to save a custom recipe");
@@ -150,8 +194,7 @@ export const useUpsertCustomRecipe = ({ toClient = false }: { toClient?: boolean
         p_name: name.trim(),
         p_description: (description?.trim() || null) as string,
         p_ingredients: ingredients,
-        // La RPC escribe type_id siempre: omitirlo dejaría la receta sin tipo al editarla
-        p_type_id: (typeId ?? null) as number,
+        p_type_id: typeId,
       });
 
       if (error) {
@@ -193,6 +236,10 @@ export const useDeleteCustomRecipe = () => {
         { queryKey: queryKeys({ userId: owner_id }).user.customRecipesBase },
         (old) => old?.filter((recipe) => recipe.id !== id),
       );
+      // Las listas por tipo son InfiniteData y mezclan dueños: se recargan
+      queryClient.invalidateQueries({
+        queryKey: queryKeys().user.customRecipesForTypeBase,
+      });
     },
   });
 };

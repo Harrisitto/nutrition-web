@@ -4,6 +4,7 @@ import { useFetchTopRecipesForUser } from "@src/services/tanstack/data/recipes";
 import type { DraftMealIngredient } from "@src/services/tanstack/data/ingredients";
 import {
   useFetchClientAndMyCustomRecipes,
+  useFetchCustomRecipesForType,
   type CustomRecipe,
 } from "@src/services/tanstack/user/customRecipes";
 import { customRecipeIngredients } from "@src/components/shared/recipes/helpers";
@@ -23,6 +24,8 @@ interface RecipeOption {
   /** Receta propia (custom_recipes): su id no es de all_recipes. undefined si aún no ha cargado */
   customRecipe?: CustomRecipe;
   isCustom?: boolean;
+  /** Dueño de la receta propia (cliente o nutricionista) */
+  ownerId?: string;
 }
 
 interface RecipeSelectEditorProps {
@@ -66,9 +69,13 @@ const RecipeSelectEditor = ({
   );
   const [showCustom, setShowCustom] = useState(defaultShowCustom);
 
-  const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage } =
-    useFetchTopRecipesForUser({ typeId, isCustom: showCustom });
-  // La RPC solo da id y nombre: los alimentos (para copiarlos a la comida) y el dueño salen de aquí
+  // Solo se pide la lista visible: catálogo o recetas propias
+  const topRecipes = useFetchTopRecipesForUser({ typeId, enabled: !showCustom });
+  const customRecipesForType = useFetchCustomRecipesForType({ typeId, enabled: showCustom });
+  const { fetchNextPage, hasNextPage, isFetching, isFetchingNextPage } = showCustom
+    ? customRecipesForType
+    : topRecipes;
+  // La RPC no da los alimentos (para copiarlos a la comida): salen de aquí
   const customRecipes = useFetchClientAndMyCustomRecipes();
   const customRecipesById = useMemo(
     () => new Map((customRecipes.data ?? []).map((recipe) => [recipe.id, recipe])),
@@ -86,13 +93,18 @@ const RecipeSelectEditor = ({
       url: null,
       isClear: true,
     };
-    const recipes = (data?.pages.flat() ?? []).map((recipe) =>
-      showCustom
-        ? { ...recipe, isCustom: true, customRecipe: customRecipesById.get(recipe.id) }
-        : recipe,
-    );
+    const recipes: RecipeOption[] = showCustom
+      ? (customRecipesForType.data?.pages.flat() ?? []).map((recipe) => ({
+          id: recipe.id,
+          name: recipe.name,
+          url: null,
+          isCustom: true,
+          ownerId: recipe.owner_id,
+          customRecipe: customRecipesById.get(recipe.id),
+        }))
+      : (topRecipes.data?.pages.flat() ?? []);
     return [noRecipe, ...recipes];
-  }, [data, showCustom, customRecipesById, t]);
+  }, [showCustom, customRecipesForType.data, topRecipes.data, customRecipesById, t]);
 
   const loadMore = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) {
@@ -209,11 +221,11 @@ const RecipeSelectEditor = ({
         }
 
         if (opt.isCustom) {
-          const isClient = opt.customRecipe?.owner_id === userId;
+          const isClient = opt.ownerId === userId;
           return (
             <div className="flex items-center gap-3 py-1">
               <span className="flex-1 truncate text-sm text-dark-green">{opt.name}</span>
-              {opt.customRecipe && (
+              {opt.ownerId && (
                 <span
                   className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
                     isClient

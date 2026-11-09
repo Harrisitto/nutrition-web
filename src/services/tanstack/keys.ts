@@ -112,6 +112,9 @@ export const queryKeys = ({
     customRecipesAll: ["user", "customRecipes"],
     customRecipesBase: ["user", "customRecipes", userId],
     customRecipes: ["user", "customRecipes", userId, language],
+    // Bajo customRecipesAll (se invalida al guardar), pero fuera de customRecipesBase: su cache es InfiniteData
+    customRecipesForTypeBase: ["user", "customRecipes", "forType"],
+    customRecipesForType: (typeId?: number) => ["user", "customRecipes", "forType", userId, typeId ?? null, searchStr],
     notes: {
       // Fechas "YYYY-MM-DD", ambas incluidas
       range: (start: string, end: string) => ["user", "notes", userId, "range", start, end],
@@ -150,7 +153,7 @@ export const queryKeys = ({
     recipes: (typeIds: number[]) => ["data", "recipes", language, searchStr, [...typeIds].sort((a, b) => a - b)],
     // Fuera de recipesBase: su cache es InfiniteData, no un array
     topRecipesBase: ["data", "topRecipes"],
-    topRecipesForUser: (typeId?: number, isCustom = false) => ["data", "topRecipes", language, userId, typeId ?? null, isCustom, searchStr],
+    topRecipesForUser: (typeId?: number) => ["data", "topRecipes", language, userId, typeId ?? null, searchStr],
     raceIngredients: ["data", "raceIngredients", userId],
     customIngredients: ["data", "customIngredients", language],
     // Id del recipe_type "receta propia" (RPC custom_recipe_type_id): no cambia

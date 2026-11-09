@@ -110,19 +110,18 @@ export const useFetchRecipes = ({
 type TopRecipesCursor = { score: number; id: number } | null;
 
 /**
- * Recetas de un tipo ordenadas por score (RPC get_top_recipes_for_type), paginadas por cursor.
- * isCustom = false: recetas de la base de datos (all_recipes) aptas para el cliente.
- * isCustom = true: recetas propias (custom_recipes) del nutricionista y del cliente seleccionado;
- * su id es de custom_recipes, no de all_recipes
+ * Recetas de la base de datos (all_recipes) de un tipo aptas para el cliente, ordenadas por score
+ * (RPC get_top_recipes_for_type) y paginadas por cursor. Las recetas propias van aparte:
+ * useFetchCustomRecipesForType
  */
 export const useFetchTopRecipesForUser = ({
     typeId,
     search = '',
-    isCustom = false,
+    enabled = true,
 }: {
     typeId?: number;
     search?: string;
-    isCustom?: boolean;
+    enabled?: boolean;
 }) => {
     const langCode = useLanguageCode();
     const userId = useAppSelector(state => state.config.selectedUserId);
@@ -132,7 +131,7 @@ export const useFetchTopRecipesForUser = ({
             language: langCode,
             userId,
             searchStr: search,
-        }).data.topRecipesForUser(typeId, isCustom),
+        }).data.topRecipesForUser(typeId),
         queryFn: async ({ pageParam }) => {
             const { data, error } = await supabase.rpc("get_top_recipes_for_type", {
                 p_user_id: userId!,
@@ -142,15 +141,13 @@ export const useFetchTopRecipesForUser = ({
                 p_page_size: TOP_RECIPES_PAGE_SIZE,
                 p_after_score: pageParam?.score,
                 p_after_id: pageParam?.id,
-                p_is_custom: isCustom,
             });
 
             if (error) {
                 throw error;
             }
 
-            // Las recetas propias no tienen imagen: receta_<id>.jpg seria la de otra receta de all_recipes
-            if (!data.length || isCustom) {
+            if (!data.length) {
                 return data.map(recipe => ({ ...recipe, url: null as string | null }));
             }
 
@@ -171,7 +168,7 @@ export const useFetchTopRecipesForUser = ({
             if (!last || lastPage.length < TOP_RECIPES_PAGE_SIZE) return undefined;
             return { score: last.score, id: last.id };
         },
-        enabled: !!userId && typeId !== undefined,
+        enabled: enabled && !!userId && typeId !== undefined,
     });
 };
 

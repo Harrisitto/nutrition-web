@@ -544,21 +544,21 @@ export type Database = {
           id: number
           name: string
           owner_id: string
-          type_id: number | null
+          type_id: number
         }
         Insert: {
           description?: string | null
           id?: number
           name: string
           owner_id?: string
-          type_id?: number | null
+          type_id?: number
         }
         Update: {
           description?: string | null
           id?: number
           name?: string
           owner_id?: string
-          type_id?: number | null
+          type_id?: number
         }
         Relationships: [
           {
@@ -1815,6 +1815,22 @@ export type Database = {
         Args: { end_date: string; start_date: string; user_uuid: string }
         Returns: number
       }
+      get_custom_recipes_for_type: {
+        Args: {
+          p_after_id?: number
+          p_page_size?: number
+          p_search?: string
+          p_type_id: number
+          p_user_id: string
+        }
+        Returns: {
+          description: string
+          id: number
+          name: string
+          owner_id: string
+          type_id: number
+        }[]
+      }
       get_recipe_alternatives: {
         Args: { p_lang: string; p_recipe_id: number; p_user_id: string }
         Returns: {
@@ -1827,7 +1843,6 @@ export type Database = {
         Args: {
           p_after_id?: number
           p_after_score?: number
-          p_is_custom?: boolean
           p_lang: string
           p_page_size?: number
           p_search?: string

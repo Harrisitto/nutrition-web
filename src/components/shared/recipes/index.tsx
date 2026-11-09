@@ -179,6 +179,11 @@ const CustomRecipeForm = ({ recipe, toClient = false, onSaved, onCancel }: Custo
     setIsResolvingType(true);
     const typeId = await resolveTypeId();
     setIsResolvingType(false);
+    // type_id es obligatorio: sin tipo elegido ni el de "receta propia" cargado no se puede guardar
+    if (typeId === null) {
+      addMutationError();
+      return;
+    }
 
     upsert.mutate(
       {
