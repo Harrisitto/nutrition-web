@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { cardStyle } from "@src/components/styles";
 import type {
   CustomRecipe,
-  useFetchMyCustomRecipes,
+  CustomRecipesQuery,
 } from "@src/services/tanstack/user/customRecipes";
 import CustomRecipeForm from "./index";
 import { CustomRecipeList } from "./list";
@@ -15,9 +15,12 @@ import { CustomRecipeList } from "./list";
 export const CustomRecipesManager = ({
   query,
   toClient = false,
+  showOwner = false,
 }: {
-  query: ReturnType<typeof useFetchMyCustomRecipes>;
+  query: CustomRecipesQuery;
   toClient?: boolean;
+  /** La lista mezcla recetas del cliente y del nutricionista: se indica de quién es cada una */
+  showOwner?: boolean;
 }) => {
   const { t } = useTranslation();
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -32,13 +35,16 @@ export const CustomRecipesManager = ({
     <div className="grid w-full max-w-5xl grid-cols-1 gap-4 animate-fade-in md:grid-cols-2">
       <section className={`${cardStyle} p-4`}>
         <h2 className="mb-3 text-lg font-semibold text-text-title">
-          {t("data:customRecipes.list.title")}
+          {showOwner
+            ? t("data:customRecipes.list.titleWithClient")
+            : t("data:customRecipes.list.title")}
         </h2>
         <CustomRecipeList
           query={query}
           editingId={editingId}
           onEdit={(recipe) => setEditingId(recipe.id)}
           onDeleted={onDeleted}
+          showOwner={showOwner}
         />
       </section>
       <CustomRecipeForm

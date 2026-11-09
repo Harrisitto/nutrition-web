@@ -34,8 +34,36 @@ export interface ConfigState {
   autoAdjustMeals: {
     onTrainingKcalChange: boolean;
     onTrainingCarbsChange: boolean;
-  }
+  };
+  /** Valores con los que se abren los selectores de la tabla de planificación */
+  defaults: DefaultsState;
 }
+
+export interface DefaultsState {
+  /**
+   * El selector de recetas se abre con las recetas propias del nutricionista y del cliente
+   * (custom_recipes) en vez de las de la base de datos (all_recipes)
+   */
+  displayDefaultNutritionistRecipes: boolean;
+}
+
+export const initialDefaults: DefaultsState = {
+  displayDefaultNutritionistRecipes: false,
+};
+
+/**
+ * Mezcla los valores guardados sobre los de por defecto: las opciones añadidas después de que el
+ * usuario guardara toman su valor por defecto y las que ya no existen se descartan
+ */
+export const mergeDefaults = (saved: unknown): DefaultsState => {
+  const savedDefaults = (saved ?? {}) as Partial<Record<string, unknown>>;
+  const merged = { ...initialDefaults };
+  for (const key of Object.keys(merged) as (keyof DefaultsState)[]) {
+    const value = savedDefaults[key];
+    if (typeof value === "boolean") merged[key] = value;
+  }
+  return merged;
+};
 
 /**
  * Filas fijas de la tabla de planificación que se pueden ocultar desde la
@@ -151,6 +179,7 @@ const initialState: ConfigState = {
     onTrainingCarbsChange: false,
   },
   showRowsInTable: { ...defaultRowsVisibility },
+  defaults: { ...initialDefaults },
 };
 
 const configSlice = createSlice({
@@ -231,6 +260,9 @@ const configSlice = createSlice({
       const { row, isVisible } = action.payload;
       state.showRowsInTable[row] = isVisible;
     },
+    setDefaults: (state, action: PayloadAction<Partial<DefaultsState>>) => {
+      state.defaults = { ...state.defaults, ...action.payload };
+    },
   },
 });
 
@@ -243,5 +275,6 @@ export const {
   setMealDisplay,
   setAutoAdjustMeals,
   setRowVisibility,
+  setDefaults,
 } = configSlice.actions;
 export default configSlice.reducer;

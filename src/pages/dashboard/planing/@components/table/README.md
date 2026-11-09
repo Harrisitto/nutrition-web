@@ -174,6 +174,13 @@ Los ingredientes se añaden después de elegir receta (o "Sin receta fija"):
   nada**. Si es la misma elección que la guardada (la misma receta fija, o "Sin receta
   fija" con el mismo tipo), el borrador empieza con los ingredientes guardados; si no,
   vacío (el guardado borrará los antiguos).
+  Las recetas salen de la RPC `get_top_recipes_for_type` (`useFetchTopRecipesForUser`). Un toggle
+  encima de la lista cambia entre las de la base de datos (`all_recipes`, `p_is_custom: false`) y las
+  propias del nutricionista y del cliente de ese tipo (`custom_recipes`, `p_is_custom: true`). Se abre
+  con el valor de `config.defaults.displayDefaultNutritionistRecipes` (configuración de la tabla).
+  Una receta propia se guarda igual que en el tipo "receta propia" (ver más abajo): fija, sin
+  `recipe_id`, con su comentario y sus alimentos como ingredientes. La RPC solo da id y nombre, así
+  que los alimentos y el dueño salen de `useFetchClientAndMyCustomRecipes`.
 - [inputs/ingredientsSelectInput.tsx](@components/inputs/ingredientsSelectInput.tsx)
   es un borrador local: añadir del catálogo `recipe_type_custom_ingredients` (con su
   cantidad de referencia), cambiar cantidades y quitar. "Volver" descarta el borrador

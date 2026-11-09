@@ -1,11 +1,10 @@
 import { useTranslation } from "react-i18next";
+import type { Macros } from "@src/helpers/macros";
 
 // Mismos colores que el resumen de macros del preset (dashboard/preset/.../macrosResume.tsx)
-const COLORS = { hc: "#455e19", prot: "#30556b", fat: "#6b2f55" } as const;
+export const MACRO_COLORS = { hc: "#455e19", prot: "#30556b", fat: "#6b2f55" } as const;
 
 const round = (value: number) => Math.round(value * 10) / 10;
-
-type Macros = { kcal: number; prot: number; hc: number; fat: number };
 
 /**
  * Gramos de hc, proteína y grasa en barras horizontales, con las kcal totales al lado.
@@ -37,7 +36,7 @@ export const RecipeMacrosChart = ({
         {data.map((entry) => (
           <li key={entry.key}>
             <div className="flex items-baseline justify-between gap-2 text-[11px] leading-tight">
-              <span className="truncate font-semibold" style={{ color: COLORS[entry.key] }}>
+              <span className="truncate font-semibold" style={{ color: MACRO_COLORS[entry.key] }}>
                 {entry.name}
               </span>
               <span className="shrink-0 font-semibold text-dark-green">{entry.value} g</span>
@@ -47,7 +46,7 @@ export const RecipeMacrosChart = ({
                 className="h-full rounded-full"
                 style={{
                   width: `${max > 0 ? (entry.value / max) * 100 : 0}%`,
-                  backgroundColor: COLORS[entry.key],
+                  backgroundColor: MACRO_COLORS[entry.key],
                 }}
               />
             </div>

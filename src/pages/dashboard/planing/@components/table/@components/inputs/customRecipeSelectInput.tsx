@@ -1,6 +1,9 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { recipeMacros } from "@src/components/shared/recipes/helpers";
+import {
+  customRecipeIngredients as recipeIngredients,
+  recipeMacros,
+} from "@src/components/shared/recipes/helpers";
 import type { DraftMealIngredient } from "@src/services/tanstack/data/ingredients";
 import {
   useFetchClientCustomRecipes,
@@ -20,12 +23,6 @@ interface CustomRecipeOption {
   isClient: boolean;
   isClear?: boolean;
 }
-
-// Los alimentos de la receta pasan a ser los ingredientes de la comida
-const recipeIngredients = (recipe: CustomRecipe): DraftMealIngredient[] =>
-  recipe.ingredients.flatMap((row) =>
-    row.ingredient ? [{ ingredientId: row.ingredient.id, amount: row.amount }] : [],
-  );
 
 interface CustomRecipeSelectEditorProps {
   /** Ingredientes guardados si la comida ya era de este tipo sin receta; si no, [] */

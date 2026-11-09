@@ -109,12 +109,20 @@ export const useFetchRecipes = ({
 
 type TopRecipesCursor = { score: number; id: number } | null;
 
+/**
+ * Recetas de un tipo ordenadas por score (RPC get_top_recipes_for_type), paginadas por cursor.
+ * isCustom = false: recetas de la base de datos (all_recipes) aptas para el cliente.
+ * isCustom = true: recetas propias (custom_recipes) del nutricionista y del cliente seleccionado;
+ * su id es de custom_recipes, no de all_recipes
+ */
 export const useFetchTopRecipesForUser = ({
     typeId,
     search = '',
+    isCustom = false,
 }: {
     typeId?: number;
     search?: string;
+    isCustom?: boolean;
 }) => {
     const langCode = useLanguageCode();
     const userId = useAppSelector(state => state.config.selectedUserId);
@@ -124,7 +132,7 @@ export const useFetchTopRecipesForUser = ({
             language: langCode,
             userId,
             searchStr: search,
-        }).data.topRecipesForUser(typeId),
+        }).data.topRecipesForUser(typeId, isCustom),
         queryFn: async ({ pageParam }) => {
             const { data, error } = await supabase.rpc("get_top_recipes_for_type", {
                 p_user_id: userId!,
@@ -134,14 +142,16 @@ export const useFetchTopRecipesForUser = ({
                 p_page_size: TOP_RECIPES_PAGE_SIZE,
                 p_after_score: pageParam?.score,
                 p_after_id: pageParam?.id,
+                p_is_custom: isCustom,
             });
 
             if (error) {
                 throw error;
             }
 
-            if (!data.length) {
-                return [];
+            // Las recetas propias no tienen imagen: receta_<id>.jpg seria la de otra receta de all_recipes
+            if (!data.length || isCustom) {
+                return data.map(recipe => ({ ...recipe, url: null as string | null }));
             }
 
             const signedUrls = await supabase.storage.from('recipe_images').createSignedUrls(

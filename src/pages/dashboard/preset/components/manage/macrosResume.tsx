@@ -1,4 +1,5 @@
 import FromDate from "@src/helpers/dates";
+import { Macros } from "@src/helpers/macros";
 import { useFetchUserWeightForDateRange } from "@src/services/tanstack/user/info";
 import type { useFetchPresets } from "@src/services/tanstack/user/preset";
 import { useMemo } from "react";
@@ -113,15 +114,10 @@ export const MacrosResume = ({
   const userWeight = useFetchUserWeightForDateRange(dates);
 
   const presetMacros = useMemo(() => {
-    const data = preset.user_preset_meal.reduce(
-      (acc, meal) => {
-        acc.carbs += meal.type_id.hc;
-        acc.fat += meal.type_id.fat;
-        acc.protein += meal.type_id.prot;
-        return acc;
-      },
-      { carbs: 0, fat: 0, protein: 0 },
+    const total = Macros.sum(
+      preset.user_preset_meal.map((meal) => Macros.from(meal.type_id)),
     );
+    const data = { carbs: total.hc, fat: total.fat, protein: total.prot };
 
     if (!userWeight.data || userWeight.data < 0)
       return {

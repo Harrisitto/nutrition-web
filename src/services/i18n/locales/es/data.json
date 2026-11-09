@@ -144,6 +144,9 @@
             "placeholder": "Ej.: sin lactosa, ración pequeña..."
         },
         "selectCustomRecipe": "Elegir receta propia",
+        "recipeSource": {
+            "nutritionistRecipes": "Recetas del nutricionista y del cliente"
+        },
         "customRecipeOwner": {
             "mine": "Tuya",
             "client": "Cliente"
@@ -711,7 +714,27 @@
             "removeIngredient": "Quitar alimento",
             "cancel": "Cancelar",
             "save": "Guardar cambios",
-            "create": "Crear receta"
+            "create": "Crear receta",
+            "type": {
+                "label": "Tipo de receta",
+                "status": {
+                    "custom": "Sin tipo del catálogo: se guardará como receta propia, sin comprobar macros.",
+                    "incomplete": "Añade alimentos con cantidad para comprobar si encajan en el tipo.",
+                    "checking": "Cargando las macros del tipo...",
+                    "match": "Los alimentos encajan en este tipo.",
+                    "noMatch": "Los alimentos no encajan en este tipo: se guardará como receta propia."
+                },
+                "chart": {
+                    "fits": "Encaja en «{{type}}»",
+                    "notFits": "No encaja en «{{type}}»",
+                    "range": "Encaja entre {{min}} g y {{max}} g",
+                    "legendRange": "Margen (±10 %, mín. 2 g)",
+                    "legendTarget": "Objetivo del tipo",
+                    "adjust": "Ajustar cantidades",
+                    "adjustMissing": "Con estos alimentos no llega a encajar: añade alguno con más {{macro}}.",
+                    "adjustExcess": "Con estos alimentos no llega a encajar: sobra {{macro}}, cambia alguno por otro con menos."
+                }
+            }
         },
         "list": {
             "title": "Tus recetas",
@@ -723,7 +746,15 @@
             "ingredientsCount_one": "{{count}} alimento",
             "ingredientsCount_other": "{{count}} alimentos",
             "total": "Total",
-            "type": "Tipo"
+            "type": "Tipo",
+            "titleWithClient": "Recetas del cliente y tuyas",
+            "search": "Buscar receta por nombre...",
+            "clearSearch": "Borrar búsqueda",
+            "noResults": "Ninguna receta con ese nombre.",
+            "owner": {
+                "client": "Cliente",
+                "mine": "Tuya"
+            }
         },
         "client": {
             "title": "Recetas del cliente",

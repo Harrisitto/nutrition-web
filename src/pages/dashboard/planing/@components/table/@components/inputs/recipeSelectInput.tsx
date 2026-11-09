@@ -2,6 +2,13 @@ import { useTranslation } from "react-i18next";
 import { useCallback, useMemo, useState } from "react";
 import { useFetchTopRecipesForUser } from "@src/services/tanstack/data/recipes";
 import type { DraftMealIngredient } from "@src/services/tanstack/data/ingredients";
+import {
+  useFetchClientAndMyCustomRecipes,
+  type CustomRecipe,
+} from "@src/services/tanstack/user/customRecipes";
+import { customRecipeIngredients } from "@src/components/shared/recipes/helpers";
+import InputComponent from "@src/components/input";
+import { useAppSelector } from "@src/store/store";
 import SelectEditor from "./default/selectInput";
 import IngredientsEditor from "./ingredientsSelectInput";
 import { addIngredientsButtonStyle } from "../../styles";
@@ -13,6 +20,9 @@ interface RecipeOption {
   name: string;
   url: string | null;
   isClear?: boolean;
+  /** Receta propia (custom_recipes): su id no es de all_recipes. undefined si aún no ha cargado */
+  customRecipe?: CustomRecipe;
+  isCustom?: boolean;
 }
 
 interface RecipeSelectEditorProps {
@@ -29,6 +39,14 @@ interface RecipeSelectEditorProps {
     recipeId: number | null,
     ingredients: DraftMealIngredient[],
   ) => Promise<unknown>;
+  /**
+   * Receta propia elegida: guarda el tipo con esos ingredientes (los de la receta o los ajustados en
+   * el editor) y cierra. No hay recipe_id: las recetas propias no están en all_recipes
+   */
+  onSaveCustomRecipe: (
+    recipe: CustomRecipe,
+    ingredients: DraftMealIngredient[],
+  ) => Promise<unknown>;
   onClose: () => void;
 }
 
@@ -37,12 +55,26 @@ const RecipeSelectEditor = ({
   initialIngredientsFor,
   onSave,
   onSaveWithIngredients,
+  onSaveCustomRecipe,
   onClose,
 }: RecipeSelectEditorProps) => {
   const { t } = useTranslation();
+  const userId = useAppSelector((state) => state.config.selectedUserId);
+  // Se abre con lo elegido en la configuración de la tabla; el toggle solo cambia este selector
+  const defaultShowCustom = useAppSelector(
+    (state) => state.config.defaults.displayDefaultNutritionistRecipes,
+  );
+  const [showCustom, setShowCustom] = useState(defaultShowCustom);
 
   const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage } =
-    useFetchTopRecipesForUser({ typeId });
+    useFetchTopRecipesForUser({ typeId, isCustom: showCustom });
+  // La RPC solo da id y nombre: los alimentos (para copiarlos a la comida) y el dueño salen de aquí
+  const customRecipes = useFetchClientAndMyCustomRecipes();
+  const customRecipesById = useMemo(
+    () => new Map((customRecipes.data ?? []).map((recipe) => [recipe.id, recipe])),
+    [customRecipes.data],
+  );
+
   // Opción (receta o "Sin receta fija") cuyos ingredientes se están editando
   const [ingredientsFor, setIngredientsFor] = useState<RecipeOption | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -54,9 +86,13 @@ const RecipeSelectEditor = ({
       url: null,
       isClear: true,
     };
-    const recipes = data?.pages.flat() ?? [];
+    const recipes = (data?.pages.flat() ?? []).map((recipe) =>
+      showCustom
+        ? { ...recipe, isCustom: true, customRecipe: customRecipesById.get(recipe.id) }
+        : recipe,
+    );
     return [noRecipe, ...recipes];
-  }, [data, t]);
+  }, [data, showCustom, customRecipesById, t]);
 
   const loadMore = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) {
@@ -64,22 +100,51 @@ const RecipeSelectEditor = ({
     }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
+  const withSaving = (save: Promise<unknown>) => {
+    setIsSaving(true);
+    save.finally(() => setIsSaving(false));
+  };
+
   const saveAll = (ingredients: DraftMealIngredient[]) => {
     if (!ingredientsFor) return;
-    setIsSaving(true);
-    onSaveWithIngredients(
-      ingredientsFor.isClear ? null : ingredientsFor.id,
-      ingredients,
-    ).finally(() => setIsSaving(false));
+    if (ingredientsFor.isCustom) {
+      if (ingredientsFor.customRecipe) {
+        withSaving(onSaveCustomRecipe(ingredientsFor.customRecipe, ingredients));
+      }
+      return;
+    }
+    withSaving(
+      onSaveWithIngredients(
+        ingredientsFor.isClear ? null : ingredientsFor.id,
+        ingredients,
+      ),
+    );
+  };
+
+  const handleSelect = (opt: RecipeOption) => {
+    if (opt.isClear) {
+      onSave(null);
+      return;
+    }
+    if (opt.isCustom) {
+      // Sin la receta cargada no hay alimentos que copiar: se ignora el click
+      if (opt.customRecipe) {
+        onSaveCustomRecipe(opt.customRecipe, customRecipeIngredients(opt.customRecipe));
+      }
+      return;
+    }
+    onSave(opt.id);
   };
 
   if (ingredientsFor) {
     return (
       <IngredientsEditor
         mealLabel={ingredientsFor.name}
-        initialIngredients={initialIngredientsFor?.(
-          ingredientsFor.isClear ? null : ingredientsFor.id,
-        )}
+        initialIngredients={
+          ingredientsFor.customRecipe
+            ? customRecipeIngredients(ingredientsFor.customRecipe)
+            : initialIngredientsFor?.(ingredientsFor.isClear ? null : ingredientsFor.id)
+        }
         isSaving={isSaving}
         onDone={saveAll}
         // Sin guardar: vuelve a la lista de recetas
@@ -88,19 +153,47 @@ const RecipeSelectEditor = ({
     );
   }
 
+  const addIngredientsButton = (opt: RecipeOption) => (
+    <button
+      type="button"
+      // Una receta propia sin cargar no tiene alimentos con los que abrir el editor
+      disabled={opt.isCustom && !opt.customRecipe}
+      onClick={(e) => {
+        // Sin esto el click tambien selecciona la receta y cierra
+        e.stopPropagation();
+        setIngredientsFor(opt);
+      }}
+      className={`${addIngredientsButtonStyle} disabled:opacity-50`}
+    >
+      {t("data:dashboardTable.ingredients.addToMeal")}
+    </button>
+  );
+
   return (
     <SelectEditor<RecipeOption>
       title={t("data:dashboardTable.selectRecipe")}
       options={options}
       getOptionId={(opt) => opt.id}
       getOptionLabel={(opt) => opt.name}
-      onSave={(opt) => onSave(opt.isClear ? null : opt.id)}
+      onSave={handleSelect}
       onClose={onClose}
       onScrollEnd={loadMore}
       searchable
+      topContent={
+        <label
+          className="flex cursor-pointer items-center justify-between gap-3 rounded-lg bg-white-green px-3 py-2"
+          // Mantiene el foco en el buscador para seguir usando el teclado en la lista
+          onMouseDown={(e) => e.preventDefault()}
+        >
+          <span className="text-xs font-semibold text-dark-green">
+            {t("data:dashboardTable.recipeSource.nutritionistRecipes")}
+          </span>
+          <InputComponent.Toggle checked={showCustom} onChange={setShowCustom} />
+        </label>
+      }
       listFooter={
-        isFetching && (
-          <p className="text-center text-xs text-gray-500">
+        (isFetching || (showCustom && customRecipes.isLoading)) && (
+          <p className="text-center text-xs text-text-muted">
             {t("system:messages.loading")}
           </p>
         )
@@ -110,17 +203,30 @@ const RecipeSelectEditor = ({
           return (
             <div className="flex items-center gap-3 py-1">
               <span className="flex-1 font-semibold text-rose-600">{opt.name}</span>
-              <button
-                type="button"
-                onClick={(e) => {
-                // Sin esto el click tambien selecciona la receta y cierra
-                e.stopPropagation();
-                setIngredientsFor(opt);
-              }}
-              className={addIngredientsButtonStyle}
-            >
-      {t("data:dashboardTable.ingredients.addToMeal")}
-    </button>
+              {addIngredientsButton(opt)}
+            </div>
+          );
+        }
+
+        if (opt.isCustom) {
+          const isClient = opt.customRecipe?.owner_id === userId;
+          return (
+            <div className="flex items-center gap-3 py-1">
+              <span className="flex-1 truncate text-sm text-dark-green">{opt.name}</span>
+              {opt.customRecipe && (
+                <span
+                  className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                    isClient
+                      ? "bg-nutrition-green/15 text-nutrition-green"
+                      : "bg-dark-green/10 text-dark-green"
+                  }`}
+                >
+                  {isClient
+                    ? t("data:dashboardTable.customRecipeOwner.client")
+                    : t("data:dashboardTable.customRecipeOwner.mine")}
+                </span>
+              )}
+              {addIngredientsButton(opt)}
             </div>
           );
         }
@@ -138,17 +244,7 @@ const RecipeSelectEditor = ({
               <div className="size-10 shrink-0 rounded-md bg-nutrition-green/10" />
             )}
             <span className="flex-1 text-sm text-dark-green">{opt.name}</span>
-            <button
-              type="button"
-              onClick={(e) => {
-                // Sin esto el click tambien selecciona la receta y cierra
-                e.stopPropagation();
-                setIngredientsFor(opt);
-              }}
-              className={addIngredientsButtonStyle}
-            >
-              {t("data:dashboardTable.ingredients.addToMeal")}
-            </button>
+            {addIngredientsButton(opt)}
           </div>
         );
       }}

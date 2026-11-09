@@ -210,6 +210,16 @@ const MealTypeEditor = ({
         onSaveWithIngredients={(recipeId, ingredients) =>
           saveMealWithIngredients(recipeTypeId, recipeId, ingredients)
         }
+        // Como en el tipo "receta propia": fija, sin recipe_id y con el comentario de la receta
+        onSaveCustomRecipe={(recipe, ingredients) =>
+          saveMealWithIngredients(
+            recipeTypeId,
+            null,
+            ingredients,
+            true,
+            customRecipeComment(recipe),
+          )
+        }
         onClose={onClose}
       />
     );

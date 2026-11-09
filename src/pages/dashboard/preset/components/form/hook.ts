@@ -1,6 +1,7 @@
 import useForm from "@src/hooks/form";
 import type { InputState } from "@src/hooks/form/types";
-import { calculateKcalFromMacros } from "@src/hooks/helpers/constants";
+import { Macros } from "@src/helpers/macros";
+import { hcToKcal } from "@src/helpers/nutrition";
 import {
   useFetchAllMealTypes,
   useFetchMeals,
@@ -57,34 +58,16 @@ const commentField = {
   },
 } as InputState<"textarea">;
 
-const createFieldForMeal = (
-  meal: Meal,
-  mealOptions: MealType[] | undefined,
-) => {
-  const unselectableOption = {
-    value: "",
-    label: " - ",
-  };
-
-  const options = mealOptions
-    ? [
-        unselectableOption,
-        ...mealOptions.map((option) => ({
-          value: option?.id?.toString(),
-          label: option?.name,
-        })),
-      ]
-    : [unselectableOption];
-
+// El selector carga sus propias opciones (búsqueda paginada), el config no depende de ellas
+const createFieldForMeal = (meal: Meal) => {
   return {
     id: fieldIds.meal.generateId(meal.id),
-    type: "selectOne",
-    currentValue: "",
+    type: "recipeType",
+    currentValue: null,
     inputProps: {
       label: meal.name,
-      options,
     },
-  } as InputState<"selectOne">;
+  } as InputState<"recipeType">;
 };
 
 const createFieldForTrainingHc = (hcData: number[]) => {
@@ -126,47 +109,26 @@ const calculateDerivedState = (
     .filter(Boolean) as InputState<"numeric">["currentValue"][];
   const mealFields = Object.entries(fields)
     .map(([key, value]) => (fieldIds.meal.isId(key) ? value : null))
-    .filter(Boolean) as InputState<"selectOne">["currentValue"][];
+    .filter(Boolean) as InputState<"recipeType">["currentValue"][];
 
   const trainingCarbs = hcFields.reduce<number>((total, currValue) => {
     const value = typeof currValue === "number" ? currValue : 0;
     return total + value;
   }, 0);
 
-  const trainingKcal = calculateKcalFromMacros({ carbs: trainingCarbs });
+  const trainingKcal = hcToKcal(trainingCarbs);
 
-  const mealTotals = mealFields.reduce<{
-    kcal: number;
-    carbs: number;
-    protein: number;
-    fat: number;
-  }>(
-    (totals, field) => {
-      const mealTypeId = field ? parseInt(field.toString(), 10) : null;
-      if (!mealTypeId || !mealsMap) return totals;
-      const mealType = mealsMap[mealTypeId];
-      const macros = mealType;
-      if (!macros) return totals;
-
-      totals.kcal += Number(
-        calculateKcalFromMacros({
-          carbs: macros.hc,
-          protein: macros.prot,
-          fat: macros.fat,
-        }),
-      );
-      totals.carbs += Number(macros.hc ?? 0);
-      totals.protein += Number(macros.prot ?? 0);
-      totals.fat += Number(macros.fat ?? 0);
-
-      return totals;
-    },
-    { kcal: 0, carbs: 0, protein: 0, fat: 0 },
+  // Kcal calculadas desde las macros de cada tipo (no las kcal guardadas en recipe_type)
+  const mealTotals = Macros.sum(
+    mealFields.flatMap((mealTypeId) => {
+      const type = mealTypeId ? mealsMap[mealTypeId] : undefined;
+      return type ? [new Macros(type.prot, type.fat, type.hc)] : [];
+    }),
   );
 
   const mealKcal = mealTotals.kcal;
-  const totalCarbs = mealTotals.carbs + trainingCarbs;
-  const totalProtein = mealTotals.protein;
+  const totalCarbs = mealTotals.hc + trainingCarbs;
+  const totalProtein = mealTotals.prot;
   const totalFat = mealTotals.fat;
 
   return {
@@ -183,14 +145,10 @@ const useCreateConfig = () => {
   // Presets store data for every meal, regardless of the table display config
   const mealsQuery = useFetchMeals({ onlyVisible: false });
 
-  const mealOptions = useFetchAllMealTypes();
-
   const mealsConfig = useMemo(() => {
     if (!mealsQuery.data) return [];
-    return mealsQuery.data.map((meal) =>
-      createFieldForMeal(meal, mealOptions.data),
-    );
-  }, [mealsQuery.data, mealOptions.data]);
+    return mealsQuery.data.map(createFieldForMeal);
+  }, [mealsQuery.data]);
 
   const trainingHcConfig = useMemo(() => {
     const hcData = Array.from({ length: 24 }, () => 0);

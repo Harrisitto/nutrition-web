@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLanguageCode } from "@src/hooks/helpers/language";
 import { supabase } from "@src/services/supabase/client";
@@ -13,7 +14,8 @@ import { queryClient } from "../queryClient";
  * (owner_id) es un cliente o el nutricionista. El nutricionista lee y escribe las suyas y las de sus
  * clientes actuales (escribir requiere suscripción activa; lo comprueba la RLS).
  * Se guardan con la RPC upsert_custom_recipe: receta y alimentos en una sola transacción.
- * type_id (FK a recipe_type) lo eligen los clientes; el nutricionista solo lo ve en la lista.
+ * type_id (FK a recipe_type) lo eligen clientes y nutricionista; la base de datos comprueba que las
+ * macros encajan (salvo el tipo "receta propia", que no se comprueba).
  */
 
 const RECIPES_TABLE = "custom_recipes" as const;
@@ -84,6 +86,33 @@ export const useFetchClientCustomRecipes = () => {
   return useFetchCustomRecipesOf(userId);
 };
 
+/** Lo que necesitan la lista y el gestor de recetas: una query o la unión de varias */
+export type CustomRecipesQuery = {
+  data: CustomRecipe[] | undefined;
+  isLoading: boolean;
+  isError: boolean;
+};
+
+/** Recetas del cliente seleccionado y del nutricionista juntas, ordenadas por nombre */
+export const useFetchClientAndMyCustomRecipes = (): CustomRecipesQuery => {
+  const client = useFetchClientCustomRecipes();
+  const mine = useFetchMyCustomRecipes();
+
+  const data = useMemo(
+    () =>
+      client.data && mine.data
+        ? [...client.data, ...mine.data].sort((a, b) => a.name.localeCompare(b.name))
+        : undefined,
+    [client.data, mine.data],
+  );
+
+  return {
+    data,
+    isLoading: client.isLoading || mine.isLoading,
+    isError: client.isError || mine.isError,
+  };
+};
+
 /**
  * Crea (sin `id`) o actualiza una receta propia con la lista completa de sus alimentos: los que no
  * vienen se borran de la receta. `toClient`: la receta nueva es del cliente seleccionado; si no, del
@@ -100,22 +129,29 @@ export const useUpsertCustomRecipe = ({ toClient = false }: { toClient?: boolean
       id,
       name,
       description,
+      typeId,
       ingredients,
     }: {
       id?: number;
       name: string;
       description: string | null;
+      /** null = sin tipo. Un tipo del catálogo cuyas macros no encajan da error 23514 */
+      typeId: number | null;
       ingredients: { ingredient_id: number; amount: number }[];
     }) => {
-      if (!ownerId) throw new Error("Owner ID is required to save a custom recipe");
+      if (!id && !ownerId) throw new Error("Owner ID is required to save a custom recipe");
       const { data, error } = await supabase.rpc("upsert_custom_recipe", {
         // Los tipos generados no marcan los argumentos como nullables, pero la RPC acepta null:
         // p_id null crea la receta y p_description null la deja sin descripción
         p_id: (id ?? null) as number,
-        p_owner_id: ownerId,
+        // Al actualizar el dueño no cambia: null evita el error 22023 si la receta es de otro dueño
+        // (p.ej. una del nutricionista editada desde la página del cliente)
+        p_owner_id: (id ? null : ownerId) as string,
         p_name: name.trim(),
         p_description: (description?.trim() || null) as string,
         p_ingredients: ingredients,
+        // La RPC escribe type_id siempre: omitirlo dejaría la receta sin tipo al editarla
+        p_type_id: (typeId ?? null) as number,
       });
 
       if (error) {
@@ -124,8 +160,9 @@ export const useUpsertCustomRecipe = ({ toClient = false }: { toClient?: boolean
       return data;
     },
     onSuccess: () => {
+      // Una receta editada puede ser de otro dueño que ownerId: se refrescan todas
       queryClient.invalidateQueries({
-        queryKey: queryKeys({ userId: ownerId }).user.customRecipesBase,
+        queryKey: queryKeys().user.customRecipesAll,
       });
     },
   });

@@ -1,11 +1,12 @@
 import { useTranslation } from "react-i18next";
 import { CustomRecipesManager } from "@src/components/shared/recipes/manager";
-import { useFetchClientCustomRecipes } from "@src/services/tanstack/user/customRecipes";
+import { useFetchClientAndMyCustomRecipes } from "@src/services/tanstack/user/customRecipes";
 
-// Recetas propias del cliente seleccionado: las nuevas se guardan con él como dueño
+// Recetas propias del cliente seleccionado y del nutricionista. Las nuevas se guardan con el cliente
+// como dueño; al editar una, el dueño no cambia
 const PageClientRecipes = () => {
   const { t } = useTranslation();
-  const query = useFetchClientCustomRecipes();
+  const query = useFetchClientAndMyCustomRecipes();
 
   return (
     <div className="m-4 space-y-6">
@@ -18,7 +19,7 @@ const PageClientRecipes = () => {
         </p>
       </header>
       <div className="flex flex-col items-center">
-        <CustomRecipesManager query={query} toClient />
+        <CustomRecipesManager query={query} toClient showOwner />
       </div>
     </div>
   );

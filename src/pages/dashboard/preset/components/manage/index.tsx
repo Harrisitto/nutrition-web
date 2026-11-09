@@ -7,7 +7,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Chart } from "./trainingHcChart";
 import { KcalResume } from "./kcalResume";
-import { calculateKcalFromMacros } from "@src/hooks/helpers/constants";
+import { hcToKcal } from "@src/helpers/nutrition";
 import { MacrosResume } from "./macrosResume";
 import { useIsGlobalPreset } from "../form/hook";
 
@@ -117,10 +117,7 @@ const Details = ({
           kcal: meal.type_id.kcal,
           name: meal.meal_id.name,
         }))}
-        trainingKcal={trainingHc.reduce(
-          (total, hc) => total + calculateKcalFromMacros({ carbs: hc }),
-          0,
-        )}
+        trainingKcal={trainingHc.reduce((total, hc) => total + hcToKcal(hc), 0)}
       />
     </div>
   );

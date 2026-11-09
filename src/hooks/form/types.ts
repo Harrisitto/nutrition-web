@@ -24,6 +24,13 @@ interface InputTypes {
     };
     value: number | "";
   };
+  // Selector de recipe_type con búsqueda y paginación (components/shared/recipeTypes)
+  recipeType: {
+    props: {
+      label?: string;
+    };
+    value: number | null;
+  };
   date: {
     props: {
       label?: string;

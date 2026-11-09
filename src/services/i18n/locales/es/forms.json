@@ -67,6 +67,16 @@
             "isVisible": "Visible"
         }
     },
+    "tableDefaults": {
+        "title": "Valores por defecto",
+        "description": "Cómo se abren los selectores de la tabla de planificación.",
+        "options": {
+            "displayDefaultNutritionistRecipes": {
+                "label": "Recetas propias al elegir receta",
+                "description": "El selector de recetas se abre con las recetas del nutricionista y del cliente en vez de las de la base de datos."
+            }
+        }
+    },
     "dashboardRows": {
         "title": "Filas de la tabla",
         "description": "Elige qué filas se muestran en la planificación. Si una sección se queda sin filas, también se oculta su título.",
@@ -129,6 +139,19 @@
         "fields": {
             "name": "Nombre de la receta",
             "description": "Descripción"
+        }
+    },
+    "recipeType": {
+        "placeholder": "Selecciona un tipo",
+        "search": "Buscar tipo...",
+        "clearSearch": "Borrar búsqueda",
+        "none": "Sin tipo",
+        "noResults": "No hay tipos con ese nombre",
+        "macros": {
+            "kcal": "kcal",
+            "prot": "P",
+            "hc": "HC",
+            "fat": "G"
         }
     }
 }

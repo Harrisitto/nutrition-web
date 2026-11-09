@@ -21,7 +21,7 @@ export const useInsert = () => {
 
         const multiValue = Object.entries(data).reduce((acc, [key, value]) => {
             if (fieldIds.meal.isId(key)) {
-                const mealType = Number(value as InputState<'selectOne'>['currentValue']);
+                const mealType = value as InputState<'recipeType'>['currentValue'];
                 const mealId = fieldIds.meal.parseId(key);
                 if (mealType && mealId) {
                     acc.meals.push({

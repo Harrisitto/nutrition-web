@@ -1740,9 +1740,17 @@ export type Database = {
         Args: { p_from_monday: string; p_to_monday: string; p_user_id: string }
         Returns: undefined
       }
-      custom_recipe_matching_type_id: {
+      custom_ingredients_match_type: {
+        Args: {
+          p_amounts: number[]
+          p_ingredient_ids: number[]
+          p_type_id: number
+        }
+        Returns: boolean
+      }
+      custom_recipe_check_type_id: {
         Args: { p_custom_recipe_id: number }
-        Returns: number
+        Returns: undefined
       }
       custom_recipe_type_id: { Args: never; Returns: number }
       delete_expired_invitations: { Args: never; Returns: number }
@@ -1819,6 +1827,7 @@ export type Database = {
         Args: {
           p_after_id?: number
           p_after_score?: number
+          p_is_custom?: boolean
           p_lang: string
           p_page_size?: number
           p_search?: string
@@ -1929,6 +1938,10 @@ export type Database = {
         Args: { p_recipe_id: number; p_user_id: string }
         Returns: boolean
       }
+      recipe_type_matches_macros: {
+        Args: { p_fat: number; p_hc: number; p_prot: number; p_type_id: number }
+        Returns: boolean
+      }
       remove_client: {
         Args: { p_user_id: string }
         Returns: {
@@ -2009,6 +2022,7 @@ export type Database = {
           p_ingredients: Json
           p_name: string
           p_owner_id: string
+          p_type_id?: number
         }
         Returns: number
       }

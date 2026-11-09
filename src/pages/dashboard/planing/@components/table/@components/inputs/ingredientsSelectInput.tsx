@@ -9,6 +9,8 @@ import {
   type DraftMealIngredient,
 } from "@src/services/tanstack/data/ingredients";
 import ModalShell from "./default/portal";
+import { draftMacros, parseAmount } from "@src/components/shared/recipes/helpers";
+import type { Macros } from "@src/helpers/macros";
 
 // Sin límite la lista del catálogo renderizaría cientos de filas a cada tecla
 const MAX_RESULTS = 30;
@@ -24,12 +26,7 @@ const round = (value: number) => Math.round(value * 10) / 10;
 // La cantidad se guarda como texto mientras se escribe ("" o "1." son válidos al teclear)
 type DraftRow = { ingredientId: number; amount: string };
 
-const parseAmount = (amount: string) => {
-  const value = Number(amount);
-  return amount !== "" && Number.isFinite(value) && value > 0 ? value : null;
-};
 
-type Macros = ReturnType<typeof mealIngredientMacros>;
 
 const MacrosLine = ({ macros }: { macros: Macros }) => {
   const { t } = useTranslation();
@@ -149,25 +146,7 @@ const IngredientsEditor = ({
     return filtered.slice(0, MAX_RESULTS);
   }, [catalog.data, search]);
 
-  const totals = useMemo(
-    () =>
-      draft.reduce<Macros>(
-        (acc, row) => {
-          const ingredient = catalogById.get(row.ingredientId);
-          const amount = parseAmount(row.amount);
-          if (!ingredient || amount === null) return acc;
-          const m = mealIngredientMacros(ingredient, amount);
-          return {
-            kcal: acc.kcal + m.kcal,
-            prot: acc.prot + m.prot,
-            hc: acc.hc + m.hc,
-            fat: acc.fat + m.fat,
-          };
-        },
-        { kcal: 0, prot: 0, hc: 0, fat: 0 },
-      ),
-    [draft, catalogById],
-  );
+  const totals = useMemo(() => draftMacros(draft, catalogById), [draft, catalogById]);
 
   const hasInvalidAmount = draft.some((row) => parseAmount(row.amount) === null);
 

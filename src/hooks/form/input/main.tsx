@@ -2,6 +2,7 @@ import { memo } from "react";
 import { useTranslation } from "react-i18next";
 import { Form } from "../class";
 import InputComponent from "@src/components/input";
+import InputSelectRecipeType from "@src/components/shared/recipeTypes/input";
 import type { FormFieldUpdate, KeyofInputTypes } from "../types";
 
 const SwitchField = ({
@@ -50,6 +51,18 @@ const SwitchField = ({
           options={thisField.inputProps?.options ?? []}
           onChange={(newValue) => {
             form.requestUpdate(id, newValue.value);
+          }}
+        />
+      );
+    }
+    case "recipeType": {
+      const thisField = field as FormFieldUpdate<"recipeType">;
+      return (
+        <InputSelectRecipeType
+          label={thisField.inputProps?.label}
+          recipeTypeId={thisField.currentValue ?? null}
+          onChange={(recipeTypeId) => {
+            form.requestUpdate(id, recipeTypeId);
           }}
         />
       );

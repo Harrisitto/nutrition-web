@@ -7,20 +7,19 @@ import {
   useFetchCustomIngredients,
   type CustomIngredient,
 } from "@src/services/tanstack/data/ingredients";
-import { parseAmount, type DraftRecipeIngredient } from "../helpers";
+import {
+  draftMacros,
+  normalizeSearch,
+  parseAmount,
+  type DraftRecipeIngredient,
+} from "../helpers";
+import type { Macros } from "@src/helpers/macros";
 
 // Sin límite la lista del catálogo renderizaría cientos de filas a cada tecla
 const MAX_RESULTS = 30;
 
-const normalize = (str: string) =>
-  str
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "");
-
 const round = (value: number) => Math.round(value * 10) / 10;
 
-type Macros = ReturnType<typeof mealIngredientMacros>;
 
 const MacrosLine = ({ macros }: { macros: Macros }) => {
   const { t } = useTranslation();
@@ -109,31 +108,13 @@ const RecipeIngredientsEditor = ({
   const addedIds = useMemo(() => new Set(value.map((row) => row.ingredientId)), [value]);
 
   const results = useMemo(() => {
-    const query = normalize(search.trim());
+    const query = normalizeSearch(search.trim());
     const all = catalog.data ?? [];
-    const filtered = query ? all.filter((el) => normalize(el.name ?? "").includes(query)) : all;
+    const filtered = query ? all.filter((el) => normalizeSearch(el.name ?? "").includes(query)) : all;
     return filtered.slice(0, MAX_RESULTS);
   }, [catalog.data, search]);
 
-  const totals = useMemo(
-    () =>
-      value.reduce<Macros>(
-        (acc, row) => {
-          const ingredient = catalogById.get(row.ingredientId);
-          const amount = parseAmount(row.amount);
-          if (!ingredient || amount === null) return acc;
-          const m = mealIngredientMacros(ingredient, amount);
-          return {
-            kcal: acc.kcal + m.kcal,
-            prot: acc.prot + m.prot,
-            hc: acc.hc + m.hc,
-            fat: acc.fat + m.fat,
-          };
-        },
-        { kcal: 0, prot: 0, hc: 0, fat: 0 },
-      ),
-    [value, catalogById],
-  );
+  const totals = useMemo(() => draftMacros(value, catalogById), [value, catalogById]);
 
   // Se añade con la cantidad de referencia del catálogo; luego se ajusta en la lista
   const addIngredient = (ingredient: CustomIngredient) => {

@@ -4,6 +4,7 @@ import { RenderCommandGroup } from "./@components/renderCommandGroup";
 import { ConfigurationPages } from "@src/pages/configuration/@components/title";
 import DisplayMealsForm from "./@components/displaymealsForm";
 import DisplayRowsForm from "./@components/displayRowsForm";
+import DefaultsForm from "./@components/defaultsForm";
 
 export const TableCommands = () => {
   const { t } = useTranslation("data");
@@ -45,7 +46,10 @@ export const TableCommands = () => {
         <div className="my-4 h-px w-full bg-nutrition-green/20" />
         <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
           <DisplayMealsForm />
-          <DisplayRowsForm />
+          <div className="grid gap-4">
+            <DisplayRowsForm />
+            <DefaultsForm />
+          </div>
         </div>
       </div>
     </ConfigurationPages>

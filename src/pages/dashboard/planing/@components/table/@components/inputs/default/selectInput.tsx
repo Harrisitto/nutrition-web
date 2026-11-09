@@ -26,6 +26,8 @@ export interface SelectEditorProps<T> {
   searchable?: boolean;
   /** Se llama al acercarse al final de la lista (paginacion infinita) */
   onScrollEnd?: () => void;
+  /** Contenido extra entre el buscador y la lista, p.ej. un filtro */
+  topContent?: ReactNode;
   /** Contenido extra al final de la lista, p.ej. "Cargando..." */
   listFooter?: ReactNode;
   /** Contenido extra entre la lista y los botones, p.ej. un campo de comentario */
@@ -43,6 +45,7 @@ export function SelectEditor<T>({
   onClose,
   searchable = true,
   onScrollEnd,
+  topContent,
   listFooter,
   bottomContent,
 }: SelectEditorProps<T>) {
@@ -184,6 +187,7 @@ export function SelectEditor<T>({
             className="w-full rounded-lg border border-nutrition-green/30 px-3 py-2 text-sm text-dark-green outline-none focus:border-dark-green"
           />
         )}
+        {topContent}
 
         <div
           ref={listRef}

@@ -144,6 +144,9 @@
             "placeholder": "E.g. lactose-free, small portion..."
         },
         "selectCustomRecipe": "Choose own recipe",
+        "recipeSource": {
+            "nutritionistRecipes": "Nutritionist and client recipes"
+        },
         "customRecipeOwner": {
             "mine": "Yours",
             "client": "Client"
@@ -711,7 +714,27 @@
             "removeIngredient": "Remove food",
             "cancel": "Cancel",
             "save": "Save changes",
-            "create": "Create recipe"
+            "create": "Create recipe",
+            "type": {
+                "label": "Recipe type",
+                "status": {
+                    "custom": "No catalogue type: it will be saved as a custom recipe, without checking macros.",
+                    "incomplete": "Add foods with an amount to check whether they fit the type.",
+                    "checking": "Loading the type's macros...",
+                    "match": "The foods fit this type.",
+                    "noMatch": "The foods don't fit this type: it will be saved as a custom recipe."
+                },
+                "chart": {
+                    "fits": "Fits “{{type}}”",
+                    "notFits": "Doesn't fit “{{type}}”",
+                    "range": "Fits between {{min}} g and {{max}} g",
+                    "legendRange": "Margin (±10%, min. 2 g)",
+                    "legendTarget": "Type target",
+                    "adjust": "Adjust amounts",
+                    "adjustMissing": "These foods can't quite fit: add one with more {{macro}}.",
+                    "adjustExcess": "These foods can't quite fit: too much {{macro}}, swap one for a food with less."
+                }
+            }
         },
         "list": {
             "title": "Your recipes",
@@ -723,7 +746,15 @@
             "ingredientsCount_one": "{{count}} food",
             "ingredientsCount_other": "{{count}} foods",
             "total": "Total",
-            "type": "Type"
+            "type": "Type",
+            "titleWithClient": "Client's recipes and yours",
+            "search": "Search recipe by name...",
+            "clearSearch": "Clear search",
+            "noResults": "No recipes with that name.",
+            "owner": {
+                "client": "Client",
+                "mine": "Yours"
+            }
         },
         "client": {
             "title": "Client recipes",

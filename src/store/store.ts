@@ -18,6 +18,7 @@ import type { PersistConfig } from 'redux-persist'
 import errorReducer from './slices/error/store'
 import notificationReducer from './slices/notification/store'
 import configReducer, {
+	mergeDefaults,
 	mergeKeyboardCommands,
 	mergeRowsVisibility,
 } from './slices/config/store'
@@ -32,8 +33,9 @@ const configPersistConfig: PersistConfig<ConfigState> = {
 		'showMealsInTable',
 		'showRowsInTable',
 		'autoAdjustMeals',
+		'defaults',
 	],
-	// Merge saved shortcuts and row visibility over the current defaults so
+	// Merge saved shortcuts, row visibility and defaults over the current defaults so
 	// newly added commands/rows get their default value instead of being undefined
 	stateReconciler: (inbound, original, reduced, config) => {
 		const merged = autoMergeLevel1(inbound, original, reduced, config)
@@ -44,6 +46,7 @@ const configPersistConfig: PersistConfig<ConfigState> = {
 				? inbound.showMealsInTable
 				: merged.showMealsInTable,
 			showRowsInTable: mergeRowsVisibility(inbound?.showRowsInTable),
+			defaults: mergeDefaults(inbound?.defaults),
 		}
 	},
 }

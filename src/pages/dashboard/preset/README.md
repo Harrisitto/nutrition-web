@@ -4,3 +4,4 @@ Luego los podrán cargar en la planificación.
 Se guardan las recetas, los hidratos por hora de entrenamiento, el comentario.
 
 También se pueden eliminar los preset viejos que ya no se vayan a usar.
+El tipo de receta de cada comida se elige con un desplegable con búsqueda por nombre (`components/shared/recipeTypes`).

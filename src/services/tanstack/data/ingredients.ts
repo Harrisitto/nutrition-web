@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import FromDate from "@src/helpers/dates";
+import { Macros } from "@src/helpers/macros";
 import { useLanguageCode } from "@src/hooks/helpers/language";
 import { supabase } from "@src/services/supabase/client";
 import { useNotification } from "@src/store/slices/notification/hook";
@@ -54,19 +55,19 @@ export const useFetchCustomIngredients = () => {
   });
 };
 
-/** Macros de un ingrediente para la cantidad `amount` (el catálogo los da por `ingredient.amount`) */
+/**
+ * Raciones que son `amount` unidades del ingrediente. Sin cantidad de ración (amount 0), `amount`
+ * ya son raciones: misma regla que la base de datos (custom_ingredients_match_type,
+ * calculate_meal_macros_for_date_range)
+ */
+export const ingredientPortions = (ingredient: Pick<CustomIngredient, "amount">, amount: number) =>
+  ingredient.amount > 0 ? amount / ingredient.amount : amount;
+
+/** Macros de un ingrediente para la cantidad `amount` (el catálogo los da por ración) */
 export const mealIngredientMacros = (
   ingredient: Pick<CustomIngredient, "amount" | "kcal" | "prot" | "hc" | "fat">,
   amount: number,
-) => {
-  const factor = ingredient.amount ? amount / ingredient.amount : 0;
-  return {
-    kcal: ingredient.kcal * factor,
-    prot: ingredient.prot * factor,
-    hc: ingredient.hc * factor,
-    fat: ingredient.fat * factor,
-  };
-};
+) => Macros.from(ingredient).scale(ingredientPortions(ingredient, amount));
 
 /** Misma semana (lunes a domingo) que la query de comidas */
 const weekRange = (date: FromDate) => ({

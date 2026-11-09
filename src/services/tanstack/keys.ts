@@ -108,6 +108,8 @@ export const queryKeys = ({
 
     },
     // Recetas propias cuyo dueño (owner_id) es `userId`: un cliente o el propio nutricionista
+    // Prefijo de las recetas propias de todos los dueños (cliente y nutricionista)
+    customRecipesAll: ["user", "customRecipes"],
     customRecipesBase: ["user", "customRecipes", userId],
     customRecipes: ["user", "customRecipes", userId, language],
     notes: {
@@ -133,6 +135,10 @@ export const queryKeys = ({
   data: {
     meals: ["data", "meals", language],
     allTypes: ["data", "allTypes", language],
+    // Busqueda paginada (InfiniteData): prefijo propio, no comparte cache con allTypes
+    recipeTypesBase: ["data", "recipeTypes"],
+    recipeTypes: ["data", "recipeTypes", language, searchStr],
+    recipeType: (id: number | null) => ["data", "recipeType", language, id],
     orderedTypes: ["data", "orderedTypes", language],
     measures: ["data", "measures"],
     receipts: ["data", "receipts"],
@@ -144,7 +150,7 @@ export const queryKeys = ({
     recipes: (typeIds: number[]) => ["data", "recipes", language, searchStr, [...typeIds].sort((a, b) => a - b)],
     // Fuera de recipesBase: su cache es InfiniteData, no un array
     topRecipesBase: ["data", "topRecipes"],
-    topRecipesForUser: (typeId?: number) => ["data", "topRecipes", language, userId, typeId ?? null, searchStr],
+    topRecipesForUser: (typeId?: number, isCustom = false) => ["data", "topRecipes", language, userId, typeId ?? null, isCustom, searchStr],
     raceIngredients: ["data", "raceIngredients", userId],
     customIngredients: ["data", "customIngredients", language],
     // Id del recipe_type "receta propia" (RPC custom_recipe_type_id): no cambia
