@@ -106,6 +106,8 @@
             "cloneSelectedWeek": "Clone selected week",
             "cloning": "Cloning...",
             "loadingWeek": "Loading week...",
+            "cloneDaySuccess": "Day cloned",
+            "copyMealSuccess": "Meal copied",
             "cloneSuccess": "Week cloned successfully",
             "cloneError": "An error occurred while cloning the week. Please try again."
         },

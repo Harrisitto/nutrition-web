@@ -1,6 +1,7 @@
 import PresetDayEditor from "../inputs/presetSelectInput";
 import { highlightRingOnDarkStyle, sectionHeaderBoxStyle } from "../../styles";
-import type FromDate from "../../../../../../../helpers/dates";
+import type FromDate from "@src/helpers/dates";
+import DraggableCell from "./draggableCell";
 
 interface CellPresetDayProps {
   dayName: string;
@@ -21,15 +22,20 @@ const CellPresetDay = ({
 }: CellPresetDayProps) => {
   return (
     <>
-      <button
-        type="button"
-        onClick={openEditor}
-        className={`${sectionHeaderBoxStyle} cursor-pointer capitalize transition-colors hover:bg-dark-green ${
-          isHighlighted ? highlightRingOnDarkStyle : ""
-        }`}
-      >
-        {dayName}
-      </button>
+      {/* Arrastrar el día sobre otro clona sus comidas allí (ver hooks/copyMeal.ts) */}
+      <DraggableCell data={{ kind: "day", date: date.save() }}>
+        {() => (
+          <button
+            type="button"
+            onClick={openEditor}
+            className={`${sectionHeaderBoxStyle} w-full cursor-pointer capitalize transition-colors hover:bg-dark-green ${
+              isHighlighted ? highlightRingOnDarkStyle : ""
+            }`}
+          >
+            {dayName}
+          </button>
+        )}
+      </DraggableCell>
 
       {isEditing && <PresetDayEditor onClose={closeEditor} date={date} />}
     </>

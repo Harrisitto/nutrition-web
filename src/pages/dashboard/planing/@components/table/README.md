@@ -211,3 +211,15 @@ Los ingredientes se añaden después de elegir receta (o "Sin receta fija"):
   muestra la receta fija, cada ingrediente con su cantidad y el comentario sobre la
   receta (`MealRowInfo.getRecipeComment`); lo mismo va en el `title` de la celda. Aún no se suman a las kcal de la celda
   ni a los totales del día.
+- Copiar arrastrando: las celdas de comida y la cabecera de cada día
+  ([cells/presetDay.tsx](@components/cells/presetDay.tsx)) van dentro de
+  [cells/draggableCell.tsx](@components/cells/draggableCell.tsx) (dnd-kit, `kind: "meal" | "day"`).
+  El `DndContext` está en [index.tsx](index.tsx), con un umbral de 6px para que el click siga
+  abriendo el editor. Solo se suelta sobre una celda del mismo `kind`. Las copias son RPCs
+  (una sola transacción: si algo falla no se guarda nada), en
+  [hooks/copyMeal.ts](hooks/copyMeal.ts) y `services/tanstack/user/meals.ts`:
+  - Comida sobre comida: `useCopyMeal` → `useCopyPlaningMeal` → `copy_planing_meal`. Copia tipo,
+    receta, si es fija, comentario e ingredientes; lo que tuviera el destino se sustituye.
+  - Día sobre día: `useCloneDay` → `useCloneDayMeals` → `clone_day_planing`. El día de destino
+    queda con las mismas comidas e ingredientes que el origen. No copia `user_planing` (entreno,
+    comentarios, eventos...).

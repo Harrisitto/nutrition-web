@@ -1,11 +1,21 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTable } from "@tanstack/react-table";
+import {
+  DndContext,
+  PointerSensor,
+  pointerWithin,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
 import FromDate from "@src/helpers/dates";
 import { useAppSelector } from "@src/store/store";
 import useTableRows from "./hooks/rows";
 import useTableColumns from "./hooks/columns";
 import { DayCellContext } from "./hooks/dayCellContext";
 import useKeyboardNavigation from "./hooks/navigation";
+import { useCloneDay, useCopyMeal } from "./hooks/copyMeal";
+import type { CellDragData } from "./@components/cells/draggableCell";
 import { features } from "./features";
 import { sectionHeaderTdStyle } from "./styles";
 import type { RowInfo } from "./types";
@@ -126,53 +136,79 @@ export const WeeklyMeals = () => {
     columns,
   });
 
+  // Arrastrar una celda de comida sobre otra la copia. El umbral de distancia deja pasar
+  // el click normal (abrir el editor) sin iniciar un arrastre
+  const { copyMeal } = useCopyMeal();
+  const { cloneDay } = useCloneDay();
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+  );
+  const handleDragEnd = useCallback(
+    ({ active, over }: DragEndEvent) => {
+      const from = active.data.current as CellDragData | undefined;
+      const to = over?.data.current as CellDragData | undefined;
+      if (!from || !to || active.id === over?.id) return;
+      // Comida sobre comida: copia esa comida. Día sobre día: clona todas sus comidas
+      if (from.kind === "meal" && to.kind === "meal") copyMeal({ from, to });
+      else if (from.kind === "day" && to.kind === "day")
+        cloneDay({ from: from.date, to: to.date });
+    },
+    [copyMeal, cloneDay],
+  );
+
   return (
     <DayCellContext.Provider value={renderDayCell}>
-      <div className="overflow-x-auto rounded-2xl bg-white-green shadow-md">
-        <table className="w-full min-w-[920px] border-separate border-spacing-0 text-sm">
-          <tbody>
-            {table.getRowModel().rows.map((row) => {
-              if (row.original.isFullWidth) {
+      <DndContext
+        sensors={sensors}
+        collisionDetection={pointerWithin}
+        onDragEnd={handleDragEnd}
+      >
+        <div className="overflow-x-auto rounded-2xl bg-white-green shadow-md">
+          <table className="w-full min-w-[920px] border-separate border-spacing-0 text-sm">
+            <tbody>
+              {table.getRowModel().rows.map((row) => {
+                if (row.original.isFullWidth) {
+                  return (
+                    <tr key={row.id}>
+                      <td
+                        className={sectionHeaderTdStyle}
+                        colSpan={dayDates.length + 1}
+                      >
+                        {row.original.label}
+                      </td>
+                    </tr>
+                  );
+                }
+
                 return (
-                  <tr key={row.id}>
-                    <td
-                      className={sectionHeaderTdStyle}
-                      colSpan={dayDates.length + 1}
-                    >
-                      {row.original.label}
-                    </td>
+                  <tr
+                    key={row.id}
+                    data-row-key={row.original.getCellId("")}
+                    className={`transition-colors`}
+                  >
+                    {row.getAllCells().map((cell, index) => {
+                      const isStickyLabel = index === 0;
+
+                      // 1. La primera columna (index === 0) se ajusta al mínimo necesario sin romper línea.
+                      // 2. Las 7 columnas restantes se dividen el espacio restante a partes iguales (100% / 7 = 14.28%).
+                      const cellStyle = isStickyLabel
+                        ? `sticky left-0 z-10 w-px whitespace-nowrap`
+                        : // max-w-0: el contenido no cuenta para el ancho de la columna (table-layout auto)
+                          "w-[14.28%] max-w-0 px-1.5 py-2 align-middle";
+
+                      return (
+                        <td key={cell.id} className={cellStyle}>
+                          <table.FlexRender cell={cell} />
+                        </td>
+                      );
+                    })}
                   </tr>
                 );
-              }
-
-              return (
-                <tr
-                  key={row.id}
-                  data-row-key={row.original.getCellId("")}
-                  className={`transition-colors`}
-                >
-                  {row.getAllCells().map((cell, index) => {
-                    const isStickyLabel = index === 0;
-
-                    // 1. La primera columna (index === 0) se ajusta al mínimo necesario sin romper línea.
-                    // 2. Las 7 columnas restantes se dividen el espacio restante a partes iguales (100% / 7 = 14.28%).
-                    const cellStyle = isStickyLabel
-                      ? `sticky left-0 z-10 w-px whitespace-nowrap`
-                      : // max-w-0: el contenido no cuenta para el ancho de la columna (table-layout auto)
-                        "w-[14.28%] max-w-0 px-1.5 py-2 align-middle";
-
-                    return (
-                      <td key={cell.id} className={cellStyle}>
-                        <table.FlexRender cell={cell} />
-                      </td>
-                    );
-                  })}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+              })}
+            </tbody>
+          </table>
+        </div>
+      </DndContext>
     </DayCellContext.Provider>
   );
 };

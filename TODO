@@ -53,3 +53,35 @@ la web.
 
 5. Comprueba que compila y pasa el lint (tsc / npm run lint / npm run build, lo que use el
    proyecto). No hagas commit.
+
+==========================================================================================
+Macros del catálogo de alimentos por 100 g (recipe_type_custom_ingredients)
+==========================================================================================
+Migración en nutrition-proton/supabase/pending/custom_ingredients_per_100g.sql. Hay que publicar
+la web a la vez que se aplica: con la fórmula vieja las macros de los alimentos salen mal.
+
+- Antes kcal/hc/prot/fat eran de UNA RACIÓN (amount + units). Ahora son por 100 g, y hay dos
+  columnas nuevas: to_grams (gramos de 1 unidad de units: 1 para g y ml, 150 para 1 pieza de fruta)
+  y error_to_grams (% de margen de to_grams: 0 para g y ml). amount sigue siendo la ración sugerida.
+  Las cantidades guardadas (user_planing_meal_ingredients.amount, custom_recipe_ingredients.amount)
+  siguen en las units del alimento.
+- Fórmula nueva: macro * cantidad * to_grams / 100 (antes macro * cantidad / amount).
+
+1. Regenera los tipos (npm run supabase-types): kcal/hc/prot/fat pasan a numeric y aparecen
+   to_grams y error_to_grams.
+2. src/services/tanstack/data/ingredients.ts
+   - selectIngredient: añade to_grams (y error_to_grams si se quiere enseñar el margen).
+   - mealIngredientMacros: Macros.from(ingredient).scale(amount * ingredient.to_grams / 100).
+   - ingredientPortions (raciones = amount / ingredient.amount) puede quedarse para fitAmounts, pero
+     ya no sirve para las macros. Quita la rama de amount 0 = raciones.
+   - Actualiza el comentario de arriba ("Los macros del catálogo son para `amount` unidades").
+3. src/components/shared/recipes/fitAmounts.ts: perUnit sale de mealIngredientMacros(ingredient, 1),
+   así que se arregla solo con el punto 2. Comprueba que unitsPerPortion sigue teniendo sentido.
+4. Lugares que muestran las macros de una ración, con mealIngredientMacros(ingredient,
+   ingredient.amount): src/components/shared/recipes/@components/ingredients.tsx y
+   src/pages/dashboard/planing/@components/table/@components/inputs/ingredientsSelectInput.tsx.
+   Siguen bien con el punto 2. Si en algún sitio se muestran ingredient.kcal/hc/... directamente
+   como "por ración", ahora son por 100 g.
+5. La columna relation se queda, pero sin FK más adelante (pending/drop_custom_relation.sql). No
+   la uses para agrupar.
+6. Comprueba que compila y pasa el lint. No hagas commit.

@@ -1125,37 +1125,46 @@ export type Database = {
         Row: {
           amount: number
           cooked_amount: number | null
+          error_to_grams: number
           fat: number
           hc: number
           id: number
           kcal: number
+          min_step: number
           name: Json | null
           prot: number
           relation: number | null
+          to_grams: number
           units: Json
         }
         Insert: {
           amount?: number
           cooked_amount?: number | null
+          error_to_grams?: number
           fat?: number
           hc?: number
           id?: number
           kcal?: number
+          min_step?: number
           name?: Json | null
           prot?: number
           relation?: number | null
+          to_grams?: number
           units?: Json
         }
         Update: {
           amount?: number
           cooked_amount?: number | null
+          error_to_grams?: number
           fat?: number
           hc?: number
           id?: number
           kcal?: number
+          min_step?: number
           name?: Json | null
           prot?: number
           relation?: number | null
+          to_grams?: number
           units?: Json
         }
         Relationships: [
@@ -1736,8 +1745,22 @@ export type Database = {
         Args: { p_end_date: string; p_start_date: string }
         Returns: undefined
       }
+      clone_day_planing: {
+        Args: { p_from: string; p_to: string; p_user_id: string }
+        Returns: undefined
+      }
       clone_week_planing: {
         Args: { p_from_monday: string; p_to_monday: string; p_user_id: string }
+        Returns: undefined
+      }
+      copy_planing_meal: {
+        Args: {
+          p_from_date: string
+          p_from_meal: number
+          p_to_date: string
+          p_to_meal: number
+          p_user_id: string
+        }
         Returns: undefined
       }
       custom_ingredients_match_type: {
@@ -1747,10 +1770,6 @@ export type Database = {
           p_type_id: number
         }
         Returns: boolean
-      }
-      custom_recipe_check_type_id: {
-        Args: { p_custom_recipe_id: number }
-        Returns: undefined
       }
       custom_recipe_type_id: { Args: never; Returns: number }
       delete_expired_invitations: { Args: never; Returns: number }

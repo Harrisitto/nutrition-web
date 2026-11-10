@@ -337,3 +337,73 @@ export const useDeletePlaningMeal = ({
 
   return mutation;
 }
+
+/** Refresca todo lo que cambia al copiar comidas: comidas, ingredientes, macros y orden de clientes */
+const useInvalidateCopiedMeals = () => {
+  const userId = useAppSelector((state) => state.config.selectedUserId);
+  const queryClient = useQueryClient();
+  const refreshClientOrder = useRefreshClientOrder();
+
+  return () => {
+    invalidateMacros(userId);
+    queryClient.invalidateQueries({ queryKey: queryKeys({ userId }).user.mealsBase });
+    queryClient.invalidateQueries({
+      queryKey: queryKeys({ userId }).user.mealIngredientsBase,
+    });
+    refreshClientOrder();
+  };
+};
+
+/**
+ * Clona las comidas de un día en otro (RPC clone_day_planing, una sola transacción): todas las
+ * filas de `user_planing_meal` y sus ingredientes (`user_planing_meal_ingredients`). El destino
+ * queda igual que el origen. No toca `user_planing` (entreno, comentarios del día...)
+ */
+export const useCloneDayMeals = () => {
+  const userId = useAppSelector((state) => state.config.selectedUserId);
+  const invalidate = useInvalidateCopiedMeals();
+
+  return useMutation({
+    mutationFn: async ({ from, to }: { from: FromDate; to: FromDate }) => {
+      if (!userId) throw new Error("User ID is required to clone a day");
+      const { error } = await supabase.rpc("clone_day_planing", {
+        p_user_id: userId,
+        p_from: from.save(),
+        p_to: to.save(),
+      });
+      if (error) throw error;
+    },
+    onSuccess: invalidate,
+  });
+};
+
+/**
+ * Copia una comida en otra celda (RPC copy_planing_meal, una sola transacción): tipo, receta, si
+ * es fija, comentario e ingredientes. Lo que tuviera el destino se sustituye.
+ * Error P0002 si la comida de origen no existe
+ */
+export const useCopyPlaningMeal = () => {
+  const userId = useAppSelector((state) => state.config.selectedUserId);
+  const invalidate = useInvalidateCopiedMeals();
+
+  return useMutation({
+    mutationFn: async ({
+      from,
+      to,
+    }: {
+      from: { date: string; mealId: number };
+      to: { date: string; mealId: number };
+    }) => {
+      if (!userId) throw new Error("User ID is required to copy a meal");
+      const { error } = await supabase.rpc("copy_planing_meal", {
+        p_user_id: userId,
+        p_from_date: from.date,
+        p_from_meal: from.mealId,
+        p_to_date: to.date,
+        p_to_meal: to.mealId,
+      });
+      if (error) throw error;
+    },
+    onSuccess: invalidate,
+  });
+};
