@@ -24,7 +24,7 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY || !GOOGLE_AI_API_KEY) {
   throw new Error('Missing SUPABASE_URL, SUPABASE_ANON_KEY or GOOGLE_AI_API_KEY environment variables');
 }
 
-const GEMINI_MODEL = 'gemini-3.8-flash';
+const GEMINI_MODEL = 'gemini-3.5-flash';
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 // Formatos de imagen que acepta Gemini
