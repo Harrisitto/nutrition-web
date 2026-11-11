@@ -7,6 +7,8 @@ import { supabase } from "@src/services/supabase/client";
 import FromDate from "@src/helpers/dates";
 import { hcToKcal, kcalByDate, raceHc } from "@src/helpers/nutrition";
 import { downloadBlob } from "@src/helpers/images";
+import { fileToBase64 } from "@src/helpers/files";
+import type { ImageProfile } from "@src/helpers/races/profileImage";
 import { useAppSelector } from "@src/store/store";
 import type { Database } from "@src/services/supabase/types";
 import { useGetAuthSession } from "../auth/get";
@@ -287,6 +289,29 @@ export const useUploadGpx = () => {
         throw error;
       }
       return gpxPath;
+    },
+  });
+};
+
+/**
+ * Lee con Gemini (edge function race-profile-image) la gráfica de altitud de una imagen.
+ * Devuelve los puntos de la línea: los tramos se calculan con raceProfileFromImage.
+ */
+export const useReadProfileImage = () => {
+  return useMutation({
+    mutationFn: async (file: File) => {
+      const { data, error } = await supabase.functions.invoke<ImageProfile>(
+        "race-profile-image",
+        { body: { image: await fileToBase64(file), mime_type: file.type } },
+      );
+
+      if (error) {
+        throw error;
+      }
+      if (!data) {
+        throw new Error("race-profile-image returned no data");
+      }
+      return data;
     },
   });
 };

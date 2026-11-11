@@ -529,7 +529,7 @@
         "steps": {
             "profile": {
                 "title": "Generar el perfil",
-                "description": "Sube un archivo GPX para generar el perfil automáticamente o añade los tramos uno a uno."
+                "description": "Sube un archivo GPX o una imagen del perfil para generarlo automáticamente, o añade los tramos uno a uno."
             },
             "landmarks": {
                 "title": "Puntos de interés",
@@ -564,10 +564,22 @@
                 "tooShort": "el recorrido mide menos de 100 m",
                 "tooLong": "el recorrido mide más de 9999 km"
             },
+            "imageTitle": "Generar desde una imagen del perfil",
+            "imageDescription": "Si no tienes el GPX, sube la gráfica de altitud que publica la organización. Se lee con IA: revisa los tramos antes de guardar.",
+            "imageReading": "Leyendo el perfil de la imagen, puede tardar unos segundos...",
+            "imageError": "No se ha podido leer el perfil",
+            "imageErrors": {
+                "invalidFile": "el archivo debe ser una imagen PNG, JPG, WEBP o HEIC",
+                "tooLarge": "la imagen pesa más de 5 MB",
+                "noProfile": "no se ha encontrado una gráfica de altitud en la imagen",
+                "tooShort": "el recorrido mide menos de 100 m",
+                "tooLong": "el recorrido mide más de 9999 km",
+                "readFailed": "inténtalo de nuevo en unos segundos"
+            },
             "stepsTitle": "Tramos",
             "addStep": "Añadir tramo",
             "removeStep": "Eliminar tramo",
-            "noSteps": "Todavía no hay tramos. Genera el perfil desde un GPX o añádelos a mano.",
+            "noSteps": "Todavía no hay tramos. Genera el perfil desde un GPX o una imagen, o añádelos a mano.",
             "columns": {
                 "km_start": "Km inicio",
                 "min_altitude": "Alt. mín (m)",
