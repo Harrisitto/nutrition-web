@@ -138,6 +138,16 @@ Deno.serve(async (req: Request) => {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData.user) return json({ error: 'Unauthorized' }, 401);
 
+  // Gemini cuesta dinero: solo nutricionistas con suscripción activa (un cliente nunca la tiene)
+  const { data: hasSubscription, error: subscriptionError } = await supabase.rpc(
+    'has_active_subscription',
+  );
+  if (subscriptionError) {
+    console.error(subscriptionError);
+    return json({ error: 'Could not check the subscription' }, 500);
+  }
+  if (!hasSubscription) return json({ error: 'Active subscription required' }, 403);
+
   let image: string;
   let mimeType: string;
 
