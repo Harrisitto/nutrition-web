@@ -529,7 +529,7 @@
         "steps": {
             "profile": {
                 "title": "Generate the profile",
-                "description": "Upload a GPX file to generate the profile automatically or add the segments one by one."
+                "description": "Upload a GPX file or an image of the profile to generate it automatically, or add the segments one by one."
             },
             "landmarks": {
                 "title": "Points of interest",
@@ -564,10 +564,22 @@
                 "tooShort": "the course is shorter than 100 m",
                 "tooLong": "the course is longer than 9999 km"
             },
+            "imageTitle": "Generate from a profile image",
+            "imageDescription": "If you don't have the GPX, upload the elevation chart published by the organisers. It is read with AI: check the segments before saving.",
+            "imageReading": "Reading the profile from the image, this may take a few seconds...",
+            "imageError": "The profile could not be read",
+            "imageErrors": {
+                "invalidFile": "the file must be a PNG, JPG, WEBP or HEIC image",
+                "tooLarge": "the image is larger than 5 MB",
+                "noProfile": "no elevation chart was found in the image",
+                "tooShort": "the course is shorter than 100 m",
+                "tooLong": "the course is longer than 9999 km",
+                "readFailed": "try again in a few seconds"
+            },
             "stepsTitle": "Segments",
             "addStep": "Add segment",
             "removeStep": "Remove segment",
-            "noSteps": "There are no segments yet. Generate the profile from a GPX or add them by hand.",
+            "noSteps": "There are no segments yet. Generate the profile from a GPX or an image, or add them by hand.",
             "columns": {
                 "km_start": "Start km",
                 "min_altitude": "Min alt. (m)",
