@@ -167,9 +167,9 @@ export const List = () => {
           const hasUpcomingMeals = checkUpcomingMeals(latestDate);
           return (
             <SingleClient
-              key={user.user_id}
+              key={user.id}
               name={user?.name || "Unnamed User"}
-              id={user.user_id}
+              id={user.id}
               idx={index}
               hasNextWeek={hasUpcomingMeals}
             />

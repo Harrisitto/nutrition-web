@@ -1,8 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useNotification, useNotificationErrorQuery } from '@src/store/slices/notification/hook'
 import { supabase } from '@src/services/supabase/client'
-import type { Database } from '@src/services/supabase/types'
-import { TABLE_ALL_USERS, TABLE_USER_PLANING, TABLE_USER_PLANING_MEAL } from '@src/services/supabase/definitions'
+import type { ViewRow } from '@src/services/supabase/database'
 import { queryKeys } from '../keys'
 import { queryClient } from '../queryClient'
 import { useGetAuthSession } from '../auth/get'
@@ -10,7 +9,7 @@ import { useAppDispatch, useAppSelector } from '@src/store/store'
 import { setSelectedUserId } from '@src/store/slices/config/store'
 import { useCallback } from 'react'
 
-type UserWithInfo = Database['public']['Tables']['all_users']['Row']
+type UserWithInfo = ViewRow<'nutri_clients'>
 
 const selectUser = () => {
   // user_planing_meal no longer has a FK to user_planing (it matches by
@@ -42,9 +41,9 @@ export const useFetchSingleUser = ({
         }).user.single,
         queryFn: async () => {
             const { data, error } = await supabase
-              .from(TABLE_ALL_USERS.NAME)
+              .from('nutri_clients')
               .select(selectUser())
-              .eq(TABLE_ALL_USERS.COLS.USER_ID, effectiveUserId)
+              .eq('id', effectiveUserId)
               .maybeSingle();
           if (error) throw error
             return data
@@ -66,14 +65,13 @@ export const useFetchNutritionistUsers = () => {
             try {
                 if (!userId) throw new Error("User ID is required to fetch nutritionist users");
                 const { data, error } = await supabase
-                    .from(TABLE_ALL_USERS.NAME)
+                    // nutri_clients already returns only this nutritionist's accepted clients
+                    .from('nutri_clients')
                     .select(selectUser())
-                    .eq(TABLE_ALL_USERS.COLS.NUTRI_ID, userId)
-                    .order(TABLE_USER_PLANING.COLS.DATE, { referencedTable: TABLE_USER_PLANING.NAME, ascending: false })
-                    .limit(1, { referencedTable: TABLE_USER_PLANING.NAME })
-                    .order(TABLE_USER_PLANING_MEAL.COLS.DATE, { referencedTable: TABLE_USER_PLANING_MEAL.NAME, ascending: false })
-                    .limit(1, { referencedTable: TABLE_USER_PLANING_MEAL.NAME })
-              //.eq(TABLE_ALL_USERS.COLS.IS_NUTRI, false)
+                    .order('date', { referencedTable: 'user_planing', ascending: false })
+                    .limit(1, { referencedTable: 'user_planing' })
+                    .order('date', { referencedTable: 'user_planing_meal', ascending: false })
+                    .limit(1, { referencedTable: 'user_planing_meal' })
                 if (error) throw error
                 // Clients whose planning runs out first (or who have none) go on top.
                 // Dates are YYYY-MM-DD, so comparing them as strings sorts them by date.
@@ -109,16 +107,18 @@ export const useUpdateClientGoal = () => {
   const clientId = useAppSelector((state) => state.config.selectedUserId);
   const { data: authData } = useGetAuthSession()
   const nutritionistId = authData?.userId
+  const { addMutationError } = useNotification();
 
   return useMutation({
     mutationFn: async (goal: string) => {
       if (!clientId) throw new Error('No authenticated user found')
       const { data, error } = await supabase
-        .from(TABLE_ALL_USERS.NAME)
+        // 55000 when the nutritionist has no active subscription (read-only)
+        .from('nutri_clients')
         .update({
             goal,
          })
-        .eq(TABLE_ALL_USERS.COLS.USER_ID, clientId)
+        .eq('id', clientId)
         .select()
         .single()
       if (error) throw error
@@ -139,7 +139,7 @@ export const useUpdateClientGoal = () => {
             }).user.fromNutritionist,
             (oldData = []) => {
                 return oldData.map(user => {
-                    if (user.user_id === clientId) {
+                    if (user.id === clientId) {
                         user.goal = data.goal
                         return user;
                     }
@@ -148,7 +148,8 @@ export const useUpdateClientGoal = () => {
                 )
             }
         )
-    }
+    },
+    onError: () => addMutationError(),
   })
 }
 
@@ -187,7 +188,7 @@ export const useRemoveClient = () => {
                 userId: nutritionistId,
             }).user.fromNutritionist,
             (oldData = []) => {
-                return oldData.filter(user => user.user_id !== clientId)
+                return oldData.filter(user => user.id !== clientId)
             }
         )
     },

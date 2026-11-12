@@ -26,7 +26,6 @@ export const ConfirmSetup = () => {
     }
     insertInfo(
       {
-        nutri_id: userId,
         name: state[fieldIds.name] as string,
       },
       {

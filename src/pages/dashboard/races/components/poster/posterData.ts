@@ -32,7 +32,7 @@ export type PosterIntake = {
 type PosterTotals = Record<AmountKey, number> & { kcal: number };
 
 export type RacePosterData = {
-  // Idioma del corredor (all_users.prefered_language): el de textos, fechas y números
+  // Idioma del corredor (nutri_clients.prefered_language): el de textos, fechas y números
   language: SupportedLanguage;
   name: string;
   date: string;

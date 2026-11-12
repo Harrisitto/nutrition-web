@@ -161,9 +161,8 @@ export const Goal = () => {
 
   const updateGoal = useCallback(
     (text: string) => {
-      // Here you would normally call a mutation to save the updated goal to the database
-      // For example: updateUserGoal.mutate(goalText);
-      updateQuery.mutateAsync(text);
+      // mutate, not mutateAsync: errors are shown by the mutation's onError
+      updateQuery.mutate(text);
     },
     [updateQuery],
   );

@@ -203,7 +203,7 @@ export const useFetchScheduledNutritionistNotes = ({
     date: string;
 }) => {
     const infoQuery = useGetAuthInfo();
-    const nutritionistId = infoQuery.data?.nutri_id ?? null;
+    const nutritionistId = infoQuery.data?.id ?? null;
 
     return useQuery({
         queryKey: queryKeys({ userId: nutritionistId }).nutritionist.notes.scheduled(date),
@@ -213,7 +213,7 @@ export const useFetchScheduledNutritionistNotes = ({
             }
 
             const response = await supabase.from('client_notes')
-                .select('*, client: all_users(name)')
+                .select('*, client: nutri_clients(name)')
                 .eq('nutri_id', nutritionistId)
                 .eq('scheduled_date', date)
                 .order('priority', { ascending: false })
@@ -233,7 +233,7 @@ export const useFetchScheduledNutritionistNotes = ({
 // nombre del cliente: primero las de mas prioridad
 export const useFetchPendingNutritionistTasks = () => {
     const infoQuery = useGetAuthInfo();
-    const nutritionistId = infoQuery.data?.nutri_id ?? null;
+    const nutritionistId = infoQuery.data?.id ?? null;
 
     return useQuery({
         queryKey: queryKeys({ userId: nutritionistId }).nutritionist.notes.pending,
@@ -243,7 +243,7 @@ export const useFetchPendingNutritionistTasks = () => {
             }
 
             const response = await supabase.from('client_notes')
-                .select('*, client: all_users(name)')
+                .select('*, client: nutri_clients(name)')
                 .eq('nutri_id', nutritionistId)
                 .eq('status', 'pending')
                 .order('priority', { ascending: false })

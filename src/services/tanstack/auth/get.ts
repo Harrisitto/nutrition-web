@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 import { queryKeys } from "../keys"
 import { supabase } from "@src/services/supabase/client"
-import { TABLE_ALL_NUTRITIONISTS } from "@src/services/supabase/definitions"
 import { queryClient } from "../queryClient"
 import { useEffect } from "react"
 import type { Session } from "@supabase/supabase-js"
@@ -56,10 +55,10 @@ export const useGetAuthInfo = () => {
       const { data: current } = await supabase.auth.getSession()
       const userId = current.session?.user?.id
       if(!userId) return null
+      // nutri_profile only returns the signed in nutritionist's row (none for clients)
       const { data, error } = await supabase
-        .from(TABLE_ALL_NUTRITIONISTS.NAME)
+        .from("nutri_profile")
         .select()
-        .eq(TABLE_ALL_NUTRITIONISTS.COLS.USER_ID, userId)
         .maybeSingle()
       if (error) throw error
       return data

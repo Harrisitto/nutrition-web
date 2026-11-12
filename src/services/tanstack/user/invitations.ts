@@ -1,5 +1,4 @@
 import { supabase } from "@src/services/supabase/client"
-import { TABLE_USER_INVITATIONS } from "@src/services/supabase/definitions"
 import { useNotification } from "@src/store/slices/notification/hook"
 import type { PostgrestError } from "@supabase/supabase-js"
 import { useMutation, useQuery } from "@tanstack/react-query"
@@ -36,13 +35,11 @@ export const useFetchInvitedClients = () => {
         queryKey: queryKeys({ userId }).user.invitations("all"),
         queryFn: async () => {
             if (!userId) throw new Error("No authenticated user found");
-            // Expired invitations are only purged once a day, so they're filtered here
+            // nutri_invitations only returns this nutritionist's invitations that haven't expired
             const { data, error } = await supabase
-                .from(TABLE_USER_INVITATIONS.NAME)
+                .from("nutri_invitations")
                 .select("client_id, message, created_at, expires_at")
-                .eq(TABLE_USER_INVITATIONS.COLS.NUTRI_ID, userId)
-                .gt(TABLE_USER_INVITATIONS.COLS.EXPIRES_AT, new Date().toISOString())
-                .order(TABLE_USER_INVITATIONS.COLS.CREATED_AT, { ascending: false })
+                .order("created_at", { ascending: false })
 
             if (error) throw error
             return data

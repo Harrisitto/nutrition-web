@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { keepPreviousData, useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { supabase } from "@src/services/supabase/client";
-import { TABLE_RECIPE_TYPES } from "@src/services/supabase/definitions";
 import { useLanguageCode } from "@src/hooks/helpers/language";
 import type { SupportedLanguage } from "@src/services/i18n/config";
 import { queryKeys } from "../keys";
@@ -36,9 +35,9 @@ export const useFetchRecipeTypes = ({
       searchStr: search,
     }).data.recipeTypes,
     queryFn: async ({ pageParam }) => {
-      const nameCol = `${TABLE_RECIPE_TYPES.COLS.NAME}->>${langCode}`;
+      const nameCol = `name->>${langCode}`;
       let query = supabase
-        .from(TABLE_RECIPE_TYPES.NAME)
+        .from("recipe_type")
         .select(selectRecipeTypes(langCode));
 
       if (search) {
@@ -48,7 +47,7 @@ export const useFetchRecipeTypes = ({
       const { data, error } = await query
         .order(nameCol)
         // Desempate estable para que el offset no repita ni salte filas
-        .order(TABLE_RECIPE_TYPES.COLS.ID)
+        .order("id")
         .range(pageParam, pageParam + RECIPE_TYPES_PAGE_SIZE - 1);
 
       if (error) throw error;
@@ -74,9 +73,9 @@ export const useFetchRecipeType = (recipeTypeId: number | null) => {
     queryKey: queryKeys({ language: langCode }).data.recipeType(recipeTypeId),
     queryFn: async () => {
       const { data, error } = await supabase
-        .from(TABLE_RECIPE_TYPES.NAME)
+        .from("recipe_type")
         .select(selectRecipeTypes(langCode))
-        .eq(TABLE_RECIPE_TYPES.COLS.ID, recipeTypeId!)
+        .eq("id", recipeTypeId!)
         .single();
 
       if (error) throw error;

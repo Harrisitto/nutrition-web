@@ -7,7 +7,7 @@ export const UserName = () => {
   const selectedUserId = useAppSelector((state) => state.config.selectedUserId);
   const users = useFetchNutritionistUsers();
   const selectedUser = users.data?.find(
-    (user) => user.user_id === selectedUserId,
+    (user) => user.id === selectedUserId,
   );
 
   if (!selectedUser) return null;

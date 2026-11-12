@@ -24,8 +24,14 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY || !GOOGLE_AI_API_KEY) {
   throw new Error('Missing SUPABASE_URL, SUPABASE_ANON_KEY or GOOGLE_AI_API_KEY environment variables');
 }
 
-const GEMINI_MODEL = 'gemini-3.5-flash';
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+// Los dos modelos se saturan a ratos (503): si el primero está saturado se prueba el siguiente
+const GEMINI_MODELS = ['gemini-3.5-flash', 'gemini-3.8-flash'];
+const geminiUrl = (model: string) =>
+  `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+// Estados que indican saturación pasajera, no un fallo de la petición
+const OVERLOADED_STATUSES = [429, 503];
+// La edge function muere a los 150 s (546); se corta antes para devolver un error propio
+const GEMINI_TIMEOUT_MS = 120_000;
 
 // Formatos de imagen que acepta Gemini
 const MIME_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/heic', 'image/heif'];
@@ -37,7 +43,7 @@ const PROMPT = `This image should be the elevation profile of a race or route: a
 Trace the profile line from start to finish and return points along it:
 - km: distance from the start in kilometres, read from the x axis.
 - altitude: altitude in metres, read from the y axis, interpolating between the axis labels.
-- Include every peak and every valley of the line, plus enough points in between that the line can be redrawn faithfully (usually between 100 and 250 points, never more than 1% of the total distance apart).
+- Include every peak and every valley of the line, plus enough points in between that the line can be redrawn faithfully (usually between 80 and 150 points).
 - Points must be ordered by km, starting at the start of the route.
 - If the axes are in miles or feet, convert them to kilometres and metres.
 - Ignore everything drawn over the chart: markers, callouts, labels, products, icons, legends.
@@ -100,19 +106,37 @@ const toImageProfile = (raw: Partial<ImageProfile>): ImageProfile => ({
   ),
 });
 
-const readProfile = async (image: string, mimeType: string) => {
-  const response = await fetch(GEMINI_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': GOOGLE_AI_API_KEY },
-    body: JSON.stringify({
-      contents: [{ parts: [{ inline_data: { mime_type: mimeType, data: image } }, { text: PROMPT }] }],
-      generationConfig: {
-        responseMimeType: 'application/json',
-        responseSchema: RESPONSE_SCHEMA,
-      },
-    }),
-  });
+class GeminiOverloadedError extends Error {}
 
+const readProfile = async (image: string, mimeType: string) => {
+  const body = JSON.stringify({
+    contents: [{ parts: [{ inline_data: { mime_type: mimeType, data: image } }, { text: PROMPT }] }],
+    generationConfig: {
+      responseMimeType: 'application/json',
+      responseSchema: RESPONSE_SCHEMA,
+      // Leer una gráfica no necesita razonar mucho; con el nivel por defecto superaba los 150 s
+      thinkingConfig: { thinkingLevel: 'low' },
+    },
+  });
+  // Un único plazo para todos los intentos: cortar antes que el límite de la edge function
+  // para responder un error propio, no un 546
+  const signal = AbortSignal.timeout(GEMINI_TIMEOUT_MS);
+
+  let response: Response | null = null;
+  for (const model of GEMINI_MODELS) {
+    response = await fetch(geminiUrl(model), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': GOOGLE_AI_API_KEY },
+      body,
+      signal,
+    });
+    if (!OVERLOADED_STATUSES.includes(response.status)) break;
+    console.warn(`Gemini ${model} overloaded (${response.status}): ${await response.text()}`);
+  }
+
+  if (!response || OVERLOADED_STATUSES.includes(response.status)) {
+    throw new GeminiOverloadedError('All Gemini models are overloaded');
+  }
   if (!response.ok) {
     throw new Error(`Gemini ${response.status}: ${await response.text()}`);
   }
@@ -165,6 +189,12 @@ Deno.serve(async (req: Request) => {
     return json(await readProfile(image, mimeType));
   } catch (e) {
     console.error(e);
+    if (e instanceof DOMException && e.name === 'TimeoutError') {
+      return json({ error: 'Reading the profile timed out' }, 504);
+    }
+    if (e instanceof GeminiOverloadedError) {
+      return json({ error: 'The AI model is busy, try again later' }, 503);
+    }
     return json({ error: 'Could not read the profile' }, 502);
   }
 });

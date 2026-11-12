@@ -1,7 +1,6 @@
 import { useNotification } from "@src/store/slices/notification/hook";
 import { useMutation } from "@tanstack/react-query";
-import type { TablesInsert } from "@src/services/supabase/types";
-import { TABLE_ALL_NUTRITIONISTS } from "@src/services/supabase/definitions";
+import type { ViewInsert } from "@src/services/supabase/database";
 import { supabase } from "@src/services/supabase/client";
 import { queryKeys } from "../keys";
 import { queryClient } from "../queryClient";
@@ -14,15 +13,30 @@ export const useInsertAuthInfo = () => {
   const userId = data?.userId;
 
   const mutation = useMutation({
-    mutationFn: async (insertData: TablesInsert<typeof TABLE_ALL_NUTRITIONISTS.NAME>) => {
+    // id defaults to auth.uid() in nutri_profile, so only the name is sent
+    mutationFn: async ({ name }: Pick<ViewInsert<"nutri_profile">, "name">) => {
       if (!userId) throw new Error('No authenticated user found')
-      const { data, error } = await supabase
-        .from(TABLE_ALL_NUTRITIONISTS.NAME)
-        .upsert(insertData)
-        .select()
-        .single()
-        if (error) throw error
-        return data
+      // upsert doesn't work on a view with INSTEAD OF triggers: insert or update depending on the row
+      const { data: existing, error: existingError } = await supabase
+        .from("nutri_profile")
+        .select("id")
+        .maybeSingle()
+      if (existingError) throw existingError
+
+      const { data, error } = existing
+        ? await supabase
+            .from("nutri_profile")
+            .update({ name })
+            .eq("id", existing.id)
+            .select()
+            .single()
+        : await supabase
+            .from("nutri_profile")
+            .insert({ name })
+            .select()
+            .single()
+      if (error) throw error
+      return data
     },
     onError: () => {
       addMutationError();

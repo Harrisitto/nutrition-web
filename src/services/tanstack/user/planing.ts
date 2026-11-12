@@ -1,9 +1,6 @@
 import { queryOptions, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../keys";
 import { supabase } from "@src/services/supabase/client";
-import {
-  TABLE_USER_PLANING,
-} from "@src/services/supabase/definitions";
 import FromDate from "@src/helpers/dates";
 import { kcalByDate, trainingIntakeKcal } from "@src/helpers/nutrition";
 import { useLanguageCode } from "@src/hooks/helpers/language";
@@ -27,12 +24,12 @@ export const fetchPlanningWeek = async ({
 }) => {
   if (!userId) return [];
   const { data, error } = await supabase
-    .from(TABLE_USER_PLANING.NAME)
+    .from("user_planing")
     .select(selectFromPlaning())
-    .eq(TABLE_USER_PLANING.COLS.USER_ID, userId)
-    .gte(TABLE_USER_PLANING.COLS.DATE, dateRange.start)
-    .lte(TABLE_USER_PLANING.COLS.DATE, dateRange.end)
-    .order(TABLE_USER_PLANING.COLS.DATE);
+    .eq("user_id", userId)
+    .gte("date", dateRange.start)
+    .lte("date", dateRange.end)
+    .order("date");
   if (error) throw error;
   return data || [];
 };
@@ -119,13 +116,13 @@ export const useSearchPlanning = ({ search }: { search: string }) => {
       if (!userId) return [];
       const value = orIlikeValue(trimmed);
       const { data, error } = await supabase
-        .from(TABLE_USER_PLANING.NAME)
+        .from("user_planing")
         .select(selectFromPlaning())
-        .eq(TABLE_USER_PLANING.COLS.USER_ID, userId)
+        .eq("user_id", userId)
         .or(
-          `${TABLE_USER_PLANING.COLS.COMMENT}.ilike.${value},${TABLE_USER_PLANING.COLS.EVENT}.ilike.${value}`,
+          `comment.ilike.${value},event.ilike.${value}`,
         )
-        .order(TABLE_USER_PLANING.COLS.DATE, { ascending: false })
+        .order("date", { ascending: false })
         .limit(SEARCH_LIMIT);
       if (error) throw error;
       return data || [];
@@ -182,7 +179,7 @@ export const useMutatePlaning = () => {
       if (!userId)
         throw new Error("User ID is required to insert planing data");
       const { data, error } = await supabase
-        .from(TABLE_USER_PLANING.NAME)
+        .from("user_planing")
         .upsert({
           user_id: userId,
           ...upsertData,
@@ -262,10 +259,10 @@ export const useDeletePlaning = ({ forDate }: { forDate?: FromDate } = {}) => {
       // así que pedirla hacía fallar el borrado entero. Tampoco se usa `.single()`
       // porque limpiar un día sin fila guardada debe ser un no-op, no un error.
       const { error: existingPlaningError } = await supabase
-        .from(TABLE_USER_PLANING.NAME)
+        .from("user_planing")
         .delete()
-        .eq(TABLE_USER_PLANING.COLS.DATE, targetDate)
-        .eq(TABLE_USER_PLANING.COLS.USER_ID, userId);
+        .eq("date", targetDate)
+        .eq("user_id", userId);
 
       if (existingPlaningError) throw existingPlaningError;
       return { date: targetDate };

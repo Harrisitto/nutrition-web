@@ -1,14 +1,14 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { supabase } from "@src/services/supabase/client";
-import type { Database } from "@src/services/supabase/types";
+import type { ViewInsert, ViewRow } from "@src/services/supabase/database";
 import { queryKeys } from "../keys";
 import { queryClient } from "../queryClient";
 import { useGetAuthSession } from "../auth/get";
 
-export type Video = Database["public"]["Tables"]["all_videos"]["Row"];
+export type Video = ViewRow<"nutri_videos">;
 // nutri_id lo pone la base de datos (default auth.uid())
 export type NewVideo = Pick<
-    Database["public"]["Tables"]["all_videos"]["Insert"],
+    ViewInsert<"nutri_videos">,
     "name" | "description" | "url"
 >;
 
@@ -21,10 +21,10 @@ export const useFetchMyVideos = () => {
         queryKey: queryKeys({ userId: nutriId }).data.videos,
         queryFn: async () => {
             const { data, error } = await supabase
-                .from("all_videos")
+                // nutri_videos ya devuelve solo los vídeos del nutricionista (auth.uid())
+                .from("nutri_videos")
                 .select("*")
-                .eq("nutri_id", nutriId)
-                .order("updated", { ascending: false });
+                .order("updated_at", { ascending: false });
 
             if (error) {
                 throw error;
@@ -42,7 +42,7 @@ export const useInsertVideo = () => {
     return useMutation({
         mutationFn: async (newVideo: NewVideo) => {
             const { data, error } = await supabase
-                .from("all_videos")
+                .from("nutri_videos")
                 .insert(newVideo)
                 .select()
                 .single();
@@ -65,7 +65,7 @@ export const useDeleteVideo = () => {
     return useMutation({
         mutationFn: async (videoId: number) => {
             const { error } = await supabase
-                .from("all_videos")
+                .from("nutri_videos")
                 .delete()
                 .eq("id", videoId);
 

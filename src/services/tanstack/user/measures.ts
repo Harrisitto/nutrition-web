@@ -1,29 +1,30 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryKeys } from "../keys";
 import { supabase } from "@src/services/supabase/client";
-import {
-  TABLE_ALL_MEASURES,
-  TABLE_USER_MEASURES,
-} from "@src/services/supabase/definitions";
 import { useLanguageCode } from "@src/hooks/helpers/language";
-import type { Tables, TablesInsert } from "@src/services/supabase/types";
+import type { ViewInsert, ViewRow } from "@src/services/supabase/database";
 import { queryClient } from "../queryClient";
-import { useGetAuthSession } from "../auth/get";
 import { useAppSelector } from "@src/store/store";
 import type FromDate from "@src/helpers/dates";
 import { invalidateMacros } from "./macros";
 
-type UserMeasure = Tables<"user_measures">;
+// user_measurements también trae la definición de la medida (name, units...), que ya sale del catálogo
+const USER_MEASURE_COLS = "client_id, measure_id, value, date" as const;
+
+type UserMeasure = Pick<
+  ViewRow<"user_measurements">,
+  "client_id" | "measure_id" | "value" | "date"
+>;
 type UserMeasuresData = UserMeasure[];
 
 const selectMeasuresFromAllMeasures = (
   languageCode: ReturnType<typeof useLanguageCode>,
 ) => {
   return `
-        ${TABLE_ALL_MEASURES.COLS.ID},
-        ${TABLE_ALL_MEASURES.COLS.NAME}: ${TABLE_ALL_MEASURES.COLS.NAME}->>${languageCode},
-        ${TABLE_ALL_MEASURES.COLS.UNITS}: ${TABLE_ALL_MEASURES.COLS.UNITS}->>${languageCode},
-        ${TABLE_ALL_MEASURES.COLS.DESCRIPTION}: ${TABLE_ALL_MEASURES.COLS.DESCRIPTION}->>${languageCode}
+        id,
+        name: name->>${languageCode},
+        units: units->>${languageCode},
+        description: description->>${languageCode}
     ` as const;
 };
 
@@ -72,7 +73,7 @@ const upsertUserMeasureInQueries = (
 };
 
 const updateUserMeasure = (updateData: UserMeasure) => {
-  updateMeasuresQueries(updateData.user_id, (oldData) => {
+  updateMeasuresQueries(updateData.client_id, (oldData) => {
     return upsertUserMeasureInQueries(oldData, updateData);
   });
 };
@@ -83,7 +84,7 @@ export const useFetchAllMeasures = () => {
     queryKey: queryKeys().data.measures,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from(TABLE_ALL_MEASURES.NAME)
+        .from("catalog_measurements")
         .select(selectMeasuresFromAllMeasures(languageCode));
       if (error) throw error;
       return data;
@@ -110,12 +111,12 @@ export const useFetchUserMeasuresForDateRange = ({
       if (!userId) return [];
 
       const { data, error } = await supabase
-        .from(TABLE_USER_MEASURES.NAME)
-        .select("*")
-        .eq(TABLE_USER_MEASURES.COLS.USER_ID, userId)
-        .gte(TABLE_USER_MEASURES.COLS.DATE, start)
-        .lte(TABLE_USER_MEASURES.COLS.DATE, end)
-        .order(TABLE_USER_MEASURES.COLS.DATE);
+        .from("user_measurements")
+        .select(USER_MEASURE_COLS)
+        .eq("client_id", userId)
+        .gte("date", start)
+        .lte("date", end)
+        .order("date");
 
       if (error) throw error;
       return data;
@@ -147,11 +148,11 @@ export const useSearchUserMeasures = ({ search }: { search: string }) => {
       if (!userId || measureIds.length === 0) return [];
 
       const { data, error } = await supabase
-        .from(TABLE_USER_MEASURES.NAME)
-        .select("*")
-        .eq(TABLE_USER_MEASURES.COLS.USER_ID, userId)
-        .in(TABLE_USER_MEASURES.COLS.MEASURE_ID, measureIds)
-        .order(TABLE_USER_MEASURES.COLS.DATE, { ascending: false })
+        .from("user_measurements")
+        .select(USER_MEASURE_COLS)
+        .eq("client_id", userId)
+        .in("measure_id", measureIds)
+        .order("date", { ascending: false })
         .limit(SEARCH_LIMIT);
 
       if (error) throw error;
@@ -169,16 +170,16 @@ export const useInsertUserMeasure = () => {
       userId,
     }).user.measuresBase,
     mutationFn: async (
-      insertData: Omit<TablesInsert<"user_measures">, "user_id">,
+      insertData: Omit<ViewInsert<"user_measurements">, "client_id">,
     ) => {
       if (!userId) throw new Error("No authenticated user found");
       const { data, error } = await supabase
-        .from(TABLE_USER_MEASURES.NAME)
+        .from("user_measurements")
         .insert({
           ...insertData,
-          user_id: userId,
+          client_id: userId,
         })
-        .select()
+        .select(USER_MEASURE_COLS)
         .single();
       if (error) throw error;
       return data;
@@ -192,8 +193,7 @@ export const useInsertUserMeasure = () => {
 };
 
 export const useDeleteMeasures = () => {
-  const { data } = useGetAuthSession();
-  const userId = data?.userId;
+  const userId = useAppSelector((state) => state.config.selectedUserId);
   return useMutation({
     mutationKey: queryKeys({
       userId,
@@ -207,17 +207,17 @@ export const useDeleteMeasures = () => {
     }) => {
       if (!userId) throw new Error("No authenticated user found");
       const { error } = await supabase
-        .from(TABLE_USER_MEASURES.NAME)
+        .from("user_measurements")
         .delete()
-        .eq(TABLE_USER_MEASURES.COLS.USER_ID, userId)
-        .eq(TABLE_USER_MEASURES.COLS.MEASURE_ID, measureId)
-        .eq(TABLE_USER_MEASURES.COLS.DATE, date);
+        .eq("client_id", userId)
+        .eq("measure_id", measureId)
+        .eq("date", date);
 
       if (error) throw error;
     },
     onSuccess: (_, measureIds) => {
-      // userId aquí es el de la sesión, no el del cliente: se invalidan todos
-      invalidateMacros();
+      // El peso y el BMR salen de las mediciones
+      invalidateMacros(userId);
       if (!userId) return;
       updateMeasuresQueries(userId, (oldData) => {
         if (!oldData) return oldData;

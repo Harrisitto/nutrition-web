@@ -22,7 +22,7 @@ src/
     helpers/
   pages/               una carpeta por página/sección
   services/
-    supabase/          client.ts, types.ts (generado), definitions.ts (nombres de tablas/columnas)
+    supabase/          client.ts, types.ts (generado), database.ts (correcciones de tipos de las vistas)
     tanstack/          queries y mutations: auth/, user/, data/ + keys.ts + queryClient.ts
     i18n/              config + locales/{es,en}/*.json
   store/               Redux: slices/{config,error,notification}/ (store.ts + hook.ts)
@@ -62,12 +62,14 @@ supabase/              SQL de migraciones y funciones (no se ejecuta desde la we
 - En `onSuccess`, `queryClient.invalidateQueries` (o `setQueriesData` para updates optimistas) sobre las keys afectadas.
 - Tipos de fila: `Database["public"]["Tables"]["tabla"]["Row" | "Insert" | "Update"]` desde `@src/services/supabase/types`.
 - El id del nutricionista sale de `useGetAuthSession().data?.userId`. `nutri_id` lo pone la base de datos (`default auth.uid()`), no se envía al insertar.
-- Constantes de nombres de tabla y columnas en `services/supabase/definitions.ts` (`TABLE_XXX.NAME / COLS`).
+- Los nombres de tablas, vistas y columnas se escriben como literales (`.from("nutri_videos")`): el cliente tipado de Supabase los comprueba. Las vistas ya filtran por `auth.uid()`, así que no hace falta `.eq("nutri_id", ...)`.
 
 ## Supabase / seguridad
 
 - Sin triggers. Se usan RLS, GRANTs por columna y RPC `security definer`.
-- Los nutricionistas pueden editar los datos de perfil de sus clientes en `all_users`. No es un problema de seguridad.
+- Las tablas de usuarios están en el esquema `public_users` y se usan por vistas (ver `../nutrition-proton/MIGRATION.md`). Los clientes del nutricionista salen de la vista `nutri_clients` (no de `all_users`, que es una vista de compatibilidad que se borrará). El nutricionista puede editar el perfil de sus clientes por esa vista, solo con suscripción activa (error 55000 si no).
+- Las vistas generan tipos con columnas nullable y sin `Update` cuando se escriben con INSTEAD OF: `src/services/supabase/database.ts` los corrige. Usa `ViewRow` / `ViewInsert` de ahí, y el cliente se tipa con ese `Database`.
+- Tipos desde la base local: `npx supabase gen types typescript --db-url postgresql://postgres:postgres@127.0.0.1:54322/postgres --schema public > src/services/supabase/types.ts`.
 - Los cambios de `nutri_id` (invitar, quitar o abandonar cliente) van por RPC (`invite_client`, `accept_invitation`, `remove_client`, `leave_nutritionist`), nunca por update directo.
 - El SQL nuevo va en `supabase/migrations/` con prefijo de timestamp `YYYYMMDDHHMMSS_nombre.sql`.
 

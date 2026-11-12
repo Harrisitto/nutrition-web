@@ -1,8 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import {
-  TABLE_ALL_MEALS,
-  TABLE_RECIPE_TYPES,
-} from "@src/services/supabase/definitions";
 import { queryKeys } from "../keys";
 import { supabase } from "@src/services/supabase/client";
 import { useLanguageCode } from "@src/hooks/helpers/language";
@@ -14,7 +10,7 @@ const fetchTypesForMeal = async (
   langCode: ReturnType<typeof useLanguageCode>,
 ) => {
   const { data, error } = await supabase
-    .from(TABLE_RECIPE_TYPES.NAME)
+    .from("recipe_type")
     .select(
       `fat, hc, id, kcal, prot, name: name->>${langCode}, comment: comment->>${langCode}`,
     );
@@ -24,7 +20,7 @@ const fetchTypesForMeal = async (
 
 const fetchMeals = async (langCode: ReturnType<typeof useLanguageCode>) => {
   const { data, error } = await supabase
-    .from(TABLE_ALL_MEALS.NAME)
+    .from("all_meals")
     .select(
       `
       id,
@@ -32,7 +28,7 @@ const fetchMeals = async (langCode: ReturnType<typeof useLanguageCode>) => {
       name: name->>${langCode}
     `,
     )
-    .order(TABLE_ALL_MEALS.COLS.ORDER);
+    .order("order");
   if (error) throw error;
   return data;
 };
