@@ -37,6 +37,8 @@ export class RowInfo {
   map: Map<string, string | number> = new Map();
   // Filas "action" que no abren editor: al abrir la celda se ejecuta esto (p. ej. navegar)
   onAction?: (date: FromDate) => void;
+  // Convierte el valor guardado en `map` en texto legible (p. ej. el id de un documento en su nombre)
+  private formatValue?: (value: string | number) => string;
 
   constructor(props: {
     id: keyof typeof ALL_IDS;
@@ -73,12 +75,36 @@ export class RowInfo {
     return this;
   }
 
+  addDisplayFormat(formatValue: (value: string | number) => string) {
+    this.formatValue = formatValue;
+    return this;
+  }
+
+  /**
+   * Texto corto que identifica la celda fuera de la tabla (p. ej. en el portapapeles): la etiqueta de la fila y
+   * su valor. En las comidas el valor es el nombre del tipo de comida (CC1...), no su id
+   */
+  getDisplayText(date: string) {
+    const raw = this.map.get(date) ?? "";
+    const value = raw === "" ? "" : this.formatValue ? this.formatValue(raw) : String(raw);
+    return [this.label, value].filter(Boolean).join(" · ");
+  }
+
   getRowId() {
     return this.id;
   }
 
   getCellId(date: string) {
     return `${this.id}.${date}`;
+  }
+
+  /**
+   * Si una celda de `other` guarda el mismo tipo de dato que una de esta fila (p. ej. para pegar en ella lo
+   * copiado). Se compara el id base, así que todas las filas de comida (`MealRowInfo`) son compatibles entre sí,
+   * y lo mismo las horas de HC (`TrainingHcRowInfo`). Una subclase puede sobrescribirlo para ser más estricta
+   */
+  isSameCell(other: RowInfo) {
+    return this.id === other.getRowId();
   }
 }
 

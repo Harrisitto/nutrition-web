@@ -17,6 +17,10 @@ export interface ConfigState {
       moveRight: string;
       /** Al arrastrar una celda, marca la de debajo para copiar también en ella */
       markCell: string;
+      /** Copia la celda resaltada */
+      copyCell: string;
+      /** Pega lo copiado en la celda resaltada (solo si es del mismo tipo) */
+      pasteCell: string;
     };
     selectOptions: {
       optionUp: string;
@@ -127,6 +131,8 @@ export const defaultKeyboardCommands = {
     moveRight: "ArrowRight",
     // KeyboardInput guarda la barra espaciadora como "Space"
     markCell: "Space",
+    copyCell: "c",
+    pasteCell: "v",
   },
   selectOptions: {
     optionUp: "ArrowUp",

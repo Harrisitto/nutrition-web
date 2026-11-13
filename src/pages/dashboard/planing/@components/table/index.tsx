@@ -16,6 +16,8 @@ import useTableColumns from "./hooks/columns";
 import { DayCellContext } from "./hooks/dayCellContext";
 import useKeyboardNavigation from "./hooks/navigation";
 import { useCloneDay, useCopyMeal } from "./hooks/copyMeal";
+import useCellClipboard from "./hooks/clipboard";
+import ClipboardBadge from "./@components/clipboardBadge";
 import type { CellDragData } from "./@components/cells/draggableCell";
 import { dragId, MarkedCellsContext } from "./hooks/markedCellsContext";
 import { features } from "./features";
@@ -86,6 +88,8 @@ export const WeeklyMeals = () => {
   // Centra verticalmente la fila seleccionada al navegar con teclado, pero no
   // en el primer render (evita un salto de scroll no solicitado al montar).
   const hasMountedRef = useRef(false);
+  // Contenedor con scroll horizontal: ClipboardBadge se recoloca al desplazarlo
+  const scrollRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!hasMountedRef.current) {
       hasMountedRef.current = true;
@@ -122,6 +126,14 @@ export const WeeklyMeals = () => {
     tableSelection: { ...selection, isEditorOpen: editingCell !== null },
     setTableSelection,
     dayDatesLength: dayDates.length,
+  });
+
+  // Teclas copyCell/pasteCell (por defecto "c"/"v") sobre la celda resaltada
+  const { copied, canPasteInto } = useCellClipboard({
+    editableRows,
+    dayDates,
+    selection,
+    isEditorOpen: editingCell !== null,
   });
 
   const { columns, renderDayCell } = useTableColumns({
@@ -161,6 +173,12 @@ export const WeeklyMeals = () => {
   useEffect(() => {
     if (!dragging) return;
     const onKeyDown = (e: KeyboardEvent) => {
+      console.log("[DEBUG drag] keydown", {
+        key: e.key,
+        markCellKey,
+        over: overRef.current,
+        dragging,
+      });
       // repeat: mantener la tecla pulsada no la marca otra vez
       if (toCommandKey(e.key) !== markCellKey) return;
       // Durante el arrastre la tecla es solo para marcar: ni hace scroll (espacio) ni llega a la
@@ -170,7 +188,8 @@ export const WeeklyMeals = () => {
       if (e.repeat) return;
       const to = overRef.current;
       // Solo celdas del mismo tipo, nunca el origen
-      if (!to || to.kind !== dragging.kind || dragId(to) === dragId(dragging)) return;
+      if (!to || to.kind !== dragging.kind || dragId(to) === dragId(dragging))
+        return;
       // Alterna: sobre una celda ya marcada la desmarca
       const key = dragId(to);
       if (markedRef.current.has(key)) markedRef.current.delete(key);
@@ -179,7 +198,8 @@ export const WeeklyMeals = () => {
     };
     // Captura: se ejecuta antes que los listeners de la navegación
     window.addEventListener("keydown", onKeyDown, { capture: true });
-    return () => window.removeEventListener("keydown", onKeyDown, { capture: true });
+    return () =>
+      window.removeEventListener("keydown", onKeyDown, { capture: true });
   }, [dragging, markCellKey]);
 
   const resetDrag = useCallback(() => {
@@ -193,6 +213,11 @@ export const WeeklyMeals = () => {
     ({ active, over }: DragEndEvent) => {
       const from = active.data.current as CellDragData | undefined;
       const drop = over?.data.current as CellDragData | undefined;
+      console.log("[DEBUG drag] end", {
+        active: active.id,
+        over: over?.id,
+        marked: [...markedRef.current.keys()],
+      });
       // Las marcadas más la de soltar (sin repetir)
       const targets = new Map(markedRef.current);
       if (drop && over?.id !== active.id) targets.set(dragId(drop), drop);
@@ -219,60 +244,80 @@ export const WeeklyMeals = () => {
         <DndContext
           sensors={sensors}
           collisionDetection={pointerWithin}
-          onDragStart={({ active }) =>
-            setDragging(active.data.current as CellDragData)
-          }
-          onDragOver={({ over }) => {
+          onDragStart={({ active }) => {
+            console.log("[DEBUG drag] start", active.id, active.data.current);
+            setDragging(active.data.current as CellDragData);
+          }}
+          onDragOver={({ over, collisions }) => {
+            console.log(
+              "[DEBUG drag] over",
+              over?.id,
+              collisions?.map((c) => c.id),
+            );
             overRef.current =
               (over?.data.current as CellDragData | undefined) ?? null;
           }}
           onDragEnd={handleDragEnd}
           onDragCancel={resetDrag}
         >
-          <div className="overflow-x-auto rounded-2xl bg-white-green shadow-md">
-            <table className="w-full min-w-[920px] border-separate border-spacing-0 text-sm">
-              <tbody>
-                {table.getRowModel().rows.map((row) => {
-                  if (row.original.isFullWidth) {
+          {/* relative fuera del overflow: el aviso no se desplaza con el scroll horizontal */}
+          <div className="relative">
+            <ClipboardBadge
+              copied={copied}
+              rowKey={selectedRowKey}
+              col={selection.col}
+              canPaste={canPasteInto(editableRows[selection.row])}
+              hidden={editingCell !== null}
+              scrollRef={scrollRef}
+            />
+            <div
+              ref={scrollRef}
+              className="overflow-x-auto rounded-2xl bg-white-green shadow-md"
+            >
+              <table className="w-full min-w-[920px] border-separate border-spacing-0 text-sm">
+                <tbody>
+                  {table.getRowModel().rows.map((row) => {
+                    if (row.original.isFullWidth) {
+                      return (
+                        <tr key={row.id}>
+                          <td
+                            className={sectionHeaderTdStyle}
+                            colSpan={dayDates.length + 1}
+                          >
+                            {row.original.label}
+                          </td>
+                        </tr>
+                      );
+                    }
+
                     return (
-                      <tr key={row.id}>
-                        <td
-                          className={sectionHeaderTdStyle}
-                          colSpan={dayDates.length + 1}
-                        >
-                          {row.original.label}
-                        </td>
+                      <tr
+                        key={row.id}
+                        data-row-key={row.original.getCellId("")}
+                        className={`transition-colors`}
+                      >
+                        {row.getAllCells().map((cell, index) => {
+                          const isStickyLabel = index === 0;
+
+                          // 1. La primera columna (index === 0) se ajusta al mínimo necesario sin romper línea.
+                          // 2. Las 7 columnas restantes se dividen el espacio restante a partes iguales (100% / 7 = 14.28%).
+                          const cellStyle = isStickyLabel
+                            ? `sticky left-0 z-10 w-px whitespace-nowrap`
+                            : // max-w-0: el contenido no cuenta para el ancho de la columna (table-layout auto)
+                              "w-[14.28%] max-w-0 px-1.5 py-2 align-middle";
+
+                          return (
+                            <td key={cell.id} className={cellStyle}>
+                              <table.FlexRender cell={cell} />
+                            </td>
+                          );
+                        })}
                       </tr>
                     );
-                  }
-
-                  return (
-                    <tr
-                      key={row.id}
-                      data-row-key={row.original.getCellId("")}
-                      className={`transition-colors`}
-                    >
-                      {row.getAllCells().map((cell, index) => {
-                        const isStickyLabel = index === 0;
-
-                        // 1. La primera columna (index === 0) se ajusta al mínimo necesario sin romper línea.
-                        // 2. Las 7 columnas restantes se dividen el espacio restante a partes iguales (100% / 7 = 14.28%).
-                        const cellStyle = isStickyLabel
-                          ? `sticky left-0 z-10 w-px whitespace-nowrap`
-                          : // max-w-0: el contenido no cuenta para el ancho de la columna (table-layout auto)
-                            "w-[14.28%] max-w-0 px-1.5 py-2 align-middle";
-
-                        return (
-                          <td key={cell.id} className={cellStyle}>
-                            <table.FlexRender cell={cell} />
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         </DndContext>
       </MarkedCellsContext.Provider>

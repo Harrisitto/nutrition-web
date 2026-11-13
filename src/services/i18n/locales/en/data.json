@@ -108,6 +108,8 @@
             "loadingWeek": "Loading week...",
             "cloneDaySuccess": "Day cloned",
             "copyMealSuccess": "Meal copied",
+            "clipboard": "Copied",
+            "cannotPasteHere": "Cannot paste here: the cell is of a different type",
             "cloneSuccess": "Week cloned successfully",
             "cloneError": "An error occurred while cloning the week. Please try again."
         },
@@ -218,6 +220,8 @@
                     "moveLeft": "Move Left",
                     "moveRight": "Move Right",
                     "markCell": "Mark Cell While Dragging",
+                    "copyCell": "Copy Cell",
+                    "pasteCell": "Paste Cell",
                     "optionUp": "Previous Option",
                     "optionDown": "Next Option",
                     "confirmOption": "Confirm Option",

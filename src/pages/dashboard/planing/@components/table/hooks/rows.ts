@@ -5,6 +5,7 @@ import { MealRowInfo, RowInfo, TrainingHcRowInfo } from "../types";
 import { useFetchPlaningMealsForDate } from "@src/services/tanstack/user/meals";
 import { useTranslation } from "react-i18next";
 import { useFetchMacrosForDateRange } from "@src/services/tanstack/user/macros";
+import { useFetchMyDocuments } from "@src/services/tanstack/data/documents";
 import { useAppDispatch, useAppSelector } from "@src/store/store";
 import { useRaceTotalsByDate } from "@src/services/tanstack/user/races";
 import { setSelectedDay } from "@src/store/slices/config/store";
@@ -20,6 +21,7 @@ const useTableRows = () => {
   const mealsQuery = useFetchMeals();
   const userMeals = useFetchPlaningMealsForDate();
   const dayMacros = useFetchMacrosForDateRange();
+  const documents = useFetchMyDocuments().data;
   // HC y kcal tomados en carreras por fecha
   const { totalsByDate: raceTotalsByDate } = useRaceTotalsByDate();
   const dispatch = useAppDispatch();
@@ -286,8 +288,14 @@ const useTableRows = () => {
           planing.date,
           planing.document_id ?? "",
         ]) ?? [],
+      )
+      // Como la celda: un documento que no está en la lista (de un nutricionista anterior) sale como "otro"
+      .addDisplayFormat(
+        (id) =>
+          documents?.find((doc) => doc.id === id)?.name ??
+          t("data:dashboardTable.documentRow.other"),
       );
-  }, [planingQuery.data, t]);
+  }, [planingQuery.data, documents, t]);
 
   const rowsVisibility = useAppSelector(
     (state) => state.config.showRowsInTable,

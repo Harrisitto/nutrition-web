@@ -14,7 +14,8 @@ export type MealSlot = { date: string; mealId: number };
  * hubiera en el destino se sustituye. Un solo aviso para todas
  */
 export const useCopyMeal = () => {
-  const copyPlaningMeal = useCopyPlaningMeal();
+  // `mutateAsync` es estable; el objeto de la mutación cambia con su estado
+  const { mutateAsync: copyPlaningMeal, isPending } = useCopyPlaningMeal();
   const { add: addNotification, addMutationError } = useNotification();
 
   const copyMeal = useCallback(
@@ -24,7 +25,7 @@ export const useCopyMeal = () => {
       );
       if (!targets.length) return;
       try {
-        await copyPlaningMeal.mutateAsync(targets.map((slot) => ({ from, to: slot })));
+        await copyPlaningMeal(targets.map((slot) => ({ from, to: slot })));
       } catch (error) {
         console.error("Error copying meal:", error);
         addMutationError();
@@ -38,7 +39,7 @@ export const useCopyMeal = () => {
     [copyPlaningMeal, addNotification, addMutationError],
   );
 
-  return { copyMeal, isPending: copyPlaningMeal.isPending };
+  return { copyMeal, isPending };
 };
 
 /**
@@ -46,7 +47,7 @@ export const useCopyMeal = () => {
  * clone_day_planing, en paralelo): cada destino queda igual que el origen. Un solo aviso para todos
  */
 export const useCloneDay = () => {
-  const cloneDayMeals = useCloneDayMeals();
+  const { mutateAsync: cloneDayMeals, isPending } = useCloneDayMeals();
   const { add: addNotification, addMutationError } = useNotification();
 
   const cloneDay = useCallback(
@@ -54,7 +55,7 @@ export const useCloneDay = () => {
       const targets = to.filter((date) => date !== from);
       if (!targets.length) return;
       try {
-        await cloneDayMeals.mutateAsync(
+        await cloneDayMeals(
           targets.map((date) => ({ from: new FromDate(from), to: new FromDate(date) })),
         );
       } catch (error) {
@@ -70,5 +71,5 @@ export const useCloneDay = () => {
     [cloneDayMeals, addNotification, addMutationError],
   );
 
-  return { cloneDay, isPending: cloneDayMeals.isPending };
+  return { cloneDay, isPending };
 };

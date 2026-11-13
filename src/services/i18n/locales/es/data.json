@@ -109,6 +109,8 @@
             "loadingWeek": "Cargando semana...",
             "cloneDaySuccess": "Día clonado",
             "copyMealSuccess": "Comida copiada",
+            "clipboard": "Copiado",
+            "cannotPasteHere": "No se puede pegar aquí: la celda es de otro tipo",
             "cloneSuccess": "Semana clonada correctamente",
             "cloneError": "Ocurrio un error al clonar la semana. Intentalo de nuevo."
         },
@@ -218,6 +220,8 @@
                     "moveLeft": "Mover izquierda",
                     "moveRight": "Mover derecha",
                     "markCell": "Marcar celda al arrastrar",
+                    "copyCell": "Copiar celda",
+                    "pasteCell": "Pegar celda",
                     "optionUp": "Opcion anterior",
                     "optionDown": "Opcion siguiente",
                     "confirmOption": "Confirmar opcion",

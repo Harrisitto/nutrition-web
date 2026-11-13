@@ -84,6 +84,28 @@ teclas configuradas en cambios de `selection`/`editingCell`:
   resaltada, solo si la fila es editable.
 - Tecla de salida (Escape por defecto) → cierra el editor sin mover la
   selección.
+- Copiar (`copyCell`, "c" por defecto) y pegar (`pasteCell`, "v" por defecto)
+  → [hooks/clipboard.ts](hooks/clipboard.ts), sobre la celda resaltada y con el
+  editor cerrado. No actúan con Ctrl/Cmd/Alt ni escribiendo en un campo. Cada
+  fila copiable tiene un handler en `pasteHandlers` (por su id base): para
+  añadir una fila basta con añadir el suyo. Solo se pega en una celda
+  compatible según `RowInfo.isSameCell` (mismo id base; si no, aviso de error):
+  comida en cualquier comida (`useCopyMeal`), día en día de la fila de presets
+  (`useCloneDay`), kcal de entreno en kcal de entreno y cualquier hora de HC en
+  cualquier hora de HC (`useSaveTraining`, con su ajuste automático), documento,
+  y comentarios/eventos/enlace en su misma fila (`useMutatePlaning`). Comidas y días se copian como referencia:
+  al pegar se copia lo que haya en ese momento en el origen. Una comida vacía
+  no se copia. Lo copiado vive en estado y se pierde al recargar.
+  [@components/clipboardBadge.tsx](@components/clipboardBadge.tsx) lo muestra
+  pegado encima de la celda seleccionada (`absolute` dentro de un contenedor
+  `relative` fuera del scroll; se recoloca con cada render, al hacer scroll
+  horizontal y al redimensionar). Es `pointer-events-none` para no tapar
+  clicks, se oculta con un editor abierto y se apaga (gris) si lo copiado no se
+  puede pegar en la celda seleccionada (`canPasteInto`). Con el editor cerrado,
+  la tecla `exitCell` (Escape) vacía el portapapeles. El texto sale de
+  `RowInfo.getDisplayText(date)`: etiqueta de la fila y valor (en las comidas,
+  el nombre del tipo, p. ej. CC1). Una fila cuyo valor no es legible le pasa un
+  conversor con `addDisplayFormat` (la de documento convierte el id en el nombre).
 
 Al hacer click directamente en una celda (`openEditor` de cada componente de
 celda → `selectCell` en `index.tsx`), la selección salta a esa celda y se
