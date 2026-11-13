@@ -111,21 +111,25 @@ const useCellClipboard = ({
       const el = e.target as HTMLElement | null;
       if (el?.closest("input, textarea, select, [contenteditable='true']")) return;
 
-      const key = toCommandKey(e.key);
+      // Las letras sin distinguir mayúsculas: con Bloq Mayús "c" llega como "C"
+      const isKey = (command: string) =>
+        command.length === 1
+          ? e.key.toLowerCase() === command.toLowerCase()
+          : toCommandKey(e.key) === command;
       // Con el editor cerrado, la tecla de salir vacía el portapapeles (ClipboardBadge no se puede pulsar)
-      if (key === exitCell && copied) {
+      if (isKey(exitCell) && copied) {
         e.preventDefault();
         setCopied(null);
         return;
       }
-      if (key !== copyCell && key !== pasteCell) return;
+      if (!isKey(copyCell) && !isKey(pasteCell)) return;
 
       const row = editableRows[selection.row];
       const date = dayDates[selection.col];
       if (!row || !date) return;
       e.preventDefault();
 
-      if (key === copyCell) {
+      if (isKey(copyCell)) {
         if (!pasteHandlers[row.getRowId()]) return;
         const value = row.map.get(date.save()) ?? "";
         // Una comida vacía no tiene nada que copiar (como al arrastrar)
