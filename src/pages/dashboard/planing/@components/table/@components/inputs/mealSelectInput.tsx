@@ -56,7 +56,8 @@ const MealTypeEditor = ({
 
   // Tipos ordenados por cuantas veces se han puesto al cliente en el ultimo mes, paginados
   const clientId = useAppSelector((state) => state.config.selectedUserId);
-  const mealTypes = useFetchRecipeTypes({ clientId });
+  // Solo cuentan los usos en esta comida: en la cena salen primero los tipos que suele cenar
+  const mealTypes = useFetchRecipeTypes({ clientId, mealId });
   const { fetchNextPage, hasNextPage, isFetchingNextPage } = mealTypes;
   const loadMore = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) fetchNextPage();

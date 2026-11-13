@@ -58,14 +58,17 @@ const commentField = {
   },
 } as InputState<"textarea">;
 
-// El selector carga sus propias opciones (búsqueda paginada), el config no depende de ellas
-const createFieldForMeal = (meal: Meal) => {
+// El selector carga sus propias opciones (búsqueda paginada), el config no depende de ellas. Ordena por los
+// usos en esa comida; en un preset del cliente, por su planificación (en uno global no hay cliente)
+const createFieldForMeal = (meal: Meal, global: boolean) => {
   return {
     id: fieldIds.meal.generateId(meal.id),
     type: "recipeType",
     currentValue: null,
     inputProps: {
       label: meal.name,
+      mealId: meal.id,
+      scoreByClient: !global,
     },
   } as InputState<"recipeType">;
 };
@@ -141,14 +144,14 @@ const calculateDerivedState = (
   };
 };
 
-const useCreateConfig = () => {
+const useCreateConfig = (global: boolean) => {
   // Presets store data for every meal, regardless of the table display config
   const mealsQuery = useFetchMeals({ onlyVisible: false });
 
   const mealsConfig = useMemo(() => {
     if (!mealsQuery.data) return [];
-    return mealsQuery.data.map(createFieldForMeal);
-  }, [mealsQuery.data]);
+    return mealsQuery.data.map((meal) => createFieldForMeal(meal, global));
+  }, [mealsQuery.data, global]);
 
   const trainingHcConfig = useMemo(() => {
     const hcData = Array.from({ length: 24 }, () => 0);
@@ -161,8 +164,8 @@ const useCreateConfig = () => {
   );
 };
 
-export const useFormPreset = () => {
-  const config = useCreateConfig();
+export const useFormPreset = ({ global = false }: { global?: boolean } = {}) => {
+  const config = useCreateConfig(global);
 
   const types = useFetchAllMealTypes();
 

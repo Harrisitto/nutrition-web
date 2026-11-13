@@ -1742,18 +1742,21 @@ export type Database = {
         Row: {
           created_at: string | null
           id: string | null
+          language_code: string | null
           name: string | null
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
           id?: string | null
+          language_code?: string | null
           name?: string | null
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
           id?: string | null
+          language_code?: string | null
           name?: string | null
           updated_at?: string | null
         }
@@ -2478,11 +2481,7 @@ export type Database = {
         }[]
       }
       scored_search_recipe_types_for_client: {
-        Args: {
-          p_client_id: string
-          p_language_code?: string
-          p_search_text: string
-        }
+        Args: { p_client_id: string; p_meal_id?: number; p_search_text: string }
         Returns: {
           comment: string
           fat: number

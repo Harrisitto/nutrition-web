@@ -186,8 +186,8 @@ Los ingredientes se añaden después de elegir receta (o "Sin receta fija"):
 
 - En [inputs/mealSelectInput.tsx](@components/inputs/mealSelectInput.tsx) se elige
   el tipo y "Elegir receta" abre el selector de recetas de ese tipo. Los tipos salen de la RPC
-  `scored_search_recipe_types_for_client` (`useFetchRecipeTypes({ clientId })`), ordenados por las veces
-  que se han puesto al cliente en el último mes y paginados al hacer scroll.
+  `scored_search_recipe_types_for_client` (`useFetchRecipeTypes({ clientId, mealId })`), ordenados por las veces
+  que se han puesto al cliente en esa comida (`p_meal_id`) en el último mes y paginados al hacer scroll.
   Debajo de la lista hay un campo para comentar la receta (`recipe_comment`,
   máx. 200 caracteres). Empieza con el comentario guardado y se envía con cualquier
   guardado del editor (tipo, receta o "Hecho"); vacío lo borra. `useMutatePlaningMeals`

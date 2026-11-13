@@ -140,8 +140,8 @@ export const queryKeys = ({
     allTypes: ["data", "allTypes", language],
     // Busqueda paginada (InfiniteData): prefijo propio, no comparte cache con allTypes
     recipeTypesBase: ["data", "recipeTypes"],
-    // userId: cliente cuya planificacion da el score ("" sin cliente)
-    recipeTypes: ["data", "recipeTypes", userId, language, searchStr],
+    // userId: cliente cuya planificacion da el score ("" sin cliente); mealId: comida que cuenta (null = todas)
+    recipeTypes: (mealId: number | null) => ["data", "recipeTypes", userId, language, searchStr, mealId],
     recipeType: (id: number | null) => ["data", "recipeType", language, id],
     measures: ["data", "measures"],
     receipts: ["data", "receipts"],

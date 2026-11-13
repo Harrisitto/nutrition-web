@@ -61,6 +61,8 @@ const SwitchField = ({
         <InputSelectRecipeType
           label={thisField.inputProps?.label}
           recipeTypeId={thisField.currentValue ?? null}
+          mealId={thisField.inputProps?.mealId}
+          scoreByClient={thisField.inputProps?.scoreByClient}
           onChange={(recipeTypeId) => {
             form.requestUpdate(id, recipeTypeId);
           }}

@@ -131,9 +131,10 @@ type GeneratedFunctions = GeneratedDatabase['public']['Functions']
 
 type FunctionOverrides = {
     // nutrition-proton 20261113120000_scored_search_recipe_types_nullable_client.sql: p_client_id NULL
-    // returns every type with score 0. The name is in the nutritionist's language_code (nutri_profile)
+    // returns every type with score 0. The name is in the nutritionist's language_code (nutri_profile).
+    // 20261113130000_scored_search_recipe_types_meal.sql: with p_meal_id the score only counts that meal
     scored_search_recipe_types_for_client: {
-        Args: { p_client_id: string | null; p_search_text: string | null }
+        Args: { p_client_id: string | null; p_search_text: string | null; p_meal_id?: number | null }
         Returns: {
             id: number; name: string; comment: string | null
             kcal: number; hc: number; prot: number; fat: number; score: number

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Check, ChevronDown, Loader2, Search, X } from "lucide-react";
+import { useAppSelector } from "@src/store/store";
 import {
   useFetchRecipeType,
   useFetchRecipeTypes,
@@ -42,21 +43,29 @@ const MacroChips = ({ type }: { type: RecipeType }) => {
 
 /**
  * Selector de tipo de receta con búsqueda por nombre (en el idioma actual)
- * y carga paginada al hacer scroll.
+ * y carga paginada al hacer scroll. Con `scoreByClient` salen primero los tipos más puestos al cliente
+ * seleccionado en el último mes; con `mealId` además solo cuentan los de esa comida. Sin cliente, por nombre.
  */
 const InputSelectRecipeType = ({
   recipeTypeId,
   onChange,
   label,
   clearable = true,
+  mealId,
+  scoreByClient = false,
 }: {
   recipeTypeId: number | null;
   onChange: (recipeTypeId: number | null) => void;
   label?: string;
   /** Muestra la opción "Sin tipo" para dejar el campo vacío */
   clearable?: boolean;
+  mealId?: number;
+  scoreByClient?: boolean;
 }) => {
   const { t } = useTranslation();
+  // Se lee aquí y no en la config del formulario: así cambiar de cliente no reinicia el formulario
+  const selectedUserId = useAppSelector((state) => state.config.selectedUserId);
+  const clientId = scoreByClient ? selectedUserId : null;
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [highlighted, setHighlighted] = useState(0);
@@ -65,7 +74,7 @@ const InputSelectRecipeType = ({
 
   // Solo se cargan las páginas cuando el desplegable está abierto
   const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage } =
-    useFetchRecipeTypes({ searchStr: search, enabled: isOpen });
+    useFetchRecipeTypes({ searchStr: search, enabled: isOpen, clientId, mealId });
   const { data: selected } = useFetchRecipeType(recipeTypeId);
 
   const recipeTypes = useMemo(() => data?.pages.flat() ?? [], [data]);

@@ -22,7 +22,7 @@ export const Provider = ({
   children: React.ReactNode;
   global?: boolean;
 }) => {
-  const value = useFormPreset();
+  const value = useFormPreset({ global });
   const scope = useMemo(() => ({ global }), [global]);
 
   return (

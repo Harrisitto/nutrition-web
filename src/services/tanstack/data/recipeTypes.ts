@@ -18,15 +18,18 @@ const selectRecipeTypes = (lang: SupportedLanguage) =>
  * El nombre sale en el `language_code` del nutricionista (nutri_profile), que useSyncProfileLanguage
  * mantiene igual al idioma de la web. La key usa ese idioma, asi se vuelve a pedir cuando cambia en la base.
  * `searchStr` se aplica con debounce para no lanzar una query por tecla.
+ * Con `mealId` el score solo cuenta los usos en esa comida (p.ej. la cena); sin cliente no cambia nada.
  */
 export const useFetchRecipeTypes = ({
   clientId = null,
   searchStr = "",
   enabled = true,
+  mealId = null,
 }: {
   clientId?: string | null;
   searchStr?: string;
   enabled?: boolean;
+  mealId?: number | null;
 } = {}) => {
   const langCode = useLanguageCode();
   const { data: profile } = useGetAuthInfo();
@@ -42,12 +45,13 @@ export const useFetchRecipeTypes = ({
       userId: clientId,
       language: profile?.language_code ?? langCode,
       searchStr: search,
-    }).data.recipeTypes,
+    }).data.recipeTypes(mealId),
     queryFn: async ({ pageParam }) => {
       const { data, error } = await supabase
         .rpc("scored_search_recipe_types_for_client", {
           p_client_id: clientId,
           p_search_text: search || null,
+          p_meal_id: mealId,
         })
         // La RPC ya ordena con desempate por id: el offset no repite ni salta filas
         .range(pageParam, pageParam + RECIPE_TYPES_PAGE_SIZE - 1);
