@@ -1,16 +1,18 @@
-import { useMemo } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
+import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
 import { queryKeys } from "../keys";
 import { supabase } from "@src/services/supabase/client";
 import { queryClient } from "../queryClient";
 import { useGetAuthSession } from "../auth/get";
-import type { Database } from "@src/services/supabase/types";
+import type { ViewInsert, ViewRow } from "@src/services/supabase/database";
 import { resizeImage } from "@src/helpers/images";
 
-type RaceIngredientRow = Database["public"]["Tables"]["nutri_race_ingredients"]["Row"];
+// Ingredientes de carrera del nutricionista: la vista nutri_race_foods (migración
+// 20261112130100_schema_races en nutrition-proton), que solo devuelve los suyos
+type RaceIngredientRow = ViewRow<"nutri_race_foods">;
 export type RaceIngredient = RaceIngredientRow & { image_url: string | null };
 export type NewRaceIngredient = Pick<
-    Database["public"]["Tables"]["nutri_race_ingredients"]["Insert"],
+    ViewInsert<"nutri_race_foods">,
     "name" | "hc_amount" | "sodium_amount" | "caffeine_amount" | "liquid_amount"
 >;
 
@@ -21,20 +23,17 @@ const IMAGES_BUCKET = "race_ingredients";
 const SIGNED_URL_TTL = 60 * 60; // 1 hora
 const MAX_IMAGE_WIDTH = 300; // px
 
-// Las imágenes van por convención en <nutri_id>/<ingredient_id>: no hace falta columna
-const imagePath = (nutriId: string, ingredientId: number) => `${nutriId}/${ingredientId}`;
-
-const withImageUrls = async (
-    nutriId: string,
-    ingredients: RaceIngredientRow[]
-): Promise<RaceIngredient[]> => {
+// La ruta de la imagen en el bucket (<nutri_id>/<ingredient_id>) la da la vista: image_path
+const withImageUrls = async <T extends { image_path: string }>(
+    ingredients: T[]
+): Promise<(T & { image_url: string | null })[]> => {
     if (!ingredients.length) return [];
 
     // Los ficheros que no existen vuelven como entradas con error, no como excepción
     const { data: signed, error } = await supabase.storage
         .from(IMAGES_BUCKET)
         .createSignedUrls(
-            ingredients.map((ingredient) => imagePath(nutriId, ingredient.id)),
+            ingredients.map((ingredient) => ingredient.image_path),
             SIGNED_URL_TTL
         );
 
@@ -63,22 +62,88 @@ export const useFetchRaceIngredients = () => {
     return useQuery({
         queryKey: queryKeys({ userId: nutriId }).data.raceIngredients,
         queryFn: async () => {
+            // La vista y no la RPC scored_search: aqui hacen falta tambien los borrados
             const { data, error } = await supabase
-                .from("nutri_race_ingredients")
+                .from("nutri_race_foods")
                 .select("*")
-                .eq("nutri_id", nutriId)
                 .order("name");
 
             if (error) {
                 throw error;
             }
-            return withImageUrls(nutriId, data);
+            return withImageUrls(data);
         },
         enabled: !!nutriId,
         // Se refresca antes de que caduquen las URLs firmadas
         staleTime: (SIGNED_URL_TTL - 10 * 60) * 1000,
     });
 };
+
+/**
+ * Ingredientes que se pueden añadir a una carrera (sin los borrados), ordenados por score
+ * (RPC scored_search_race_ingredients_for_user). `clientId` es el cliente de la carrera; `null` busca
+ * sin cliente. Las cantidades son opcionales: sin ellas no filtran y el score las cuenta como 0.
+ * Para nombre, imagen o HC de un ingrediente ya puesto: useRaceIngredientCatalog (incluye borrados).
+ */
+export const useFetchScoredRaceIngredients = ({
+    clientId = null,
+    searchStr = "",
+    amounts = {},
+}: {
+    clientId?: string | null;
+    searchStr?: string;
+    amounts?: {
+        carbs?: number | null;
+        sodium?: number | null;
+        caffeine?: number | null;
+        liquid?: number | null;
+    };
+} = {}) => {
+    const { data: sessionData } = useGetAuthSession();
+    const nutriId = sessionData?.userId ?? "";
+    const { carbs = null, sodium = null, caffeine = null, liquid = null } = amounts;
+    const [search, setSearch] = useState(searchStr);
+
+    // Debounce: no se lanza una query por tecla
+    useEffect(() => {
+        const timeout = setTimeout(() => setSearch(searchStr), 300);
+        return () => clearTimeout(timeout);
+    }, [searchStr]);
+
+    return useQuery({
+        queryKey: [
+            ...queryKeys({ userId: clientId, searchStr: search }).data.scoredRaceIngredients,
+            carbs,
+            sodium,
+            caffeine,
+            liquid,
+        ],
+        queryFn: async () => {
+            const { data, error } = await supabase.rpc("scored_search_race_ingredients_for_user", {
+                p_user_id: clientId,
+                p_search_text: search || null,
+                p_carbs_amount: carbs,
+                p_sodium_amount: sodium,
+                p_caffeine_amount: caffeine,
+                p_liquid_amount: liquid,
+            });
+
+            if (error) {
+                throw error;
+            }
+            return withImageUrls(data);
+        },
+        enabled: !!nutriId,
+        // Mientras se escribe se mantiene la lista anterior en vez de vaciarla
+        placeholderData: keepPreviousData,
+        // Se refresca antes de que caduquen las URLs firmadas
+        staleTime: (SIGNED_URL_TTL - 10 * 60) * 1000,
+    });
+};
+
+export type ScoredRaceIngredient = NonNullable<
+    ReturnType<typeof useFetchScoredRaceIngredients>["data"]
+>[number];
 
 /**
  * Catálogo por id (para mostrar las tomas de una carrera, aunque el
@@ -113,7 +178,7 @@ export const useAddRaceIngredient = () => {
             const resizedImage = image ? await resizeImage(image, MAX_IMAGE_WIDTH) : null;
 
             const { data, error } = await supabase
-                .from("nutri_race_ingredients")
+                .from("nutri_race_foods")
                 .insert({ ...ingredient, nutri_id: nutriId })
                 .select("*")
                 .single();
@@ -125,7 +190,7 @@ export const useAddRaceIngredient = () => {
             if (resizedImage) {
                 const { error: uploadError } = await supabase.storage
                     .from(IMAGES_BUCKET)
-                    .upload(imagePath(nutriId, data.id), resizedImage, {
+                    .upload(data.image_path, resizedImage, {
                         contentType: resizedImage.type,
                     });
 
@@ -138,7 +203,7 @@ export const useAddRaceIngredient = () => {
                 }
             }
 
-            const [withImage] = await withImageUrls(nutriId, [data]);
+            const [withImage] = await withImageUrls([data]);
             return withImage;
         },
         onSuccess: (newIngredient) => {
@@ -147,6 +212,9 @@ export const useAddRaceIngredient = () => {
                 (oldData: RaceIngredient[] | undefined) =>
                     sortByName([...(oldData ?? []), newIngredient])
             );
+            queryClient.invalidateQueries({
+                queryKey: queryKeys().data.scoredRaceIngredientsBase,
+            });
         },
     });
 };
@@ -159,7 +227,7 @@ export const useDeleteRaceIngredient = () => {
     return useMutation({
         mutationFn: async (id: number) => {
             const { error } = await supabase
-                .from("nutri_race_ingredients")
+                .from("nutri_race_foods")
                 .update({ is_deleted: true })
                 .eq("id", id);
 
@@ -178,6 +246,9 @@ export const useDeleteRaceIngredient = () => {
                             : ingredient
                     )
             );
+            queryClient.invalidateQueries({
+                queryKey: queryKeys().data.scoredRaceIngredientsBase,
+            });
         },
     });
 };

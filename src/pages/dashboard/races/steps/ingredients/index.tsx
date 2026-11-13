@@ -12,7 +12,7 @@ export const StepIngredients = () => {
   const { t } = useTranslation();
   const { draft, updateDraft } = useRaceDraft();
   // Con los ingredientes borrados del catálogo: siguen contando en la carrera
-  const { byId, available } = useRaceIngredientCatalog();
+  const { byId } = useRaceIngredientCatalog();
   const errorOf = useItemError("ingredients");
 
   const hcAmountOf = (intake: RaceIngredientDraft) =>
@@ -36,7 +36,8 @@ export const StepIngredients = () => {
         </div>
       }
     >
-      <AddIntakeForm options={available} />
+      {/* Para elegir: los no borrados, por score para el cliente de la carrera (RPC) */}
+      <AddIntakeForm clientId={draft.userId || null} catalog={byId} />
       <KmItemList
         items={draft.ingredients}
         emptyText={t("data:races.ingredients.empty")}

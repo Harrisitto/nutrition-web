@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { keepPreviousData, useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { supabase } from "@src/services/supabase/client";
 import { useLanguageCode } from "@src/hooks/helpers/language";
+import { useGetAuthInfo } from "@src/services/tanstack/auth/get";
 import type { SupportedLanguage } from "@src/services/i18n/config";
 import { queryKeys } from "../keys";
 
@@ -11,17 +12,24 @@ const selectRecipeTypes = (lang: SupportedLanguage) =>
   `id, kcal, prot, fat, hc, name: name->>${lang}, comment: comment->>${lang}` as const;
 
 /**
- * Tipos de receta paginados, filtrados por nombre en el idioma actual.
+ * Tipos de receta paginados (RPC scored_search_recipe_types_for_client), ordenados por score: cuantas veces
+ * se ha puesto cada tipo en la planificacion de `clientId` en el ultimo mes. Sin cliente (`null`) todos
+ * tienen score 0 y salen por nombre.
+ * El nombre sale en el `language_code` del nutricionista (nutri_profile), que useSyncProfileLanguage
+ * mantiene igual al idioma de la web. La key usa ese idioma, asi se vuelve a pedir cuando cambia en la base.
  * `searchStr` se aplica con debounce para no lanzar una query por tecla.
  */
 export const useFetchRecipeTypes = ({
+  clientId = null,
   searchStr = "",
   enabled = true,
 }: {
+  clientId?: string | null;
   searchStr?: string;
   enabled?: boolean;
 } = {}) => {
   const langCode = useLanguageCode();
+  const { data: profile } = useGetAuthInfo();
   const [search, setSearch] = useState(searchStr);
 
   useEffect(() => {
@@ -31,23 +39,17 @@ export const useFetchRecipeTypes = ({
 
   return useInfiniteQuery({
     queryKey: queryKeys({
-      language: langCode,
+      userId: clientId,
+      language: profile?.language_code ?? langCode,
       searchStr: search,
     }).data.recipeTypes,
     queryFn: async ({ pageParam }) => {
-      const nameCol = `name->>${langCode}`;
-      let query = supabase
-        .from("recipe_type")
-        .select(selectRecipeTypes(langCode));
-
-      if (search) {
-        query = query.ilike(nameCol, `%${search}%`);
-      }
-
-      const { data, error } = await query
-        .order(nameCol)
-        // Desempate estable para que el offset no repita ni salte filas
-        .order("id")
+      const { data, error } = await supabase
+        .rpc("scored_search_recipe_types_for_client", {
+          p_client_id: clientId,
+          p_search_text: search || null,
+        })
+        // La RPC ya ordena con desempate por id: el offset no repite ni salta filas
         .range(pageParam, pageParam + RECIPE_TYPES_PAGE_SIZE - 1);
 
       if (error) throw error;

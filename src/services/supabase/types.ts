@@ -76,24 +76,6 @@ export type Database = {
         }
         Relationships: []
       }
-      all_race_landmarks: {
-        Row: {
-          id: number
-          name: Json
-          url: string
-        }
-        Insert: {
-          id?: number
-          name: Json
-          url?: string
-        }
-        Update: {
-          id?: number
-          name?: Json
-          url?: string
-        }
-        Relationships: []
-      }
       all_recipe_groups: {
         Row: {
           comment: Json
@@ -243,6 +225,20 @@ export type Database = {
           theme_id?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "appointment_theme_points_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "client_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointment_theme_points_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "nutri_documents"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "appointment_theme_points_document_id_fkey"
             columns: ["document_id"]
@@ -504,6 +500,20 @@ export type Database = {
             foreignKeyName: "nutri_appointment_documents_document_id_fkey"
             columns: ["document_id"]
             isOneToOne: false
+            referencedRelation: "client_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nutri_appointment_documents_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "nutri_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nutri_appointment_documents_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
             referencedRelation: "nutritionist_documents"
             referencedColumns: ["id"]
           },
@@ -620,126 +630,6 @@ export type Database = {
           },
         ]
       }
-      nutri_race_ingredients: {
-        Row: {
-          caffeine_amount: number | null
-          created_at: string
-          hc_amount: number | null
-          id: number
-          is_deleted: boolean
-          liquid_amount: number | null
-          name: string
-          nutri_id: string
-          sodium_amount: number | null
-        }
-        Insert: {
-          caffeine_amount?: number | null
-          created_at?: string
-          hc_amount?: number | null
-          id?: number
-          is_deleted?: boolean
-          liquid_amount?: number | null
-          name: string
-          nutri_id?: string
-          sodium_amount?: number | null
-        }
-        Update: {
-          caffeine_amount?: number | null
-          created_at?: string
-          hc_amount?: number | null
-          id?: number
-          is_deleted?: boolean
-          liquid_amount?: number | null
-          name?: string
-          nutri_id?: string
-          sodium_amount?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "nutri_race_ingredients_nutri_id_fkey"
-            columns: ["nutri_id"]
-            isOneToOne: false
-            referencedRelation: "all_nutritionist"
-            referencedColumns: ["nutri_id"]
-          },
-          {
-            foreignKeyName: "nutri_race_ingredients_nutri_id_fkey"
-            columns: ["nutri_id"]
-            isOneToOne: false
-            referencedRelation: "nutri_profile"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      nutri_races: {
-        Row: {
-          created_at: string
-          distance_km: number
-          gpx_path: string | null
-          id: number
-          name: string
-          nutri_id: string
-          race_date: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          distance_km: number
-          gpx_path?: string | null
-          id?: number
-          name: string
-          nutri_id?: string
-          race_date: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          distance_km?: number
-          gpx_path?: string | null
-          id?: number
-          name?: string
-          nutri_id?: string
-          race_date?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "nutri_races_nutri_id_fkey"
-            columns: ["nutri_id"]
-            isOneToOne: false
-            referencedRelation: "all_nutritionist"
-            referencedColumns: ["nutri_id"]
-          },
-          {
-            foreignKeyName: "nutri_races_nutri_id_fkey"
-            columns: ["nutri_id"]
-            isOneToOne: false
-            referencedRelation: "nutri_profile"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "nutri_races_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "all_users"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "nutri_races_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "client_profile"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "nutri_races_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "nutri_clients"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       nutri_recipe: {
         Row: {
           nutri_id: string
@@ -776,182 +666,6 @@ export type Database = {
             columns: ["recipe_id"]
             isOneToOne: false
             referencedRelation: "all_recipes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      nutritionist_documents: {
-        Row: {
-          created_at: string
-          document_type: string
-          extension: string | null
-          id: string
-          mime_type: string
-          name: string
-          nutri_id: string
-          size_bytes: number
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          document_type?: string
-          extension?: string | null
-          id: string
-          mime_type: string
-          name: string
-          nutri_id: string
-          size_bytes: number
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          document_type?: string
-          extension?: string | null
-          id?: string
-          mime_type?: string
-          name?: string
-          nutri_id?: string
-          size_bytes?: number
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "nutritionist_documents_nutri_id_fkey"
-            columns: ["nutri_id"]
-            isOneToOne: false
-            referencedRelation: "all_nutritionist"
-            referencedColumns: ["nutri_id"]
-          },
-          {
-            foreignKeyName: "nutritionist_documents_nutri_id_fkey"
-            columns: ["nutri_id"]
-            isOneToOne: false
-            referencedRelation: "nutri_profile"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      race_ingredients: {
-        Row: {
-          amount: number
-          id: number
-          ingredient_id: number
-          km: number
-          km_span: number | null
-          race_id: number
-        }
-        Insert: {
-          amount?: number
-          id?: number
-          ingredient_id: number
-          km: number
-          km_span?: number | null
-          race_id: number
-        }
-        Update: {
-          amount?: number
-          id?: number
-          ingredient_id?: number
-          km?: number
-          km_span?: number | null
-          race_id?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "race_ingredients_ingredient_id_fkey"
-            columns: ["ingredient_id"]
-            isOneToOne: false
-            referencedRelation: "nutri_race_ingredients"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "race_ingredients_race_id_fkey"
-            columns: ["race_id"]
-            isOneToOne: false
-            referencedRelation: "nutri_races"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      race_landmarks: {
-        Row: {
-          id: number
-          km: number
-          landmark_id: number
-          name: string
-          race_id: number
-        }
-        Insert: {
-          id?: number
-          km: number
-          landmark_id: number
-          name?: string
-          race_id: number
-        }
-        Update: {
-          id?: number
-          km?: number
-          landmark_id?: number
-          name?: string
-          race_id?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "race_landmarks_landmark_id_fkey"
-            columns: ["landmark_id"]
-            isOneToOne: false
-            referencedRelation: "all_race_landmarks"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "race_landmarks_race_id_fkey"
-            columns: ["race_id"]
-            isOneToOne: false
-            referencedRelation: "nutri_races"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      race_steps: {
-        Row: {
-          aprox_time_start: string | null
-          elevation_gain: number | null
-          elevation_loss: number | null
-          km_start: number
-          max_altitude: number | null
-          max_altitude_at: number | null
-          min_altitude: number | null
-          min_altitude_at: number | null
-          race_id: number
-        }
-        Insert: {
-          aprox_time_start?: string | null
-          elevation_gain?: number | null
-          elevation_loss?: number | null
-          km_start: number
-          max_altitude?: number | null
-          max_altitude_at?: number | null
-          min_altitude?: number | null
-          min_altitude_at?: number | null
-          race_id: number
-        }
-        Update: {
-          aprox_time_start?: string | null
-          elevation_gain?: number | null
-          elevation_loss?: number | null
-          km_start?: number
-          max_altitude?: number | null
-          max_altitude_at?: number | null
-          min_altitude?: number | null
-          min_altitude_at?: number | null
-          race_id?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "race_steps_race_id_fkey"
-            columns: ["race_id"]
-            isOneToOne: false
-            referencedRelation: "nutri_races"
             referencedColumns: ["id"]
           },
         ]
@@ -1348,6 +1062,20 @@ export type Database = {
             foreignKeyName: "user_planing_document_id_fkey"
             columns: ["document_id"]
             isOneToOne: false
+            referencedRelation: "client_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_planing_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "nutri_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_planing_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
             referencedRelation: "nutritionist_documents"
             referencedColumns: ["id"]
           },
@@ -1692,6 +1420,24 @@ export type Database = {
         }
         Relationships: []
       }
+      all_race_landmarks: {
+        Row: {
+          id: number | null
+          name: Json | null
+          url: string | null
+        }
+        Insert: {
+          id?: number | null
+          name?: Json | null
+          url?: string | null
+        }
+        Update: {
+          id?: number | null
+          name?: Json | null
+          url?: string | null
+        }
+        Relationships: []
+      }
       all_users: {
         Row: {
           birth_date: string | null
@@ -1764,6 +1510,40 @@ export type Database = {
         }
         Relationships: []
       }
+      catalog_race_landmarks: {
+        Row: {
+          id: number | null
+          name: Json | null
+          url: string | null
+        }
+        Insert: {
+          id?: number | null
+          name?: Json | null
+          url?: string | null
+        }
+        Update: {
+          id?: number | null
+          name?: Json | null
+          url?: string | null
+        }
+        Relationships: []
+      }
+      client_documents: {
+        Row: {
+          created_at: string | null
+          document_type: string | null
+          extension: string | null
+          id: string | null
+          mime_type: string | null
+          name: string | null
+          nutri_id: string | null
+          nutri_name: string | null
+          path: string | null
+          size_bytes: number | null
+          updated_at: string | null
+        }
+        Relationships: []
+      }
       client_invitations: {
         Row: {
           client_id: string | null
@@ -1795,6 +1575,58 @@ export type Database = {
         }
         Relationships: []
       }
+      client_race_plans: {
+        Row: {
+          client_id: string | null
+          distance_km: number | null
+          id: number | null
+          intakes: Json | null
+          landmarks: Json | null
+          name: string | null
+          nutri_id: string | null
+          race_date: string | null
+          steps: Json | null
+        }
+        Insert: {
+          client_id?: string | null
+          distance_km?: number | null
+          id?: number | null
+          intakes?: never
+          landmarks?: never
+          name?: string | null
+          nutri_id?: string | null
+          race_date?: string | null
+          steps?: never
+        }
+        Update: {
+          client_id?: string | null
+          distance_km?: number | null
+          id?: number | null
+          intakes?: never
+          landmarks?: never
+          name?: string | null
+          nutri_id?: string | null
+          race_date?: string | null
+          steps?: never
+        }
+        Relationships: []
+      }
+      client_races: {
+        Row: {
+          client_id: string | null
+          created_at: string | null
+          distance_km: number | null
+          id: number | null
+          image_path: string | null
+          name: string | null
+          nutri_id: string | null
+          nutri_name: string | null
+          race_date: string | null
+          total_hc: number | null
+          total_kcal: number | null
+        }
+        Relationships: []
+      }
       client_videos: {
         Row: {
           description: string | null
@@ -1804,6 +1636,24 @@ export type Database = {
           nutri_name: string | null
           updated_at: string | null
           url: string | null
+        }
+        Relationships: []
+      }
+      nutri_client_races: {
+        Row: {
+          client_id: string | null
+          client_language: string | null
+          client_name: string | null
+          created_at: string | null
+          distance_km: number | null
+          gpx_path: string | null
+          id: number | null
+          image_path: string | null
+          name: string | null
+          nutri_id: string | null
+          race_date: string | null
+          total_hc: number | null
+          total_kcal: number | null
         }
         Relationships: []
       }
@@ -1822,6 +1672,45 @@ export type Database = {
           phone: string | null
           prefered_language: string | null
           updated_at: string | null
+        }
+        Relationships: []
+      }
+      nutri_documents: {
+        Row: {
+          created_at: string | null
+          document_type: string | null
+          extension: string | null
+          id: string | null
+          mime_type: string | null
+          name: string | null
+          nutri_id: string | null
+          path: string | null
+          size_bytes: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          document_type?: string | null
+          extension?: string | null
+          id?: string | null
+          mime_type?: string | null
+          name?: string | null
+          nutri_id?: string | null
+          path?: never
+          size_bytes?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          document_type?: string | null
+          extension?: string | null
+          id?: string | null
+          mime_type?: string | null
+          name?: string | null
+          nutri_id?: string | null
+          path?: never
+          size_bytes?: number | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -1870,6 +1759,129 @@ export type Database = {
         }
         Relationships: []
       }
+      nutri_race_foods: {
+        Row: {
+          caffeine_amount: number | null
+          created_at: string | null
+          hc_amount: number | null
+          id: number | null
+          image_path: string | null
+          is_deleted: boolean | null
+          liquid_amount: number | null
+          name: string | null
+          nutri_id: string | null
+          sodium_amount: number | null
+        }
+        Insert: {
+          caffeine_amount?: number | null
+          created_at?: string | null
+          hc_amount?: number | null
+          id?: number | null
+          image_path?: never
+          is_deleted?: boolean | null
+          liquid_amount?: number | null
+          name?: string | null
+          nutri_id?: string | null
+          sodium_amount?: number | null
+        }
+        Update: {
+          caffeine_amount?: number | null
+          created_at?: string | null
+          hc_amount?: number | null
+          id?: number | null
+          image_path?: never
+          is_deleted?: boolean | null
+          liquid_amount?: number | null
+          name?: string | null
+          nutri_id?: string | null
+          sodium_amount?: number | null
+        }
+        Relationships: []
+      }
+      nutri_race_ingredients: {
+        Row: {
+          caffeine_amount: number | null
+          created_at: string | null
+          hc_amount: number | null
+          id: number | null
+          is_deleted: boolean | null
+          liquid_amount: number | null
+          name: string | null
+          nutri_id: string | null
+          sodium_amount: number | null
+        }
+        Insert: {
+          caffeine_amount?: number | null
+          created_at?: string | null
+          hc_amount?: number | null
+          id?: number | null
+          is_deleted?: boolean | null
+          liquid_amount?: number | null
+          name?: string | null
+          nutri_id?: string | null
+          sodium_amount?: number | null
+        }
+        Update: {
+          caffeine_amount?: number | null
+          created_at?: string | null
+          hc_amount?: number | null
+          id?: number | null
+          is_deleted?: boolean | null
+          liquid_amount?: number | null
+          name?: string | null
+          nutri_id?: string | null
+          sodium_amount?: number | null
+        }
+        Relationships: []
+      }
+      nutri_race_plans: {
+        Row: {
+          client_id: string | null
+          distance_km: number | null
+          gpx_path: string | null
+          id: number | null
+          intakes: Json | null
+          landmarks: Json | null
+          name: string | null
+          nutri_id: string | null
+          race_date: string | null
+          steps: Json | null
+        }
+        Relationships: []
+      }
+      nutri_races: {
+        Row: {
+          created_at: string | null
+          distance_km: number | null
+          gpx_path: string | null
+          id: number | null
+          name: string | null
+          nutri_id: string | null
+          race_date: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          distance_km?: number | null
+          gpx_path?: string | null
+          id?: number | null
+          name?: string | null
+          nutri_id?: string | null
+          race_date?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          distance_km?: number | null
+          gpx_path?: string | null
+          id?: number | null
+          name?: string | null
+          nutri_id?: string | null
+          race_date?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       nutri_videos: {
         Row: {
           description: string | null
@@ -1894,6 +1906,129 @@ export type Database = {
           nutri_id?: string | null
           updated_at?: string | null
           url?: string | null
+        }
+        Relationships: []
+      }
+      nutritionist_documents: {
+        Row: {
+          created_at: string | null
+          document_type: string | null
+          extension: string | null
+          id: string | null
+          mime_type: string | null
+          name: string | null
+          nutri_id: string | null
+          size_bytes: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          document_type?: string | null
+          extension?: string | null
+          id?: string | null
+          mime_type?: string | null
+          name?: string | null
+          nutri_id?: string | null
+          size_bytes?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          document_type?: string | null
+          extension?: string | null
+          id?: string | null
+          mime_type?: string | null
+          name?: string | null
+          nutri_id?: string | null
+          size_bytes?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      race_ingredients: {
+        Row: {
+          amount: number | null
+          id: number | null
+          ingredient_id: number | null
+          km: number | null
+          km_span: number | null
+          race_id: number | null
+        }
+        Insert: {
+          amount?: number | null
+          id?: number | null
+          ingredient_id?: number | null
+          km?: number | null
+          km_span?: number | null
+          race_id?: number | null
+        }
+        Update: {
+          amount?: number | null
+          id?: number | null
+          ingredient_id?: number | null
+          km?: number | null
+          km_span?: number | null
+          race_id?: number | null
+        }
+        Relationships: []
+      }
+      race_landmarks: {
+        Row: {
+          id: number | null
+          km: number | null
+          landmark_id: number | null
+          name: string | null
+          race_id: number | null
+        }
+        Insert: {
+          id?: number | null
+          km?: number | null
+          landmark_id?: number | null
+          name?: string | null
+          race_id?: number | null
+        }
+        Update: {
+          id?: number | null
+          km?: number | null
+          landmark_id?: number | null
+          name?: string | null
+          race_id?: number | null
+        }
+        Relationships: []
+      }
+      race_steps: {
+        Row: {
+          aprox_time_start: string | null
+          elevation_gain: number | null
+          elevation_loss: number | null
+          km_start: number | null
+          max_altitude: number | null
+          max_altitude_at: number | null
+          min_altitude: number | null
+          min_altitude_at: number | null
+          race_id: number | null
+        }
+        Insert: {
+          aprox_time_start?: string | null
+          elevation_gain?: number | null
+          elevation_loss?: number | null
+          km_start?: number | null
+          max_altitude?: number | null
+          max_altitude_at?: number | null
+          min_altitude?: number | null
+          min_altitude_at?: number | null
+          race_id?: number | null
+        }
+        Update: {
+          aprox_time_start?: string | null
+          elevation_gain?: number | null
+          elevation_loss?: number | null
+          km_start?: number | null
+          max_altitude?: number | null
+          max_altitude_at?: number | null
+          min_altitude?: number | null
+          min_altitude_at?: number | null
+          race_id?: number | null
         }
         Relationships: []
       }
@@ -2257,9 +2392,10 @@ export type Database = {
         Args: { p_nutri_id: string }
         Returns: string
       }
+      nutri_unused_gpx: { Args: { p_paths: string[] }; Returns: string[] }
       nutritionist_document_path: {
         Args: {
-          p_doc: Database["public"]["Tables"]["nutritionist_documents"]["Row"]
+          p_doc: Database["public"]["Views"]["nutritionist_documents"]["Row"]
         }
         Returns: string
       }
@@ -2320,6 +2456,43 @@ export type Database = {
           p_user_id: string
         }
         Returns: number
+      }
+      scored_search_race_ingredients_for_user: {
+        Args: {
+          p_caffeine_amount: number
+          p_carbs_amount: number
+          p_liquid_amount: number
+          p_search_text: string
+          p_sodium_amount: number
+          p_user_id: string
+        }
+        Returns: {
+          caffeine_amount: number
+          carbs_amount: number
+          id: number
+          image_path: string
+          liquid_amount: number
+          name: string
+          score: number
+          sodium_amount: number
+        }[]
+      }
+      scored_search_recipe_types_for_client: {
+        Args: {
+          p_client_id: string
+          p_language_code?: string
+          p_search_text: string
+        }
+        Returns: {
+          comment: string
+          fat: number
+          hc: number
+          id: number
+          kcal: number
+          name: string
+          prot: number
+          score: number
+        }[]
       }
       search_documents_for_client_by_date_range: {
         Args: { p_end_date: string; p_name?: string; p_start_date: string }

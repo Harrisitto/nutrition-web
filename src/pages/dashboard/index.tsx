@@ -1,6 +1,7 @@
 import AppDashboard from "./@components/sideBar";
 import { AnimationLoading } from "@src/components/global/Animations";
 import { useGetAuthInfo } from "@src/services/tanstack/auth/get";
+import { useSyncProfileLanguage } from "@src/services/tanstack/auth/mutate";
 import { useFetchNutritionistUsers } from "@src/services/tanstack/user/profile";
 import { useFetchHasSuscription } from "./@queries/hasSuscription";
 import { ManageAuthState } from "../configuration/authManagement";
@@ -32,6 +33,8 @@ const ScreenCancelPayment = lazy(() => import("./@components/cancelPayment/index
 export default function PageDashboard() {
   const allClients = useFetchNutritionistUsers();
   const nutriInfoQuery = useGetAuthInfo();
+  // La base busca los nombres en el idioma del nutricionista: se guarda el de la web
+  useSyncProfileLanguage();
   const hasSuscriptionQuery = useFetchHasSuscription();
 
   const isLoading = useMemo(

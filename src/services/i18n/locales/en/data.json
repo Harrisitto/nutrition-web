@@ -217,6 +217,7 @@
                     "moveDown": "Move Down",
                     "moveLeft": "Move Left",
                     "moveRight": "Move Right",
+                    "markCell": "Mark Cell While Dragging",
                     "optionUp": "Previous Option",
                     "optionDown": "Next Option",
                     "confirmOption": "Confirm Option",
@@ -624,7 +625,10 @@
             "during": "over {{km}} km",
             "deleted": "(removed from catalog)",
             "km": "Km",
-            "empty": "There are no ingredients in the race yet."
+            "empty": "There are no ingredients in the race yet.",
+            "search": "Search ingredient...",
+            "clearSearch": "Clear search",
+            "noResults": "No ingredients match your search."
         },
         "backToList": "Back to races",
         "manage": {

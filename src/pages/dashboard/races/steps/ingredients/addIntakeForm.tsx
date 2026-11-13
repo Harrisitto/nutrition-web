@@ -3,13 +3,21 @@ import { useTranslation } from "react-i18next";
 import { Plus } from "lucide-react";
 import InputComponent from "@src/components/input";
 import { primaryButtonStyle } from "@src/components/styles";
-import type { RaceIngredient } from "@src/services/tanstack/data/raceIngredients";
 import { usePendingForm, useRaceDraft } from "../../context/raceDraftContext";
-import { SelectField } from "../../components/selectField";
+import type { RaceIngredient } from "@src/services/tanstack/data/raceIngredients";
+import { IngredientSelect } from "./@components/ingredientSelect";
 import { toNumberInput, useKmField, type NumberInput } from "../../hooks";
 import { roundKm } from "../../validation";
 
-export const AddIntakeForm = ({ options }: { options: RaceIngredient[] }) => {
+export const AddIntakeForm = ({
+  clientId,
+  catalog,
+}: {
+  /** Cliente de la carrera: ordena los ingredientes por score para él */
+  clientId: string | null;
+  /** Catálogo completo por id, para pintar el ingrediente elegido */
+  catalog: Map<number, RaceIngredient>;
+}) => {
   const { t } = useTranslation();
   const { updateDraft } = useRaceDraft();
   const kmField = useKmField();
@@ -66,12 +74,11 @@ export const AddIntakeForm = ({ options }: { options: RaceIngredient[] }) => {
         value={kmField.value}
         onChange={(e) => kmField.setValue(toNumberInput(e.target.value))}
       />
-      <SelectField
-        label={t("data:races.ingredients.ingredient")}
-        placeholder={t("data:races.ingredients.selectIngredient")}
+      <IngredientSelect
+        clientId={clientId}
         value={ingredientId}
-        options={options.map((option) => ({ value: option.id, label: option.name }))}
         onChange={setIngredientId}
+        catalog={catalog}
       />
       <InputComponent.Numeric
         label={t("data:races.ingredients.amount")}

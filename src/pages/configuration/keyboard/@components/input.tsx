@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { toCommandKey } from "@src/helpers/keyboard";
 
 export const KeyboardInput = ({
     value,
@@ -19,7 +20,7 @@ export const KeyboardInput = ({
         // Ignore modifier-only presses so shortcuts always store an actionable key.
         if (["Shift", "Control", "Alt", "Meta"].includes(e.key)) return;
 
-        const key = e.key === " " ? "Space" : e.key;
+        const key = toCommandKey(e.key);
         onChange(key);
         setIsFocused(false);
         inputRef.current?.blur();

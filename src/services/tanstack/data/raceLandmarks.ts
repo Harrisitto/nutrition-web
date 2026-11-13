@@ -17,7 +17,7 @@ export const useFetchRaceLandmarkOptions = (language?: SupportedLanguage) => {
     queryKey: queryKeys({ language: langCode }).data.raceLandmarks,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("all_race_landmarks")
+        .from("catalog_race_landmarks")
         .select(`id, url, name: name->>${langCode}`)
         .order("id");
 

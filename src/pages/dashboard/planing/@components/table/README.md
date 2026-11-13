@@ -163,7 +163,9 @@ que estar guardada antes de añadirle ingredientes.
 Los ingredientes se añaden después de elegir receta (o "Sin receta fija"):
 
 - En [inputs/mealSelectInput.tsx](@components/inputs/mealSelectInput.tsx) se elige
-  el tipo y "Elegir receta" abre el selector de recetas de ese tipo.
+  el tipo y "Elegir receta" abre el selector de recetas de ese tipo. Los tipos salen de la RPC
+  `scored_search_recipe_types_for_client` (`useFetchRecipeTypes({ clientId })`), ordenados por las veces
+  que se han puesto al cliente en el último mes y paginados al hacer scroll.
   Debajo de la lista hay un campo para comentar la receta (`recipe_comment`,
   máx. 200 caracteres). Empieza con el comentario guardado y se envía con cualquier
   guardado del editor (tipo, receta o "Hecho"); vacío lo borra. `useMutatePlaningMeals`
@@ -215,7 +217,10 @@ Los ingredientes se añaden después de elegir receta (o "Sin receta fija"):
   ([cells/presetDay.tsx](@components/cells/presetDay.tsx)) van dentro de
   [cells/draggableCell.tsx](@components/cells/draggableCell.tsx) (dnd-kit, `kind: "meal" | "day"`).
   El `DndContext` está en [index.tsx](index.tsx), con un umbral de 6px para que el click siga
-  abriendo el editor. Solo se suelta sobre una celda del mismo `kind`. Las copias son RPCs
+  abriendo el editor. Solo se suelta sobre una celda del mismo `kind`. Durante el arrastre, pulsar la tecla `markCell` (Configuración → Teclado, por defecto espacio) sobre
+  otra celda del mismo `kind` la marca (otra vez, la desmarca) (anillo discontinuo, `hooks/markedCellsContext.ts`); al soltar
+  se copia en las marcadas y en la de destino con una sola mutación: las RPC van en paralelo
+  (`Promise.allSettled`) y se invalida una vez, al acabar todas, aunque alguna falle. Cancelar (Escape) no copia nada. Las copias son RPCs
   (una sola transacción: si algo falla no se guarda nada), en
   [hooks/copyMeal.ts](hooks/copyMeal.ts) y `services/tanstack/user/meals.ts`:
   - Comida sobre comida: `useCopyMeal` → `useCopyPlaningMeal` → `copy_planing_meal`. Copia tipo,

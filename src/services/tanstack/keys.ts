@@ -140,9 +140,9 @@ export const queryKeys = ({
     allTypes: ["data", "allTypes", language],
     // Busqueda paginada (InfiniteData): prefijo propio, no comparte cache con allTypes
     recipeTypesBase: ["data", "recipeTypes"],
-    recipeTypes: ["data", "recipeTypes", language, searchStr],
+    // userId: cliente cuya planificacion da el score ("" sin cliente)
+    recipeTypes: ["data", "recipeTypes", userId, language, searchStr],
     recipeType: (id: number | null) => ["data", "recipeType", language, id],
-    orderedTypes: ["data", "orderedTypes", language],
     measures: ["data", "measures"],
     receipts: ["data", "receipts"],
     videos: ["data", "videos", userId],
@@ -155,6 +155,9 @@ export const queryKeys = ({
     topRecipesBase: ["data", "topRecipes"],
     topRecipesForUser: (typeId?: number) => ["data", "topRecipes", language, userId, typeId ?? null, searchStr],
     raceIngredients: ["data", "raceIngredients", userId],
+    // RPC scored_search_race_ingredients_for_user. userId: cliente de la carrera ("" sin cliente)
+    scoredRaceIngredientsBase: ["data", "scoredRaceIngredients"],
+    scoredRaceIngredients: ["data", "scoredRaceIngredients", userId, searchStr],
     customIngredients: ["data", "customIngredients", language],
     // Id del recipe_type "receta propia" (RPC custom_recipe_type_id): no cambia
     customRecipeTypeId: ["data", "customRecipeTypeId"],

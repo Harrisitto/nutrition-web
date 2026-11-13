@@ -6,8 +6,10 @@ import {
   useFetchRecipeTypes,
 } from "@src/services/tanstack/data/recipeTypes";
 
-type RecipeType = NonNullable<
-  ReturnType<typeof useFetchRecipeType>["data"]
+// Lo que usa el selector: vale para useFetchRecipeType y para las filas de la RPC (useFetchRecipeTypes)
+type RecipeType = Pick<
+  NonNullable<ReturnType<typeof useFetchRecipeType>["data"]>,
+  "id" | "name" | "kcal" | "prot" | "hc" | "fat"
 >;
 
 // Distancia (px) al final de la lista a la que se pide la siguiente pagina

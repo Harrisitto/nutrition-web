@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import FromDate from "@src/helpers/dates";
-import { useFetchOrderedMealsForId } from "@src/services/tanstack/data/meals";
-import { useMemo, useState } from "react";
+import { useFetchRecipeTypes } from "@src/services/tanstack/data/recipeTypes";
+import { useCallback, useMemo, useState } from "react";
 import {
   useDeletePlaningMeal,
   useFetchPlaningMealsForDate,
@@ -54,9 +54,13 @@ const MealTypeEditor = ({
   // Tipo cuyo listado de recetas se está mostrando (null = listado de tipos)
   const [recipeTypeId, setRecipeTypeId] = useState<number | null>(null);
 
-  const mealTypes = useFetchOrderedMealsForId({
-    mealId,
-  });
+  // Tipos ordenados por cuantas veces se han puesto al cliente en el ultimo mes, paginados
+  const clientId = useAppSelector((state) => state.config.selectedUserId);
+  const mealTypes = useFetchRecipeTypes({ clientId });
+  const { fetchNextPage, hasNextPage, isFetchingNextPage } = mealTypes;
+  const loadMore = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const insertMeal = useMutatePlaningMeals({
     forDate: date,
@@ -97,7 +101,14 @@ const MealTypeEditor = ({
   const { data: customRecipeTypeId } = useSelectCustomRecipeId();
 
 
-  const rawOptions = mealTypes.data ?? [];
+  const rawOptions = useMemo<MealTypeOption[]>(
+    () =>
+      (mealTypes.data?.pages.flat() ?? []).map((type) => ({
+        ...type,
+        comment: type.comment ?? undefined,
+      })),
+    [mealTypes.data],
+  );
 
   // Opción de limpiar al inicio del listado
   const options = useMemo<MealTypeOption[]>(() => {
@@ -234,6 +245,7 @@ const MealTypeEditor = ({
       getOptionLabel={(opt) => opt.name}
       onSave={handleSave}
       onClose={onClose}
+      onScrollEnd={loadMore}
       searchable
       bottomContent={
         <label className="flex flex-col gap-1">

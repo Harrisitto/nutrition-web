@@ -1,10 +1,13 @@
 import { useNotification } from "@src/store/slices/notification/hook";
 import { useMutation } from "@tanstack/react-query";
+import { useEffect, useRef } from "react";
+import { useLanguageCode } from "@src/hooks/helpers/language";
+import type { SupportedLanguage } from "@src/services/i18n/config";
 import type { ViewInsert } from "@src/services/supabase/database";
 import { supabase } from "@src/services/supabase/client";
 import { queryKeys } from "../keys";
 import { queryClient } from "../queryClient";
-import { useGetAuthSession } from "./get";
+import { useGetAuthInfo, useGetAuthSession } from "./get";
 
 
 export const useInsertAuthInfo = () => {
@@ -46,6 +49,45 @@ export const useInsertAuthInfo = () => {
     },
   })
   return mutation
+}
+
+/**
+ * Guarda el idioma de la web en nutri_profile.language_code: la base lo usa para buscar y devolver
+ * nombres (scored_search_recipe_types_for_client). Se sincroniza al cambiar de idioma y tambien al
+ * entrar, por si el idioma detectado del navegador no es el guardado.
+ */
+export const useSyncProfileLanguage = () => {
+  const langCode = useLanguageCode();
+  const { data: profile } = useGetAuthInfo();
+  const { addMutationError } = useNotification();
+  // Un intento por idioma: si falla no se reintenta en bucle
+  const attempted = useRef<SupportedLanguage | null>(null);
+
+  const { mutate } = useMutation({
+    mutationFn: async ({ id, language_code }: { id: string; language_code: SupportedLanguage }) => {
+      const { data, error } = await supabase
+        .from("nutri_profile")
+        .update({ language_code })
+        .eq("id", id)
+        .select()
+        .single()
+      if (error) throw error
+      return data
+    },
+    onError: () => {
+      addMutationError();
+    },
+    onSuccess: (data) => {
+      // El perfil nuevo cambia la key de los tipos de receta (useFetchRecipeTypes) y se vuelven a pedir
+      queryClient.setQueryData(queryKeys().auth.profile, () => data)
+    },
+  })
+
+  useEffect(() => {
+    if (!profile || profile.language_code === langCode || attempted.current === langCode) return
+    attempted.current = langCode
+    mutate({ id: profile.id, language_code: langCode })
+  }, [profile, langCode, mutate])
 }
 
 export const useVerifyAuth = ({

@@ -5,12 +5,16 @@ import { queryKeys } from "../keys";
 import { invalidateMacros } from "./macros";
 import { supabase } from "@src/services/supabase/client";
 import FromDate from "@src/helpers/dates";
-import { hcToKcal, kcalByDate, raceHc } from "@src/helpers/nutrition";
+import { kcalByDate } from "@src/helpers/nutrition";
 import { downloadBlob } from "@src/helpers/images";
 import { fileToBase64 } from "@src/helpers/files";
 import type { ImageProfile } from "@src/helpers/races/profileImage";
 import { useAppSelector } from "@src/store/store";
-import type { Database } from "@src/services/supabase/types";
+import type {
+  RacePlanIntake,
+  RacePlanLandmark,
+  RacePlanStep,
+} from "@src/services/supabase/database";
 import { useGetAuthSession } from "../auth/get";
 
 const GPX_BUCKET = "race_gpx";
@@ -20,23 +24,10 @@ const RACE_IMAGES_BUCKET = "race_images";
 // en la carpeta del nutricionista dueño de la carrera (lo exigen las policies del bucket)
 const raceImagePath = (nutriId: string, raceId: number) => `${nutriId}/${raceId}.png`;
 
-const selectRacesWithHc = () => {
-  return `
-    id,
-    nutri_id,
-    name,
-    race_date,
-    distance_km,
-    gpx_path,
-    race_ingredients(
-      amount,
-      ingredient: nutri_race_ingredients(hc_amount)
-    )
-  ` as const;
-};
-
-// Carreras entre dos fechas (ambas incluidas) con los hidratos planeados
-// (amount × hc_amount de cada toma) y sus kcal
+// Carreras entre dos fechas (ambas incluidas) con los hidratos planeados y sus kcal. La vista
+// nutri_client_races (migración 20261112130100_schema_races en nutrition-proton) solo devuelve
+// las carreras del nutricionista de sus clientes aceptados, con total_hc (Σ amount × hc_amount de
+// cada toma, también de ingredientes borrados) y total_kcal ya calculados
 const racesForDateRangeOptions = ({
   userId,
   start,
@@ -50,9 +41,9 @@ const racesForDateRangeOptions = ({
     queryKey: queryKeys({ userId }).user.races(start, end),
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("nutri_races")
-        .select(selectRacesWithHc())
-        .eq("user_id", userId || "")
+        .from("nutri_client_races")
+        .select("id, nutri_id, name, race_date, distance_km, gpx_path, total_hc, total_kcal")
+        .eq("client_id", userId || "")
         .gte("race_date", start)
         .lte("race_date", end)
         .order("race_date");
@@ -61,23 +52,16 @@ const racesForDateRangeOptions = ({
         throw error;
       }
 
-      return data.map((race) => {
-        const totalHc = raceHc(
-          race.race_ingredients,
-          (intake) => intake.ingredient?.hc_amount,
-        );
-
-        return {
-          id: race.id,
-          nutriId: race.nutri_id,
-          name: race.name,
-          date: race.race_date,
-          distanceKm: race.distance_km,
-          gpxPath: race.gpx_path,
-          totalHc,
-          totalKcal: hcToKcal(totalHc),
-        };
-      });
+      return data.map((race) => ({
+        id: race.id,
+        nutriId: race.nutri_id,
+        name: race.name,
+        date: race.race_date,
+        distanceKm: race.distance_km,
+        gpxPath: race.gpx_path,
+        totalHc: race.total_hc,
+        totalKcal: race.total_kcal,
+      }));
     },
     enabled: !!userId,
   });
@@ -145,18 +129,11 @@ export const useRaceTotalsByDate = () => {
   return { totalsByDate, isLoading: racesQuery.isLoading };
 };
 
-type Tables = Database["public"]["Tables"];
-
-// Tramo, toma y punto de interés tal y como se editan en el borrador y se envían a save_race_plan
-export type RaceStepDraft = Omit<Tables["race_steps"]["Row"], "race_id">;
-export type RaceIngredientDraft = Pick<
-  Tables["race_ingredients"]["Row"],
-  "ingredient_id" | "km" | "amount" | "km_span"
->;
-export type RaceLandmarkDraft = Pick<
-  Tables["race_landmarks"]["Row"],
-  "landmark_id" | "km" | "name"
->;
+// Tramo, toma y punto de interés tal y como se editan en el borrador y se envían a save_race_plan:
+// los mismos campos que los jsonb de nutri_race_plans
+export type RaceStepDraft = RacePlanStep;
+export type RaceIngredientDraft = RacePlanIntake;
+export type RaceLandmarkDraft = RacePlanLandmark;
 
 // Plan completo de una carrera: lo que se edita en la página races y se envía a save_race_plan
 export type RacePlanDraft = {
@@ -173,31 +150,9 @@ export type RacePlanDraft = {
   landmarks: RaceLandmarkDraft[];
 };
 
-const selectRacePlan = () => {
-  return `
-    id,
-    user_id,
-    name,
-    race_date,
-    distance_km,
-    gpx_path,
-    race_steps(
-      km_start,
-      min_altitude,
-      min_altitude_at,
-      max_altitude,
-      max_altitude_at,
-      elevation_gain,
-      elevation_loss,
-      aprox_time_start
-    ),
-    race_ingredients(ingredient_id, km, amount, km_span),
-    race_landmarks(landmark_id, km, name)
-  ` as const;
-};
-
 /**
- * Plan completo de una carrera para editarlo en la página races.
+ * Plan completo de una carrera para editarlo en la página races. nutri_race_plans devuelve los
+ * tramos, las tomas y los puntos de interés ya ordenados por km.
  */
 export const useFetchRacePlan = (raceId: number | null) => {
   const user = useAppSelector((state) => state.config.selectedUserId);
@@ -206,8 +161,8 @@ export const useFetchRacePlan = (raceId: number | null) => {
     queryKey: queryKeys({ userId: user }).user.racePlan(raceId ?? 0),
     queryFn: async (): Promise<RacePlanDraft> => {
       const { data, error } = await supabase
-        .from("nutri_races")
-        .select(selectRacePlan())
+        .from("nutri_race_plans")
+        .select("id, client_id, name, race_date, distance_km, gpx_path, steps, intakes, landmarks")
         .eq("id", raceId ?? 0)
         .single();
 
@@ -217,14 +172,14 @@ export const useFetchRacePlan = (raceId: number | null) => {
 
       return {
         id: data.id,
-        userId: data.user_id,
+        userId: data.client_id,
         name: data.name,
         raceDate: data.race_date,
         distanceKm: data.distance_km,
         gpxPath: data.gpx_path,
-        steps: data.race_steps.sort((a, b) => a.km_start - b.km_start),
-        ingredients: data.race_ingredients.sort((a, b) => a.km - b.km),
-        landmarks: data.race_landmarks,
+        steps: data.steps,
+        ingredients: data.intakes,
+        landmarks: data.landmarks,
       };
     },
     enabled: raceId !== null,
@@ -236,25 +191,23 @@ export const useFetchRacePlan = (raceId: number | null) => {
 
 /**
  * Borra de race_gpx los gpx que ya no usa ninguna carrera (un gpx puede estar
- * compartido, p. ej. por carreras copiadas a otros corredores). Si falla solo
- * queda un fichero huérfano: el error no se propaga.
+ * compartido, p. ej. por carreras copiadas a otros corredores). Lo decide la RPC
+ * nutri_unused_gpx, que también mira las carreras de clientes que ya no lo son
+ * (nutri_client_races no las ve). Si falla solo queda un fichero huérfano: el
+ * error no se propaga.
  */
 export const removeUnusedGpx = async (paths: string[]) => {
   const candidates = [...new Set(paths)];
   if (!candidates.length) return;
 
-  const { data, error } = await supabase
-    .from("nutri_races")
-    .select("gpx_path")
-    .in("gpx_path", candidates);
+  const { data: unused, error } = await supabase.rpc("nutri_unused_gpx", {
+    p_paths: candidates,
+  });
 
   if (error) {
     console.error("Error checking race gpx usage:", error);
     return;
   }
-
-  const used = new Set(data.map((race) => race.gpx_path));
-  const unused = candidates.filter((path) => !used.has(path));
   if (!unused.length) return;
 
   const { error: storageError } = await supabase.storage
@@ -449,7 +402,8 @@ export const useDeleteRace = () => {
       nutriId: string;
       gpxPath: string | null;
     }) => {
-      const { error } = await supabase.from("nutri_races").delete().eq("id", id);
+      // nutri_client_races solo borra con suscripción y si el corredor sigue siendo cliente
+      const { error } = await supabase.from("nutri_client_races").delete().eq("id", id);
 
       if (error) {
         throw error;

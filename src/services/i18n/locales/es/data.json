@@ -217,6 +217,7 @@
                     "moveDown": "Mover abajo",
                     "moveLeft": "Mover izquierda",
                     "moveRight": "Mover derecha",
+                    "markCell": "Marcar celda al arrastrar",
                     "optionUp": "Opcion anterior",
                     "optionDown": "Opcion siguiente",
                     "confirmOption": "Confirmar opcion",
@@ -624,7 +625,10 @@
             "during": "durante {{km}} km",
             "deleted": "(eliminado del catálogo)",
             "km": "Km",
-            "empty": "Todavía no hay ingredientes en la carrera."
+            "empty": "Todavía no hay ingredientes en la carrera.",
+            "search": "Buscar ingrediente...",
+            "clearSearch": "Borrar búsqueda",
+            "noResults": "Ningún ingrediente coincide con la búsqueda."
         },
         "backToList": "Volver a las carreras",
         "manage": {
