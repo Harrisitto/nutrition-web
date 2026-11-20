@@ -17,7 +17,7 @@ interface Props {
   onClose: () => void;
 }
 
-/** Elige uno de los documentos del nutricionista y lo adjunta al día (user_planing.document_id) */
+/** Elige uno de los documentos del nutricionista y lo adjunta al día (user_planning_days.document_id) */
 const DocumentSelectEditor = ({ date, currentDocumentId, onClose }: Props) => {
   const { t } = useTranslation();
   const documentsQuery = useFetchMyDocuments();

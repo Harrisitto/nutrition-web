@@ -5,6 +5,10 @@ export const APP_ROUTES = {
   SIGN_UP: "/sign-up",
   PRIVACY_POLICY: "/privacy-policy",
   REFERENCES: "/references",
+  
+  //Database editor routes
+  DATABASE_EDITORS_WILD: "/database-editors/*",
+  DATABASE_EDITORS: "/database-editors",
 
   // Protected routes
   DASHBOARD: "/dashboard/",

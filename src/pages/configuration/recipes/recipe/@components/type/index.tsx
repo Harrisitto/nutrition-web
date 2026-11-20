@@ -9,14 +9,15 @@ export const RecipeType = ({
     const { data: recipe } = useFetchRecipeInfo({ recipeId });
     const { t } = useTranslation(); 
 
-    if (!recipe || !recipe.type_id) {
+    // Las recetas ya no tienen tipo: macros de la receta con sus cantidades
+    if (!recipe) {
         return null;
     }
 
     return (
         <div>
             <h2 className="text-base font-semibold uppercase tracking-wide text-text-title">
-              {recipe.type_id.name}
+              {Math.round(recipe.macros.kcal)} kcal
             </h2>
             <div className="mt-2 grid gap-1 text-sm font-medium text-text-subtitle">
               <p>
@@ -24,7 +25,7 @@ export const RecipeType = ({
                   {t("data:macronutrients.carbs")}:
                 </span>{" "}
                 <span className="font-semibold text-text-title">
-                  {recipe.type_id.hc}g
+                  {Math.round(recipe.macros.hc)}g
                 </span>
               </p>
               <p>
@@ -32,7 +33,7 @@ export const RecipeType = ({
                   {t("data:macronutrients.protein")}:
                 </span>{" "}
                 <span className="font-semibold text-text-title">
-                  {recipe.type_id.prot}g
+                  {Math.round(recipe.macros.prot)}g
                 </span>
               </p>
               <p>
@@ -40,7 +41,7 @@ export const RecipeType = ({
                   {t("data:macronutrients.fats")}:
                 </span>{" "}
                 <span className="font-semibold text-text-title">
-                  {recipe.type_id.fat}g
+                  {Math.round(recipe.macros.fat)}g
                 </span>
               </p>
             </div>

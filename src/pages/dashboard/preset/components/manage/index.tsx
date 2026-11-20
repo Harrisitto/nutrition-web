@@ -69,7 +69,7 @@ const Details = ({
   trainingHc,
   comment,
 }: {
-  meals: Preset["user_preset_meal"];
+  meals: Preset["meals"];
   trainingHc: Preset["training_hc"];
   comment: Preset["comment"];
 }) => {
@@ -83,14 +83,14 @@ const Details = ({
         <ul className="space-y-1.5">
           {meals.map((meal) => (
             <li
-              key={`${meal.meal_id}-${meal.type_id?.id}`}
+              key={`${meal.meal.id}-${meal.type?.id}`}
               className="rounded-md bg-nutrition-green/10 px-3 py-2 text-text-title font-bold"
             >
               <span className="text-xs text-text-muted">
-                {meal.meal_id.name}
+                {meal.meal.name}
               </span>
               <br />
-              {meal.type_id.name || t("forms:preset.fields.unknownMealType")}
+              {meal.type.name || t("forms:preset.fields.unknownMealType")}
             </li>
           ))}
         </ul>
@@ -114,8 +114,8 @@ const Details = ({
 
       <KcalResume
         mealKcal={meals.map((meal) => ({
-          kcal: meal.type_id.kcal,
-          name: meal.meal_id.name,
+          kcal: meal.type.kcal,
+          name: meal.meal.name,
         }))}
         trainingKcal={trainingHc.reduce((total, hc) => total + hcToKcal(hc), 0)}
       />
@@ -131,14 +131,14 @@ const RenderOne = ({ preset }: { preset: Preset }) => {
       <Header
         id={preset.id}
         title={preset.name}
-        isShared={!isGlobal && preset.user_id === null}
+        isShared={!isGlobal && preset.client_id === null}
         isSelected={viewDetails}
         viewDetails={() => setViewDetails((prev) => !prev)}
       />
       {viewDetails && (
         <>
           <Details
-            meals={preset.user_preset_meal}
+            meals={preset.meals}
             trainingHc={preset.training_hc}
             comment={preset.comment}
           />

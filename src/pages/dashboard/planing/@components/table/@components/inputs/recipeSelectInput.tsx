@@ -2,12 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useCallback, useMemo, useState } from "react";
 import { useFetchTopRecipesForUser } from "@src/services/tanstack/data/recipes";
 import type { DraftMealIngredient } from "@src/services/tanstack/data/ingredients";
-import {
-  useFetchClientAndMyCustomRecipes,
-  useFetchCustomRecipesForType,
-  type CustomRecipe,
-} from "@src/services/tanstack/user/customRecipes";
-import { customRecipeIngredients } from "@src/components/shared/recipes/helpers";
+import { useFetchCustomRecipesForType } from "@src/services/tanstack/user/customRecipes";
 import InputComponent from "@src/components/input";
 import { useAppSelector } from "@src/store/store";
 import SelectEditor from "./default/selectInput";
@@ -21,8 +16,7 @@ interface RecipeOption {
   name: string;
   url: string | null;
   isClear?: boolean;
-  /** Receta propia (custom_recipes): su id no es de all_recipes. undefined si aún no ha cargado */
-  customRecipe?: CustomRecipe;
+  /** Receta propia (user_recipes) del cliente o del nutricionista */
   isCustom?: boolean;
   /** Dueño de la receta propia (cliente o nutricionista) */
   ownerId?: string;
@@ -42,14 +36,6 @@ interface RecipeSelectEditorProps {
     recipeId: number | null,
     ingredients: DraftMealIngredient[],
   ) => Promise<unknown>;
-  /**
-   * Receta propia elegida: guarda el tipo con esos ingredientes (los de la receta o los ajustados en
-   * el editor) y cierra. No hay recipe_id: las recetas propias no están en all_recipes
-   */
-  onSaveCustomRecipe: (
-    recipe: CustomRecipe,
-    ingredients: DraftMealIngredient[],
-  ) => Promise<unknown>;
   onClose: () => void;
 }
 
@@ -58,7 +44,6 @@ const RecipeSelectEditor = ({
   initialIngredientsFor,
   onSave,
   onSaveWithIngredients,
-  onSaveCustomRecipe,
   onClose,
 }: RecipeSelectEditorProps) => {
   const { t } = useTranslation();
@@ -69,18 +54,13 @@ const RecipeSelectEditor = ({
   );
   const [showCustom, setShowCustom] = useState(defaultShowCustom);
 
-  // Solo se pide la lista visible: catálogo o recetas propias
+  // Solo se pide la lista visible: catálogo (con las propias que llegan al tipo) o recetas propias.
+  // Las dos listas traen solo recetas que llegan a las macros del tipo: se fijan como cualquier receta
   const topRecipes = useFetchTopRecipesForUser({ typeId, enabled: !showCustom });
   const customRecipesForType = useFetchCustomRecipesForType({ typeId, enabled: showCustom });
   const { fetchNextPage, hasNextPage, isFetching, isFetchingNextPage } = showCustom
     ? customRecipesForType
     : topRecipes;
-  // La RPC no da los alimentos (para copiarlos a la comida): salen de aquí
-  const customRecipes = useFetchClientAndMyCustomRecipes();
-  const customRecipesById = useMemo(
-    () => new Map((customRecipes.data ?? []).map((recipe) => [recipe.id, recipe])),
-    [customRecipes.data],
-  );
 
   // Opción (receta o "Sin receta fija") cuyos ingredientes se están editando
   const [ingredientsFor, setIngredientsFor] = useState<RecipeOption | null>(null);
@@ -100,11 +80,10 @@ const RecipeSelectEditor = ({
           url: null,
           isCustom: true,
           ownerId: recipe.owner_id,
-          customRecipe: customRecipesById.get(recipe.id),
         }))
       : (topRecipes.data?.pages.flat() ?? []);
     return [noRecipe, ...recipes];
-  }, [showCustom, customRecipesForType.data, topRecipes.data, customRecipesById, t]);
+  }, [showCustom, customRecipesForType.data, topRecipes.data, t]);
 
   const loadMore = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) {
@@ -119,12 +98,6 @@ const RecipeSelectEditor = ({
 
   const saveAll = (ingredients: DraftMealIngredient[]) => {
     if (!ingredientsFor) return;
-    if (ingredientsFor.isCustom) {
-      if (ingredientsFor.customRecipe) {
-        withSaving(onSaveCustomRecipe(ingredientsFor.customRecipe, ingredients));
-      }
-      return;
-    }
     withSaving(
       onSaveWithIngredients(
         ingredientsFor.isClear ? null : ingredientsFor.id,
@@ -138,13 +111,6 @@ const RecipeSelectEditor = ({
       onSave(null);
       return;
     }
-    if (opt.isCustom) {
-      // Sin la receta cargada no hay alimentos que copiar: se ignora el click
-      if (opt.customRecipe) {
-        onSaveCustomRecipe(opt.customRecipe, customRecipeIngredients(opt.customRecipe));
-      }
-      return;
-    }
     onSave(opt.id);
   };
 
@@ -152,11 +118,9 @@ const RecipeSelectEditor = ({
     return (
       <IngredientsEditor
         mealLabel={ingredientsFor.name}
-        initialIngredients={
-          ingredientsFor.customRecipe
-            ? customRecipeIngredients(ingredientsFor.customRecipe)
-            : initialIngredientsFor?.(ingredientsFor.isClear ? null : ingredientsFor.id)
-        }
+        initialIngredients={initialIngredientsFor?.(
+          ingredientsFor.isClear ? null : ingredientsFor.id,
+        )}
         isSaving={isSaving}
         onDone={saveAll}
         // Sin guardar: vuelve a la lista de recetas
@@ -168,14 +132,12 @@ const RecipeSelectEditor = ({
   const addIngredientsButton = (opt: RecipeOption) => (
     <button
       type="button"
-      // Una receta propia sin cargar no tiene alimentos con los que abrir el editor
-      disabled={opt.isCustom && !opt.customRecipe}
       onClick={(e) => {
         // Sin esto el click tambien selecciona la receta y cierra
         e.stopPropagation();
         setIngredientsFor(opt);
       }}
-      className={`${addIngredientsButtonStyle} disabled:opacity-50`}
+      className={addIngredientsButtonStyle}
     >
       {t("data:dashboardTable.ingredients.addToMeal")}
     </button>
@@ -204,7 +166,7 @@ const RecipeSelectEditor = ({
         </label>
       }
       listFooter={
-        (isFetching || (showCustom && customRecipes.isLoading)) && (
+        isFetching && (
           <p className="text-center text-xs text-text-muted">
             {t("system:messages.loading")}
           </p>

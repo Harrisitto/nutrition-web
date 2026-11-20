@@ -19,15 +19,15 @@ const fetchTypesForMeal = async (
 
 const fetchMeals = async (langCode: ReturnType<typeof useLanguageCode>) => {
   const { data, error } = await supabase
-    .from("all_meals")
+    .from("catalog_meals")
     .select(
       `
       id,
-      order,
+      position,
       name: name->>${langCode}
     `,
     )
-    .order("order");
+    .order("position");
   if (error) throw error;
   return data;
 };
@@ -45,7 +45,7 @@ export const useFetchMeals = ({ onlyVisible = true } = {}) => {
     (meals: Awaited<ReturnType<typeof fetchMeals>>) => {
       const displayMap = new Map(displayMeals);
       const getOrder = (meal: (typeof meals)[number]) =>
-        displayMap.get(meal.id)?.order ?? meal.order ?? 0;
+        displayMap.get(meal.id)?.order ?? meal.position ?? 0;
 
       return meals
         .filter(

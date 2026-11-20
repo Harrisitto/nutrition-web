@@ -13,7 +13,7 @@ import ExpandableCell from "./expandableCell";
 
 interface CellDocumentProps {
   date: FromDate;
-  // user_planing.document_id del día, "" si no tiene
+  // user_planning_days.document_id del día, "" si no tiene
   cellValue: string | number;
   isEditing: boolean;
   isHighlighted: boolean;
@@ -36,7 +36,7 @@ const CellDocument = ({
   const document = documentId
     ? documents?.find((doc) => doc.id === documentId)
     : undefined;
-  // Un documento de un nutricionista anterior (copiado con clone_week_planing) no está en la lista
+  // Un documento de un nutricionista anterior (copiado con user_planning_days_clone_week) no está en la lista
   const label = document?.name ?? (documentId ? t("data:dashboardTable.documentRow.other") : "-");
 
   return (

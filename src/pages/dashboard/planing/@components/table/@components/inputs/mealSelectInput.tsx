@@ -14,12 +14,10 @@ import {
   useReplaceMealIngredients,
   type DraftMealIngredient,
 } from "@src/services/tanstack/data/ingredients";
-import { useNotification } from "@src/store/slices/notification/hook";
 import { useSelectCustomRecipeId } from "@src/services/tanstack/user/customRecipes";
 import SelectEditor from "./default/selectInput";
 import RecipeSelectEditor from "./recipeSelectInput";
 import CustomRecipeSelectEditor from "./customRecipeSelectInput";
-import { customRecipeComment } from "@src/components/shared/recipes/helpers";
 import { optionActionButtonStyle } from "../../styles";
 
 const CLEAR_MEAL_ID = -1;
@@ -93,11 +91,10 @@ const MealTypeEditor = ({
   const savedIngredients = useMemo<DraftMealIngredient[]>(
     () =>
       filterMealIngredients(weekIngredients, { date: date.save(), mealId }).map(
-        (el) => ({ ingredientId: el.ingredient_id, amount: el.amount }),
+        (el) => ({ ingredientId: el.ingredient_id, amount: el.amount, unitId: el.unit_id }),
       ),
     [weekIngredients, date, mealId],
   );
-  const { addMutationError } = useNotification();
   // Tipo "receta propia": su selector ofrece las recetas propias en vez del catálogo
   const { data: customRecipeTypeId } = useSelectCustomRecipeId();
 
@@ -126,8 +123,6 @@ const MealTypeEditor = ({
     [options, selectedTypeId],
   );
 
-  // isFixed sin recipeId: receta propia, cuyos alimentos van como ingredientes de la comida.
-  // comment sustituye al del campo de comentario (la receta propia pone el suyo)
   const saveMeal = (
     typeId: number,
     recipeId: number | null,
@@ -156,11 +151,11 @@ const MealTypeEditor = ({
     isFixed = recipeId !== null,
     comment = recipeComment,
   ) => {
-    // Si algo falla el editor sigue abierto con el borrador, para reintentar
+    // Si algo falla el editor sigue abierto con el borrador, para reintentar (el error lo
+    // notifica el onError de la mutación)
     try {
       await saveMeal(typeId, recipeId, isFixed, comment);
     } catch {
-      addMutationError();
       return;
     }
     try {
@@ -198,16 +193,10 @@ const MealTypeEditor = ({
         <CustomRecipeSelectEditor
           savedIngredients={ingredientsFor(null)}
           onSave={() => saveMeal(recipeTypeId, null).finally(onClose)}
+          // Con receta propia la comida queda fija con ella y sus alimentos (los de la receta o
+          // los ajustados en el editor)
           onSaveWithIngredients={(ingredients, recipe) =>
-            recipe
-              ? saveMealWithIngredients(
-                  recipeTypeId,
-                  null,
-                  ingredients,
-                  true,
-                  customRecipeComment(recipe),
-                )
-              : saveMealWithIngredients(recipeTypeId, null, ingredients)
+            saveMealWithIngredients(recipeTypeId, recipe?.id ?? null, ingredients)
           }
           onClose={onClose}
         />
@@ -221,16 +210,6 @@ const MealTypeEditor = ({
         onSave={(recipeId) => saveMeal(recipeTypeId, recipeId).finally(onClose)}
         onSaveWithIngredients={(recipeId, ingredients) =>
           saveMealWithIngredients(recipeTypeId, recipeId, ingredients)
-        }
-        // Como en el tipo "receta propia": fija, sin recipe_id y con el comentario de la receta
-        onSaveCustomRecipe={(recipe, ingredients) =>
-          saveMealWithIngredients(
-            recipeTypeId,
-            null,
-            ingredients,
-            true,
-            customRecipeComment(recipe),
-          )
         }
         onClose={onClose}
       />

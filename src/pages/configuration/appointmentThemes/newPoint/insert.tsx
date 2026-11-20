@@ -8,6 +8,7 @@ import { primaryIconButtonStyle } from "@src/components/styles";
 import type { Form } from "@src/hooks/form/class";
 import { fieldIds } from "./form";
 import { groupNameOfDay } from "../listPoints/groups";
+import { useNotification } from "@src/store/slices/notification/hook";
 
 export const BtnInsertAppointmentPoint = ({
     form,
@@ -21,6 +22,7 @@ export const BtnInsertAppointmentPoint = ({
     onInserted: () => void;
 }) => {
     const { t } = useTranslation();
+    const { addMutationError } = useNotification();
     const insertAppointmentPoint = useInsertAppointmentPoint();
     // Ya en caché por la lista: de aquí sale el grupo del día al que se añade
     const { data: points } = useFetchAppointmentThemeById(theme_id);
@@ -44,7 +46,7 @@ export const BtnInsertAppointmentPoint = ({
                     form.reset();
                     onInserted();
                 },
-                onError: (error) => console.error("Error inserting appointment point:", error),
+                onError: addMutationError,
             },
         );
     };

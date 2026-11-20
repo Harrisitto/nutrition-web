@@ -9,8 +9,8 @@ import { useNotification } from "@src/store/slices/notification/hook";
 export type MealSlot = { date: string; mealId: number };
 
 /**
- * Copia una comida a una o varias celdas con `useCopyPlaningMeal` (RPC copy_planing_meal, en
- * paralelo): la fila de `user_planing_meal` y sus ingredientes, cada copia en su transacción. Lo que
+ * Copia una comida a una o varias celdas con `useCopyPlaningMeal` (RPC user_planning_meals_copy, en
+ * paralelo): la fila de `user_planning_meals` y sus ingredientes, cada copia en su transacción. Lo que
  * hubiera en el destino se sustituye. Un solo aviso para todas
  */
 export const useCopyMeal = () => {
@@ -44,7 +44,7 @@ export const useCopyMeal = () => {
 
 /**
  * Clona las comidas (e ingredientes) de un día en uno o varios días con `useCloneDayMeals` (RPC
- * clone_day_planing, en paralelo): cada destino queda igual que el origen. Un solo aviso para todos
+ * user_planning_days_clone, en paralelo): cada destino queda igual que el origen. Un solo aviso para todos
  */
 export const useCloneDay = () => {
   const { mutateAsync: cloneDayMeals, isPending } = useCloneDayMeals();

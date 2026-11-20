@@ -85,3 +85,15 @@ la web a la vez que se aplica: con la fórmula vieja las macros de los alimentos
 5. La columna relation se queda, pero sin FK más adelante (pending/drop_custom_relation.sql). No
    la uses para agrupar.
 6. Comprueba que compila y pasa el lint. No hagas commit.
+
+==========================================================================================
+Política de privacidad: recetas de cuentas borradas
+==========================================================================================
+Decidido el 2026-11-15 (grupo 3 de la migración de recetas, nutrition-proton/supabase/pending/
+schema_recipes_user_recipes.sql). Al borrar una cuenta, sus recetas de public_recipes.all_recipes
+NO se borran: all_recipes.user_id no tiene FK y conserva el uuid del usuario borrado.
+- Las aprobadas (is_global y revised_at no nulos) siguen en el catálogo y se pueden seleccionar.
+- Las privadas (nombre, descripción e ingredientes) se quedan guardadas, aunque nadie las ve.
+
+1. Cambia la política de privacidad de la web para decirlo: al cerrar la cuenta, las recetas que
+   creó el usuario se conservan (las aprobadas siguen disponibles para el resto).

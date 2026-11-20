@@ -28,7 +28,7 @@ interface InputTypes {
   recipeType: {
     props: {
       label?: string;
-      /** Ordena por los usos en esta comida (all_meals.id) */
+      /** Ordena por los usos en esta comida (catalog_meals.id) */
       mealId?: number;
       /** Ordena por la planificación del cliente seleccionado (state.config.selectedUserId) */
       scoreByClient?: boolean;

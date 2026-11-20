@@ -10,6 +10,7 @@
         "formSubmitted": "Form submitted successfully!",
         "success": "Operation successful!",
         "mutationError": "An error occurred while processing your request. Please try again.",
+        "noSubscription": "You need an active subscription to make changes.",
         "clear": "Clear",
         "search": "Search",
         "noResults": "No results",

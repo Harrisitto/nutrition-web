@@ -4,6 +4,7 @@ import { Check, Loader, Pencil, Trash2, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { fieldIds, useNewAppointmentForm } from "../newAppointment/form";
+import { useNotification } from "@src/store/slices/notification/hook";
 
 type Theme = NonNullable<ReturnType<typeof useFetchAppointmentThemes>["data"]>[number];
 
@@ -15,6 +16,7 @@ export const ListAppointmentThemes = ({
     onSelect: (themeId: number | null) => void;
 }) => {
     const { t } = useTranslation();
+    const { addMutationError } = useNotification();
     const { data: appointmentThemes, isLoading: isLoadingThemes, error: errorThemes } = useFetchAppointmentThemes();
     const { mutate: deleteTheme, isPending: isDeleting, variables: deletingId } = useDeleteAppointmentTheme();
     const changeAppointmentTheme = useChangeAppointmentTheme();
@@ -39,7 +41,7 @@ export const ListAppointmentThemes = ({
             { id, name: state[fieldIds.name] as string },
             {
                 onSuccess: cancelEditing,
-                onError: (error) => console.error("Error updating appointment theme:", error),
+                onError: addMutationError,
             },
         );
     };
@@ -52,7 +54,7 @@ export const ListAppointmentThemes = ({
         deleteTheme(theme.id, {
             // The points column belongs to the selected theme, clear it if that one is gone
             onSuccess: () => { if (selectedId === theme.id) onSelect(null); },
-            onError: (error) => console.error("Error deleting appointment theme:", error),
+            onError: addMutationError,
         });
     };
 

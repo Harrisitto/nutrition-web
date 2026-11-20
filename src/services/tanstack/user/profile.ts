@@ -12,18 +12,12 @@ import { useCallback } from 'react'
 type UserWithInfo = ViewRow<'nutri_clients'>
 
 const selectUser = () => {
-  // user_planing_meal no longer has a FK to user_planing (it matches by
-  // user_id + date), so it's embedded as a sibling of user_planing rather
-  // than nested inside it.
+  // Last day of the client's planning that has meals: every meal hangs from its day
+  // (user_planning_meals -> user_planning_days), and !inner leaves out days without meals
   return `*,
-    user_planing(
-      date
-    ),
-    user_planing_meal(
+    user_planning_days(
       date,
-      meal_id,
-      recipe_id,
-      type_id
+      user_planning_meals!inner(meal_id)
     )
   ` as const;
 }
@@ -68,15 +62,13 @@ export const useFetchNutritionistUsers = () => {
                     // nutri_clients already returns only this nutritionist's accepted clients
                     .from('nutri_clients')
                     .select(selectUser())
-                    .order('date', { referencedTable: 'user_planing', ascending: false })
-                    .limit(1, { referencedTable: 'user_planing' })
-                    .order('date', { referencedTable: 'user_planing_meal', ascending: false })
-                    .limit(1, { referencedTable: 'user_planing_meal' })
+                    .order('date', { referencedTable: 'user_planning_days', ascending: false })
+                    .limit(1, { referencedTable: 'user_planning_days' })
                 if (error) throw error
                 // Clients whose planning runs out first (or who have none) go on top.
                 // Dates are YYYY-MM-DD, so comparing them as strings sorts them by date.
                 const lastMealDate = (user: (typeof data)[number]) =>
-                    user.user_planing_meal[0]?.date ?? ""
+                    user.user_planning_days[0]?.date ?? ""
                 return data.sort((a, b) =>
                     lastMealDate(a).localeCompare(lastMealDate(b)) || a.name.localeCompare(b.name))
             } catch (error) {

@@ -24,9 +24,9 @@ export const fetchPlanningWeek = async ({
 }) => {
   if (!userId) return [];
   const { data, error } = await supabase
-    .from("user_planing")
+    .from("user_planning_days")
     .select(selectFromPlaning())
-    .eq("user_id", userId)
+    .eq("client_id", userId)
     .gte("date", dateRange.start)
     .lte("date", dateRange.end)
     .order("date");
@@ -116,9 +116,9 @@ export const useSearchPlanning = ({ search }: { search: string }) => {
       if (!userId) return [];
       const value = orIlikeValue(trimmed);
       const { data, error } = await supabase
-        .from("user_planing")
+        .from("user_planning_days")
         .select(selectFromPlaning())
-        .eq("user_id", userId)
+        .eq("client_id", userId)
         .or(
           `comment.ilike.${value},event.ilike.${value}`,
         )
@@ -178,14 +178,14 @@ export const useMutatePlaning = () => {
     }) => {
       if (!userId)
         throw new Error("User ID is required to insert planing data");
+      // Solo las columnas que vienen: las demás no cambian (o toman su valor por defecto si el día es nuevo)
+      const { date, ...values } = upsertData;
       const { data, error } = await supabase
-        .from("user_planing")
-        .upsert({
-          user_id: userId,
-          ...upsertData,
-          date: upsertData.date.save(),
+        .rpc("user_planning_days_upsert", {
+          p_client_id: userId,
+          p_date: date.save(),
+          p_values: values,
         })
-        .select(selectFromPlaning())
         .single();
       if (error) throw error;
       return data;
@@ -202,7 +202,7 @@ export const useMutatePlaning = () => {
       const date = upsertData.date.save();
       const current = previous.find((day) => day.date === date);
       const optimistic = {
-        user_id: userId ?? "",
+        client_id: userId ?? "",
         comment: "",
         event: "",
         custom_url: null,
@@ -255,14 +255,14 @@ export const useDeletePlaning = ({ forDate }: { forDate?: FromDate } = {}) => {
       if (!userId) throw new Error("User ID is required to delete a planing");
       const targetDate = safeDate.save();
 
-      // `user_planing` se identifica por (user_id, date): no tiene columna `id`,
-      // así que pedirla hacía fallar el borrado entero. Tampoco se usa `.single()`
-      // porque limpiar un día sin fila guardada debe ser un no-op, no un error.
+      // Un día se identifica por (client_id, date). Sin `.single()`: limpiar un día sin
+      // fila guardada debe ser un no-op, no un error. Borrar el día borra sus comidas y
+      // sus alimentos (ON DELETE CASCADE)
       const { error: existingPlaningError } = await supabase
-        .from("user_planing")
+        .from("user_planning_days")
         .delete()
         .eq("date", targetDate)
-        .eq("user_id", userId);
+        .eq("client_id", userId);
 
       if (existingPlaningError) throw existingPlaningError;
       return { date: targetDate };

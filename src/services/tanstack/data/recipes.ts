@@ -4,63 +4,76 @@ import { queryKeys } from "../keys";
 import { useEffect, useState } from "react";
 import { supabase } from "@src/services/supabase/client";
 import type { SupportedLanguage } from "@src/services/i18n/config";
+import { Macros } from "@src/helpers/macros";
 import { queryClient } from "../queryClient";
 import { useGetAuthSession } from "../auth/get";
 import { useAppSelector } from "../../../store/store";
+import { mealIngredientMacros } from "./ingredients";
+
+/*
+ * Recetas del catálogo (vista catalog_recipes: publicadas y revisadas, las globales de los editores y las
+ * recetas por defecto) y la valoración del nutricionista (nutri_recipe_ratings, 0-100).
+ * Las recetas ya no tienen tipo: a qué tipos llega una la decide la base de datos por sus macros, moviendo
+ * cada ingrediente entre su mínimo y su máximo. Las macros que se muestran aquí son las de la receta con
+ * sus cantidades tal cual (catalog_recipe_ingredients).
+ */
 
 type RecipeInfo = NonNullable<ReturnType<typeof useFetchRecipeInfo>["data"]>;
 
 const TOP_RECIPES_PAGE_SIZE = 20;
+
+// Lo justo de cada alimento para calcular las macros de la receta
+const selectIngredientMacros = `
+    amount,
+    unit_id,
+    ingredient: catalog_ingredients(kcal, prot: protein, hc: carbs, fat, units: catalog_ingredient_units(unit_id, grams))
+` as const;
 
 export const selectRecipes = (lang: SupportedLanguage) => {
     return `
     id,
     url,
     name: name->>${lang},
-    type_id!inner(
-        id,
-        kcal,
-        prot,
-        fat,
-        hc,
-        name: name->>${lang}
-    ),
-    nutri_recipe(*)
+    ingredients: catalog_recipe_ingredients(${selectIngredientMacros}),
+    nutri_recipe: nutri_recipe_ratings(rating)
     ` as const;
 }
 
 export const selectRecipeInfo = (lang: SupportedLanguage) => {
-    return   `
+    return `
     id,
     url,
     name: name->>${lang},
     description: description->>${lang},
-    type_id!inner(
-        id,
-        kcal,
-        prot,
-        fat,
-        hc,
-        name: name->>${lang}
+    ingredients: catalog_recipe_ingredients(
+        amount,
+        unit_id,
+        ingredient_id,
+        comment: comment->>${lang},
+        ingredient: catalog_ingredients(name: name->>${lang}, kcal, prot: protein, hc: carbs, fat, units: catalog_ingredient_units(unit_id, grams))
     ),
-    all_ingredients!inner(
-        id,
-        recipe_id,
-        url,
-        name: name->>${lang},
-        amount: amount->>${lang},
-        comment: comment->>${lang}
-    ),
-    nutri_recipe(*)
+    nutri_recipe: nutri_recipe_ratings(rating)
 ` as const;
 }
 
+/** Macros de una receta con las cantidades de sus alimentos */
+const recipeMacros = (
+    ingredients: {
+        amount: number;
+        unit_id: number;
+        ingredient: Parameters<typeof mealIngredientMacros>[0] | null;
+    }[],
+) =>
+    Macros.sum(
+        ingredients.flatMap(({ amount, unit_id, ingredient }) =>
+            ingredient ? [mealIngredientMacros(ingredient, amount, unit_id)] : [],
+        ),
+    );
+
 export const useFetchRecipes = ({
     searchStr = '',
-    typeIds = [],
 }: {
     searchStr: string;
-    typeIds?: number[];
 }) => {
     const langCode = useLanguageCode();
     const [search, setSearch] = useState(searchStr);
@@ -74,34 +87,30 @@ export const useFetchRecipes = ({
         queryKey: queryKeys({
             language: langCode,
             searchStr: search,
-        }).data.recipes(typeIds),
+        }).data.recipes([]),
         queryFn: async () => {
-            let query = supabase
-                .from("all_recipes")
+            const { data, error } = await supabase
+                .from("catalog_recipes")
                 .select(selectRecipes(langCode))
                 .ilike("name->>" + langCode, `%${search}%`);
-
-            if (typeIds.length > 0) {
-                query = query.in("type_id", typeIds);
-            }
-
-            const { data, error } = await query;
 
             if (error) {
                 throw error;
             }
 
-            const recipeIds = data?.map(recipe => recipe.id) || [];
+            // Las recetas por defecto (id negativo) no tienen ingredientes ni foto
+            const recipes = data.filter((recipe) => recipe.id > 0);
 
             const signedUrls = await supabase.storage.from('recipe_images').createSignedUrls(
-                recipeIds.map(id => `receta_${id}.jpg`),
+                recipes.map(recipe => `receta_${recipe.id}.jpg`),
                 60 * 60 // 1 hour
             );
 
-            return data?.map((recipe, index) => ({
+            return recipes.map(({ ingredients, ...recipe }, index) => ({
                 ...recipe,
+                macros: recipeMacros(ingredients),
                 url: signedUrls.data ? signedUrls.data[index]?.signedUrl : recipe.url,
-            })) || [];
+            }));
         },
         placeholderData: [],
     });
@@ -110,9 +119,9 @@ export const useFetchRecipes = ({
 type TopRecipesCursor = { score: number; id: number } | null;
 
 /**
- * Recetas de la base de datos (all_recipes) de un tipo aptas para el cliente, ordenadas por score
- * (RPC get_top_recipes_for_type) y paginadas por cursor. Las recetas propias van aparte:
- * useFetchCustomRecipesForType
+ * Recetas que el cliente puede planificar en un tipo, ordenadas por score (RPC
+ * scored_search_recipes_for_type) y paginadas por cursor: del catálogo, del cliente y de su
+ * nutricionista que llegan a las macros del tipo. En el tipo de receta propia, cualquiera de ellas
  */
 export const useFetchTopRecipesForUser = ({
     typeId,
@@ -133,8 +142,8 @@ export const useFetchTopRecipesForUser = ({
             searchStr: search,
         }).data.topRecipesForUser(typeId),
         queryFn: async ({ pageParam }) => {
-            const { data, error } = await supabase.rpc("get_top_recipes_for_type", {
-                p_user_id: userId!,
+            const { data, error } = await supabase.rpc("scored_search_recipes_for_type", {
+                p_client_id: userId!,
                 p_type_id: typeId!,
                 p_lang: langCode,
                 p_search: search || undefined,
@@ -185,7 +194,7 @@ export const useFetchRecipeInfo = ({
         }).data.singleRecipe(recipeId),
         queryFn: async () => {
             const { data, error } = await supabase
-                .from("all_recipes")
+                .from("catalog_recipes")
                 .select(selectRecipeInfo(langCode))
                 .eq("id", recipeId)
                 .single();
@@ -202,6 +211,7 @@ export const useFetchRecipeInfo = ({
 
             return {
                 ...data,
+                macros: recipeMacros(data.ingredients),
                 url: signedUrl.data ? signedUrl.data?.signedUrl : null,
             };
         },
@@ -209,6 +219,10 @@ export const useFetchRecipeInfo = ({
     });
 }
 
+/**
+ * Valoración del nutricionista (0-100). nutri_recipe_ratings no admite upsert (INSTEAD OF): se cambia la
+ * suya y, si aún no tenía, se crea
+ */
 export const useMutateNutriRecipe = ({
     recipeId,
 }: {
@@ -223,22 +237,28 @@ export const useMutateNutriRecipe = ({
             language: langCode,
         }).data.singleRecipe(recipeId),
         mutationFn: async (rating: number) => {
-            console.log("Updating rating to:", rating);
-            const { data, error } = await supabase
-                .from("nutri_recipe")
-                .upsert({
-                    recipe_id: recipeId,
-                    nutri_id: nutriId,
-                    rating,
-                })
+            const { data: updated, error: updateError } = await supabase
+                .from("nutri_recipe_ratings")
+                .update({ rating })
                 .eq("recipe_id", recipeId)
                 .eq("nutri_id", nutriId)
+                .select("*");
+            if (updateError) {
+                throw updateError;
+            }
+            if (updated.length) {
+                return updated[0];
+            }
+
+            const { data, error } = await supabase
+                .from("nutri_recipe_ratings")
+                .insert({ recipe_id: recipeId, rating })
                 .select("*")
                 .single();
             if (error) {
                 throw error;
             }
-            return data || null;
+            return data;
         },
         onMutate: (newRating) => {
             // Optimistically update the cache
@@ -250,15 +270,12 @@ export const useMutateNutriRecipe = ({
                     if (!oldData) return oldData;
                     return {
                         ...oldData,
-                        nutri_recipe: [{
-                            ...oldData.nutri_recipe,
-                            rating: newRating,
-                        }],
+                        nutri_recipe: [{ rating: newRating }],
                     };
                 }
             );
 
-            // Todas las busquedas cacheadas (texto y tipos) que puedan contener la receta
+            // Todas las busquedas cacheadas que puedan contener la receta
             queryClient.setQueriesData(
                 {
                     queryKey: queryKeys({
@@ -267,18 +284,11 @@ export const useMutateNutriRecipe = ({
                 },
                 (oldData: RecipeInfo[] | undefined) => {
                     if (!oldData) return oldData;
-                    return oldData.map(recipe => {
-                        if (recipe.id === recipeId) {
-                            return {
-                                ...recipe,
-                                nutri_recipe: [{
-                                    ...recipe.nutri_recipe,
-                                    rating: newRating,
-                                }],
-                            };
-                        }
-                        return recipe;
-                    });
+                    return oldData.map(recipe =>
+                        recipe.id === recipeId
+                            ? { ...recipe, nutri_recipe: [{ rating: newRating }] }
+                            : recipe,
+                    );
                 }
             );
         },

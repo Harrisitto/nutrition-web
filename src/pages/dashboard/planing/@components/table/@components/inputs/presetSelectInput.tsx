@@ -68,13 +68,13 @@ const PresetDayEditor = ({ onClose, date }: PresetDayEditorProps) => {
     }
 
     Promise.all([
-      upsertMeals.mutateAsync(selectedPreset.user_preset_meal.map((meal) => ({
-        meal_id: meal.meal_id.id,
-        type_id: meal.type_id.id,
+      upsertMeals.mutateAsync(selectedPreset.meals.map((meal) => ({
+        meal_id: meal.meal.id,
+        type_id: meal.type.id,
       }))),
       upsertPlaning.mutateAsync({
         date,
-        comment: selectedPreset.comment,
+        comment: selectedPreset.comment ?? "",
         training_hc: selectedPreset.training_hc,
       }),
     ]).finally(onClose);

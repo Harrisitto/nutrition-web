@@ -77,12 +77,12 @@ export const PendingAppointmentItem = ({ appointment }: { appointment: PendingAp
     // Primero los puntos del nutricionista y despues los del cliente, cada uno por su position
     // (ya ordenados por la query)
     const points = [
-        ...appointment.appointment_points.map((point) => ({
+        ...appointment.nutri_points.map((point) => ({
             key: `nutri-${point.id}`,
             point: point.point,
-            tag: point.client_themes?.theme_name ?? null,
+            tag: point.theme_name,
         })),
-        ...appointment.user_appointment_points.map((point) => ({
+        ...appointment.client_points.map((point) => ({
             key: `client-${point.id}`,
             point: point.point,
             tag: t("data:appointments.pending.clientPoint"),

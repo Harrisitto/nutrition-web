@@ -6,17 +6,23 @@ import { queryClient } from "../queryClient";
 import { useAppSelector } from "@src/store/store";
 import { useGetAuthSession } from "../auth/get";
 
+/*
+ * Días predefinidos del nutricionista (vistas nutri_predefined_days + nutri_predefined_meals): un nombre,
+ * un comentario, los HC de entreno y el tipo de cada comida. client_id null = global (sirve para todos sus
+ * clientes). nutri_id lo pone la base de datos y no cambia. El nombre es único por cliente (23505).
+ */
+
 type Preset = NonNullable<ReturnType<typeof useFetchPresets>["data"]>[number];
 
 const selectFromMeal = (languageCode: ReturnType<typeof useLanguageCode>) => {
     return `*,
-        user_preset_meal(
-        preset_id,
-        meal_id(
+        meals: nutri_predefined_meals(
+        day_id,
+        meal: catalog_meals(
             id,
             name: name->>${languageCode}
         ),
-        type_id(
+        type: recipe_type(
             *,
             name: name->>${languageCode}
         ))` as const;
@@ -26,13 +32,13 @@ const updatePresetList = (
     newPreset: Preset
 ) => {
     // Un preset global aparece en la lista de cada cliente: se refrescan todas
-    if (newPreset.user_id === null) {
+    if (newPreset.client_id === null) {
         queryClient.invalidateQueries({ queryKey: queryKeys().user.presetsBase });
         return;
     }
     queryClient.setQueryData<Preset[]>(
         queryKeys({
-            userId: newPreset.user_id,
+            userId: newPreset.client_id,
         }).user.presets,
         (oldData) => {
             if (!oldData) return [newPreset];
@@ -62,7 +68,7 @@ const removePresetFromList = (
     );
 }
 
-// global: solo los presets con user_id null. Si no, los globales más los del cliente
+// global: solo los presets con client_id null. Si no, los globales más los del cliente
 export const useFetchPresets = ({ global = false }: { global?: boolean } = {}) => {
     const userId = useAppSelector((state) => state.config.selectedUserId);
     const { data: session } = useGetAuthSession();
@@ -77,13 +83,13 @@ export const useFetchPresets = ({ global = false }: { global?: boolean } = {}) =
             }).user.presets,
         queryFn: async () => {
             const query = supabase
-                .from("user_preset")
+                .from("nutri_predefined_days")
                 .select(selectFromMeal(languageCode));
 
             if (global) {
                 if (!nutriId) throw new Error("Nutritionist ID is required to fetch global presets");
                 const { data, error } = await query
-                    .is("user_id", null)
+                    .is("client_id", null)
                     .eq("nutri_id", nutriId);
                 if (error) throw error;
                 return data;
@@ -91,7 +97,7 @@ export const useFetchPresets = ({ global = false }: { global?: boolean } = {}) =
 
             if (!userId) throw new Error("User ID is required to fetch presets");
             const { data, error } = await query.or(
-                `user_id.is.null,user_id.eq.${userId}`,
+                `client_id.is.null,client_id.eq.${userId}`,
             );
 
             if (error) throw error;
@@ -124,10 +130,9 @@ export const useInsertPreset = ({ global = false }: { global?: boolean } = {}) =
             if (!global && !userId) throw new Error("User ID is required to insert preset");
             if (!nutriId) throw new Error("Nutritionist ID is required to insert preset");
             const { data, error } = await supabase
-                .from("user_preset")
-                .upsert({
-                    user_id: global ? null : userId,
-                    nutri_id: nutriId,
+                .from("nutri_predefined_days")
+                .insert({
+                    client_id: global ? null : userId,
                     name: name,
                     comment: comment,
                     training_hc: training_hc,
@@ -139,10 +144,10 @@ export const useInsertPreset = ({ global = false }: { global?: boolean } = {}) =
             const presetId = data.id;
 
             const { error: mealsError } = await supabase
-                .from("user_preset_meal")
+                .from("nutri_predefined_meals")
                 .insert(
                     meals.map((meal) => ({
-                        preset_id: presetId,
+                        day_id: presetId,
                         meal_id: meal.meal_id,
                         type_id: meal.type_id,
                     }))
@@ -150,7 +155,7 @@ export const useInsertPreset = ({ global = false }: { global?: boolean } = {}) =
             if (mealsError) throw mealsError;
 
             const { data: insertedPreset, error: fetchError } = await supabase
-                .from("user_preset")
+                .from("nutri_predefined_days")
                 .select(selectFromMeal(languageCode))
                 .eq("id", presetId)
                 .single();
@@ -172,18 +177,18 @@ export const useDeletePreset = ({ global = false }: { global?: boolean } = {}) =
     return useMutation({
         mutationFn: async (presetId: number) => {
             const query = supabase
-                .from("user_preset")
+                .from("nutri_predefined_days")
                 .delete()
                 .eq("id", presetId);
 
             if (global) {
-                const { error } = await query.is("user_id", null);
+                const { error } = await query.is("client_id", null);
                 if (error) throw error;
                 return presetId;
             }
 
             if (!userId) throw new Error("User ID is required to delete preset");
-            const { error } = await query.eq("user_id", userId);
+            const { error } = await query.eq("client_id", userId);
 
             if (error) throw error;
             return presetId;

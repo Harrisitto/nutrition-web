@@ -31,7 +31,7 @@ interface CustomRecipeSelectEditorProps {
   onSave: () => void;
   /**
    * Guarda el tipo con exactamente esos ingredientes y cierra. `recipe`: la receta propia elegida
-   * (la comida queda fija y su comentario es el de la receta); null con "Sin receta fija"
+   * (la comida queda fija con ella); null con "Sin receta fija"
    */
   onSaveWithIngredients: (
     ingredients: DraftMealIngredient[],
@@ -42,11 +42,10 @@ interface CustomRecipeSelectEditorProps {
 
 /**
  * Selector para el tipo "receta propia": en vez del catálogo de recetas ofrece las recetas
- * propias del nutricionista y las del cliente. Elegir una copia sus alimentos a los
- * ingredientes de la comida (user_planing_meal_ingredients); "+ Ingredientes" abre el editor
+ * propias del nutricionista y las del cliente. Elegir una la fija en la comida (recipe_id) y copia
+ * sus alimentos a los ingredientes de la comida (user_planning_meal_ingredients): este tipo no
+ * tiene macros, así que la comida cuenta solo sus alimentos. "+ Ingredientes" abre el editor
  * con ellos para ajustarlos antes de guardar.
- * Con una receta elegida la comida queda fija (is_fixed_recipe) pero sin recipe_id: las recetas
- * propias no están en all_recipes.
  */
 const CustomRecipeSelectEditor = ({
   savedIngredients,

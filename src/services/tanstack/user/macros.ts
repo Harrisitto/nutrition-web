@@ -27,8 +27,8 @@ export const useFetchMacrosForDateRange = ({
     queryFn: async () => {
       if (!userId) throw new Error("User ID is required to calculate macros");
       const { data, error } = await supabase.rpc(
-        "calculate_macros_for_date_range",
-        { p_user_id: userId, p_start_date: start, p_end_date: end },
+        "user_planning_days_macros",
+        { p_client_id: userId, p_start_date: start, p_end_date: end },
       );
       if (error) throw error;
       return data ?? [];

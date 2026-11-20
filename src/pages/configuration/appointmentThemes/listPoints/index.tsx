@@ -21,7 +21,7 @@ export const ListPointsFrom = ({ themeId }: { themeId: number }) => {
   const form = useNewPointForm();
   // Nombre y ruta de los documentos de los puntos
   const { data: documents } = useFetchMyDocuments();
-  const { addFormSubmitError } = useNotification();
+  const { addFormSubmitError, addMutationError } = useNotification();
   const documentsById = new Map((documents ?? []).map((document) => [document.id, document]));
 
   // Fields read the Form state when they mount, so fill it before rendering the edit block
@@ -54,7 +54,7 @@ export const ListPointsFrom = ({ themeId }: { themeId: number }) => {
       },
       {
         onSuccess: cancelEditing,
-        onError: (error) => console.error("Error updating appointment point:", error),
+        onError: addMutationError,
       },
     );
   };
@@ -65,7 +65,7 @@ export const ListPointsFrom = ({ themeId }: { themeId: number }) => {
     });
     if (!window.confirm(message)) return;
     deletePoint(point.id, {
-      onError: (error) => console.error("Error deleting appointment point:", error),
+      onError: addMutationError,
     });
   };
 

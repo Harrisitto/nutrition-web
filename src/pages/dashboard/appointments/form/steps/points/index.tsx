@@ -18,6 +18,7 @@ import { StepSection } from "../../components/stepSection";
 import { AddThemePointForm } from "./addThemePointForm";
 import { AddCustomPointForm } from "./addCustomPointForm";
 import { AddPendingPointForm } from "./addPendingPointForm";
+import { isNoSubscriptionError } from "@src/services/supabase/errors";
 
 export const StepPoints = ({ appointmentId }: { appointmentId: number }) => {
   const { t } = useTranslation();
@@ -141,10 +142,10 @@ export const StepPoints = ({ appointmentId }: { appointmentId: number }) => {
               id: point.id,
               point: point.point,
               treated: point.treated_at !== null,
-              tag: point.client_themes?.theme_name ?? null,
+              tag: point.theme_name,
               // Grupo y documento son del punto de la plantilla (los personalizados no tienen)
-              groupName: point.appointment_theme_points?.group_name ?? null,
-              documentId: point.appointment_theme_points?.document_id ?? null,
+              groupName: point.group_name,
+              documentId: point.document_id,
               removable: true,
             }),
           )}
@@ -176,7 +177,7 @@ export const StepPoints = ({ appointmentId }: { appointmentId: number }) => {
 
       {error && (
         <p className="text-sm text-red-500" role="alert">
-          {t("data:appointments.form.errors.points")}
+          {t(isNoSubscriptionError(error) ? "system:messages.noSubscription" : "data:appointments.form.errors.points")}
         </p>
       )}
     </StepSection>

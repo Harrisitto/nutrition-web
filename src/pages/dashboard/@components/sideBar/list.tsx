@@ -160,9 +160,9 @@ export const List = () => {
       <div className="flex flex-col gap-1 w-full">
         {displayUsers.map((user, index) => {
           if (!user) return null;
-          // Última comida planificada: user_planing se genera solo a partir de las kcal
-          // y puede existir sin comidas, así que no sirve para saber si está planificado
-          const latestDate = user.user_planing_meal?.[0]?.date;
+          // Último día con comidas: un día puede existir sin comidas (entreno, comentario),
+          // así que la query solo trae días que tienen alguna
+          const latestDate = user.user_planning_days?.[0]?.date;
           // Evaluamos si tiene comidas programadas para de aquí a 5 días en adelante
           const hasUpcomingMeals = checkUpcomingMeals(latestDate);
           return (

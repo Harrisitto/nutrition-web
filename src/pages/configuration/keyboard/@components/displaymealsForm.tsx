@@ -106,7 +106,7 @@ const DisplayMealsForm = () => {
             ([id]) => id === mealType.id,
           );
           const isVisible = mealConfig?.[1].isVisible ?? true;
-          const order = mealConfig?.[1].order ?? mealType.order ?? 0;
+          const order = mealConfig?.[1].order ?? mealType.position ?? 0;
 
           return (
             <li

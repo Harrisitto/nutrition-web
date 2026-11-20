@@ -48,7 +48,7 @@ export interface ConfigState {
 export interface DefaultsState {
   /**
    * El selector de recetas se abre con las recetas propias del nutricionista y del cliente
-   * (custom_recipes) en vez de las de la base de datos (all_recipes)
+   * (user_recipes) en vez de las del catálogo (catalog_recipes)
    */
   displayDefaultNutritionistRecipes: boolean;
 }

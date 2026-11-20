@@ -38,7 +38,7 @@ export const DayDetail = ({
 
   // El formulario trabaja con el cliente seleccionado: se selecciona el de la consulta antes de abrirla
   const openAppointment = (appointment: CalendarAppointment) => {
-    dispatch(setSelectedUserId(appointment.user_id));
+    dispatch(setSelectedUserId(appointment.client_id));
     navigateTo(APP_ROUTES.FORM_APPOINTMENT, { state: { appointmentId: appointment.id } });
   };
 

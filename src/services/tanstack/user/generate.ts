@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@src/services/supabase/client";
+import type { ViewRow } from "@src/services/supabase/database";
 import { queryKeys } from "../keys";
 import { invalidateMacros } from "./macros";
 import { useAppSelector } from "@src/store/store";
@@ -40,7 +41,7 @@ export const parseGenerateError = (error: unknown): GenerateError | null => {
 };
 
 /**
- * Genera (o completa) las comidas de un día con `generate_meal_types_for_day`:
+ * Genera (o completa) las comidas de un día con `user_planning_meals_generate`:
  * las comidas de `mealIds` que no existen se insertan y los tipos se eligen
  * sobre el historial del usuario para acercarse al objetivo. Cada llamada usa
  * una semilla nueva, así que repetirla da otra combinación.
@@ -82,8 +83,8 @@ export const useGeneratePlaningDay = () => {
     }) => {
       if (!userId) throw new Error("User ID is required to generate a day");
 
-      const { data, error } = await supabase.rpc("generate_meal_types_for_day", {
-        p_user_id: userId,
+      const { data, error } = await supabase.rpc("user_planning_meals_generate", {
+        p_client_id: userId,
         p_date: date.save(),
         p_changable_meal_ids: mealIds,
         p_seed: Math.floor(Math.random() * 2147483647),
@@ -94,7 +95,8 @@ export const useGeneratePlaningDay = () => {
         p_old_training_hc: previousTrainingHc,
       });
       if (error) throw error;
-      return data ?? [];
+      // Filas de user_planning_meals: los tipos generados de la RPC no conocen sus NOT NULL
+      return (data ?? []) as ViewRow<"user_planning_meals">[];
     },
     onError: (error) => {
       const generateError = parseGenerateError(error);
@@ -119,7 +121,7 @@ export const useGeneratePlaningDay = () => {
             },
       );
     },
-    // La RPC también puede crear la fila de `user_planing` y las recetas las
+    // La RPC también puede crear el día (`user_planning_days`) y las recetas las
     // elige el trigger, así que se recargan ambas queries de la semana.
     onSuccess: (_data, { date }) => {
       invalidateMacros(userId);

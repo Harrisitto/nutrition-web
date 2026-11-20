@@ -4,9 +4,9 @@ import { Pie, PieChart, ResponsiveContainer, Sector, Tooltip } from "recharts";
 import { renderMacroLabel } from "./macroLabel";
 
 export const RecipePieChart = ({ recipeId }: { recipeId: number }) => {
-  const { data: recipe } = useFetchRecipeInfo({ recipeId }); // Replace with actual recipe ID
+  const { data: recipe } = useFetchRecipeInfo({ recipeId });
   const { t } = useTranslation();
-  if (!recipe || !recipe.type_id) {
+  if (!recipe) {
     return null;
   }
   return (
@@ -17,17 +17,17 @@ export const RecipePieChart = ({ recipeId }: { recipeId: number }) => {
             data={[
               {
                 name: t("data:macronutrients.carbs"),
-                value: recipe.type_id.hc,
+                value: Math.round(recipe.macros.hc),
                 fill: "#455e19",
               },
               {
                 name: t("data:macronutrients.protein"),
-                value: recipe.type_id.prot,
+                value: Math.round(recipe.macros.prot),
                 fill: "#30556b",
               },
               {
                 name: t("data:macronutrients.fats"),
-                value: recipe.type_id.fat,
+                value: Math.round(recipe.macros.fat),
                 fill: "#6b2f55",
               },
             ]}
@@ -52,7 +52,7 @@ export const RecipePieChart = ({ recipeId }: { recipeId: number }) => {
           {t("data:macronutrients.kcal")}
         </span>
         <span className="text-2xl font-bold text-nutrition-green">
-          {recipe.type_id.kcal}
+          {Math.round(recipe.macros.kcal)}
         </span>
         <span className="text-xs text-text-muted">kcal</span>
       </div>

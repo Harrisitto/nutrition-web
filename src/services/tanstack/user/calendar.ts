@@ -32,8 +32,10 @@ export const useFetchCalendarNotes = ({
         throw new Error("Nutritionist ID is not defined");
       }
 
-      const response = await supabase.from('client_notes')
-        .select('*, client: nutri_clients(name), appointment_points(client_themes(theme_name))')
+      // Sin los puntos de su consulta: el calendario no los usa (y embeber appointment_points desde
+      // client_notes daba PGRST200, no hay relacion entre ellas)
+      const response = await supabase.from('nutri_client_notes')
+        .select('*, client: nutri_clients(name)')
         .eq('nutri_id', nutriId)
         // Entre comillas: los instantes ISO llevan ":" y "." que el filtro or() no admite sueltos
         .or(
@@ -74,8 +76,8 @@ export const useFetchCalendarAppointments = ({
         throw new Error("Nutritionist ID is not defined");
       }
 
-      const response = await supabase.from('nutri_appointments')
-        .select('*, client: nutri_clients(name), appointment_points(client_themes(theme_name))')
+      const response = await supabase.from('user_appointments')
+        .select('*, client: nutri_clients(name), nutri_points: user_appointment_nutri_points(theme_name)')
         .eq('nutri_id', nutriId)
         .in('status', ['scheduled', 'in_progress'] satisfies AppointmentStatus[])
         .gte('scheduled_on', start)

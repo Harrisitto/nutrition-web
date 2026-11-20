@@ -85,10 +85,7 @@ const RecipeItem = ({
           </p>
         )}
         <div className="mt-2">
-          <RecipeMacrosChart
-            macros={recipeMacros(recipe)}
-            typeName={recipe.type?.name}
-          />
+          <RecipeMacrosChart macros={recipeMacros(recipe)} />
         </div>
       </div>
       <button

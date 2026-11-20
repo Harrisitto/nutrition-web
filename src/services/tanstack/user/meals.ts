@@ -5,23 +5,40 @@ import { useAppSelector } from "@src/store/store";
 import { queryOptions, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../keys";
 import { supabase } from "@src/services/supabase/client";
-import type { TablesInsert } from "@src/services/supabase/types";
+import type { ViewRow } from "@src/services/supabase/database";
 import { useCallback } from "react";
 import { useRefreshClientOrder } from "./profile";
 import { invalidateMacros } from "./macros";
 import { useNotification } from "@src/store/slices/notification/hook";
-import {
-  deleteMealIngredientsForDate,
-  deleteMealIngredientsForSlots,
-} from "../data/ingredients";
+import { deleteMealIngredientsForSlots } from "../data/ingredients";
 
-const TABLE_NAME = "user_planing_meal" as const;
+const TABLE_NAME = "user_planning_meals" as const;
 
+/*
+ * La receta de una comida es de public_recipes: del catálogo (catalog_recipes) o propia del
+ * cliente o de su nutricionista (user_recipes). Se embeben las dos y `withRecipe` deja una sola,
+ * `fixed_recipe`, con el nombre ya traducido.
+ */
 const selectFromMeal = (languageCode: ReturnType<typeof useLanguageCode>) => {
-  return `*, recipe_type(*, name: name->>${languageCode}), fixed_recipe: all_recipes(name: name->>${languageCode})` as const;
+  return `*, recipe_type(*, name: name->>${languageCode}), catalog_recipe: catalog_recipes(name: name->>${languageCode}), own_recipe: user_recipes(name: name->>${languageCode})` as const;
 };
 
+const withRecipe = <
+  T extends {
+    catalog_recipe: { name: string | null } | null;
+    own_recipe: { name: string | null } | null;
+  },
+>({ catalog_recipe, own_recipe, ...meal }: T) => ({
+  ...meal,
+  fixed_recipe: catalog_recipe ?? own_recipe,
+});
+
 type MealType = NonNullable<ReturnType<typeof useFetchPlaningMealsForDate>["data"]>[number];
+
+/** Comida que se guarda: date y meal_id la identifican; las demás columnas que no vienen no cambian */
+export type PlaningMealInput = Partial<
+  Pick<ViewRow<"user_planning_meals">, "date" | "meal_id" | "type_id" | "recipe_id" | "is_fixed_recipe" | "recipe_comment">
+>;
 
 /**
  * Rango semanal de la query de comidas. La query y las mutaciones tienen que
@@ -66,13 +83,13 @@ export const useFetchPlaningMealsForDate = ({
       const { data, error } = await supabase
         .from(TABLE_NAME)
         .select(selectFromMeal(language))
-        .eq("user_id", userId!)
+        .eq("client_id", userId!)
         .gte("date", monday.save())
         .lte("date", sunday.save());
 
       if (error) throw new Error(error.message);
 
-      return data;
+      return data.map(withRecipe);
     },
     enabled: !!userId,
   });
@@ -118,13 +135,13 @@ const mealsForDateRangeOptions = ({
       const { data, error } = await supabase
         .from(TABLE_NAME)
         .select(selectFromMeal(language))
-        .eq("user_id", userId!)
+        .eq("client_id", userId!)
         .gte("date", start)
         .lte("date", end);
 
       if (error) throw new Error(error.message);
 
-      return data;
+      return data.map(withRecipe);
     },
     enabled: !!userId,
   });
@@ -177,7 +194,7 @@ export const useMutatePlaningMeals = ({
   const safeDate = forDate ?? new FromDate(d);
 
   const mutation = useMutation({
-    mutationFn: async (meal: Partial<TablesInsert<'user_planing_meal'>>[]) => {
+    mutationFn: async (meal: PlaningMealInput[]) => {
       if (!userId) {
         throw new Error("User ID is required for all meals.");
       }
@@ -186,44 +203,68 @@ export const useMutatePlaningMeals = ({
         throw new Error("Meal ID and type ID are required for all meals.");
       }
 
-      const safeMeals: TablesInsert<'user_planing_meal'>[] = meal.map((m) => ({
-        user_id: userId,
+      const safeMeals = meal.map((m) => ({
         date: m.date ?? safeDate.save(),
         meal_id: m.meal_id!,
-        recipe_id: m.recipe_id ?? null,
-        // Solo es fija si se eligio receta a mano. Puede serlo sin recipe_id: las recetas
-        // propias (custom_recipes) no están en all_recipes y van como ingredientes
-        is_fixed_recipe: m.is_fixed_recipe ?? false,
         type_id: m.type_id!,
-        // Solo si se envía: los presets no lo traen y el upsert no debe borrarlo
-        ...(m.recipe_comment !== undefined && { recipe_comment: m.recipe_comment }),
+        // Solo es fija si se eligió receta a mano
+        is_fixed_recipe: m.is_fixed_recipe ?? false,
+        recipe_id: m.recipe_id ?? null,
+        recipe_comment: m.recipe_comment,
       }));
 
-      // Receta guardada antes del upsert: si cambia, sus ingredientes adicionales sobran
+      // Receta guardada antes de guardar: si cambia, sus ingredientes adicionales sobran
       const { data: previous, error: previousError } = await supabase
         .from(TABLE_NAME)
         .select("date, meal_id, recipe_id, type_id, is_fixed_recipe")
-        .eq("user_id", userId)
+        .eq("client_id", userId)
         .in("date", [...new Set(safeMeals.map((m) => m.date))])
         .in("meal_id", [...new Set(safeMeals.map((m) => m.meal_id))]);
       if (previousError) throw new Error(previousError.message);
 
-      // Sin receta fija, recipe_id lo rellena el trigger recommend_recipe y la petición
-      // lleva null: lo que identifica la elección es el tipo, no la receta guardada
-      const recipeChoice = (m: Pick<TablesInsert<'user_planing_meal'>, "is_fixed_recipe" | "recipe_id" | "type_id">) =>
+      const findPrevious = (m: { date: string; meal_id: number }) =>
+        previous.find((p) => p.date === m.date && p.meal_id === m.meal_id);
+
+      // Sin receta fija, la receta la elige la base de datos: lo que identifica la elección
+      // es el tipo, no la receta guardada
+      const recipeChoice = (m: Pick<ViewRow<"user_planning_meals">, "is_fixed_recipe" | "recipe_id" | "type_id">) =>
         m.is_fixed_recipe ? `recipe:${m.recipe_id}` : `type:${m.type_id}`;
       const recipeChanged = safeMeals
         .filter((m) => {
-          const old = previous.find((p) => p.date === m.date && p.meal_id === m.meal_id);
+          const old = findPrevious(m);
           return !!old && recipeChoice(old) !== recipeChoice(m);
         })
         .map((m) => ({ date: m.date, mealId: m.meal_id }));
 
-      const { data, error } = await supabase
+      // user_planning_meals_upsert solo escribe las claves que vienen. recipe_id va si la receta
+      // es fija, o null al soltarla (la base de datos elige otra); si no, la elegida se queda y
+      // guardar solo el comentario no cambia la receta. recipe_comment solo si se envía: los
+      // días predefinidos no lo traen y no deben borrarlo
+      const payload = safeMeals.map(({ recipe_id, recipe_comment, ...m }) => ({
+        ...m,
+        ...(m.is_fixed_recipe
+          ? { recipe_id }
+          : findPrevious(m)?.is_fixed_recipe && { recipe_id: null }),
+        ...(recipe_comment !== undefined && { recipe_comment }),
+      }));
+
+      const { error: upsertError } = await supabase.rpc("user_planning_meals_upsert", {
+        p_client_id: userId,
+        p_meals: payload,
+      });
+      if (upsertError) throw new Error(upsertError.message);
+
+      // La RPC devuelve las filas sin los recursos embebidos: se leen de la vista
+      const { data: saved, error } = await supabase
         .from(TABLE_NAME)
-        .upsert(safeMeals)
-        .select(selectFromMeal(language));
+        .select(selectFromMeal(language))
+        .eq("client_id", userId)
+        .in("date", [...new Set(safeMeals.map((m) => m.date))])
+        .in("meal_id", [...new Set(safeMeals.map((m) => m.meal_id))]);
       if (error) throw new Error(error.message);
+      const data = saved
+        .filter((m) => safeMeals.some((s) => s.date === m.date && s.meal_id === m.meal_id))
+        .map(withRecipe);
 
       // Después del upsert: si este falla, los ingredientes no se pierden. Si falla el
       // borrado la comida ya está guardada: se avisa pero no se rechaza la mutación,
@@ -236,6 +277,8 @@ export const useMutatePlaningMeals = ({
       }
       return data;
     },
+    // 23514: receta fijada que no llega a las macros del tipo; 42501/55000: sin permiso o sin suscripción
+    onError: addMutationError,
     onSuccess: (data) => {
       invalidateMacros(userId);
       if (!data?.length) return;
@@ -287,27 +330,14 @@ export const useDeletePlaningMeal = ({
         throw new Error("User ID is required to delete a meal.");
       }
 
-      // Primero los ingredientes adicionales: cuelgan de la comida por FK
-      if (mealId === undefined) {
-        await deleteMealIngredientsForDate(userId, safeDate.save());
-        const { data, error } = await supabase
+      // Borrar la comida borra sus ingredientes adicionales (ON DELETE CASCADE)
+      let query = supabase
         .from(TABLE_NAME)
         .delete()
-        .eq("user_id", userId)
-        .eq("date", safeDate.save())
-        .select(selectFromMeal(language));
-        if (error) throw new Error(error.message);
-        return data;
-      } 
-
-      await deleteMealIngredientsForSlots(userId, [{ date: safeDate.save(), mealId }]);
-      const { data, error } = await supabase
-        .from(TABLE_NAME)
-        .delete()
-        .eq("user_id", userId)
-        .eq("date", safeDate.save())
-        .eq("meal_id", mealId)
-        .select(selectFromMeal(language));
+        .eq("client_id", userId)
+        .eq("date", safeDate.save());
+      if (mealId !== undefined) query = query.eq("meal_id", mealId);
+      const { data, error } = await query.select("date, meal_id");
       if (error) throw new Error(error.message);
       return data;
     },
@@ -327,7 +357,7 @@ export const useDeletePlaningMeal = ({
         }).user.meals(monday.save(), sunday.save()),
        (oldData: MealType[] | undefined) => {
           if (!oldData) return oldData;
-          const deleted = new Set(data.map(mealSlotId));
+          const deleted = new Set(data.map((m) => `${m.date}-${m.meal_id}`));
           return oldData.filter((m) => !deleted.has(mealSlotId(m)));
         },
       );
@@ -355,9 +385,9 @@ const useInvalidateCopiedMeals = () => {
 };
 
 /**
- * Clona las comidas de un día en otro (RPC clone_day_planing, una sola transacción): todas las
- * filas de `user_planing_meal` y sus ingredientes (`user_planing_meal_ingredients`). El destino
- * queda igual que el origen. No toca `user_planing` (entreno, comentarios del día...)
+ * Clona las comidas de un día en otro (RPC user_planning_days_clone, una sola transacción): todas las
+ * comidas (`user_planning_meals`) y sus ingredientes (`user_planning_meal_ingredients`). El destino
+ * queda igual que el origen. No toca el día (`user_planning_days`: entreno, comentarios...)
  */
 /**
  * Espera todas las RPC (en paralelo) y falla si alguna ha fallado. allSettled y no all: con all la
@@ -378,7 +408,7 @@ const runAll = async (calls: PromiseLike<{ error: unknown }>[]) => {
 };
 
 /**
- * Clona las comidas de varios días (RPC clone_day_planing, una por par, en paralelo). Cada RPC es una
+ * Clona las comidas de varios días (RPC user_planning_days_clone, una por par, en paralelo). Cada RPC es una
  * transacción: si una falla las demás se guardan igual. Se invalida una sola vez, al acabar todas
  * (onSettled: también si alguna ha fallado, porque las otras sí han cambiado datos)
  */
@@ -391,8 +421,8 @@ export const useCloneDayMeals = () => {
       if (!userId) throw new Error("User ID is required to clone a day");
       await runAll(
         clones.map(({ from, to }) =>
-          supabase.rpc("clone_day_planing", {
-            p_user_id: userId,
+          supabase.rpc("user_planning_days_clone", {
+            p_client_id: userId,
             p_from: from.save(),
             p_to: to.save(),
           }),
@@ -404,7 +434,7 @@ export const useCloneDayMeals = () => {
 };
 
 /**
- * Copia varias comidas (RPC copy_planing_meal, una por par, en paralelo). Igual que useCloneDayMeals:
+ * Copia varias comidas (RPC user_planning_meals_copy, una por par, en paralelo). Igual que useCloneDayMeals:
  * cada copia es atómica por separado y se invalida una vez al acabar todas
  */
 export const useCopyPlaningMeal = () => {
@@ -421,8 +451,8 @@ export const useCopyPlaningMeal = () => {
       if (!userId) throw new Error("User ID is required to copy a meal");
       await runAll(
         copies.map(({ from, to }) =>
-          supabase.rpc("copy_planing_meal", {
-            p_user_id: userId,
+          supabase.rpc("user_planning_meals_copy", {
+            p_client_id: userId,
             p_from_date: from.date,
             p_from_meal: from.mealId,
             p_to_date: to.date,

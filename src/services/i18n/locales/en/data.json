@@ -388,6 +388,9 @@
             "myRecipes": {
                 "title": "My recipes",
                 "description": "Create your own recipes from the food catalogue."
+            },
+            "databaseEditors": {
+                "title": "Editors"
             }
         }
     },
@@ -733,18 +736,19 @@
             "search": "Search food...",
             "noResults": "No results",
             "amount": "Amount",
+            "unit": "Unit",
             "removeIngredient": "Remove food",
             "cancel": "Cancel",
             "save": "Save changes",
             "create": "Create recipe",
             "type": {
-                "label": "Recipe type",
+                "label": "Fit to a type (optional)",
                 "status": {
-                    "custom": "No catalogue type: it will be saved as a custom recipe, without checking macros.",
+                    "custom": "Recipes have no type: planning offers them in the types whose macros they can reach. Pick a type to fit the amounts to it.",
                     "incomplete": "Add foods with an amount to check whether they fit the type.",
                     "checking": "Loading the type's macros...",
                     "match": "The foods fit this type.",
-                    "noMatch": "The foods don't fit this type: it will be saved as a custom recipe."
+                    "noMatch": "With these amounts it doesn't fit this type. It is saved anyway."
                 },
                 "chart": {
                     "fits": "Fits “{{type}}”",
@@ -781,6 +785,22 @@
         "client": {
             "title": "Client recipes",
             "description": "This client’s own recipes, made with foods from the catalogue."
+        }
+    },
+    "databaseEditors": {
+        "title": "Database editors",
+        "description": "Catalog recipes. For now they are read-only: creating, editing and reviewing recipes will come later.",
+        "back": "Back to dashboard",
+        "recipes": {
+            "search": "Search recipe by name...",
+            "empty": "No recipes",
+            "backToList": "Back to the list",
+            "id": "Id",
+            "name": "Name",
+            "prot": "Protein",
+            "hc": "Carbs",
+            "fat": "Fat",
+            "ingredients": "Ingredients"
         }
     }
 }

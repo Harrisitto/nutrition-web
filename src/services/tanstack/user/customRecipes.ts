@@ -9,24 +9,27 @@ import { queryKeys } from "../keys";
 import { queryClient } from "../queryClient";
 
 /*
- * Recetas propias (custom_recipes + custom_recipe_ingredients, schemas/custom_recipes.sql en
- * nutrition-proton). Una receta es una lista de alimentos del catálogo con su cantidad, y su dueño
- * (owner_id) es un cliente o el nutricionista. El nutricionista lee y escribe las suyas y las de sus
- * clientes actuales (escribir requiere suscripción activa; lo comprueba la RLS).
- * Se guardan con la RPC upsert_custom_recipe: receta y alimentos en una sola transacción.
- * type_id (FK a recipe_type, obligatorio) lo eligen clientes y nutricionista; la base de datos comprueba que las
- * macros encajan (salvo el tipo "receta propia", que no se comprueba).
+ * Recetas propias (vistas user_recipes + user_recipe_ingredients, schemas/schema_recipes_user_recipes.sql
+ * en nutrition-proton). Una receta es una lista de alimentos del catálogo (catalog_ingredients) con su
+ * cantidad en una unidad del alimento (amount + unit_id), y su dueño (user_id) es un cliente o el
+ * nutricionista. El nutricionista lee y escribe las suyas y las de sus clientes aceptados (escribir
+ * requiere suscripción activa: 55000 sin ella, 42501 sin permiso).
+ * Se guardan con la RPC upsert_custom_recipe con p_public_recipes (provisional, TODELETE.md en
+ * nutrition-proton): receta y alimentos en una sola transacción.
+ * Las recetas ya no tienen tipo: a qué tipos llega una receta lo decide la base de datos por sus macros.
+ * Una receta aprobada (approved_at) no se borra: borrarla solo quita el autor y deja de verse.
  */
 
-const RECIPES_TABLE = "custom_recipes" as const;
+const RECIPES_TABLE = "user_recipes" as const;
 const RECIPES_FOR_TYPE_PAGE_SIZE = 20;
 
 const selectCustomRecipe = (language: ReturnType<typeof useLanguageCode>) =>
-  `*, 
-  type: recipe_type(id, name: name->>${language}),
-  ingredients: custom_recipe_ingredients(
-    amount, 
-    ingredient: recipe_type_custom_ingredients(${selectIngredient(language)})
+  `id, owner_id: user_id, name: name->>${language}, description: description->>${language},
+  url, is_global, revised_at, approved_at,
+  ingredients: user_recipe_ingredients(
+    amount,
+    unit_id,
+    ingredient: catalog_ingredients(${selectIngredient(language)})
   )` as const;
 
 export type CustomRecipe = NonNullable<
@@ -63,13 +66,15 @@ const useFetchCustomRecipesOf = (ownerId: string | null | undefined) => {
       const { data, error } = await supabase
         .from(RECIPES_TABLE)
         .select(selectCustomRecipe(language))
-        .eq("owner_id", ownerId)
-        .order("name");
+        .eq("user_id", ownerId);
 
       if (error) {
         throw error;
       }
-      return data;
+      // Ordenado aquí: `order("name")` ordenaría por el JSON, no por el texto traducido
+      return data
+        .map((recipe) => ({ ...recipe, name: recipe.name ?? "" }))
+        .sort((a, b) => a.name.localeCompare(b.name));
     },
     enabled: !!ownerId,
   });
@@ -115,9 +120,10 @@ export const useFetchClientAndMyCustomRecipes = (): CustomRecipesQuery => {
 };
 
 /**
- * Recetas propias de un tipo (RPC get_custom_recipes_for_type): las del nutricionista y las del
- * cliente seleccionado, paginadas por cursor (id de la última). Solo traen los datos de la receta,
- * sin alimentos
+ * Recetas propias (RPC get_custom_recipes_for_type con p_public_recipes): las del nutricionista y las
+ * del cliente seleccionado que se pueden fijar en una comida de `typeId` (sus macros llegan a las del
+ * tipo; en el tipo receta propia, todas), paginadas por cursor (id de la última). Solo traen los datos
+ * de la receta, sin alimentos
  */
 export const useFetchCustomRecipesForType = ({
   typeId,
@@ -136,6 +142,7 @@ export const useFetchCustomRecipesForType = ({
       const { data, error } = await supabase.rpc("get_custom_recipes_for_type", {
         p_user_id: userId!,
         p_type_id: typeId!,
+        p_public_recipes: true,
         p_search: search || undefined,
         p_page_size: RECIPES_FOR_TYPE_PAGE_SIZE,
         p_after_id: pageParam ?? undefined,
@@ -173,15 +180,12 @@ export const useUpsertCustomRecipe = ({ toClient = false }: { toClient?: boolean
       id,
       name,
       description,
-      typeId,
       ingredients,
     }: {
       id?: number;
       name: string;
       description: string | null;
-      /** Obligatorio (type_id not null). Un tipo del catálogo cuyas macros no encajan da error 23514 */
-      typeId: number;
-      ingredients: { ingredient_id: number; amount: number }[];
+      ingredients: { ingredient_id: number; amount: number; unit_id: number }[];
     }) => {
       if (!id && !ownerId) throw new Error("Owner ID is required to save a custom recipe");
       const { data, error } = await supabase.rpc("upsert_custom_recipe", {
@@ -194,7 +198,8 @@ export const useUpsertCustomRecipe = ({ toClient = false }: { toClient?: boolean
         p_name: name.trim(),
         p_description: (description?.trim() || null) as string,
         p_ingredients: ingredients,
-        p_type_id: typeId,
+        // Provisional (TODELETE.md): escribe en public_recipes por user_recipes y user_recipe_ingredients
+        p_public_recipes: true,
       });
 
       if (error) {
@@ -211,7 +216,10 @@ export const useUpsertCustomRecipe = ({ toClient = false }: { toClient?: boolean
   });
 };
 
-/** Borra una receta propia (sus alimentos se borran en cascada) */
+/**
+ * Borra una receta propia (sus alimentos se borran en cascada). Una aprobada no se borra: pierde el
+ * autor y deja de verse igual. 42501 si es una receta que quedó al juntar duplicados
+ */
 export const useDeleteCustomRecipe = () => {
   return useMutation({
     mutationFn: async (recipeId: number) => {
@@ -219,7 +227,7 @@ export const useDeleteCustomRecipe = () => {
         .from(RECIPES_TABLE)
         .delete()
         .eq("id", recipeId)
-        .select("id, owner_id")
+        .select("id, owner_id: user_id")
         // Sin fila borrada (no existe o la RLS no deja) maybeSingle da null en vez de error
         .maybeSingle();
 

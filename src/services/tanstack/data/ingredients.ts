@@ -8,20 +8,25 @@ import { useAppSelector } from "@src/store/store";
 import { queryKeys } from "../keys";
 import { invalidateMacros } from "../user/macros";
 
-const INGREDIENTS_TABLE = "recipe_type_custom_ingredients" as const;
-const MEAL_INGREDIENTS_TABLE = "user_planing_meal_ingredients" as const;
+const INGREDIENTS_TABLE = "catalog_ingredients" as const;
+const MEAL_INGREDIENTS_TABLE = "user_planning_meal_ingredients" as const;
+
+/** Unidades fijas de public_recipes.all_units */
+export const GRAMS_UNIT_ID = 1;
+const MILLILITRES_UNIT_ID = 2;
 
 /*
  * Ingredientes sueltos que el nutricionista añade a una comida planificada, encima
  * de su receta o de su tipo de comida. Cada fila apunta a la comida por
- * (meal_id, user_id, date) y guarda la cantidad elegida (`amount`). Los macros del
- * catálogo son para `amount` unidades del ingrediente, así que los de la fila se
- * escalan con `mealIngredientMacros`.
+ * (client_id, date, meal_id) y guarda la cantidad en una unidad del ingrediente
+ * (`amount` + `unit_id`). El catálogo (catalog_ingredients) da los macros por 100 g y
+ * catalog_ingredient_units los gramos de cada unidad, así que los de la fila se
+ * calculan con `mealIngredientMacros`.
  */
 
-// `name` y `units` son JSON por idioma: se piden ya traducidos
+// `name` es JSON por idioma: se pide ya traducido. prot/hc con los nombres de Macros
 export const selectIngredient = (language: ReturnType<typeof useLanguageCode>) =>
-  `id, amount, kcal, prot, hc, fat, relation, name: name->>${language}, units: units->>${language}` as const;
+  `id, kcal, prot: protein, hc: carbs, fat, name: name->>${language}, units: catalog_ingredient_units(unit_id, grams, min_scale)` as const;
 
 const selectMealIngredient = (language: ReturnType<typeof useLanguageCode>) =>
   `*, ingredient: ${INGREDIENTS_TABLE}(${selectIngredient(language)})` as const;
@@ -29,6 +34,8 @@ const selectMealIngredient = (language: ReturnType<typeof useLanguageCode>) =>
 export type CustomIngredient = NonNullable<
   ReturnType<typeof useFetchCustomIngredients>["data"]
 >[number];
+
+export type IngredientUnit = CustomIngredient["units"][number];
 
 export type MealIngredient = NonNullable<
   ReturnType<typeof useFetchMealIngredientsForDate>["data"]
@@ -49,25 +56,91 @@ export const useFetchCustomIngredients = () => {
         throw error;
       }
       // Ordenado aquí: `order("name")` ordenaría por el JSON, no por el texto traducido
-      return data.sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
+      return data
+        .map((ingredient) => ({
+          ...ingredient,
+          // Solo las unidades con gramos sirven para calcular macros; gramos primero
+          units: ingredient.units
+            .filter((unit) => (unit.grams ?? 0) > 0)
+            .sort((a, b) => Number(b.unit_id === GRAMS_UNIT_ID) - Number(a.unit_id === GRAMS_UNIT_ID)),
+        }))
+        .sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
     },
     staleTime: 30 * 60 * 1000,
   });
 };
 
-/**
- * Raciones que son `amount` unidades del ingrediente. Sin cantidad de ración (amount 0), `amount`
- * ya son raciones: misma regla que la base de datos (custom_ingredients_match_type,
- * calculate_meal_macros_for_date_range)
- */
-export const ingredientPortions = (ingredient: Pick<CustomIngredient, "amount">, amount: number) =>
-  ingredient.amount > 0 ? amount / ingredient.amount : amount;
+/** Lo mínimo de una unidad para pasar una cantidad a gramos */
+type UnitGrams = { unit_id: number; grams: number | null };
 
-/** Macros de un ingrediente para la cantidad `amount` (el catálogo los da por ración) */
-export const mealIngredientMacros = (
-  ingredient: Pick<CustomIngredient, "amount" | "kcal" | "prot" | "hc" | "fat">,
+/** Unidad `unitId` del ingrediente; sin ella, la primera (gramos si los tiene) */
+export const ingredientUnit = <U extends UnitGrams>(
+  ingredient: { units: U[] },
+  unitId?: number,
+): U | undefined =>
+  ingredient.units.find((unit) => unit.unit_id === unitId) ?? ingredient.units[0];
+
+/** Unidad con la que se añade un ingrediente: la primera que no es de peso o volumen, si no gramos */
+export const defaultIngredientUnit = (ingredient: Pick<CustomIngredient, "units">) =>
+  ingredient.units.find((unit) => unit.unit_id !== GRAMS_UNIT_ID && unit.unit_id !== MILLILITRES_UNIT_ID) ??
+  ingredientUnit(ingredient);
+
+/** Cantidad de referencia (una ración) en esa unidad: 100 g o ml, o 1 unidad */
+export const referenceAmount = (unit: Pick<IngredientUnit, "unit_id"> | undefined) =>
+  unit && unit.unit_id !== GRAMS_UNIT_ID && unit.unit_id !== MILLILITRES_UNIT_ID ? 1 : 100;
+
+/** Nombres de las unidades (catalog_units) en el idioma actual, por id */
+export const useFetchUnitNames = () => {
+  const language = useLanguageCode();
+
+  return useQuery({
+    queryKey: queryKeys({ language }).data.units,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("catalog_units")
+        .select(`id, name: name->>${language}`);
+
+      if (error) {
+        throw error;
+      }
+      return new Map(data.map((unit) => [unit.id, unit.name ?? ""]));
+    },
+    staleTime: 30 * 60 * 1000,
+  });
+};
+
+/** Texto de una unidad: g y ml abreviados, las demás con su nombre (useFetchUnitNames) */
+export const useUnitLabel = () => {
+  const { data: names } = useFetchUnitNames();
+  return (unitId: number | undefined) =>
+    unitId === GRAMS_UNIT_ID ? "g" : unitId === MILLILITRES_UNIT_ID ? "ml" : (names?.get(unitId ?? -1) ?? "");
+};
+
+/** Gramos que son `amount` en la unidad `unitId` del ingrediente (0 si no tiene esa unidad) */
+export const ingredientGrams = (
+  ingredient: { units: UnitGrams[] },
   amount: number,
-) => Macros.from(ingredient).scale(ingredientPortions(ingredient, amount));
+  unitId?: number,
+) => amount * (ingredientUnit(ingredient, unitId)?.grams ?? 0);
+
+/** Macros de un ingrediente para `amount` en la unidad `unitId` (el catálogo los da por 100 g) */
+export const mealIngredientMacros = (
+  ingredient: {
+    kcal: number | null;
+    prot: number | null;
+    hc: number | null;
+    fat: number | null;
+    units: UnitGrams[];
+  },
+  amount: number,
+  unitId?: number,
+) =>
+  Macros.from({
+    kcal: ingredient.kcal ?? 0,
+    prot: ingredient.prot ?? 0,
+    hc: ingredient.hc ?? 0,
+    fat: ingredient.fat ?? 0,
+  }).scale(ingredientGrams(ingredient, amount, unitId) / 100);
 
 /** Misma semana (lunes a domingo) que la query de comidas */
 const weekRange = (date: FromDate) => ({
@@ -89,10 +162,12 @@ export const useFetchMealIngredientsForDate = ({ date }: { date?: FromDate } = {
       const { data, error } = await supabase
         .from(MEAL_INGREDIENTS_TABLE)
         .select(selectMealIngredient(language))
-        .eq("user_id", userId!)
+        .eq("client_id", userId!)
         .gte("date", start)
         .lte("date", end)
-        .order("id");
+        .order("date")
+        .order("meal_id")
+        .order("ingredient_id");
 
       if (error) {
         throw error;
@@ -124,21 +199,8 @@ export const deleteMealIngredientsForSlots = async (userId: string, slots: MealS
   const { error } = await supabase
     .from(MEAL_INGREDIENTS_TABLE)
     .delete()
-    .eq("user_id", userId)
+    .eq("client_id", userId)
     .or(filter);
-
-  if (error) {
-    throw error;
-  }
-};
-
-/** Borra los ingredientes adicionales de todas las comidas de un día */
-export const deleteMealIngredientsForDate = async (userId: string, date: string) => {
-  const { error } = await supabase
-    .from(MEAL_INGREDIENTS_TABLE)
-    .delete()
-    .eq("user_id", userId)
-    .eq("date", date);
 
   if (error) {
     throw error;
@@ -159,11 +221,11 @@ const useInvalidateMealIngredients = () => {
 };
 
 /** Ingrediente del borrador del editor, antes de guardarse */
-export type DraftMealIngredient = { ingredientId: number; amount: number };
+export type DraftMealIngredient = { ingredientId: number; amount: number; unitId: number };
 
 /**
  * Deja la comida exactamente con esos ingredientes: borra los que tenía e inserta los
- * nuevos. La comida tiene que estar ya guardada en user_planing_meal (la FK es compuesta).
+ * nuevos. La comida tiene que estar ya guardada en user_planning_meals (la FK es compuesta).
  */
 export const useReplaceMealIngredients = () => {
   const userId = useAppSelector((state) => state.config.selectedUserId);
@@ -190,12 +252,13 @@ export const useReplaceMealIngredients = () => {
       const { data, error } = await supabase
         .from(MEAL_INGREDIENTS_TABLE)
         .insert(
-          ingredients.map(({ ingredientId, amount }) => ({
-            user_id: userId,
+          ingredients.map(({ ingredientId, amount, unitId }) => ({
+            client_id: userId,
             date: date.save(),
             meal_id: mealId,
             ingredient_id: ingredientId,
             amount,
+            unit_id: unitId,
           })),
         )
         .select("*");

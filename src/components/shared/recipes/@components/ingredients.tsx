@@ -3,8 +3,11 @@ import { useTranslation } from "react-i18next";
 import { Plus, Trash2 } from "lucide-react";
 import { deleteButtonStyle } from "@src/components/styles";
 import {
+  defaultIngredientUnit,
   mealIngredientMacros,
+  referenceAmount,
   useFetchCustomIngredients,
+  useUnitLabel,
   type CustomIngredient,
 } from "@src/services/tanstack/data/ingredients";
 import {
@@ -33,15 +36,50 @@ const MacrosLine = ({ macros }: { macros: Macros }) => {
   );
 };
 
+/** Unidad de la cantidad: un desplegable si el alimento tiene varias, si no su nombre */
+export const UnitSelect = ({
+  ingredient,
+  unitId,
+  onChange,
+}: {
+  ingredient?: Pick<CustomIngredient, "units">;
+  unitId: number;
+  onChange: (unitId: number) => void;
+}) => {
+  const { t } = useTranslation();
+  const unitLabel = useUnitLabel();
+  const units = ingredient?.units ?? [];
+
+  if (units.length <= 1) {
+    return <span className="w-16 truncate text-xs text-text-muted">{unitLabel(unitId)}</span>;
+  }
+  return (
+    <select
+      value={unitId}
+      aria-label={t("data:customRecipes.form.unit")}
+      onChange={(e) => onChange(Number(e.target.value))}
+      className="w-24 rounded-md border border-nutrition-green/30 px-1 py-1 text-xs text-dark-green outline-none focus:border-dark-green"
+    >
+      {units.map((unit) => (
+        <option key={unit.unit_id} value={unit.unit_id}>
+          {unitLabel(unit.unit_id)}
+        </option>
+      ))}
+    </select>
+  );
+};
+
 const DraftRow = ({
   row,
   ingredient,
   onChangeAmount,
+  onChangeUnit,
   onRemove,
 }: {
   row: DraftRecipeIngredient;
   ingredient?: CustomIngredient;
   onChangeAmount: (amount: string) => void;
+  onChangeUnit: (unitId: number) => void;
   onRemove: () => void;
 }) => {
   const { t } = useTranslation();
@@ -54,7 +92,7 @@ const DraftRow = ({
           {ingredient?.name ?? "-"}
         </span>
         {ingredient && amount !== null && (
-          <MacrosLine macros={mealIngredientMacros(ingredient, amount)} />
+          <MacrosLine macros={mealIngredientMacros(ingredient, amount, row.unitId)} />
         )}
       </div>
       <label className="flex shrink-0 items-center gap-1">
@@ -70,7 +108,7 @@ const DraftRow = ({
             amount === null ? "border-nutrition-red" : "border-nutrition-green/30"
           }`}
         />
-        <span className="w-8 text-xs text-text-muted">{ingredient?.units ?? ""}</span>
+        <UnitSelect ingredient={ingredient} unitId={row.unitId} onChange={onChangeUnit} />
       </label>
       <button
         type="button"
@@ -86,7 +124,7 @@ const DraftRow = ({
 };
 
 /**
- * Lista de alimentos de la receta (custom_recipe_ingredients) y buscador del catálogo.
+ * Lista de alimentos de la receta (user_recipe_ingredients) y buscador del catálogo.
  * Controlado: el padre guarda el borrador y lo envía al guardar la receta.
  */
 const RecipeIngredientsEditor = ({
@@ -99,6 +137,7 @@ const RecipeIngredientsEditor = ({
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const catalog = useFetchCustomIngredients();
+  const unitLabel = useUnitLabel();
 
   const catalogById = useMemo(
     () => new Map((catalog.data ?? []).map((el) => [el.id, el])),
@@ -116,14 +155,21 @@ const RecipeIngredientsEditor = ({
 
   const totals = useMemo(() => draftMacros(value, catalogById), [value, catalogById]);
 
-  // Se añade con la cantidad de referencia del catálogo; luego se ajusta en la lista
+  // Se añade con una ración (1 unidad, o 100 g o ml); luego se ajusta en la lista
   const addIngredient = (ingredient: CustomIngredient) => {
-    if (addedIds.has(ingredient.id)) return;
-    onChange([...value, { ingredientId: ingredient.id, amount: String(ingredient.amount || 1) }]);
+    const unit = defaultIngredientUnit(ingredient);
+    if (addedIds.has(ingredient.id) || !unit) return;
+    onChange([
+      ...value,
+      { ingredientId: ingredient.id, amount: String(referenceAmount(unit)), unitId: unit.unit_id },
+    ]);
   };
 
   const changeAmount = (ingredientId: number, amount: string) =>
     onChange(value.map((row) => (row.ingredientId === ingredientId ? { ...row, amount } : row)));
+
+  const changeUnit = (ingredientId: number, unitId: number) =>
+    onChange(value.map((row) => (row.ingredientId === ingredientId ? { ...row, unitId } : row)));
 
   const removeIngredient = (ingredientId: number) =>
     onChange(value.filter((row) => row.ingredientId !== ingredientId));
@@ -147,6 +193,7 @@ const RecipeIngredientsEditor = ({
                   row={row}
                   ingredient={catalogById.get(row.ingredientId)}
                   onChangeAmount={(amount) => changeAmount(row.ingredientId, amount)}
+                  onChangeUnit={(unitId) => changeUnit(row.ingredientId, unitId)}
                   onRemove={() => removeIngredient(row.ingredientId)}
                 />
               ))}
@@ -182,22 +229,24 @@ const RecipeIngredientsEditor = ({
           )}
           {results.map((ingredient) => {
             const isAdded = addedIds.has(ingredient.id);
+            const unit = defaultIngredientUnit(ingredient);
+            const reference = referenceAmount(unit);
             return (
               <li key={ingredient.id}>
                 <button
                   type="button"
                   onClick={() => addIngredient(ingredient)}
-                  disabled={isAdded}
+                  disabled={isAdded || !unit}
                   className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left transition-colors hover:bg-nutrition-green/15 disabled:cursor-default disabled:opacity-50 disabled:hover:bg-transparent"
                 >
                   <div className="flex min-w-0 flex-1 flex-col">
                     <span className="truncate text-sm text-dark-green">
                       {ingredient.name}{" "}
                       <span className="text-xs text-text-muted">
-                        ({ingredient.amount} {ingredient.units ?? ""})
+                        ({reference} {unitLabel(unit?.unit_id)})
                       </span>
                     </span>
-                    <MacrosLine macros={mealIngredientMacros(ingredient, ingredient.amount)} />
+                    <MacrosLine macros={mealIngredientMacros(ingredient, reference, unit?.unit_id)} />
                   </div>
                   {!isAdded && <Plus className="size-4 shrink-0 text-nutrition-green" aria-hidden />}
                 </button>

@@ -36,7 +36,7 @@ export const queryKeys = ({
       start,
       end,
     ],
-    // Ingredientes añadidos a las comidas planificadas (user_planing_meal_ingredients)
+    // Ingredientes añadidos a las comidas planificadas (user_planning_meal_ingredients)
     mealIngredientsBase: ["user", "mealIngredients", userId],
     mealIngredients: (start: string, end: string) => [
       "user",
@@ -46,7 +46,7 @@ export const queryKeys = ({
       start,
       end,
     ],
-    // Kcal y macros diarios calculados por la RPC calculate_macros_for_date_range
+    // Kcal y macros diarios calculados por la RPC user_planning_days_macros
     macrosBase: ["user", "macros", userId],
     macros: (start: string, end: string) => [
       "user",
@@ -159,6 +159,7 @@ export const queryKeys = ({
     scoredRaceIngredientsBase: ["data", "scoredRaceIngredients"],
     scoredRaceIngredients: ["data", "scoredRaceIngredients", userId, searchStr],
     customIngredients: ["data", "customIngredients", language],
+    units: ["data", "units", language],
     // Id del recipe_type "receta propia" (RPC custom_recipe_type_id): no cambia
     customRecipeTypeId: ["data", "customRecipeTypeId"],
     raceLandmarks: ["data", "raceLandmarks", language],
@@ -171,5 +172,8 @@ export const queryKeys = ({
     session: ["auth", "session"],
     subscriptionBase: ["auth", "subscription"],
     subscription: ["auth", "subscription", userId],
+    // Si el usuario `userId` es editor de la base de datos (public_users.database_editors)
+    databaseEditorBase: ["auth", "databaseEditor"],
+    databaseEditor: ["auth", "databaseEditor", userId],
   },
 });

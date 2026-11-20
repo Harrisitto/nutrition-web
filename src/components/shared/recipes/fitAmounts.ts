@@ -1,7 +1,8 @@
 import { MACRO_KEYS, Macros } from "@src/helpers/macros";
 import {
-  ingredientPortions,
+  ingredientUnit,
   mealIngredientMacros,
+  referenceAmount,
   type CustomIngredient,
 } from "@src/services/tanstack/data/ingredients";
 
@@ -14,6 +15,8 @@ import {
  *
  *   Σ_macro ((total − objetivo) / margen)²  +  λ · Σ_alimento (raciones − raciones actuales)²
  *
+ * Cada cantidad va en la unidad de su fila (unitId). Una ración son 100 g o ml, o 1 unidad.
+ *
  * - Cada macro se mide en "márgenes" (Macros.tolerance): 5 g de grasa sobre 20 g pesan más que 5 g
  *   de hc sobre 100 g, igual que en la regla de encaje.
  * - El segundo término, pequeño, desempata cuando hay más alimentos que macros (infinitas
@@ -24,9 +27,14 @@ import {
 const SWEEPS = 300;
 const PROXIMITY_WEIGHT = 0.01;
 
-/** Paso de redondeo: unidades enteras (g, ml) si la ración es grande, décimas si es pequeña */
-const roundingStep = (ingredient: CustomIngredient) =>
-  ingredient.amount >= 10 ? 1 : ingredient.amount > 0 ? 0.1 : 0.25;
+/**
+ * Paso de redondeo: gramos o ml enteros; en las demás unidades, la fracción más pequeña que se
+ * puede planificar (min_scale) o cuartos
+ */
+const roundingStep = (ingredient: CustomIngredient, unitId: number) => {
+  const unit = ingredientUnit(ingredient, unitId);
+  return referenceAmount(unit) > 1 ? 1 : (unit?.min_scale ?? 0.25);
+};
 
 const roundTo = (value: number, step: number) =>
   Number((Math.round(value / step) * step).toFixed(2));
@@ -38,17 +46,17 @@ export type FitResult = {
 };
 
 export const fitAmountsToMacros = (
-  rows: { ingredient: CustomIngredient; amount: number | null }[],
+  rows: { ingredient: CustomIngredient; amount: number | null; unitId: number }[],
   target: Macros,
 ): FitResult => {
   // Macros por unidad de cantidad de cada alimento (lo que aporta subir su cantidad en 1)
-  const perUnit = rows.map(({ ingredient }) => mealIngredientMacros(ingredient, 1));
+  const perUnit = rows.map(({ ingredient, unitId }) => mealIngredientMacros(ingredient, 1, unitId));
   // Unidades que son una ración: el término de proximidad se mide en raciones
-  const unitsPerPortion = rows.map(({ ingredient }) => 1 / ingredientPortions(ingredient, 1));
-  const minAmount = rows.map(({ ingredient }) => roundingStep(ingredient));
-  const initial = rows.map(({ ingredient, amount }, i) =>
-    Math.max(amount ?? (ingredient.amount || 1), minAmount[i]),
+  const unitsPerPortion = rows.map(({ ingredient, unitId }) =>
+    referenceAmount(ingredientUnit(ingredient, unitId)),
   );
+  const minAmount = rows.map(({ ingredient, unitId }) => roundingStep(ingredient, unitId));
+  const initial = rows.map(({ amount }, i) => Math.max(amount ?? unitsPerPortion[i], minAmount[i]));
   const weight = MACRO_KEYS.map((key) => 1 / Macros.tolerance(target[key]) ** 2);
 
   const amounts = [...initial];
@@ -83,7 +91,7 @@ export const fitAmountsToMacros = (
 
   const rounded = amounts.map((amount, i) => roundTo(amount, minAmount[i]));
   const macros = Macros.sum(
-    rows.map(({ ingredient }, i) => mealIngredientMacros(ingredient, rounded[i])),
+    rows.map(({ ingredient, unitId }, i) => mealIngredientMacros(ingredient, rounded[i], unitId)),
   );
   return { amounts: rounded, macros, fits: macros.fits(target) };
 };

@@ -21,10 +21,14 @@ import { StepPoints } from "./steps/points";
 import { fieldIds, useAppointmentForm } from "./configAppointment";
 import type { AppointmentStep } from "./constants";
 import StepHistory from "./steps/history";
+import { isNoSubscriptionError } from "@src/services/supabase/errors";
 
 // 23505: una consulta por dia y cliente, y una sola sin fecha (indice unico
 // nutri_appointments_one_per_day, NULLS NOT DISTINCT)
 const saveErrorKey = (error: Error, scheduledOn: string | null | undefined) => {
+  if (isNoSubscriptionError(error)) {
+    return "system:messages.noSubscription";
+  }
   if ((error as PostgrestError).code !== "23505") {
     return "data:appointments.form.errors.save";
   }
@@ -157,7 +161,9 @@ const FormAppointment = () => {
           saveAppointment.error
             ? saveErrorKey(saveAppointment.error, saveAppointment.variables?.scheduled_on)
             : setAppointmentStatus.isError
-              ? "data:appointments.form.errors.status"
+              ? isNoSubscriptionError(setAppointmentStatus.error)
+                ? "system:messages.noSubscription"
+                : "data:appointments.form.errors.status"
               : null
         }
         status={status}

@@ -4,19 +4,19 @@ import { useAppSelector } from "../../../store/store";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "../queryClient";
 
-// Consulta con sus puntos: los del nutricionista (con su tematica y el grupo de su punto de la
-// plantilla) y los temas del cliente
+// Consulta con sus puntos: los del nutricionista (nutri_points, con el nombre de su tematica y el
+// grupo y documento de su punto de la plantilla) y los temas del cliente (client_points)
 const APPOINTMENT_WITH_POINTS =
-  '*, appointment_points(*, client_themes(theme_name), appointment_theme_points(group_name, document_id)), user_appointment_points(*)';
+  '*, nutri_points: user_appointment_nutri_points(*), client_points: user_appointment_client_points(*)';
 
 // Estados de una consulta: programada -> en curso (Empezar consulta) -> tratada (Terminar consulta)
 export type AppointmentStatus = "scheduled" | "in_progress" | "done";
 
-// Puntos del nutricionista (appointment_points) o temas del cliente (user_appointment_points)
+// Puntos del nutricionista (user_appointment_nutri_points) o temas del cliente (user_appointment_client_points)
 export type PointKind = "nutri" | "client";
 
-const pointTable = (kind: PointKind): 'appointment_points' | 'user_appointment_points' =>
-  kind === "nutri" ? 'appointment_points' : 'user_appointment_points';
+const pointTable = (kind: PointKind): 'user_appointment_nutri_points' | 'user_appointment_client_points' =>
+  kind === "nutri" ? 'user_appointment_nutri_points' : 'user_appointment_client_points';
 
 export const useFetchClientAppointmentPoints = () => {
   const clientId = useAppSelector((state) => state.config.selectedUserId);
@@ -28,13 +28,13 @@ export const useFetchClientAppointmentPoints = () => {
             throw new Error("Client ID is not defined");
         }   
 
-        const response = await supabase.from('user_appointment_points')
+        const response = await supabase.from('user_appointment_client_points')
         .select('*')
-        .eq('user_id', clientId)
+        .eq('client_id', clientId)
         .is('treated_at', null);
 
         if (response.error) {
-            throw new Error(response.error.message);
+            throw response.error;
         }
 
         return response.data;
@@ -51,13 +51,13 @@ export const useFetchTreatedClientAppointmentPoints = () => {
         if (!clientId) {
             throw new Error("Client ID is not defined");
         }
-        const response = await supabase.from('user_appointment_points')
+        const response = await supabase.from('user_appointment_client_points')
         .select('*')
-        .eq('user_id', clientId)
+        .eq('client_id', clientId)
         .not('treated_at', 'is', null);
 
         if (response.error) {
-            throw new Error(response.error.message);
+            throw response.error;
         }
 
         return response.data;
@@ -75,19 +75,19 @@ export const useFetchClientPendingAppointments = () => {
             throw new Error("Client ID is not defined");
         }
 
-        const response = await supabase.from('nutri_appointments')
+        const response = await supabase.from('user_appointments')
         .select(APPOINTMENT_WITH_POINTS)
-        .eq('user_id', clientId)
+        .eq('client_id', clientId)
         // Las empezadas siguen pendientes hasta terminarlas
         .in('status', ['scheduled', 'in_progress'] satisfies AppointmentStatus[])
         // Por dias que faltan: primero las atrasadas, despues las proximas y al final las sin fecha
         .order('scheduled_on', { ascending: true, nullsFirst: false })
         .order('start_time', { ascending: true, nullsFirst: false })
-        .order('position', { referencedTable: 'appointment_points' })
-        .order('position', { referencedTable: 'user_appointment_points' });
+        .order('position', { referencedTable: 'nutri_points' })
+        .order('position', { referencedTable: 'client_points' });
 
         if (response.error) {
-            throw new Error(response.error.message);
+            throw response.error;
         }
 
         return response.data;
@@ -105,13 +105,13 @@ export const useFetchClientTreatedAppointments = () => {
             throw new Error("Client ID is not defined");
         }
 
-        const response = await supabase.from('nutri_appointments')
+        const response = await supabase.from('user_appointments')
         .select(APPOINTMENT_WITH_POINTS)
-        .eq('user_id', clientId)
+        .eq('client_id', clientId)
         .eq('status', 'done');
 
         if (response.error) {
-            throw new Error(response.error.message);
+            throw response.error;
         }
 
         return response.data;
@@ -126,25 +126,25 @@ const fetchClientThemesWithPoints = async (clientId: string | null) => {
     throw new Error("Client ID is not defined");
   }
 
-  const response = await supabase.from('client_themes')
-    .select('id, theme_name, start_date, nutri_appointment_themes(appointment_theme_points(id, point, in_days, group_name, document_id)), appointment_points(theme_point_id, treated_at)')
-    .eq('user_id', clientId)
+  const response = await supabase.from('nutri_client_themes')
+    .select('id, theme_name, start_date, theme: nutri_themes(points: nutri_theme_points(id, point, in_days, group_name, document_id)), nutri_points: user_appointment_nutri_points(theme_point_id, treated_at)')
+    .eq('client_id', clientId)
     .order('start_date', { ascending: false });
 
   if (response.error) {
-    throw new Error(response.error.message);
+    throw response.error;
   }
 
   return response.data.map((theme) => {
-    const templatePoints = theme.nutri_appointment_themes?.appointment_theme_points ?? [];
-    const used = new Set(theme.appointment_points.map((point) => point.theme_point_id));
+    const templatePoints = theme.theme?.points ?? [];
+    const used = new Set(theme.nutri_points.map((point) => point.theme_point_id));
     // En el orden de la plantilla: por dia y, el mismo dia, por orden de creacion
     const availablePoints = templatePoints
       .filter((point) => !used.has(point.id))
       .sort((a, b) => a.in_days - b.in_days || a.id - b.id);
     // Sobre los puntos de la plantilla: quitar uno sin tratar de una consulta no la adelanta
     const total = templatePoints.length;
-    const treated = theme.appointment_points.filter((point) => point.treated_at !== null).length;
+    const treated = theme.nutri_points.filter((point) => point.treated_at !== null).length;
     return {
       id: theme.id,
       theme_name: theme.theme_name,
@@ -155,7 +155,7 @@ const fetchClientThemesWithPoints = async (clientId: string | null) => {
       // Terminada: no quedan puntos de la plantilla por añadir y todos los añadidos estan tratados
       isFinished:
         availablePoints.length === 0 &&
-        theme.appointment_points.every((point) => point.treated_at !== null),
+        theme.nutri_points.every((point) => point.treated_at !== null),
       total,
       treated,
       progress: total === 0 ? 0 : treated / total,
@@ -195,16 +195,16 @@ export const useFetchSingleAppointment = (appointmentId: number | null) => {
           throw new Error("Client ID is not defined");
         }
 
-        const response = await supabase.from('nutri_appointments')
+        const response = await supabase.from('user_appointments')
           .select(APPOINTMENT_WITH_POINTS)
-          .eq('user_id', clientId)
+          .eq('client_id', clientId)
           .eq('id', appointmentId!)
-          .order('position', { referencedTable: 'appointment_points' })
-          .order('position', { referencedTable: 'user_appointment_points' })
+          .order('position', { referencedTable: 'nutri_points' })
+          .order('position', { referencedTable: 'client_points' })
           .single();
 
         if (response.error) {
-          throw new Error(response.error.message);
+          throw response.error;
         }
 
         return response.data;
@@ -213,7 +213,7 @@ export const useFetchSingleAppointment = (appointmentId: number | null) => {
 };
 
 // La consulta sin fecha del cliente, si la tiene: solo puede haber una sin contar las
-// canceladas (nutri_appointments_one_per_day). null si no hay
+// canceladas (appointments_one_per_day). null si no hay
 export const useFetchUndatedAppointment = ({ enabled }: { enabled: boolean }) => {
   const clientId = useAppSelector((state) => state.config.selectedUserId);
 
@@ -225,15 +225,15 @@ export const useFetchUndatedAppointment = ({ enabled }: { enabled: boolean }) =>
           throw new Error("Client ID is not defined");
         }
 
-        const response = await supabase.from('nutri_appointments')
+        const response = await supabase.from('user_appointments')
           .select('id')
-          .eq('user_id', clientId)
+          .eq('client_id', clientId)
           .is('scheduled_on', null)
           .neq('status', 'cancelled')
           .maybeSingle();
 
         if (response.error) {
-          throw new Error(response.error.message);
+          throw response.error;
         }
 
         return response.data;
@@ -255,19 +255,19 @@ export const useFetchPendingPoints = ({ enabled }: { enabled: boolean }) => {
         }
 
         const [undated, unassigned] = await Promise.all([
-          supabase.from('nutri_appointments')
-            .select('appointment_points(id, point, position, treated_at, client_themes(theme_name)), user_appointment_points(id, point, position, treated_at)')
-            .eq('user_id', clientId)
+          supabase.from('user_appointments')
+            .select('nutri_points: user_appointment_nutri_points(id, point, position, treated_at, theme_name), client_points: user_appointment_client_points(id, point, position, treated_at)')
+            .eq('client_id', clientId)
             .is('scheduled_on', null)
             .neq('status', 'cancelled')
-            .is('appointment_points.treated_at', null)
-            .is('user_appointment_points.treated_at', null)
-            .order('position', { referencedTable: 'appointment_points' })
-            .order('position', { referencedTable: 'user_appointment_points' })
+            .is('nutri_points.treated_at', null)
+            .is('client_points.treated_at', null)
+            .order('position', { referencedTable: 'nutri_points' })
+            .order('position', { referencedTable: 'client_points' })
             .maybeSingle(),
-          supabase.from('user_appointment_points')
+          supabase.from('user_appointment_client_points')
             .select('id, point, position, treated_at')
-            .eq('user_id', clientId)
+            .eq('client_id', clientId)
             .is('appointment_id', null)
             .is('treated_at', null)
             .order('created_at', { ascending: true }),
@@ -281,14 +281,14 @@ export const useFetchPendingPoints = ({ enabled }: { enabled: boolean }) => {
         }
 
         return [
-          ...(undated.data?.appointment_points ?? [])
+          ...(undated.data?.nutri_points ?? [])
             .map((point) => ({
               kind: "nutri" as const,
               id: point.id,
               point: point.point,
-              themeName: point.client_themes?.theme_name ?? null,
+              themeName: point.theme_name,
             })),
-          ...[...(undated.data?.user_appointment_points ?? []), ...unassigned.data]
+          ...[...(undated.data?.client_points ?? []), ...unassigned.data]
             .map((point) => ({
               kind: "client" as const,
               id: point.id,
@@ -333,11 +333,11 @@ export const useSaveAppointment = () => {
         }
 
         const response = id === null
-          ? await supabase.from('nutri_appointments')
-              .insert({ user_id: clientId, description, scheduled_on, start_time, video_url })
+          ? await supabase.from('user_appointments')
+              .insert({ client_id: clientId, description, scheduled_on, start_time, video_url })
               .select()
               .single()
-          : await supabase.from('nutri_appointments')
+          : await supabase.from('user_appointments')
               .update({ description, scheduled_on, start_time, video_url })
               .eq('id', id)
               .select()
@@ -358,7 +358,7 @@ export const useSetAppointmentStatus = () => {
 
   return useMutation({
     mutationFn: async ({ id, status }: { id: number; status: AppointmentStatus }) => {
-        const response = await supabase.from('nutri_appointments')
+        const response = await supabase.from('user_appointments')
           .update({ status })
           .eq('id', id)
           .select()
@@ -374,13 +374,13 @@ export const useSetAppointmentStatus = () => {
   });
 };
 
-// .single(): si RLS no deja borrarla no hay fila y da error en vez de no hacer nada
+// .single(): si no deja borrarla no hay fila y da error en vez de no hacer nada
 export const useDeleteAppointment = () => {
   const clientId = useAppSelector((state) => state.config.selectedUserId);
 
   return useMutation({
     mutationFn: async (appointmentId: number) => {
-        const response = await supabase.from('nutri_appointments')
+        const response = await supabase.from('user_appointments')
           .delete()
           .eq('id', appointmentId)
           .select()
@@ -411,13 +411,13 @@ export const useInsertAppointmentPointToAppointment = () => {
       client_theme_id?: number;
       theme_point_id?: number;
     }) => {
-        const response = await supabase.from('appointment_points')
+        const response = await supabase.from('user_appointment_nutri_points')
           .insert(newPoint)
           .select()
           .single();
 
         if (response.error) {
-          throw new Error(response.error.message);
+          throw response.error;
         }
 
         return response.data;
@@ -432,14 +432,14 @@ export const useDeleteAppointmentPointFromAppointment = () => {
 
   return useMutation({
     mutationFn: async (pointId: number) => {
-        const response = await supabase.from('appointment_points')
+        const response = await supabase.from('user_appointment_nutri_points')
           .delete()
           .eq('id', pointId)
           .select()
           .single();
 
         if (response.error) {
-          throw new Error(response.error.message);
+          throw response.error;
         }
 
         return response.data;
@@ -473,7 +473,7 @@ export const useMovePointToAppointment = () => {
           .single();
 
         if (response.error) {
-          throw new Error(response.error.message);
+          throw response.error;
         }
 
         return response.data;
@@ -505,7 +505,7 @@ export const useSetPointTreated = () => {
           .single();
 
         if (response.error) {
-          throw new Error(response.error.message);
+          throw response.error;
         }
 
         return response.data;
@@ -515,7 +515,7 @@ export const useSetPointTreated = () => {
 };
 
 // Asigna una tematica al cliente desde una fecha: crea las consultas que falten y copia sus puntos
-// (assign_appointment_theme). Devuelve el id de client_themes
+// (nutri_client_themes_assign). Devuelve el id de nutri_client_themes
 export const useAssignAppointmentTheme = () => {
   const clientId = useAppSelector((state) => state.config.selectedUserId);
 
@@ -525,8 +525,8 @@ export const useAssignAppointmentTheme = () => {
           throw new Error("Client ID is not defined");
         }
 
-        const response = await supabase.rpc('assign_appointment_theme', {
-          p_user_id: clientId,
+        const response = await supabase.rpc('nutri_client_themes_assign', {
+          p_client_id: clientId,
           p_theme_id: theme_id,
           p_start_date: start_date,
         });

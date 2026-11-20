@@ -4,6 +4,7 @@ import { Routes, Route } from "react-router-dom";
 import { APP_ROUTES, getTrailingRoute } from "@src/hooks/navigation/routes";
 import useAppNavigation from "@src/hooks/navigation";
 import { lazy } from "react";
+import { useIsDatabaseEditor } from "@src/services/tanstack/auth/databaseEditor";
 
 const PageInviteClient = lazy(() => import("./inviteClient/index"));
 const PageAppointmentThemes = lazy(() => import("./appointmentThemes/index"));
@@ -29,6 +30,7 @@ const PageManageAuthState = lazy(() =>
 const PageNutritionistConfiguration = () => {
   const { t } = useTranslation();
   const { navigateTo } = useAppNavigation();
+  const { data: isDatabaseEditor } = useIsDatabaseEditor();
 
   return (
     <div className="p-6">
@@ -84,6 +86,16 @@ const PageNutritionistConfiguration = () => {
             label: t("data:configuration.sections.myRecipes.title"),
             onClick: () => navigateTo(APP_ROUTES.MY_RECIPES),
           },
+          // Fuera del dashboard: solo para los editores de la base de datos
+          ...(isDatabaseEditor
+            ? [
+                {
+                  route: APP_ROUTES.DATABASE_EDITORS,
+                  label: t("data:configuration.sections.databaseEditors.title"),
+                  onClick: () => navigateTo(APP_ROUTES.DATABASE_EDITORS),
+                },
+              ]
+            : []),
         ]}
       />
       <Routes>

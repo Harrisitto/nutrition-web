@@ -6,10 +6,13 @@ import FromDate from "@src/helpers/dates";
 import { primaryIconButtonStyle } from "@src/components/styles";
 import { useFetchAppointmentThemes } from "../../../../../services/tanstack/data/appointments";
 import { useAssignAppointmentTheme } from "../../../../../services/tanstack/user/appointments";
+import { isNoSubscriptionError } from "@src/services/supabase/errors";
 
 // assign_appointment_theme: 22023 si la tematica no tiene puntos
 const assignErrorKey = (error: Error) =>
-    (error as PostgrestError).code === "22023"
+    isNoSubscriptionError(error)
+        ? "system:messages.noSubscription"
+        : (error as PostgrestError).code === "22023"
         ? "data:appointments.assign.errors.noPoints"
         : "data:appointments.assign.errors.generic";
 

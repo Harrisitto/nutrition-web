@@ -2,16 +2,16 @@ import { useFetchRecipes } from "@src/services/tanstack/data/recipes";
 import { Loader } from "lucide-react";
 import { placeholderRecipeImg } from "../constants";
 
+// Recetas del catálogo. Ya no tienen tipo (la base de datos decide por macros a qué tipos llega cada una),
+// así que no se filtran por tipo y se muestran sus kcal con las cantidades de la receta
 export const List = ({
-  typeIds,
   searchStr,
   onSelectRecipe,
 }: {
-  typeIds?: number[];
   searchStr: string;
   onSelectRecipe: (id: number) => void;
 }) => {
-  const { data: recipes, isLoading } = useFetchRecipes({ searchStr, typeIds });
+  const { data: recipes, isLoading } = useFetchRecipes({ searchStr });
   
   return isLoading ? (
     <div className="flex items-center justify-center space-x-2 p-8 text-nutrition-green">
@@ -27,8 +27,6 @@ export const List = ({
         return b.nutri_recipe[0].rating - a.nutri_recipe[0].rating;
       })
       .map((recipe) => {
-        if (!recipe.type_id) return null;
-       
         const score = recipe.nutri_recipe[0]?.rating || 0
         const stars = Math.round(score / 20);
         return (
@@ -64,11 +62,8 @@ export const List = ({
                   </h3>
                 </div>
                 <div className="flex flex-col w-full items-center justify-center overflow-hidden">
-                  <p className="text-md text-nutrition-green font-bold">
-                    {recipe.type_id.name}
-                  </p>
                   <p className="ml-2 truncate text-sm text-text-muted">
-                    {recipe.type_id.kcal} kcal
+                    {Math.round(recipe.macros.kcal)} kcal
                   </p>
                 </div>
               </div>

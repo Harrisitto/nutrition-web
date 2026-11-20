@@ -142,7 +142,7 @@ const useTableRows = () => {
       });
   }, [raceTotalsByDate, t, dispatch, navigateTo]);
 
-  // Kcal y macros de cada día los calcula la RPC calculate_macros_for_date_range
+  // Kcal y macros de cada día los calcula la RPC user_planning_days_macros
   const macrosByDate = useMemo(
     () => new Map(dayMacros.data?.map((day) => [day.date, day]) ?? []),
     [dayMacros.data],

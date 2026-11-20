@@ -7,7 +7,8 @@ import {
 import type { CustomRecipe } from "@src/services/tanstack/user/customRecipes";
 
 // La cantidad se guarda como texto mientras se escribe ("" o "1." son válidos al teclear)
-export type DraftRecipeIngredient = { ingredientId: number; amount: string };
+// unitId: unidad del alimento (catalog_ingredient_units) en la que va la cantidad
+export type DraftRecipeIngredient = { ingredientId: number; amount: string; unitId: number };
 
 /** Texto para buscar sin distinguir mayúsculas ni acentos */
 export const normalizeSearch = (str: string) =>
@@ -26,7 +27,7 @@ export const parseAmount = (amount: string) => {
 export const recipeMacros = (recipe: CustomRecipe) =>
   Macros.sum(
     recipe.ingredients.flatMap((row) =>
-      row.ingredient ? [mealIngredientMacros(row.ingredient, row.amount)] : [],
+      row.ingredient ? [mealIngredientMacros(row.ingredient, row.amount, row.unit_id)] : [],
     ),
   );
 
@@ -42,18 +43,16 @@ export const draftMacros = (
     draft.flatMap((row) => {
       const ingredient = catalogById.get(row.ingredientId);
       const amount = parseAmount(row.amount);
-      return ingredient && amount !== null ? [mealIngredientMacros(ingredient, amount)] : [];
+      return ingredient && amount !== null
+        ? [mealIngredientMacros(ingredient, amount, row.unitId)]
+        : [];
     }),
   );
-
-/** Comentario de la comida al planificar una receta propia: "Nombre: descripción" */
-export const customRecipeComment = (recipe: Pick<CustomRecipe, "name" | "description">) => {
-  const description = recipe.description?.trim();
-  return description ? `${recipe.name}: ${description}` : recipe.name;
-};
 
 /** Los alimentos de una receta propia como ingredientes de una comida del planing */
 export const customRecipeIngredients = (recipe: CustomRecipe): DraftMealIngredient[] =>
   recipe.ingredients.flatMap((row) =>
-    row.ingredient ? [{ ingredientId: row.ingredient.id, amount: row.amount }] : [],
+    row.ingredient
+      ? [{ ingredientId: row.ingredient.id, amount: row.amount, unitId: row.unit_id }]
+      : [],
   );

@@ -10,6 +10,7 @@ const PagePrivacyPolicy = lazy(() => import("./pages/privacyPolicy"));
 const PageReferences = lazy(() => import("./pages/references"));
 const NotFoundPage = lazy(() => import("./pages/error/NotFoundPage"));
 const PageInfo = lazy(() => import("./pages/info/info"));
+const PageDatabaseEditors = lazy(() => import("./pages/editors"));
 
 function App() {
   return (
@@ -40,6 +41,15 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path={APP_ROUTES.DATABASE_EDITORS_WILD}
+            element={
+              <ProtectedRoute databaseEditorRequired={true}>
+                <PageDatabaseEditors />
+              </ProtectedRoute>
+            }
+          />
+
           {/* 404 - Catch all unmatched routes */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

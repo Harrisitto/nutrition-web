@@ -45,9 +45,9 @@ export const useFetchNutritionistNotesForDateRange = ({
                 throw new Error("Client ID is not defined");
             }
 
-            const response = await supabase.from('client_notes')
+            const response = await supabase.from('nutri_client_notes')
                 .select('*')
-                .eq('user_id', clientId)
+                .eq('client_id', clientId)
                 .gte('created_at', start.toISOString())
                 .lt('created_at', afterEnd.toISOString())
                 .order('created_at');
@@ -77,9 +77,9 @@ export const useSearchNutritionistNote = ({
                 throw new Error("Client ID is not defined");
             }
 
-            const response = await supabase.from('client_notes')
+            const response = await supabase.from('nutri_client_notes')
                 .select('*')
-                .eq('user_id', clientId)
+                .eq('client_id', clientId)
                 .ilike('note', `%${trimmed}%`)
                 .order('created_at', { ascending: false });
 
@@ -133,11 +133,11 @@ export const useMutateNutritionistNote = () => {
             const finalStatus = status === "note" ? null : done ? "done" : "pending";
 
             const response = id === null
-                ? await supabase.from('client_notes')
-                    .insert({ ...fields, status: finalStatus, user_id: clientId!, appointment_id: appointment_id ?? null })
+                ? await supabase.from('nutri_client_notes')
+                    .insert({ ...fields, status: finalStatus, client_id: clientId!, appointment_id: appointment_id ?? null })
                     .select()
                     .single()
-                : await supabase.from('client_notes')
+                : await supabase.from('nutri_client_notes')
                     .update(appointment_id === undefined
                         ? { ...fields, status: finalStatus }
                         : { ...fields, status: finalStatus, appointment_id })
@@ -151,7 +151,7 @@ export const useMutateNutritionistNote = () => {
 
             return response.data;
         },
-        onSuccess: (note) => invalidateClientNotes(note.user_id),
+        onSuccess: (note) => invalidateClientNotes(note.client_id),
     });
 };
 
@@ -159,10 +159,10 @@ export const useMutateNutritionistNote = () => {
 export const useCompleteNutritionistNote = () => {
     return useMutation({
         mutationFn: async ({ id, done }: { id: number; done: boolean }) => {
-            const response = await supabase.from('client_notes')
+            const response = await supabase.from('nutri_client_notes')
                 .update({ status: done ? "done" : "pending" })
                 .eq('id', id)
-                .select('user_id')
+                .select('client_id')
                 .single();
 
             if (response.error) {
@@ -171,7 +171,7 @@ export const useCompleteNutritionistNote = () => {
 
             return response.data;
         },
-        onSuccess: (note) => invalidateClientNotes(note.user_id),
+        onSuccess: (note) => invalidateClientNotes(note.client_id),
     });
 };
 
@@ -179,10 +179,10 @@ export const useDeleteNutritionistNote = () => {
     return useMutation({
         mutationFn: async (noteId: number) => {
             // Devuelve el cliente de la nota para refrescar sus listas
-            const response = await supabase.from('client_notes')
+            const response = await supabase.from('nutri_client_notes')
                 .delete()
                 .eq('id', noteId)
-                .select('user_id')
+                .select('client_id')
                 .single();
 
             if (response.error) {
@@ -191,7 +191,7 @@ export const useDeleteNutritionistNote = () => {
 
             return response.data;
         },
-        onSuccess: (note) => invalidateClientNotes(note.user_id),
+        onSuccess: (note) => invalidateClientNotes(note.client_id),
     });
 };
 
@@ -212,7 +212,7 @@ export const useFetchScheduledNutritionistNotes = ({
                 throw new Error("Nutritionist ID is not defined");
             }
 
-            const response = await supabase.from('client_notes')
+            const response = await supabase.from('nutri_client_notes')
                 .select('*, client: nutri_clients(name)')
                 .eq('nutri_id', nutritionistId)
                 .eq('scheduled_date', date)
@@ -242,7 +242,7 @@ export const useFetchPendingNutritionistTasks = () => {
                 throw new Error("Nutritionist ID is not defined");
             }
 
-            const response = await supabase.from('client_notes')
+            const response = await supabase.from('nutri_client_notes')
                 .select('*, client: nutri_clients(name)')
                 .eq('nutri_id', nutritionistId)
                 .eq('status', 'pending')

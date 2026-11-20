@@ -20,8 +20,8 @@ export const useCloneWeek = () => {
       const fromMonday = from.thisMonday();
       const toMonday = to.thisMonday();
 
-      const { error } = await supabase.rpc("clone_week_planing", {
-        p_user_id: userId,
+      const { error } = await supabase.rpc("user_planning_days_clone_week", {
+        p_client_id: userId,
         p_from_monday: fromMonday.save(),
         p_to_monday: toMonday.save(),
       });

@@ -4,6 +4,7 @@ import { Plus } from "lucide-react";
 import { primaryIconButtonStyle } from "@src/components/styles";
 import type { Form } from "@src/hooks/form/class";
 import { fieldIds } from "./form";
+import { useNotification } from "@src/store/slices/notification/hook";
 
 export const BtnInsertAppointment = ({
     form,
@@ -11,6 +12,7 @@ export const BtnInsertAppointment = ({
     form: Form;
 }) => {
     const { t } = useTranslation();
+    const { addMutationError } = useNotification();
     const insertAppointmentTheme = useInsertAppointmentTheme();
 
     const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -22,7 +24,7 @@ export const BtnInsertAppointment = ({
             { name: state[fieldIds.name] as string },
             {
                 onSuccess: () => form.reset(),
-                onError: (error) => console.error("Error inserting appointment theme:", error),
+                onError: addMutationError,
             },
         );
     };

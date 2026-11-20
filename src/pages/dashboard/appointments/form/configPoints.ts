@@ -33,8 +33,8 @@ export const useFormAppointmentPoints = (appointmentId: number) => {
   const deletePoint = useDeleteAppointmentPointFromAppointment();
   const setTreated = useSetPointTreated();
 
-  const points = appointmentQuery.data?.appointment_points ?? [];
-  const clientPoints = appointmentQuery.data?.user_appointment_points ?? [];
+  const points = appointmentQuery.data?.nutri_points ?? [];
+  const clientPoints = appointmentQuery.data?.client_points ?? [];
 
   // Los puntos nuevos o traidos van al final de la consulta
   const addPoint = (newPoint: NewPoint, onSuccess?: () => void) =>

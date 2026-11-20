@@ -155,7 +155,7 @@ export const useRenameDocument = () => {
 
 /**
  * Borra el fichero del bucket; el trigger nutritionist_documents_on_delete borra la fila, sus
- * adjuntos en consultas y deja a null user_planing.document_id
+ * adjuntos en consultas y deja a null el document_id de los días (user_planning_days)
  */
 export const useDeleteDocument = () => {
     const { data: sessionData } = useGetAuthSession();

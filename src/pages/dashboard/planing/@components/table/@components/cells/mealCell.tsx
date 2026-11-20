@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import {
   filterMealIngredients,
   useFetchMealIngredientsForDate,
+  useUnitLabel,
 } from "@src/services/tanstack/data/ingredients";
 import type { MealRowInfo } from "../../types";
 import MealTypeEditor from "../inputs/mealSelectInput";
@@ -47,6 +48,7 @@ const CellMeal = ({
   closeEditor,
 }: CellMealProps) => {
   const { t } = useTranslation();
+  const unitLabel = useUnitLabel();
   // Misma query semanal para todas las celdas: una sola petición por semana
   const { data: weekIngredients } = useFetchMealIngredientsForDate({ date });
   const extraIngredients = cellValue
@@ -63,7 +65,7 @@ const CellMeal = ({
     : undefined;
   const ingredientLines = extraIngredients.map(
     (el) =>
-      `${el.ingredient?.name ?? "-"} · ${round(el.amount)}${el.ingredient?.units ? ` ${el.ingredient.units}` : ""}`,
+      `${el.ingredient?.name ?? "-"} · ${round(el.amount)} ${unitLabel(el.unit_id)}`,
   );
   // El title muestra lo mismo que el hover cuando el texto no cabe en la celda
   const tooltip = [fixedRecipe, ...ingredientLines, recipeComment]
@@ -130,7 +132,7 @@ const CellMeal = ({
                     className={`mt-0.5 text-left text-[11px] font-normal opacity-80 ${revealClass}`}
                   >
                     {ingredientLines.map((line, index) => (
-                      <li key={extraIngredients[index].id}>+ {line}</li>
+                      <li key={extraIngredients[index].ingredient_id}>+ {line}</li>
                     ))}
                   </ul>
                 )}

@@ -388,6 +388,9 @@
             "myRecipes": {
                 "title": "Mis recetas",
                 "description": "Crea tus recetas a partir de los alimentos del catálogo."
+            },
+            "databaseEditors": {
+                "title": "Editores"
             }
         }
     },
@@ -733,18 +736,19 @@
             "search": "Buscar alimento...",
             "noResults": "Sin resultados",
             "amount": "Cantidad",
+            "unit": "Unidad",
             "removeIngredient": "Quitar alimento",
             "cancel": "Cancelar",
             "save": "Guardar cambios",
             "create": "Crear receta",
             "type": {
-                "label": "Tipo de receta",
+                "label": "Ajustar a un tipo (opcional)",
                 "status": {
-                    "custom": "Sin tipo del catálogo: se guardará como receta propia, sin comprobar macros.",
+                    "custom": "Las recetas no tienen tipo: la planificación las ofrece en los tipos a cuyas macros llegan. Elige un tipo para ajustar las cantidades a él.",
                     "incomplete": "Añade alimentos con cantidad para comprobar si encajan en el tipo.",
                     "checking": "Cargando las macros del tipo...",
                     "match": "Los alimentos encajan en este tipo.",
-                    "noMatch": "Los alimentos no encajan en este tipo: se guardará como receta propia."
+                    "noMatch": "Con estas cantidades no encaja en este tipo. Se guarda igual."
                 },
                 "chart": {
                     "fits": "Encaja en «{{type}}»",
@@ -781,6 +785,22 @@
         "client": {
             "title": "Recetas del cliente",
             "description": "Recetas propias de este cliente, hechas con alimentos del catálogo."
+        }
+    },
+    "databaseEditors": {
+        "title": "Editores de la base de datos",
+        "description": "Recetas del catálogo. Por ahora solo se pueden consultar: crear, editar y revisar recetas llegará más adelante.",
+        "back": "Volver al dashboard",
+        "recipes": {
+            "search": "Buscar receta por nombre...",
+            "empty": "No hay recetas",
+            "backToList": "Volver a la lista",
+            "id": "Id",
+            "name": "Nombre",
+            "prot": "Proteína",
+            "hc": "Hidratos",
+            "fat": "Grasa",
+            "ingredients": "Alimentos"
         }
     }
 }

@@ -4,7 +4,7 @@ import { CalendarClock, Check, Pencil, Trash2, X } from "lucide-react";
 import FromDate from "@src/helpers/dates";
 import { useLanguageCode } from "@src/hooks/helpers/language";
 import { deleteButtonStyle, primaryButtonStyle } from "@src/components/styles";
-import type { Tables } from "@src/services/supabase/types";
+import type { ViewRow } from "@src/services/supabase/database";
 import {
   useCompleteNutritionistNote,
   useDeleteNutritionistNote,
@@ -19,7 +19,7 @@ import {
 import { NoteFieldsInputs } from "./noteFields";
 import { PriorityTag } from "./priorityTag";
 
-type Note = Tables<"client_notes"> & { client?: { name: string } | null };
+type Note = ViewRow<"nutri_client_notes"> & { client?: { name: string } | null };
 
 // Lo guardado de la nota, tal como lo edita el formulario
 const toFields = (note: Note): NoteFields => ({

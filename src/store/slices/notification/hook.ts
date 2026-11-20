@@ -1,6 +1,7 @@
 import { useAppDispatch, useAppSelector } from "@src/store/store"
 import { add, remove, type Notification } from "./store";
 import { useCallback } from "react";
+import { isNoSubscriptionError } from "@src/services/supabase/errors";
 
 const useAddNotification = () => {
     const dispatch = useAppDispatch();
@@ -73,10 +74,11 @@ export const useNotification = () => {
         });
     }, [addNotification]);
 
-    const addMutationError = useCallback(() => {
+    // Con el error de la mutacion, el de sin suscripcion (55000) tiene su propio mensaje
+    const addMutationError = useCallback((error?: unknown) => {
         addNotification({
             type: "error",
-            message: "system:messages.mutationError",
+            message: isNoSubscriptionError(error) ? "system:messages.noSubscription" : "system:messages.mutationError",
         });
     }, [addNotification]);
 

@@ -3,11 +3,15 @@ import { useTranslation } from "react-i18next";
 import { Plus, Trash2 } from "lucide-react";
 import { useAppSelector } from "@src/store/store";
 import {
+  defaultIngredientUnit,
   mealIngredientMacros,
+  referenceAmount,
   useFetchCustomIngredients,
+  useUnitLabel,
   type CustomIngredient,
   type DraftMealIngredient,
 } from "@src/services/tanstack/data/ingredients";
+import { UnitSelect } from "@src/components/shared/recipes/@components/ingredients";
 import ModalShell from "./default/portal";
 import { draftMacros, parseAmount } from "@src/components/shared/recipes/helpers";
 import type { Macros } from "@src/helpers/macros";
@@ -24,7 +28,7 @@ const normalize = (str: string) =>
 const round = (value: number) => Math.round(value * 10) / 10;
 
 // La cantidad se guarda como texto mientras se escribe ("" o "1." son válidos al teclear)
-type DraftRow = { ingredientId: number; amount: string };
+type DraftRow = { ingredientId: number; amount: string; unitId: number };
 
 
 
@@ -44,11 +48,13 @@ const DraftIngredientRow = ({
   row,
   ingredient,
   onChangeAmount,
+  onChangeUnit,
   onRemove,
 }: {
   row: DraftRow;
   ingredient?: CustomIngredient;
   onChangeAmount: (amount: string) => void;
+  onChangeUnit: (unitId: number) => void;
   onRemove: () => void;
 }) => {
   const { t } = useTranslation();
@@ -61,7 +67,7 @@ const DraftIngredientRow = ({
           {ingredient?.name ?? "-"}
         </span>
         {ingredient && amount !== null && (
-          <MacrosLine macros={mealIngredientMacros(ingredient, amount)} />
+          <MacrosLine macros={mealIngredientMacros(ingredient, amount, row.unitId)} />
         )}
       </div>
       <label className="flex shrink-0 items-center gap-1">
@@ -77,7 +83,7 @@ const DraftIngredientRow = ({
             amount === null ? "border-nutrition-red" : "border-nutrition-green/30"
           }`}
         />
-        <span className="w-8 text-xs text-text-muted">{ingredient?.units ?? ""}</span>
+        <UnitSelect ingredient={ingredient} unitId={row.unitId} onChange={onChangeUnit} />
       </label>
       <button
         type="button"
@@ -104,7 +110,7 @@ interface IngredientsEditorProps {
 }
 
 /**
- * Borrador de los ingredientes extra de una comida (user_planing_meal_ingredients).
+ * Borrador de los ingredientes extra de una comida (user_planning_meal_ingredients).
  * No guarda nada por sí mismo: al pulsar "Hecho" entrega la lista al padre.
  */
 const IngredientsEditor = ({
@@ -125,10 +131,12 @@ const IngredientsEditor = ({
     initialIngredients.map((el) => ({
       ingredientId: el.ingredientId,
       amount: String(el.amount),
+      unitId: el.unitId,
     })),
   );
 
   const catalog = useFetchCustomIngredients();
+  const unitLabel = useUnitLabel();
 
   const catalogById = useMemo(
     () => new Map((catalog.data ?? []).map((el) => [el.id, el])),
@@ -150,14 +158,20 @@ const IngredientsEditor = ({
 
   const hasInvalidAmount = draft.some((row) => parseAmount(row.amount) === null);
 
-  // Se añade con la cantidad de referencia del catálogo; luego se ajusta en la lista
+  // Se añade con una ración (1 unidad, o 100 g o ml); luego se ajusta en la lista
   const addIngredient = (ingredient: CustomIngredient) => {
-    if (addedIds.has(ingredient.id)) return;
+    const unit = defaultIngredientUnit(ingredient);
+    if (addedIds.has(ingredient.id) || !unit) return;
     setDraft((prev) => [
       ...prev,
-      { ingredientId: ingredient.id, amount: String(ingredient.amount || 1) },
+      { ingredientId: ingredient.id, amount: String(referenceAmount(unit)), unitId: unit.unit_id },
     ]);
   };
+
+  const changeUnit = (ingredientId: number, unitId: number) =>
+    setDraft((prev) =>
+      prev.map((row) => (row.ingredientId === ingredientId ? { ...row, unitId } : row)),
+    );
 
   const changeAmount = (ingredientId: number, amount: string) =>
     setDraft((prev) =>
@@ -173,6 +187,7 @@ const IngredientsEditor = ({
       draft.map((row) => ({
         ingredientId: row.ingredientId,
         amount: parseAmount(row.amount)!,
+        unitId: row.unitId,
       })),
     );
   };
@@ -210,6 +225,7 @@ const IngredientsEditor = ({
                     row={row}
                     ingredient={catalogById.get(row.ingredientId)}
                     onChangeAmount={(amount) => changeAmount(row.ingredientId, amount)}
+                    onChangeUnit={(unitId) => changeUnit(row.ingredientId, unitId)}
                     onRemove={() => removeIngredient(row.ingredientId)}
                   />
                 ))}
@@ -246,22 +262,24 @@ const IngredientsEditor = ({
             )}
             {results.map((ingredient) => {
               const isAdded = addedIds.has(ingredient.id);
+              const unit = defaultIngredientUnit(ingredient);
+              const reference = referenceAmount(unit);
               return (
                 <li key={ingredient.id}>
                   <button
                     type="button"
                     onClick={() => addIngredient(ingredient)}
-                    disabled={isAdded}
+                    disabled={isAdded || !unit}
                     className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left transition-colors hover:bg-nutrition-green/15 disabled:cursor-default disabled:opacity-50 disabled:hover:bg-transparent"
                   >
                     <div className="flex min-w-0 flex-1 flex-col">
                       <span className="truncate text-sm text-dark-green">
                         {ingredient.name}{" "}
                         <span className="text-xs text-text-muted">
-                          ({ingredient.amount} {ingredient.units ?? ""})
+                          ({reference} {unitLabel(unit?.unit_id)})
                         </span>
                       </span>
-                      <MacrosLine macros={mealIngredientMacros(ingredient, ingredient.amount)} />
+                      <MacrosLine macros={mealIngredientMacros(ingredient, reference, unit?.unit_id)} />
                     </div>
                     {!isAdded && (
                       <Plus className="size-4 shrink-0 text-nutrition-green" aria-hidden />

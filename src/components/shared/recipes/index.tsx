@@ -17,16 +17,17 @@ import { RecipeTypeFitChart } from "./@components/typeFitChart";
 import { draftMacros, parseAmount, type DraftRecipeIngredient } from "./helpers";
 import { fitAmountsToMacros } from "./fitAmounts";
 import { fieldIds, useCustomRecipeForm } from "./form";
-import { doIngredientsMatchRecipeType } from "./@api/matchType";
 
 const toDraft = (recipe: CustomRecipe | null | undefined): DraftRecipeIngredient[] =>
   (recipe?.ingredients ?? []).flatMap((row) =>
-    row.ingredient ? [{ ingredientId: row.ingredient.id, amount: String(row.amount) }] : [],
+    row.ingredient
+      ? [{ ingredientId: row.ingredient.id, amount: String(row.amount), unitId: row.unit_id }]
+      : [],
   );
 
 type TypeStatus = "custom" | "incomplete" | "checking" | "match" | "noMatch";
 
-// Explica con qué tipo se guardará la receta según el tipo elegido y sus alimentos
+// Si los alimentos encajan en el tipo elegido (solo una guía: la receta se guarda sin tipo)
 const TypeStatusHint = ({ status }: { status: TypeStatus }) => {
   const { t } = useTranslation();
   const text = t(`data:customRecipes.form.type.status.${status}`);
@@ -70,21 +71,19 @@ interface CustomRecipeFormProps {
 }
 
 /**
- * Crea o edita una receta propia (custom_recipes + custom_recipe_ingredients) en una sola
- * llamada a upsert_custom_recipe. Se usa en configuración (recetas del nutricionista) y en el
+ * Crea o edita una receta propia (user_recipes + user_recipe_ingredients) en una sola
+ * llamada a upsert_custom_recipe. Las recetas no tienen tipo: el tipo elegido solo sirve para ajustar
+ * las cantidades a sus macros; la planificación ofrece la receta en los tipos a los que llega. Se usa en configuración (recetas del nutricionista) y en el
  * dashboard (recetas del cliente). Para cambiar de receta, monta el componente con otra `key`.
  */
 const CustomRecipeForm = ({ recipe, toClient = false, onSaved, onCancel }: CustomRecipeFormProps) => {
   const { t } = useTranslation();
   const { addFormSubmitSucess, addInvalidForm, addMutationError } = useNotification();
   const { form, Fields } = useCustomRecipeForm(recipe);
-  // Id del tipo "receta propia" en la base de datos: ese tipo no se valida contra sus ingredientes
+  // Id del tipo "receta propia" en la base de datos: no tiene macros a las que ajustar
   const { data: customRecipeTypeId } = useSelectCustomRecipeId();
   const [ingredients, setIngredients] = useState<DraftRecipeIngredient[]>(() => toDraft(recipe));
-  const [selectedRecipeTypeId, setSelectedRecipeTypeId] = useState<number | null>(
-    () => recipe?.type_id ?? null,
-  );
-  const [isResolvingType, setIsResolvingType] = useState(false);
+  const [selectedRecipeTypeId, setSelectedRecipeTypeId] = useState<number | null>(null);
   const [adjustFailed, setAdjustFailed] = useState(false);
   const upsert = useUpsertCustomRecipe({ toClient });
   const catalog = useFetchCustomIngredients();
@@ -92,7 +91,7 @@ const CustomRecipeForm = ({ recipe, toClient = false, onSaved, onCancel }: Custo
 
   const isEditing = !!recipe;
   const hasInvalidAmount = ingredients.some((row) => parseAmount(row.amount) === null);
-  const isSaving = upsert.isPending || isResolvingType;
+  const isSaving = upsert.isPending;
 
   const catalogById = useMemo(
     () => new Map((catalog.data ?? []).map((el) => [el.id, el])),
@@ -131,7 +130,9 @@ const CustomRecipeForm = ({ recipe, toClient = false, onSaved, onCancel }: Custo
     if (!typeTarget) return;
     const rows = ingredients.flatMap((row) => {
       const ingredient = catalogById.get(row.ingredientId);
-      return ingredient ? [{ id: row.ingredientId, ingredient, amount: parseAmount(row.amount) }] : [];
+      return ingredient
+        ? [{ id: row.ingredientId, ingredient, amount: parseAmount(row.amount), unitId: row.unitId }]
+        : [];
     });
     const result = fitAmountsToMacros(rows, typeTarget);
     const adjusted = new Map(rows.map((row, i) => [row.id, result.amounts[i]]));
@@ -144,28 +145,7 @@ const CustomRecipeForm = ({ recipe, toClient = false, onSaved, onCancel }: Custo
     setAdjustFailed(!result.fits);
   };
 
-  /**
-   * Tipo con el que se guarda: el elegido si los alimentos encajan; si no (o no hay tipo), el de
-   * receta propia. Así upsert_custom_recipe nunca falla con 23514 por macros que no encajan.
-   * La UI calcula el encaje en local (Macros.fits), pero aquí decide la base de datos, con la misma
-   * regla y su catálogo
-   */
-  const resolveTypeId = async (): Promise<number | null> => {
-    const fallback = customRecipeTypeId ?? null;
-    if (!needsCheck) return selectedRecipeTypeId ?? fallback;
-    try {
-      const match = await doIngredientsMatchRecipeType(
-        ingredients.map((row) => ({ id: row.ingredientId, amount: parseAmount(row.amount)! })),
-        selectedRecipeTypeId,
-      );
-      return match ? selectedRecipeTypeId : fallback;
-    } catch (error) {
-      console.error("Error checking if ingredients match recipe type:", error);
-      return fallback;
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isSaving) return;
     // Validar todo antes de cortar: validateForm marca los errores de cada campo
@@ -176,24 +156,16 @@ const CustomRecipeForm = ({ recipe, toClient = false, onSaved, onCancel }: Custo
     }
 
     const state = form.getState();
-    setIsResolvingType(true);
-    const typeId = await resolveTypeId();
-    setIsResolvingType(false);
-    // type_id es obligatorio: sin tipo elegido ni el de "receta propia" cargado no se puede guardar
-    if (typeId === null) {
-      addMutationError();
-      return;
-    }
 
     upsert.mutate(
       {
         id: recipe?.id,
         name: state[fieldIds.name] as string,
         description: (state[fieldIds.description] as string) || null,
-        typeId,
         ingredients: ingredients.map((row) => ({
           ingredient_id: row.ingredientId,
           amount: parseAmount(row.amount)!,
+          unit_id: row.unitId,
         })),
       },
       {

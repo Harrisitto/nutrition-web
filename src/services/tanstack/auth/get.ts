@@ -38,6 +38,7 @@ const startAuthListener = () => {
     if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") {
       queryClient.invalidateQueries({ queryKey: queryKeys().auth.profileBase })
       queryClient.invalidateQueries({ queryKey: queryKeys().auth.subscriptionBase })
+      queryClient.invalidateQueries({ queryKey: queryKeys().auth.databaseEditorBase })
     }
   })
 }

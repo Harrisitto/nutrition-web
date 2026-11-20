@@ -115,7 +115,7 @@ export const MacrosResume = ({
 
   const presetMacros = useMemo(() => {
     const total = Macros.sum(
-      preset.user_preset_meal.map((meal) => Macros.from(meal.type_id)),
+      preset.meals.map((meal) => Macros.from(meal.type)),
     );
     const data = { carbs: total.hc, fat: total.fat, protein: total.prot };
 
@@ -133,7 +133,7 @@ export const MacrosResume = ({
       fatPerKg: data.fat / userWeight.data,
       proteinPerKg: data.protein / userWeight.data,
     };
-  }, [preset.user_preset_meal, userWeight.data]);
+  }, [preset.meals, userWeight.data]);
 
   return (
     <section className="mt-3 rounded-xl border border-nutrition-green/30 bg-gradient-to-br from-nutrition-green/15 via-nutrition-green/10 to-white-green/60 p-4 shadow-sm">

@@ -8,12 +8,12 @@ export const useFetchAppointmentThemes = () => {
     queryKey: queryKeys().data.appointmentThemes,
     queryFn: async () => {
       const response = await supabase
-        .from('nutri_appointment_themes')
+        .from('nutri_themes')
         .select('*')
         .eq('is_deleted', false);
 
       if (response.error) {
-        throw new Error(response.error.message);
+        throw response.error;
       }
 
       return response.data;
@@ -25,13 +25,13 @@ export const useInsertAppointmentTheme = () => {
     return useMutation({
         mutationFn: async (newTheme: { name: string }) => {
             const response = await supabase
-                .from('nutri_appointment_themes')
+                .from('nutri_themes')
                 .insert(newTheme)
                 .select()
                 .single();
 
             if (response.error) {
-                throw new Error(response.error.message);
+                throw response.error;
             }
 
             return response.data;
@@ -47,14 +47,14 @@ export const useChangeAppointmentTheme = () => {
     return useMutation({
         mutationFn: async (updatedTheme: { id: number; name: string }) => {
             const response = await supabase
-                .from('nutri_appointment_themes')
+                .from('nutri_themes')
                 .update({ name: updatedTheme.name })
                 .eq('id', updatedTheme.id)
                 .select()
                 .single();
 
             if (response.error) {
-                throw new Error(response.error.message);
+                throw response.error;
             }
 
             return response.data;
@@ -70,14 +70,14 @@ export const useDeleteAppointmentTheme = () => {
     return useMutation({
         mutationFn: async (themeId: number) => {
             const response = await supabase
-                .from('nutri_appointment_themes')
+                .from('nutri_themes')
                 .update({ is_deleted: true })
                 .eq('id', themeId)
                 .select()
                 .single();
 
             if (response.error) {
-                throw new Error(response.error.message);
+                throw response.error;
             }
 
             return response.data;
@@ -94,7 +94,7 @@ export const useFetchAppointmentThemeById = (themeId: number) => {
     queryKey: queryKeys().data.appointmentPoints(themeId),
     queryFn: async () => {
       const response = await supabase
-        .from('appointment_theme_points')
+        .from('nutri_theme_points')
         .select('*')
         .eq('theme_id', themeId)
         .order('in_days', { ascending: true })
@@ -102,7 +102,7 @@ export const useFetchAppointmentThemeById = (themeId: number) => {
         .order('id', { ascending: true });
 
       if (response.error) {
-        throw new Error(response.error.message);
+        throw response.error;
       }
 
       return response.data;
@@ -122,13 +122,13 @@ export const useInsertAppointmentPoint = () => {
       document_id: string | null;
     }) => {
       const response = await supabase
-        .from('appointment_theme_points')
+        .from('nutri_theme_points')
         .insert(newPoint)
         .select()
         .single();
 
       if (response.error) {
-        throw new Error(response.error.message);
+        throw response.error;
       }
 
       return response.data;
@@ -151,7 +151,7 @@ export const useChangeAppointmentPoint = () => {
       document_id: string | null;
     }) => {
       const response = await supabase
-        .from('appointment_theme_points')
+        .from('nutri_theme_points')
         .update({
           point: updatedPoint.point,
           in_days: updatedPoint.in_days,
@@ -163,7 +163,7 @@ export const useChangeAppointmentPoint = () => {
         .single();
 
       if (response.error) {
-        throw new Error(response.error.message);
+        throw response.error;
       }
 
       return response.data;
@@ -180,13 +180,13 @@ export const useRenameAppointmentPointGroup = () => {
   return useMutation({
     mutationFn: async (group: { theme_id: number; in_days: number; group_name: string | null }) => {
       const response = await supabase
-        .from('appointment_theme_points')
+        .from('nutri_theme_points')
         .update({ group_name: group.group_name })
         .eq('theme_id', group.theme_id)
         .eq('in_days', group.in_days);
 
       if (response.error) {
-        throw new Error(response.error.message);
+        throw response.error;
       }
     },
     onSuccess: (_, group) => {
@@ -199,14 +199,14 @@ export const useDeleteAppointmentPoint = () => {
   return useMutation({
     mutationFn: async (pointId: number) => {
       const response = await supabase
-        .from('appointment_theme_points')
+        .from('nutri_theme_points')
         .delete()
         .eq('id', pointId)
         .select()
         .single();
 
       if (response.error) {
-        throw new Error(response.error.message);
+        throw response.error;
       }
 
       return response.data;
