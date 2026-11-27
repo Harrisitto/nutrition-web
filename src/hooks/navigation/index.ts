@@ -2,41 +2,26 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useCallback } from 'react'
 import { APP_ROUTES } from './routes'
 import type { AppRoute } from './routes'
-import { DEFAULT_ROUTE_METADATA, ROUTE_METADATA } from './metadata'
 import { addRouteToStack } from '@src/store/slices/error/store'
 import { useAppDispatch } from '@src/store/store'
 import useSearchParams from './search_params'
-import { useGetAuthSession } from '@src/services/tanstack/auth/get'
 
 export default function useAppNavigation() {
     const navigate = useNavigate();
     const location = useLocation();
     const dispatch = useAppDispatch();
     const searchParams = useSearchParams();
-    const { data: session } = useGetAuthSession();
 
+    // Protected routes are guarded by ProtectedRoute, which reads the current session.
+    // Checking it here used the session captured by the caller's closure: right after
+    // verifying the OTP it was still null, so the dashboard was swapped for HOME.
     const navigateTo = useCallback((route: AppRoute, options?: { replace?: boolean; state?: unknown }) => {
-        const routeMetadata = ROUTE_METADATA[route] || DEFAULT_ROUTE_METADATA;
-        let routeState: Record<string, unknown> = {};
-        let finalRoute: AppRoute = route;
-
-        if (routeMetadata.isProtected && !session?.session) {
-            routeState = {
-                from: route,
-                message: 'Please sign in to access this page'
-            };
-            finalRoute = APP_ROUTES.HOME;
-        }
-        dispatch(addRouteToStack(finalRoute));
-        const extraState = options?.state && typeof options.state === 'object'
-            ? (options.state as Record<string, unknown>)
-            : {};
-
-        navigate(finalRoute, {
+        dispatch(addRouteToStack(route));
+        navigate(route, {
             replace: options?.replace,
-            state: { ...routeState, ...extraState }
+            state: options?.state,
         })
-    }, [dispatch, session, navigate]);
+    }, [dispatch, navigate]);
 
     const goBack = useCallback(() => {
         if (window.history.length > 1) {
